@@ -339,53 +339,10 @@ body .layer-selection-row {
   margin: 0 0 5px !important;
 }
 
-.subpanel-rail-title {
-  display: none !important;
-}
 
-.subpanel-rail-item {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  min-width: 24px;
-  height: 24px;
-  min-height: 24px;
-  padding: 0;
-  border: 1px solid rgba(255,255,255,.075);
-  border-radius: 6px;
-  background: rgba(255,255,255,.025);
-  color: rgba(235,235,245,.62);
-  cursor: pointer;
-  transform-origin: center;
-  transition: transform .12s ease, border-color .12s ease, background-color .12s ease, color .12s ease;
-}
 
-.subpanel-rail-item:hover {
-  transform: scale(1.025);
-  border-color: rgba(217,119,66,.26);
-  background: rgba(217,119,66,.075);
-  color: rgba(255,248,244,.94);
-}
 
-.subpanel-rail-item kbd {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  border: 0;
-  border-radius: inherit;
-  background: transparent;
-  color: rgba(245,245,247,.84);
-  font-family: inherit;
-  font-size: 8px;
-  font-weight: 650;
-  line-height: 1;
-}
 
-.subpanel-rail-item span {
-  display: none !important;
-}
 
 body:not(.quick-panel-mode) #scrollArea {
   display: grid !important;
@@ -890,7 +847,10 @@ main#scrollArea {
   min-height: calc(100vh - 98px) !important;
 }
 
-#assistantHub {
+/* Guarded like every other #assistantHub rule in this file. Unguarded, this
+   !important block pinned the hub over the whole surface in quick-panel
+   mode too, covering the Quick Controls overlay. */
+body:not(.quick-panel-mode) #assistantHub {
   position: absolute !important;
   display: flex !important;
   left: var(--tnt-filter-gutter, 32px) !important;

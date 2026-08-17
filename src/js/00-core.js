@@ -591,7 +591,7 @@ function bindRailTooltipDelegation() {
   filterColumnEl.__railTooltipDelegated = true;
   let activeTarget = null;
   filterColumnEl.addEventListener("mouseover", event => {
-    const target = event.target.closest && event.target.closest(".filter-btn, .subpanel-rail-item");
+    const target = event.target.closest && event.target.closest(".filter-btn");
     if (!target || !filterColumnEl.contains(target)) return;
     activeTarget = target;
     showPanelTooltip(target, event);
@@ -624,7 +624,7 @@ function setupFilterTooltips() {
     "timing-order": "Timing and Layer Order\nStagger, sequence, and reorder selected layers",
     filter: "Filter\nShortcut: Shift+X"
   };
-  filterColumnEl.querySelectorAll(".filter-btn, .subpanel-rail-item").forEach(btn => {
+  filterColumnEl.querySelectorAll(".filter-btn").forEach(btn => {
     const tooltip = btn.id === "settingsBtn"
       ? "Settings\nPanel options and shortcut guide"
       : (btn.dataset.tooltip || tooltipByPanel[btn.dataset.subpanel]);

@@ -912,10 +912,6 @@ if (filterColumnEl) {
       toggleSettingsMenu();
       return;
     }
-    const panelBtn = e.target.closest && e.target.closest("[data-subpanel]");
-    if (!panelBtn) return;
-    e.preventDefault();
-    openSubpanelByKey(panelBtn.dataset.subpanel);
   });
 }
 

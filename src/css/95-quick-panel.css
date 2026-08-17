@@ -21,6 +21,16 @@ body.quick-panel-mode > .active-filter-notice {
   display: none !important;
 }
 
+/* The docked panel's chrome must never surface in the overlay. Named explicitly
+   rather than relying on <main> being hidden: both of these carry !important
+   display/position rules of their own, and this file builds last, so any future
+   unguarded override in an earlier module still loses here. */
+body.quick-panel-mode #assistantHub,
+body.quick-panel-mode #filterColumn,
+body.quick-panel-mode #scrollArea {
+  display: none !important;
+}
+
 body.quick-panel-mode .quick-panel-shell {
   display: flex;
   position: fixed;
