@@ -2727,7 +2727,7 @@ if (assistantHubEl) {
   loadAssistantSessions();
   loadAssistantSavedFunctions();
   if (!assistantSessions.length) createAssistantSession();
-  assistantCurrentSessionId = assistantCurrentSession().id;
+  assistantCurrentSessionId = currentAssistantSession().id;
   renderAssistantSession(currentAssistantSession());
   renderAssistantHistoryMenu();
   renderAssistantDraftActions();
