@@ -17,7 +17,7 @@ swiftc \
   -framework Cocoa \
   -framework Carbon \
   -framework WebKit \
-  "$source_file" \
+  "$root/native-helper/Sources/"*.swift \
   -o "$macos/TNTQuickControls"
 
 codesign --force --deep --sign - "$app"

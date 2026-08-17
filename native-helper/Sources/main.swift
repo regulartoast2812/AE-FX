@@ -1,5 +1,6 @@
 import Cocoa
 import Carbon
+import Network
 import WebKit
 
 private let afterEffectsBundleIdentifier = "com.adobe.AfterEffects.application"
@@ -218,47 +219,11 @@ private final class AfterEffectsBridge: NSObject, WKScriptMessageHandler {
         }
 
         onExecutionStarted?()
-        executionQueue.async { [weak self] in
-            let resultURL = FileManager.default.temporaryDirectory
-                .appendingPathComponent("tnt-quick-\(requestId)-\(UUID().uuidString).txt")
-            let wrappedScript = """
-            (function () {
-                var __tntResult = "";
-                try {
-                    __tntResult = eval(\(javaScriptLiteral(script)));
-                    if (__tntResult === undefined || __tntResult === null) __tntResult = "";
-                } catch (__tntError) {
-                    __tntResult = JSON.stringify({ ok: false, error: String(__tntError) });
-                }
-                var __tntFile = new File(\(javaScriptLiteral(resultURL.path)));
-                __tntFile.encoding = "UTF-8";
-                if (__tntFile.open("w")) {
-                    __tntFile.write(String(__tntResult));
-                    __tntFile.close();
-                }
-            }());
-            """
-            let source = """
-            tell application id "\(afterEffectsBundleIdentifier)"
-                DoScript \(appleScriptQuoted(wrappedScript))
-            end tell
-            """
-            var error: NSDictionary?
-            NSAppleScript(source: source)?.executeAndReturnError(&error)
-            let result: String
-            if let error {
-                let message = error[NSAppleScript.errorMessage] as? String ?? "Could not execute JSX."
-                let encoded = try? JSONSerialization.data(
-                    withJSONObject: ["ok": false, "error": message],
-                    options: []
-                )
-                result = encoded.flatMap { String(data: $0, encoding: .utf8) }
-                    ?? "{\"ok\":false,\"error\":\"Could not execute JSX.\"}"
-            } else {
-                result = (try? String(contentsOf: resultURL, encoding: .utf8)) ?? ""
-            }
-            try? FileManager.default.removeItem(at: resultURL)
-
+        sendToPanelBridge(
+            requestId: requestId,
+            script: script,
+            queue: executionQueue
+        ) { [weak self] result in
             DispatchQueue.main.async {
                 self?.webView?.evaluateJavaScript(
                     "window.__tntNativeResolve(\(javaScriptLiteral(requestId)), \(javaScriptLiteral(result)));"

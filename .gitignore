@@ -9,3 +9,7 @@ native-helper/.build/
 
 # macOS
 .DS_Store
+
+# .NET build output (native-helper-win)
+native-helper-win/bin/
+native-helper-win/obj/
