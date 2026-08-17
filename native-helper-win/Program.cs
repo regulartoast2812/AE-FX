@@ -31,14 +31,47 @@ internal static class Program
 internal static class PanelBridge
 {
     private const string Host = "127.0.0.1";
-    private const int Port = 8099;
     private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(15);
+
+    private const string Unreachable =
+        "Could not reach the panel bridge. " +
+        "Open the Premiere Style Timeline panel in After Effects.";
 
     private static string ErrorJson(string message) =>
         JsonSerializer.Serialize(new { ok = false, error = message });
 
+    private static string DiscoveryPath() => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+        ".tnt-quick-controls",
+        "bridge.json");
+
+    /// <summary>
+    /// Port and token are published by the panel; nothing here is hardcoded.
+    /// Returns null when the panel has never run or is currently closed.
+    /// </summary>
+    private static (int Port, string Token)? LoadEndpoint()
+    {
+        try
+        {
+            using var document = JsonDocument.Parse(File.ReadAllText(DiscoveryPath()));
+            var root = document.RootElement;
+            var port = root.GetProperty("port").GetInt32();
+            var token = root.GetProperty("token").GetString();
+            if (port <= 0 || port > 65535 || string.IsNullOrEmpty(token)) return null;
+            return (port, token);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
     public static async Task<string> SendAsync(string id, string script)
     {
+        var endpoint = LoadEndpoint();
+        if (endpoint is null) return ErrorJson(Unreachable);
+        var (port, token) = endpoint.Value;
+
         try
         {
             using var client = new TcpClient();
@@ -46,7 +79,7 @@ internal static class PanelBridge
 
             try
             {
-                await client.ConnectAsync(Host, Port, cts.Token);
+                await client.ConnectAsync(Host, port, cts.Token);
             }
             catch (OperationCanceledException)
             {
@@ -55,13 +88,11 @@ internal static class PanelBridge
             catch (SocketException)
             {
                 // Nothing listening - the panel is closed in After Effects.
-                return ErrorJson(
-                    $"Could not reach the panel bridge on {Host}:{Port}. " +
-                    "Open the Premiere Style Timeline panel in After Effects.");
+                return ErrorJson(Unreachable);
             }
 
             using var stream = client.GetStream();
-            var request = JsonSerializer.Serialize(new { id, script }) + "\n";
+            var request = JsonSerializer.Serialize(new { id, token, script }) + "\n";
             var payload = Encoding.UTF8.GetBytes(request);
             await stream.WriteAsync(payload, cts.Token);
             await stream.FlushAsync(cts.Token);
