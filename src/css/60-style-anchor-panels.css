@@ -1,0 +1,1816 @@
+/* v92: layer style editor revamp. No black header/footer bars; one soft glass tool surface. */
+.layer-style-dialog-backdrop {
+  align-items: flex-start !important;
+  padding: 64px 36px 28px !important;
+  background: rgba(0,0,0,.22) !important;
+}
+
+.layer-style-dialog {
+  width: min(1180px, calc(100vw - 72px)) !important;
+  max-height: calc(100vh - 92px) !important;
+  border-color: rgba(255,255,255,.18) !important;
+  background:
+    linear-gradient(145deg, rgba(70,70,72,.70), rgba(42,43,45,.68)),
+    rgba(45,46,48,.72) !important;
+  box-shadow:
+    0 26px 72px rgba(0,0,0,.44),
+    inset 0 1px 0 rgba(255,255,255,.10),
+    inset 0 0 0 1px rgba(255,255,255,.035) !important;
+  overflow: hidden !important;
+}
+
+.layer-style-dialog::before {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.10), transparent 38%),
+    radial-gradient(ellipse 62% 36% at 44% 0%, rgba(255,255,255,.07), transparent 68%),
+    radial-gradient(ellipse 42% 28% at 58% 12%, rgba(217,119,66,.10), transparent 72%) !important;
+}
+
+.layer-style-dialog-head {
+  min-height: 62px !important;
+  padding: 17px 20px 13px !important;
+  border-bottom: 1px solid rgba(255,255,255,.10) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.layer-style-dialog-title {
+  font-size: 18px !important;
+  line-height: 1.1 !important;
+  font-weight: 700 !important;
+  color: rgba(255,255,255,.95) !important;
+}
+
+.layer-style-dialog-subtitle {
+  display: block !important;
+  margin-top: 5px !important;
+  font-size: 11px !important;
+  color: rgba(235,235,245,.46) !important;
+}
+
+.layer-style-close {
+  background: rgba(255,255,255,.075) !important;
+  border-color: rgba(255,255,255,.16) !important;
+  color: rgba(245,245,247,.82) !important;
+}
+
+.layer-style-close:hover {
+  background: rgba(255,255,255,.13) !important;
+  border-color: rgba(255,255,255,.22) !important;
+}
+
+.layer-style-dialog-body {
+  padding: 0 20px 14px !important;
+  background: transparent !important;
+}
+
+.layer-style-layout {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  gap: 12px !important;
+}
+
+.layer-style-add-panel,
+.layer-style-edit-panel {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.layer-style-section-title {
+  margin: 0 0 8px !important;
+  color: rgba(235,235,245,.52) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+}
+
+.layer-style-header-add-row {
+  max-width: none !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px !important;
+  overflow: visible !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  border-radius: var(--tnt-radius-panel) !important;
+  background: rgba(255,255,255,.055) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055) !important;
+}
+
+.layer-style-header-add-row.empty {
+  min-height: 46px !important;
+}
+
+.layer-style-header-add-row.empty span {
+  color: rgba(235,235,245,.48) !important;
+}
+
+.layer-style-add-button {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  border-color: var(--style-color, #777) !important;
+  border-radius: 8px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.035)),
+    rgba(255,255,255,.07) !important;
+  color: rgba(255,255,255,.92) !important;
+  line-height: 32px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    inset 0 -3px 0 var(--style-color, #777),
+    0 7px 18px rgba(0,0,0,.16) !important;
+}
+
+.layer-style-add-button:hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07)),
+    rgba(255,255,255,.10) !important;
+  transform: translateY(-1px) !important;
+}
+
+.layer-style-add-button.drag-adding {
+  background:
+    linear-gradient(180deg, rgba(217,119,66,.34), rgba(217,119,66,.18)),
+    rgba(255,255,255,.10) !important;
+  transform: translateY(1px) !important;
+}
+
+.layer-style-edit-panel {
+  min-height: 0 !important;
+}
+
+.layer-style-node-row {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 280px)) !important;
+  align-items: start !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.layer-style-node {
+  width: auto !important;
+  min-width: 0 !important;
+  flex: none !important;
+  overflow: hidden !important;
+  border-color: rgba(255,255,255,.13) !important;
+  border-radius: var(--tnt-radius-panel) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.070), rgba(255,255,255,.038)),
+    rgba(36,37,39,.46) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.075),
+    0 12px 30px rgba(0,0,0,.18) !important;
+}
+
+.layer-style-node.disabled {
+  opacity: .58 !important;
+  filter: saturate(.72) brightness(.86) !important;
+}
+
+.layer-style-node.disabled:hover,
+.layer-style-node.mixed:hover {
+  opacity: .78 !important;
+}
+
+.layer-style-node-head {
+  padding: 11px 12px 9px !important;
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.layer-style-node-head strong {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: rgba(255,255,255,.92) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+.layer-style-node-controls {
+  gap: 7px !important;
+}
+
+.layer-style-toggle {
+  width: 34px !important;
+  height: 20px !important;
+  border-color: rgba(255,255,255,.15) !important;
+  background: rgba(0,0,0,.18) !important;
+}
+
+.layer-style-toggle span {
+  left: 3px !important;
+  top: 3px !important;
+  width: 14px !important;
+  height: 14px !important;
+  background: rgba(235,235,245,.66) !important;
+}
+
+.layer-style-toggle.on {
+  border-color: rgba(217,119,66,.42) !important;
+  background: rgba(217,119,66,.26) !important;
+}
+
+.layer-style-toggle.on span {
+  left: 16px !important;
+  background: #fff !important;
+}
+
+.layer-style-delete {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  border-color: rgba(255,120,120,.24) !important;
+  background: rgba(255,90,90,.09) !important;
+  color: rgba(255,190,190,.86) !important;
+}
+
+.layer-style-delete:hover {
+  background: rgba(255,90,90,.16) !important;
+  border-color: rgba(255,140,140,.34) !important;
+}
+
+.layer-style-node-props {
+  gap: 8px !important;
+  padding: 12px !important;
+}
+
+.layer-style-prop {
+  grid-template-columns: 72px minmax(72px, 1fr) 52px !important;
+  min-height: 28px !important;
+  gap: 8px !important;
+  color: rgba(235,235,245,.68) !important;
+}
+
+.layer-style-prop.inline {
+  grid-template-columns: 72px minmax(0, 1fr) !important;
+}
+
+.layer-style-prop span {
+  color: rgba(235,235,245,.62) !important;
+  font-size: 11px !important;
+}
+
+.layer-style-prop input[type="number"],
+.layer-style-prop select {
+  width: 52px !important;
+  height: 26px !important;
+  border-color: rgba(255,255,255,.12) !important;
+  background: rgba(255,255,255,.070) !important;
+}
+
+.layer-style-prop select {
+  width: 100% !important;
+}
+
+.layer-style-prop input[type="color"] {
+  width: 44px !important;
+  height: 28px !important;
+  border-color: rgba(255,255,255,.14) !important;
+  background: rgba(255,255,255,.075) !important;
+}
+
+.layer-style-prop input[type="range"]::-webkit-slider-runnable-track {
+  border-color: rgba(255,255,255,.12) !important;
+  background: rgba(255,255,255,.08) !important;
+}
+
+.layer-style-prop input[type="range"]::-webkit-slider-thumb {
+  border-color: rgba(217,119,66,.62) !important;
+  background: rgba(217,119,66,.34) !important;
+  box-shadow: 0 0 0 3px rgba(217,119,66,.12) !important;
+}
+
+.layer-style-dialog-actions {
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  padding: 12px 20px 18px !important;
+  border-top: 1px solid rgba(255,255,255,.08) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.layer-style-dialog-actions button {
+  border-color: rgba(255,255,255,.13) !important;
+  background: rgba(255,255,255,.065) !important;
+}
+
+.layer-style-dialog-actions button:hover {
+  background: rgba(255,255,255,.12) !important;
+}
+
+.layer-style-dialog-actions button.primary {
+  border-color: rgba(217,119,66,.36) !important;
+  background: rgba(217,119,66,.16) !important;
+}
+
+.layer-style-dialog-actions button.danger {
+  border-color: rgba(255,120,120,.24) !important;
+  background: rgba(255,90,90,.09) !important;
+  color: rgba(255,190,190,.88) !important;
+}
+
+.layer-style-empty,
+.layer-style-loading {
+  border: 1px solid rgba(255,255,255,.10) !important;
+  border-radius: var(--tnt-radius-panel) !important;
+  background: rgba(255,255,255,.045) !important;
+  color: rgba(235,235,245,.55) !important;
+}
+
+/* v93: darker transparent layer style glass. Less gray fill, more smoky depth. */
+.layer-style-dialog {
+  border-color: rgba(255,255,255,.13) !important;
+  background:
+    linear-gradient(145deg, rgba(38,39,38,.52), rgba(23,24,23,.58)),
+    rgba(22,23,23,.54) !important;
+  box-shadow:
+    0 30px 82px rgba(0,0,0,.52),
+    inset 0 1px 0 rgba(255,255,255,.065),
+    inset 0 0 0 1px rgba(255,255,255,.022) !important;
+}
+
+.layer-style-dialog::before {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.055), transparent 36%),
+    radial-gradient(ellipse 60% 34% at 42% 0%, rgba(255,255,255,.035), transparent 70%),
+    radial-gradient(ellipse 34% 22% at 58% 12%, rgba(217,119,66,.055), transparent 74%) !important;
+}
+
+.layer-style-dialog-head {
+  border-bottom-color: rgba(255,255,255,.065) !important;
+}
+
+.layer-style-dialog-title {
+  color: rgba(255,255,255,.91) !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,.46) !important;
+}
+
+.layer-style-dialog-subtitle,
+.layer-style-section-title {
+  color: rgba(235,235,245,.42) !important;
+}
+
+.layer-style-close,
+.layer-style-dialog-actions button {
+  border-color: rgba(255,255,255,.105) !important;
+  background: rgba(255,255,255,.040) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035) !important;
+}
+
+.layer-style-close:hover,
+.layer-style-dialog-actions button:hover {
+  border-color: rgba(255,255,255,.16) !important;
+  background: rgba(255,255,255,.075) !important;
+}
+
+.layer-style-header-add-row {
+  border-color: rgba(255,255,255,.075) !important;
+  background: rgba(0,0,0,.18) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035),
+    inset 0 0 0 1px rgba(0,0,0,.12) !important;
+}
+
+.layer-style-add-button {
+  border-color: var(--style-color, #777) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.060), rgba(255,255,255,.016)),
+    rgba(0,0,0,.24) !important;
+  color: rgba(245,245,247,.88) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.060),
+    inset 0 -3px 0 var(--style-color, #777),
+    0 7px 18px rgba(0,0,0,.22) !important;
+}
+
+.layer-style-add-button:hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.090), rgba(255,255,255,.028)),
+    rgba(0,0,0,.16) !important;
+}
+
+.layer-style-add-button.drag-adding {
+  background:
+    linear-gradient(180deg, rgba(217,119,66,.24), rgba(217,119,66,.105)),
+    rgba(0,0,0,.18) !important;
+}
+
+.layer-style-node {
+  border-color: rgba(255,255,255,.095) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.040), rgba(255,255,255,.014)),
+    rgba(15,16,16,.34) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.045),
+    0 14px 32px rgba(0,0,0,.24) !important;
+}
+
+.layer-style-node-head {
+  border-bottom-color: rgba(255,255,255,.055) !important;
+}
+
+.layer-style-node-head strong {
+  color: rgba(245,245,247,.88) !important;
+}
+
+.layer-style-prop span {
+  color: rgba(235,235,245,.52) !important;
+}
+
+.layer-style-prop input[type="number"],
+.layer-style-prop select,
+.layer-style-prop input[type="color"] {
+  border-color: rgba(255,255,255,.09) !important;
+  background: rgba(0,0,0,.22) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.028) !important;
+}
+
+.layer-style-prop input[type="range"]::-webkit-slider-runnable-track {
+  border-color: rgba(255,255,255,.085) !important;
+  background: rgba(0,0,0,.30) !important;
+}
+
+.layer-style-toggle {
+  border-color: rgba(255,255,255,.11) !important;
+  background: rgba(0,0,0,.30) !important;
+}
+
+.layer-style-delete {
+  border-color: rgba(255,120,120,.18) !important;
+  background: rgba(0,0,0,.20) !important;
+}
+
+.layer-style-dialog-actions {
+  border-top-color: rgba(255,255,255,.055) !important;
+}
+
+.layer-style-dialog-actions button.primary {
+  border-color: rgba(217,119,66,.30) !important;
+  background: rgba(217,119,66,.11) !important;
+}
+
+.layer-style-dialog-actions button.danger {
+  border-color: rgba(255,120,120,.18) !important;
+  background: rgba(255,70,70,.055) !important;
+}
+
+.layer-style-empty,
+.layer-style-loading {
+  border-color: rgba(255,255,255,.075) !important;
+  background: rgba(0,0,0,.16) !important;
+}
+
+/* v94: balanced anchor popover with paired align controls. */
+.anchor-dialog {
+  width: 390px !important;
+  padding: 22px !important;
+  border-color: rgba(255,255,255,.14) !important;
+  background:
+    linear-gradient(145deg, rgba(38,39,38,.58), rgba(23,24,23,.62)),
+    rgba(22,23,23,.58) !important;
+  box-shadow:
+    0 26px 70px rgba(0,0,0,.48),
+    inset 0 1px 0 rgba(255,255,255,.065) !important;
+}
+
+.anchor-dialog .dialog-title {
+  margin: 0 0 6px !important;
+  font-size: 18px !important;
+  line-height: 1.1 !important;
+}
+
+.anchor-dialog .dialog-subtitle {
+  max-width: 320px !important;
+  margin: 0 0 18px !important;
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+  color: rgba(235,235,245,.58) !important;
+}
+
+.anchor-panel {
+  display: grid;
+  grid-template-columns: 1fr 104px;
+  gap: 18px;
+  align-items: start;
+}
+
+.anchor-section {
+  min-width: 0;
+}
+
+.anchor-section-title {
+  margin: 0 0 10px;
+  color: rgba(235,235,245,.42);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.anchor-grid {
+  grid-template-columns: repeat(3, 46px) !important;
+  gap: 10px !important;
+  justify-content: start !important;
+  margin: 0 !important;
+}
+
+.anchor-cell {
+  width: 46px !important;
+  height: 46px !important;
+  border-color: rgba(255,255,255,.16) !important;
+  background: rgba(0,0,0,.34) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 7px 18px rgba(0,0,0,.18) !important;
+}
+
+.anchor-cell::after {
+  inset: 15px !important;
+  background: rgba(245,245,247,.78) !important;
+}
+
+.anchor-cell:hover {
+  border-color: rgba(255,255,255,.25) !important;
+  background: rgba(255,255,255,.055) !important;
+}
+
+.anchor-cell.active {
+  border-color: rgba(217,119,66,.52) !important;
+  background: rgba(217,119,66,.16) !important;
+}
+
+.anchor-cell.active::after {
+  background: rgba(110,174,255,.96) !important;
+}
+
+.anchor-option {
+  gap: 9px !important;
+  margin: 16px 0 0 !important;
+  color: rgba(235,235,245,.76) !important;
+  font-size: 12px !important;
+}
+
+.anchor-align-section {
+  padding-left: 18px;
+  border-left: 1px solid rgba(255,255,255,.075);
+}
+
+.anchor-align-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 28px);
+  gap: 8px;
+}
+
+.anchor-align-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--tnt-radius-control);
+  background: rgba(0,0,0,.26);
+  color: rgba(245,245,247,.84);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.anchor-align-btn:hover {
+  border-color: rgba(217,119,66,.36);
+  background: rgba(217,119,66,.13);
+  color: #fff;
+}
+
+.anchor-dialog .dialog-error {
+  min-height: 14px !important;
+  margin: 14px 0 0 !important;
+}
+
+/* v95: compact anchor/align blocks, back on the size guide. */
+.anchor-dialog {
+  width: 334px !important;
+  padding: 16px !important;
+}
+
+.anchor-dialog .dialog-title {
+  margin-bottom: 4px !important;
+  font-size: 15px !important;
+}
+
+.anchor-dialog .dialog-subtitle {
+  max-width: 280px !important;
+  margin-bottom: 12px !important;
+  font-size: 11px !important;
+}
+
+.anchor-panel {
+  grid-template-columns: 1fr 104px !important;
+  gap: 10px !important;
+}
+
+.anchor-section {
+  padding: 10px !important;
+  border: 1px solid rgba(255,255,255,.085) !important;
+  border-radius: var(--tnt-radius-panel) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012)),
+    rgba(0,0,0,.18) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035) !important;
+}
+
+.anchor-section-title {
+  margin-bottom: 8px !important;
+  font-size: 9px !important;
+}
+
+.anchor-grid {
+  grid-template-columns: repeat(3, 34px) !important;
+  gap: 8px !important;
+}
+
+.anchor-cell {
+  width: 34px !important;
+  height: 34px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.045),
+    0 5px 12px rgba(0,0,0,.16) !important;
+}
+
+.anchor-cell::after {
+  inset: 11px !important;
+}
+
+.anchor-option {
+  gap: 7px !important;
+  margin-top: 10px !important;
+  font-size: 11px !important;
+}
+
+.anchor-align-section {
+  padding-left: 10px !important;
+  border-left: 1px solid rgba(255,255,255,.085) !important;
+}
+
+.anchor-align-grid {
+  grid-template-columns: repeat(3, 26px) !important;
+  gap: 7px !important;
+}
+
+.anchor-align-btn {
+  width: 26px !important;
+  height: 26px !important;
+  font-size: 10px !important;
+}
+
+.anchor-dialog .dialog-error {
+  margin-top: 10px !important;
+}
+
+/* v96: no outer anchor shell; only two floating function blocks. */
+.anchor-dialog {
+  width: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.anchor-dialog::before {
+  content: none !important;
+  display: none !important;
+}
+
+.anchor-dialog .dialog-title,
+.anchor-dialog .dialog-subtitle {
+  display: none !important;
+}
+
+.anchor-panel {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+}
+
+.anchor-section {
+  width: auto !important;
+  min-width: 0 !important;
+  padding: 12px !important;
+  border-color: rgba(255,255,255,.11) !important;
+  border-radius: var(--tnt-radius-panel) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.040), rgba(255,255,255,.014)),
+    rgba(17,18,18,.56) !important;
+  box-shadow:
+    0 18px 44px rgba(0,0,0,.36),
+    inset 0 1px 0 rgba(255,255,255,.045) !important;
+}
+
+.anchor-section-title {
+  margin: 0 0 9px !important;
+}
+
+.anchor-grid {
+  grid-template-columns: repeat(3, 30px) !important;
+  gap: 8px !important;
+  justify-content: start !important;
+}
+
+.anchor-cell {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.anchor-cell::after {
+  inset: 10px !important;
+}
+
+.anchor-option {
+  margin-top: 10px !important;
+  white-space: nowrap !important;
+}
+
+.anchor-align-section {
+  padding: 12px !important;
+  border-left: 1px solid rgba(255,255,255,.11) !important;
+}
+
+.anchor-align-grid {
+  grid-template-columns: repeat(3, 26px) !important;
+  gap: 7px !important;
+}
+
+.anchor-dialog .dialog-error {
+  position: absolute !important;
+  left: 0 !important;
+  top: calc(100% + 6px) !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+/* v97: AE-style align panel with distribution controls. */
+.anchor-panel {
+  gap: 12px !important;
+}
+
+.anchor-align-section {
+  width: 210px !important;
+  padding: 12px !important;
+}
+
+.anchor-align-target {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 11px;
+  color: rgba(235,235,245,.66);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.anchor-align-target select {
+  height: 26px;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--tnt-radius-control);
+  background: rgba(255,255,255,.055);
+  color: rgba(235,235,245,.48);
+  padding: 0 22px 0 8px;
+  font-size: 11px;
+}
+
+.anchor-align-grid {
+  grid-template-columns: repeat(6, 24px) !important;
+  gap: 6px !important;
+  margin-bottom: 10px;
+}
+
+.anchor-distribute-title {
+  margin-top: 11px !important;
+  padding-top: 11px !important;
+  border-top: 1px solid rgba(255,255,255,.075);
+}
+
+.anchor-align-btn {
+  position: relative;
+  width: 24px !important;
+  height: 24px !important;
+  color: transparent !important;
+  overflow: hidden;
+}
+
+.anchor-align-btn::before,
+.anchor-align-btn::after {
+  content: "";
+  position: absolute;
+  background: rgba(235,235,245,.50);
+  border-radius: 1px;
+}
+
+.anchor-align-btn:hover::before,
+.anchor-align-btn:hover::after {
+  background: rgba(245,245,247,.82);
+}
+
+.anchor-align-btn.align-left::before,
+.anchor-align-btn.align-hcenter::before,
+.anchor-align-btn.align-right::before {
+  top: 5px;
+  bottom: 5px;
+  width: 2px;
+}
+
+.anchor-align-btn.align-left::before { left: 5px; }
+.anchor-align-btn.align-hcenter::before { left: 11px; }
+.anchor-align-btn.align-right::before { right: 5px; }
+
+.anchor-align-btn.align-left::after,
+.anchor-align-btn.align-hcenter::after,
+.anchor-align-btn.align-right::after {
+  width: 11px;
+  height: 3px;
+  top: 7px;
+  box-shadow: 0 7px 0 rgba(235,235,245,.50);
+}
+
+.anchor-align-btn.align-left::after { left: 8px; }
+.anchor-align-btn.align-hcenter::after { left: 6px; }
+.anchor-align-btn.align-right::after { right: 8px; }
+
+.anchor-align-btn.align-left:hover::after,
+.anchor-align-btn.align-hcenter:hover::after,
+.anchor-align-btn.align-right:hover::after {
+  box-shadow: 0 7px 0 rgba(245,245,247,.82);
+}
+
+.anchor-align-btn.align-top::before,
+.anchor-align-btn.align-vcenter::before,
+.anchor-align-btn.align-bottom::before {
+  left: 5px;
+  right: 5px;
+  height: 2px;
+}
+
+.anchor-align-btn.align-top::before { top: 5px; }
+.anchor-align-btn.align-vcenter::before { top: 11px; }
+.anchor-align-btn.align-bottom::before { bottom: 5px; }
+
+.anchor-align-btn.align-top::after,
+.anchor-align-btn.align-vcenter::after,
+.anchor-align-btn.align-bottom::after {
+  width: 3px;
+  height: 11px;
+  left: 7px;
+  top: 8px;
+  box-shadow: 7px 0 0 rgba(235,235,245,.50);
+}
+
+.anchor-align-btn.align-vcenter::after { top: 6px; }
+.anchor-align-btn.align-bottom::after { top: 5px; }
+
+.anchor-align-btn.align-top:hover::after,
+.anchor-align-btn.align-vcenter:hover::after,
+.anchor-align-btn.align-bottom:hover::after {
+  box-shadow: 7px 0 0 rgba(245,245,247,.82);
+}
+
+.anchor-align-btn[class*="dist-"]::before {
+  background: transparent;
+}
+
+.anchor-align-btn.dist-top::after,
+.anchor-align-btn.dist-vcenter::after,
+.anchor-align-btn.dist-bottom::after {
+  left: 5px;
+  width: 14px;
+  height: 2px;
+  top: 6px;
+  box-shadow: 0 5px 0 rgba(235,235,245,.50), 0 10px 0 rgba(235,235,245,.50);
+}
+
+.anchor-align-btn.dist-left::after,
+.anchor-align-btn.dist-hcenter::after,
+.anchor-align-btn.dist-right::after {
+  top: 5px;
+  width: 2px;
+  height: 14px;
+  left: 6px;
+  box-shadow: 5px 0 0 rgba(235,235,245,.50), 10px 0 0 rgba(235,235,245,.50);
+}
+
+.anchor-align-btn[class*="dist-"]:hover::after {
+  box-shadow: inherit;
+}
+
+/* v98: denser layer styles panel with full-name add buttons. */
+.layer-style-dialog {
+  width: min(860px, calc(100vw - 54px)) !important;
+}
+
+.layer-style-dialog-head {
+  min-height: 46px !important;
+  padding: 11px 14px 9px !important;
+}
+
+.layer-style-dialog-title {
+  font-size: 14px !important;
+}
+
+.layer-style-dialog-subtitle {
+  display: none !important;
+}
+
+.layer-style-dialog-body {
+  padding: 0 14px 10px !important;
+}
+
+.layer-style-layout {
+  gap: 8px !important;
+}
+
+.layer-style-header-add-row {
+  gap: 6px !important;
+  padding: 8px !important;
+}
+
+.layer-style-add-button {
+  width: auto !important;
+  height: 24px !important;
+  min-width: 0 !important;
+  min-height: 24px !important;
+  padding: 0 9px !important;
+  border-radius: var(--tnt-radius-control) !important;
+  line-height: 22px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  text-align: left !important;
+}
+
+.layer-style-add-button span {
+  display: block;
+  max-width: 112px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.layer-style-node-row {
+  grid-template-columns: repeat(auto-fill, minmax(186px, 220px)) !important;
+  gap: 8px !important;
+}
+
+.layer-style-node-head {
+  padding: 8px 9px 7px !important;
+}
+
+.layer-style-node-head strong {
+  font-size: 11px !important;
+}
+
+.layer-style-node-props {
+  padding: 8px !important;
+  gap: 6px !important;
+}
+
+.layer-style-prop {
+  grid-template-columns: 58px minmax(56px, 1fr) 44px !important;
+  min-height: 24px !important;
+  gap: 6px !important;
+  font-size: 10px !important;
+}
+
+.layer-style-prop.inline {
+  grid-template-columns: 58px minmax(0, 1fr) !important;
+}
+
+.layer-style-prop span {
+  font-size: 10px !important;
+}
+
+.layer-style-prop input[type="number"],
+.layer-style-prop select {
+  width: 44px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  font-size: 10px !important;
+}
+
+.layer-style-dialog-actions {
+  padding: 8px 14px 12px !important;
+  gap: 6px !important;
+}
+
+.layer-style-dialog-actions button {
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 9px !important;
+  font-size: 10px !important;
+}
+
+/* v99: anchor glass blur, quiet style add actions, bounded comp menu. */
+#anchorModal.show {
+  background: rgba(0,0,0,.30) !important;
+}
+
+.anchor-section {
+  -webkit-backdrop-filter: blur(18px) saturate(112%) !important;
+  backdrop-filter: blur(18px) saturate(112%) !important;
+}
+
+.layer-style-header-add-row {
+  padding: 4px 0 6px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.layer-style-add-button {
+  position: relative !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  padding: 0 6px 0 12px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: rgba(235,235,245,.66) !important;
+  line-height: 20px !important;
+  box-shadow: none !important;
+}
+
+.layer-style-add-button::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 6px;
+  width: 4px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--style-color, rgba(235,235,245,.45));
+  opacity: .72;
+}
+
+.layer-style-add-button:hover:not(:disabled),
+.layer-style-add-button.drag-adding {
+  border: 0 !important;
+  background: transparent !important;
+  color: rgba(245,245,247,.94) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.layer-style-add-button:hover:not(:disabled)::before,
+.layer-style-add-button.drag-adding::before {
+  opacity: 1;
+}
+
+.layer-style-add-button.all-have,
+.layer-style-add-button:disabled {
+  opacity: .42 !important;
+}
+
+.layer-style-add-button span {
+  max-width: 108px !important;
+}
+
+.comp-select-menu {
+  max-height: calc(100vh - 82px) !important;
+  padding: 6px !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+.comp-select-item {
+  border: 1px solid transparent !important;
+  border-radius: var(--tnt-radius-node) !important;
+}
+
+.comp-select-item.active {
+  border-color: rgba(217,119,66,.34) !important;
+  background: rgba(217,119,66,.16) !important;
+  color: rgba(255,255,255,.96) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+
+.comp-select-item.active .comp-select-detail {
+  color: rgba(255,226,206,.72) !important;
+}
+
+/* v100: persistent style option rectangles and header actions. */
+.layer-style-dialog:not(.mask-control-dialog) {
+  position: relative !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-dialog-head {
+  padding-right: 430px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) > .layer-style-dialog-actions {
+  position: absolute !important;
+  top: 10px !important;
+  right: 52px !important;
+  z-index: 4 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) > .layer-style-dialog-actions button {
+  height: 24px !important;
+  min-height: 24px !important;
+}
+
+.layer-style-header-add-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  padding: 6px 0 7px !important;
+}
+
+.layer-style-add-button {
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 9px 0 16px !important;
+  border: 1px solid rgba(255,255,255,.095) !important;
+  border-radius: var(--tnt-radius-control) !important;
+  background: rgba(0,0,0,.18) !important;
+  color: rgba(235,235,245,.66) !important;
+  line-height: 22px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.030) !important;
+}
+
+.layer-style-add-button::before {
+  left: 7px !important;
+  top: 7px !important;
+  width: 4px !important;
+  height: 8px !important;
+}
+
+.layer-style-add-button:hover:not(:disabled),
+.layer-style-add-button.drag-adding {
+  border-color: rgba(255,255,255,.16) !important;
+  background: rgba(255,255,255,.055) !important;
+  color: rgba(245,245,247,.92) !important;
+}
+
+.layer-style-add-button.is-added {
+  border-color: rgba(217,119,66,.30) !important;
+  background: rgba(217,119,66,.105) !important;
+  color: rgba(255,236,224,.90) !important;
+}
+
+.layer-style-add-button.is-added::before {
+  opacity: 1 !important;
+  box-shadow: 0 0 8px var(--style-color, rgba(217,119,66,.4));
+}
+
+.layer-style-add-button.some-have {
+  border-style: dashed !important;
+}
+
+.layer-style-add-button.all-have,
+.layer-style-add-button:disabled {
+  opacity: 1 !important;
+}
+
+.layer-style-add-button span {
+  max-width: 122px !important;
+}
+
+.layer-style-node.style-node-flash {
+  animation: styleNodeFlash 1s ease-out;
+}
+
+@keyframes styleNodeFlash {
+  0% {
+    border-color: rgba(217,119,66,.70);
+    box-shadow:
+      0 0 0 2px rgba(217,119,66,.24),
+      0 16px 36px rgba(0,0,0,.28),
+      inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  100% {
+    border-color: rgba(255,255,255,.095);
+    box-shadow:
+      0 14px 32px rgba(0,0,0,.24),
+      inset 0 1px 0 rgba(255,255,255,.045);
+  }
+}
+
+/* v101: anchored comp menu, icon command buttons, Apple-system typography. */
+:root {
+  --tnt-font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--tnt-font-main) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+
+body [class],
+body [id],
+body button,
+body input,
+body select,
+body textarea {
+  font-family: var(--tnt-font-main) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+
+.dialog-title,
+.layer-style-dialog-title,
+.flow-chart-title,
+.timeline-command-dialog-title,
+.clip-name,
+.comp-select-name,
+.layer-style-node-head strong,
+.mask-control-node-title,
+.anchor-section-title,
+#timeDisplay {
+  font-weight: 500 !important;
+}
+
+header,
+.status-row,
+.comp-select {
+  overflow: visible !important;
+}
+
+.comp-select {
+  position: relative !important;
+  z-index: 5000 !important;
+}
+
+.comp-select-search {
+  position: absolute !important;
+  inset: 0 !important;
+  box-sizing: border-box !important;
+  display: none !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 28px 0 20px !important;
+  border: 1px solid rgba(217,119,66,.58) !important;
+  border-radius: inherit !important;
+  outline: none !important;
+  background: rgba(28, 23, 21, .96) !important;
+  color: rgba(245,245,247,.94) !important;
+  font: inherit !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  z-index: 2 !important;
+}
+
+.comp-select-search::placeholder {
+  color: rgba(245,245,247,.82) !important;
+}
+
+.comp-select.open .comp-select-search {
+  display: block !important;
+}
+
+.comp-select.open .comp-select-button {
+  color: transparent !important;
+}
+
+.comp-select-menu {
+  position: absolute !important;
+  display: none;
+  top: calc(100% + 6px) !important;
+  bottom: auto !important;
+  left: 0 !important;
+  right: auto !important;
+  transform: none !important;
+  width: 100% !important;
+  max-height: calc(100vh - 100px) !important;
+  margin: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  z-index: 5200 !important;
+}
+
+.comp-select-item[hidden] {
+  display: none !important;
+}
+
+.comp-select-empty {
+  padding: 14px 18px !important;
+  color: rgba(235,235,245,.48) !important;
+  font-size: 12px !important;
+}
+
+.comp-select.open .comp-select-menu {
+  display: block !important;
+}
+
+#durationBtn,
+#keyframeModeBtn {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  height: var(--tnt-control-h) !important;
+  min-height: var(--tnt-control-h) !important;
+  padding: 0 11px !important;
+  border: 1px solid rgba(255,255,255,.115) !important;
+  border-radius: var(--tnt-radius-control) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.060), rgba(255,255,255,.025)),
+    rgba(13,13,13,.54) !important;
+  color: rgba(245,245,247,.84) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 6px 14px rgba(0,0,0,.18) !important;
+  line-height: normal !important;
+}
+
+#durationBtn:hover,
+#keyframeModeBtn:hover {
+  border-color: rgba(217,119,66,.34) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.030)),
+    rgba(30,24,20,.66) !important;
+  color: rgba(255,245,238,.94) !important;
+}
+
+#keyframeModeBtn.active {
+  border-color: rgba(217,119,66,.48) !important;
+  background:
+    linear-gradient(180deg, rgba(217,119,66,.26), rgba(217,119,66,.10)),
+    rgba(19,15,12,.72) !important;
+  color: rgba(255,241,232,.96) !important;
+}
+
+#durationBtn::before,
+#keyframeModeBtn::before {
+  content: "";
+  display: inline-block;
+  flex: 0 0 auto;
+  opacity: .82;
+}
+
+#durationBtn::before {
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+#durationBtn::after {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 9px;
+  width: 5px;
+  height: 5px;
+  border-left: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  opacity: .82;
+  transform: translate(1px, 1px);
+  pointer-events: none;
+}
+
+#keyframeModeBtn::before {
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+  transform: rotate(45deg);
+  box-sizing: border-box;
+}
+
+#keyframeModeBtn.active::before {
+  border-radius: 3px;
+  border-color: rgba(255,226,207,.92);
+  background: rgba(217,119,66,.34);
+  transform: rotate(0deg);
+}
+
+/* v102: header/ruler corner alignment. */
+:root {
+  --tnt-header-pad-x: 10px;
+  --tnt-left-tool-w: 30px;
+  --tnt-header-leading-spacer: calc(var(--left-gutter) - var(--tnt-control-icon) - var(--tnt-gap) - var(--tnt-header-pad-x));
+}
+
+header {
+  padding-left: var(--tnt-header-pad-x) !important;
+  padding-right: var(--tnt-header-pad-x) !important;
+}
+
+.status-row {
+  gap: var(--tnt-gap) !important;
+  align-items: center !important;
+}
+
+.status-row::before {
+  content: "";
+  display: block;
+  flex: 0 0 var(--tnt-header-leading-spacer);
+  width: var(--tnt-header-leading-spacer);
+  min-width: 0;
+}
+
+.platform-badge {
+  margin: 0 !important;
+  align-self: center !important;
+}
+
+.comp-select {
+  margin: 0 !important;
+}
+
+.comp-select-button {
+  display: block !important;
+}
+
+#timeDisplay,
+body.keyframe-mode #timeDisplay {
+  left: var(--tnt-left-tool-w) !important;
+  width: var(--track-gutter) !important;
+  max-width: var(--track-gutter) !important;
+  padding: 0 10px 0 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  overflow: hidden !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+}
+
+.track-label,
+body.keyframe-mode .track-label {
+  left: var(--tnt-left-tool-w) !important;
+  width: var(--track-gutter) !important;
+}
+
+#scrollArea::after {
+  left: var(--tnt-left-tool-w) !important;
+  width: var(--track-gutter) !important;
+}
+
+/* v103: mask subpanel mass edit controls. */
+.mask-control-mass-panel {
+  grid-column: 1 / -1;
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,.095);
+  border-radius: var(--tnt-radius-panel);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.060), rgba(255,255,255,.025)),
+    rgba(12,12,14,.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 12px 28px rgba(0,0,0,.24);
+}
+
+.mask-control-mass-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.mask-control-mass-head strong {
+  color: rgba(245,245,247,.92);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.mask-control-mass-head span {
+  color: rgba(235,235,245,.54);
+  font-size: 10px;
+}
+
+.mask-control-mass-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(166px, 1fr));
+  gap: 8px;
+}
+
+.mask-control-mass-panel .mask-control-prop,
+.mask-control-mass-panel .mask-control-prop-group {
+  min-width: 0;
+  margin: 0;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: var(--tnt-radius-node);
+  background: rgba(0,0,0,.18);
+}
+
+.mask-control-mass-panel .mask-control-prop {
+  display: grid;
+  grid-template-columns: minmax(52px, auto) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+}
+
+.mask-control-mass-panel .mask-control-prop.inline {
+  grid-template-columns: minmax(52px, auto) auto 1fr;
+}
+
+.mask-control-mass-panel .mask-control-prop > span,
+.mask-control-mass-panel .mask-control-prop-group-head span {
+  color: rgba(235,235,245,.62);
+  font-size: 10px;
+}
+
+.mask-control-mass-panel .mask-control-prop-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.mask-control-mass-panel .mask-control-pair {
+  min-width: 0;
+}
+
+.mask-control-mass-panel button[data-mask-bulk-apply] {
+  height: 22px;
+  min-width: 48px;
+  padding: 0 9px;
+  border: 1px solid rgba(217,119,66,.26);
+  border-radius: var(--tnt-radius-control);
+  background: rgba(217,119,66,.12);
+  color: rgba(255,226,207,.90);
+  font-size: 10px;
+  line-height: 20px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.045);
+}
+
+.mask-control-mass-panel button[data-mask-bulk-apply]:hover {
+  border-color: rgba(217,119,66,.46);
+  background: rgba(217,119,66,.20);
+  color: rgba(255,244,236,.96);
+}
+
+/* v104: side rail tooltips anchor beside the compact rail buttons. */
+.panel-tooltip.rail-tooltip {
+  z-index: 18000 !important;
+  min-width: 178px !important;
+  border-color: rgba(217,119,66,.22) !important;
+  box-shadow:
+    0 16px 34px rgba(0,0,0,.48),
+    inset 3px 0 0 rgba(217,119,66,.54),
+    inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+
+/* v105: mask control nodes scan sideways like style edit nodes. */
+.mask-control-layout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 10px !important;
+}
+
+.mask-control-layer {
+  min-width: 0 !important;
+}
+
+.mask-control-node-row {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 260px)) !important;
+  align-items: start !important;
+  gap: 8px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.mask-control-node {
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+.mask-control-node-head {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: baseline !important;
+  gap: 8px !important;
+}
+
+.mask-control-node-head strong,
+.mask-control-node-head em {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.mask-control-props {
+  display: grid !important;
+  gap: 6px !important;
+}
+
+.mask-control-prop {
+  min-width: 0 !important;
+}
+
+.mask-control-prop:not(.compact) {
+  display: grid !important;
+  grid-template-columns: 58px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.mask-control-prop.inline {
+  grid-template-columns: 58px auto !important;
+}
+
+.mask-control-prop-group {
+  min-width: 0 !important;
+}
+
+.mask-control-pair {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 46px !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+
+/* v124: grouped mask nodes and mixed-value placeholders. */
+.mask-control-dialog .mask-control-mass-panel {
+  display: none !important;
+}
+
+.mask-control-grouped .mask-control-layer-head {
+  margin-bottom: 8px !important;
+}
+
+.mask-control-group-node {
+  min-width: 240px !important;
+}
+
+.mask-control-group-node .mask-control-node-head em {
+  color: rgba(235,235,245,.48) !important;
+}
+
+.mask-control-pair input[type="text"][data-mask-control-kind="number"] {
+  width: 46px !important;
+  min-width: 46px !important;
+  height: 28px !important;
+  padding: 0 5px !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: var(--tnt-radius-control, 7px) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)),
+    rgba(0,0,0,.28) !important;
+  color: rgba(235,235,245,.82) !important;
+  font-family: inherit !important;
+  font-size: 11px !important;
+  text-align: center !important;
+  outline: none !important;
+}
+
+.mask-control-pair input[type="text"][data-mask-control-kind="number"]:focus {
+  border-color: rgba(217,119,66,.55) !important;
+  box-shadow: 0 0 0 2px rgba(217,119,66,.13) !important;
+}
+
+/* v125: effects and shapes subpanels share the compact grouped node language. */
+.effects-control-dialog,
+.shapes-control-dialog {
+  width: min(900px, calc(100vw - 48px)) !important;
+}
+
+.effects-control-layout,
+.shapes-control-layout {
+  display: grid !important;
+  gap: 14px !important;
+  min-width: 0 !important;
+}
+
+.effects-control-browser,
+.shapes-control-add-row {
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px !important;
+  background: rgba(20, 20, 20, 0.42) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  padding: 12px !important;
+}
+
+.effects-control-search {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 40px !important;
+  border: 1px solid rgba(255, 255, 255, 0.13) !important;
+  border-radius: 9px !important;
+  background: rgba(12, 12, 12, 0.52) !important;
+  color: rgba(245, 245, 245, 0.92) !important;
+  font: 14px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  outline: none !important;
+  padding: 0 12px !important;
+}
+
+.effects-control-search:focus {
+  border-color: rgba(217,119,66,.55) !important;
+  box-shadow: 0 0 0 2px rgba(217,119,66,.13) !important;
+}
+
+.effects-control-results {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) !important;
+  gap: 8px !important;
+  margin-top: 10px !important;
+  max-height: 156px !important;
+  overflow: auto !important;
+}
+
+.effects-control-result,
+.shapes-control-add-row button {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 9px !important;
+  background: rgba(36, 36, 36, 0.7) !important;
+  color: rgba(244, 244, 244, 0.9) !important;
+  cursor: pointer !important;
+  min-height: 36px !important;
+  text-align: left !important;
+}
+
+.effects-control-result {
+  display: grid !important;
+  gap: 2px !important;
+  padding: 8px 10px !important;
+}
+
+.effects-control-result strong,
+.effects-control-result em {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.effects-control-result strong {
+  font-size: 13px !important;
+  font-weight: 650 !important;
+}
+
+.effects-control-result em {
+  color: rgba(220, 220, 220, 0.5) !important;
+  font-size: 11px !important;
+  font-style: normal !important;
+}
+
+.effects-control-result:hover,
+.shapes-control-add-row button:hover {
+  border-color: rgba(217,119,66,.48) !important;
+  background: rgba(61, 44, 36, 0.72) !important;
+}
+
+.effects-control-node-row,
+.shapes-control-node-row {
+  align-items: stretch !important;
+}
+
+.effects-control-node,
+.shapes-control-node {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  width: min(320px, 100%) !important;
+  min-height: 76px !important;
+  gap: 10px !important;
+}
+
+.effects-control-node .layer-style-node-controls,
+.shapes-control-node .layer-style-node-controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.effects-control-node.disabled,
+.shapes-control-node.disabled {
+  opacity: 0.54 !important;
+}
+
+.shapes-control-add-row {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.shapes-control-add-row button {
+  text-align: center !important;
+  padding: 0 10px !important;
+}

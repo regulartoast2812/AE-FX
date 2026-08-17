@@ -1,0 +1,441 @@
+.timing-order-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1190;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 12px 12px;
+  background: transparent;
+}
+
+.timing-order-backdrop.show {
+  display: flex;
+}
+
+.timing-order-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, .9fr) minmax(330px, 1fr) minmax(340px, 1fr);
+  gap: 8px;
+  width: min(1120px, calc(100vw - 24px));
+  align-items: start;
+}
+
+.timing-snap-pull-card {
+  grid-column: auto;
+}
+
+.timing-order-card {
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.115);
+  border-radius: var(--tnt-radius-panel, 14px);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.045), rgba(255,255,255,.012) 42%, rgba(0,0,0,.15)),
+    rgba(18,19,21,.90);
+  box-shadow: inset 0 1px rgba(255,255,255,.055), 0 20px 48px rgba(0,0,0,.42);
+  color: rgba(245,245,247,.88);
+  -webkit-backdrop-filter: blur(20px) saturate(114%);
+  backdrop-filter: blur(20px) saturate(114%);
+}
+
+.timing-order-head {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 11px;
+  border-bottom: 1px solid rgba(255,255,255,.085);
+}
+
+.timing-order-title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  font-family: "Ivory LL Web", "IvoryLLWeb-Light", "Iowan Old Style", Baskerville, Georgia, serif;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.timing-order-title b {
+  display: grid;
+  width: 24px;
+  height: 20px;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 6px;
+  background: rgba(255,255,255,.05);
+  font-family: inherit;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.timing-order-title em {
+  padding: 3px 6px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 8px;
+  background: rgba(255,255,255,.04);
+  color: rgba(235,235,245,.54);
+  font-family: inherit;
+  font-size: 8px;
+  font-style: normal;
+}
+
+.timing-order-body {
+  display: grid;
+  gap: 8px;
+  padding: 10px 11px 8px;
+}
+
+.timing-order-field {
+  display: grid;
+  gap: 5px;
+}
+
+.timing-order-field > span {
+  color: rgba(235,235,245,.48);
+  font-size: 8px;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.timing-order-segmented {
+  display: grid;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 7px;
+  background: rgba(5,6,7,.30);
+}
+
+.timing-unit {
+  grid-template-columns: repeat(2, 27px);
+}
+
+.order-basis {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.order-proximity,
+.order-direction {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.timing-order-segmented button {
+  min-height: 22px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: rgba(235,235,245,.56);
+  font: inherit;
+  font-size: 8px;
+}
+
+.timing-order-segmented button:hover {
+  background: rgba(255,255,255,.045);
+  color: rgba(245,245,247,.86);
+}
+
+.timing-order-segmented button.active {
+  border-color: rgba(217,119,66,.34);
+  background: rgba(217,119,66,.13);
+  color: rgba(255,238,228,.95);
+}
+
+.timing-amount-row {
+  display: grid;
+  grid-template-columns: minmax(76px, 1fr) 52px 52px auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.timing-amount-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 16px;
+  margin: 0;
+  outline: none;
+  background: transparent;
+}
+
+.timing-amount-range::-webkit-slider-runnable-track {
+  height: 2px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e8844a 0%, #e8844a var(--range-fill, 0%), #34363a var(--range-fill, 0%), #34363a 100%);
+}
+
+.timing-amount-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  width: 10px;
+  height: 10px;
+  margin-top: -4px;
+  border: 1px solid rgba(255,218,196,.72);
+  border-radius: 50%;
+  background: #e8844a;
+  box-shadow: 0 0 0 3px rgba(232,132,74,.1);
+}
+
+.timing-amount-range:disabled {
+  opacity: .38;
+}
+
+.timing-amount-range:disabled::-webkit-slider-thumb {
+  border-color: rgba(255,255,255,.18);
+  background: #6a6d73;
+  box-shadow: none;
+}
+
+.timing-amount-input {
+  box-sizing: border-box;
+  width: 52px;
+  height: 25px;
+  padding: 0 6px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 6px;
+  outline: none;
+  background: rgba(0,0,0,.28);
+  color: rgba(245,245,247,.90);
+  font: inherit;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+}
+
+.timing-amount-input:disabled {
+  opacity: .46;
+}
+
+.timing-amount-input:focus {
+  border-color: rgba(217,119,66,.52);
+}
+
+.timing-group-control {
+  display: grid;
+  gap: 2px;
+}
+
+.timing-group-control span {
+  overflow: hidden;
+  color: rgba(235,235,245,.46);
+  font-size: 7px;
+  line-height: 1;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.timing-group-input {
+  box-sizing: border-box;
+  width: 52px;
+  height: 19px;
+  padding: 0 6px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 6px;
+  outline: none;
+  background: rgba(0,0,0,.28);
+  color: rgba(245,245,247,.90);
+  font: inherit;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+}
+
+.timing-group-input:disabled {
+  opacity: .46;
+}
+
+.timing-group-input:focus {
+  border-color: rgba(217,119,66,.52);
+}
+
+.timing-amount-input::-webkit-inner-spin-button,
+.timing-amount-input::-webkit-outer-spin-button,
+.timing-group-input::-webkit-inner-spin-button,
+.timing-group-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.timing-execute-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.order-stack-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding-top: 7px;
+  border-top: 1px solid rgba(255,255,255,.07);
+}
+
+.order-sort-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.order-sort-actions button:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.timing-two-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.timing-execute-actions button {
+  display: grid;
+  min-height: 38px;
+  align-content: center;
+  gap: 2px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255,255,255,.085);
+  border-radius: 7px;
+  background: rgba(255,255,255,.03);
+  color: rgba(245,245,247,.84);
+  text-align: left;
+  transform-origin: center;
+  transition: transform .12s ease, border-color .12s ease, background-color .12s ease;
+}
+
+.timing-execute-actions button:hover:not(:disabled) {
+  transform: scale(1.012);
+  border-color: rgba(217,119,66,.30);
+  background: rgba(217,119,66,.075);
+}
+
+.timing-execute-actions button.active {
+  border-color: rgba(217,119,66,.42);
+  background: rgba(217,119,66,.14);
+  color: rgba(255,238,228,.95);
+}
+
+.timing-execute-actions strong {
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.timing-execute-actions span {
+  color: rgba(235,235,245,.45);
+  font-size: 7px;
+}
+
+.timing-execute-actions button:disabled,
+.timing-snap-scope button:disabled {
+  opacity: .3;
+  cursor: default;
+}
+
+.timing-snap-pull-card .timing-order-body {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+}
+
+.timing-compact-group {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: var(--tnt-radius-node, 7px);
+  background: rgba(0,0,0,.18);
+}
+
+.timing-compact-head {
+  display: grid;
+  gap: 2px;
+}
+
+.timing-compact-head strong {
+  color: rgba(245,245,247,.88);
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.timing-compact-head span {
+  color: rgba(235,235,245,.48);
+  font-size: 8px;
+}
+
+.timing-snap-grid {
+  display: grid;
+  gap: 5px;
+}
+
+.timing-snap-scope {
+  display: grid;
+  grid-template-columns: 72px repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: 5px;
+}
+
+.timing-snap-scope > span {
+  overflow: hidden;
+  color: rgba(235,235,245,.52);
+  font-size: 8px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.timing-snap-scope button {
+  min-height: 24px;
+  border: 1px solid rgba(255,255,255,.085);
+  border-radius: var(--tnt-radius-control, 6px);
+  background: rgba(255,255,255,.03);
+  color: rgba(245,245,247,.82);
+  font: inherit;
+  font-size: 8px;
+}
+
+.timing-snap-scope button:hover:not(:disabled) {
+  border-color: rgba(217,119,66,.30);
+  background: rgba(217,119,66,.075);
+  color: rgba(255,238,228,.95);
+}
+
+.timing-live-status {
+  min-height: 13px;
+  color: rgba(235,235,245,.42);
+  font-size: 8px;
+  line-height: 1.2;
+}
+
+.order-target-summary {
+  min-height: 18px;
+  padding: 5px 7px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 6px;
+  background: rgba(0,0,0,.18);
+  color: rgba(235,235,245,.54);
+  font-size: 8px;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timing-order-error {
+  min-height: 10px;
+  padding: 0 11px 8px;
+  color: #efa0a0;
+  font-size: 8px;
+}
+
+@media (max-width: 980px) {
+  .timing-order-layout {
+    grid-template-columns: 1fr;
+    width: min(360px, calc(100vw - 18px));
+    max-height: calc(100vh - 76px);
+    overflow-y: auto;
+  }
+
+  .timing-snap-pull-card .timing-order-body {
+    grid-template-columns: 1fr;
+  }
+
+  .timing-snap-scope {
+    grid-template-columns: 66px repeat(2, minmax(0, 1fr));
+  }
+}

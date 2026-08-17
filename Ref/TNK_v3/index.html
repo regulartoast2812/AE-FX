@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TNK v.3</title>
+<script>if(typeof module==='object'){window.module=module;module=undefined;}</script>
+<script src="js/CSInterface.js"></script>
+<script>if(window.module)module=window.module;</script>
+<script src="js/bridge.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#1a1a1e;--surface:#222228;--surface2:#2a2a32;--border:#35353f;--accent:#5b7fff;--text:#e8e8f0;--muted:#7070a0;--success:#06d6a0;}
+html,body{background:var(--bg);font-family:'DM Mono',monospace;font-size:11px;color:var(--text);height:100%;overflow:hidden;user-select:none;}
+#toast{position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(10px);background:rgba(91,127,255,0.15);border:1px solid rgba(91,127,255,0.4);color:var(--accent);font-size:10px;padding:5px 14px;border-radius:20px;opacity:0;transition:opacity 0.2s,transform 0.2s;pointer-events:none;white-space:nowrap;z-index:100;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+#hotkey-overlay{display:none;position:fixed;inset:0;background:rgba(10,10,14,0.92);z-index:50;align-items:center;justify-content:center;flex-direction:column;gap:6px;}
+#hotkey-overlay.visible{display:flex;}
+#hotkey-overlay h2{font-family:'Syne',sans-serif;font-size:13px;color:var(--text);margin-bottom:10px;letter-spacing:0.1em;}
+.hk-row{display:flex;align-items:center;gap:12px;width:260px;}
+.hk-key{background:var(--surface2);border:1px solid var(--border);border-radius:5px;width:26px;height:22px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--accent);flex-shrink:0;}
+.hk-label{font-size:10px;color:var(--muted);}
+#tip{position:fixed;background:#0d0d12;border:1px solid var(--border);color:var(--text);font-size:9px;padding:5px 8px;border-radius:4px;pointer-events:none;z-index:9999;display:none;max-width:220px;line-height:1.5;}
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center;}
+#modal-overlay.visible{display:flex;}
+#modal-box{background:#1a1a1e;border:1px solid #35353f;border-radius:8px;padding:18px 20px;width:280px;box-shadow:0 20px 60px rgba(0,0,0,0.9);}
+#modal-title{font-size:10px;color:#7070a0;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;}
+#modal-input{width:100%;background:#2a2a32;border:1px solid #35353f;color:#e8e8f0;font-family:'DM Mono',monospace;font-size:11px;padding:6px 8px;border-radius:4px;outline:none;margin-bottom:14px;box-sizing:border-box;}
+#modal-input:focus{border-color:#5b7fff;}
+#modal-btns{display:flex;gap:6px;justify-content:flex-end;}
+.modal-btn{font-family:'DM Mono',monospace;font-size:10px;padding:5px 14px;border-radius:4px;border:1px solid #35353f;background:#2a2a32;color:#7070a0;cursor:pointer;transition:filter 0.1s;}
+.modal-btn.ok{background:rgba(91,127,255,0.15);border-color:rgba(91,127,255,0.35);color:#5b7fff;}
+.modal-btn:hover{filter:brightness(1.3);}
+#purge-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:center;justify-content:center;}
+#purge-overlay.visible{display:flex;}
+#purge-box{background:#1a1a1e;border:1px solid #35353f;border-radius:8px;padding:18px 20px;width:240px;box-shadow:0 20px 60px rgba(0,0,0,0.9);}
+.purge-title{font-size:10px;color:#ff7070;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;}
+.purge-check{display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;font-size:10px;color:var(--muted);}
+.purge-check:hover{color:var(--text);}
+#purge-btns{display:flex;gap:6px;margin-top:14px;}
+.purge-btn{flex:1;font-family:'DM Mono',monospace;font-size:10px;padding:6px 0;border-radius:4px;border:1px solid #35353f;background:#2a2a32;color:#7070a0;cursor:pointer;transition:filter 0.1s;text-align:center;}
+.purge-btn.go{background:rgba(220,60,60,0.15);border-color:rgba(220,60,60,0.35);color:#ff7070;}
+.purge-btn:hover{filter:brightness(1.3);}
+.panel{display:flex;flex-direction:column;height:100vh;}
+.global-bar{background:#141418;padding:5px 8px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0;}
+.param-group{display:flex;align-items:center;gap:4px;}
+.param-group label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;}
+.param-group input{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:10px;width:34px;padding:3px 4px;border-radius:4px;text-align:center;outline:none;transition:border-color 0.15s;}
+.param-group input:focus{border-color:var(--accent);}
+.divider-v{width:1px;height:16px;background:var(--border);flex-shrink:0;}
+.top-actions{margin-left:auto;display:flex;gap:5px;}
+.groups-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:#35354a transparent;}
+.groups-scroll::-webkit-scrollbar{width:4px;}
+.groups-scroll::-webkit-scrollbar-track{background:transparent;}
+.groups-scroll::-webkit-scrollbar-thumb{background:#35354a;border-radius:2px;}
+.groups-scroll::-webkit-scrollbar-thumb:hover{background:#5b5b80;}
+.group{background:var(--surface);padding:6px 8px;transition:background 0.12s;--panel-color:var(--accent);--panel-glow:rgba(91,127,255,0.3);border-top:1px solid var(--border);flex-shrink:0;}
+.group:first-child{border-top:none;}
+.group:hover{background:#252530;}
+.group-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.group-title{display:flex;align-items:center;gap:6px;}
+.group-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.group-label{font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);}
+.group-hotkey{font-size:9px;color:#3a3a5a;background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;}
+.sub{font-size:9px;color:var(--muted);margin-bottom:3px;letter-spacing:0.08em;margin-top:5px;}
+.sub:first-child{margin-top:0;}
+.sub-divider{margin-top:4px;padding-top:4px;border-top:1px solid var(--border);}
+.sub-label{font-size:7px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:3px;}
+.group-tools{display:flex;flex-wrap:wrap;gap:3px;align-items:center;}
+.tool-btn{height:26px;min-width:26px;background:#1c1c22;border:1px solid #2e2e3a;border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.1s,border-color 0.1s,transform 0.1s,box-shadow 0.1s;font-size:13px;color:#9090b0;padding:0 4px;position:relative;}
+.tool-btn:hover{background:var(--panel-color);border-color:var(--panel-color);color:#fff;transform:translateY(-1px);box-shadow:0 3px 10px var(--panel-glow);}
+.tool-btn:active{transform:translateY(0);box-shadow:none;}
+.tool-btn.wide{padding:0 8px;font-size:9px;color:var(--muted);letter-spacing:0.05em;}
+.tool-btn.wide:hover{color:#fff;}
+.tool-btn.primary{background:rgba(91,127,255,0.15);border-color:rgba(91,127,255,0.35);color:var(--accent);}
+.tool-btn.del{background:rgba(var(--panel-rgb),0.06);border-color:rgba(var(--panel-rgb),0.22);color:color-mix(in srgb,var(--panel-color) 70%,#888);}
+.tool-btn.del:hover{background:var(--panel-color);border-color:var(--panel-color);color:#fff;box-shadow:0 3px 10px var(--panel-glow);}
+.btn-gap{width:5px;flex-shrink:0;}
+.swatch-row{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:2px;}
+.swatch{width:14px;height:14px;border-radius:3px;cursor:pointer;transition:transform 0.1s,box-shadow 0.1s;border:1px solid transparent;flex-shrink:0;}
+.swatch:hover{transform:scale(1.4);box-shadow:0 2px 6px rgba(0,0,0,0.5);border-color:rgba(255,255,255,0.3);}
+.comp-info{font-size:9px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:3px 8px;display:flex;gap:10px;margin-bottom:6px;}
+.comp-info span{color:var(--text);}
+.bottom-bar{background:#141418;border-top:1px solid var(--border);padding:5px 10px;display:flex;align-items:center;gap:8px;font-size:9px;color:#40405a;flex-shrink:0;}
+.indicator{width:6px;height:6px;border-radius:50%;background:var(--success);}
+.bottom-bar .hk-hint{margin-left:auto;color:#3a3a5a;cursor:pointer;transition:color 0.15s;}
+.bottom-bar .hk-hint:hover{color:var(--accent);}
+.autoclose-toggle{display:flex;align-items:center;gap:5px;cursor:pointer;padding:2px 6px;border-radius:3px;transition:background 0.12s;}
+.autoclose-toggle:hover{background:var(--surface2);}
+.toggle-pip{width:20px;height:10px;border-radius:5px;background:var(--border);position:relative;transition:background 0.2s;}
+.toggle-pip::after{content:'';position:absolute;top:2px;left:2px;width:6px;height:6px;border-radius:50%;background:var(--muted);transition:left 0.2s,background 0.2s;}
+.toggle-pip.on{background:rgba(91,127,255,0.3);}
+.toggle-pip.on::after{left:12px;background:var(--accent);}
+/* Marker overlays */
+.mkr-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;align-items:center;justify-content:center;}
+.mkr-ov.visible{display:flex;}
+.mkr-box{background:#141418;border:1px solid #2e2e3a;border-radius:8px;width:230px;box-shadow:0 20px 60px rgba(0,0,0,.95);}
+.mkr-box-head{display:flex;align-items:center;justify-content:space-between;padding:9px 12px 7px;border-bottom:1px solid #1e1e28;}
+.mkr-box-title{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:#ff9999;}
+.mkr-box-close{width:16px;height:16px;background:#1e1e28;border:1px solid #2e2e3a;border-radius:3px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5a5a78;font-size:9px;line-height:1;transition:all .1s;}
+.mkr-box-close:hover{background:#ff9999;border-color:#ff9999;color:#fff;}
+.mkr-body{padding:9px 12px 11px;}
+.mkr-sec-title{font-size:7px;letter-spacing:.11em;text-transform:uppercase;color:#44445a;margin-bottom:5px;margin-top:9px;}
+.mkr-sec-title:first-child{margin-top:0;}
+.mkr-row{display:flex;align-items:center;gap:5px;margin-bottom:4px;}
+.mkr-row:last-child{margin-bottom:0;}
+.mkr-btn{flex:1;height:24px;background:#1c1c26;border:1px solid #2a2a38;border-radius:4px;color:#8888a8;font-family:inherit;font-size:9px;letter-spacing:.03em;cursor:pointer;padding:0 8px;text-align:left;transition:background .1s,border-color .1s,color .1s;white-space:nowrap;}
+.mkr-btn:hover{background:#ff9999;border-color:#ff9999;color:#fff;}
+.mkr-btn.del-btn{color:rgba(255,153,153,.7);border-color:rgba(255,153,153,.2);border-style:dashed;}
+.mkr-btn.del-btn:hover{border-style:solid;background:#ff9999;color:#fff;}
+.mkr-input{flex:1;height:22px;background:#0e0e14;border:1px solid #22222e;border-radius:4px;color:#d0d0e8;font-family:inherit;font-size:9px;padding:0 6px;outline:none;}
+.mkr-input:focus{border-color:#ff9999;}
+.mkr-input::placeholder{color:#2e2e44;}
+.mkr-sep{height:1px;background:#1c1c28;margin:7px 0;}
+.mkr-prot-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.mkr-prot-pip{width:26px;height:14px;border-radius:7px;background:#1e1e2c;border:1px solid #2a2a3a;position:relative;cursor:pointer;flex-shrink:0;transition:background .15s,border-color .15s;}
+.mkr-prot-pip::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:#3a3a52;transition:left .15s,background .15s;}
+.mkr-prot-pip.on{background:rgba(255,153,153,.25);border-color:rgba(255,153,153,.5);}
+.mkr-prot-pip.on::after{left:12px;background:#ff9999;}
+.mkr-prot-lbl{font-size:8px;color:#5a5a78;cursor:pointer;user-select:none;}
+/* marker trigger buttons */
+.mkr-trigger{position:relative;padding-right:15px;}
+.mkr-trigger::after{content:"▾";position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:7px;opacity:.45;}
+
+/* Anchor overlay */
+#anchor-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center;}
+#anchor-overlay.visible{display:flex;}
+#anchor-box{background:#1a1a1e;border:1px solid #35353f;border-radius:8px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,0.9);}
+.anchor-box-title{font-size:9px;color:#7070a0;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;text-align:center;}
+.anchor-pts{display:grid;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(3,42px);gap:4px;}
+.anchor-pt{border-radius:5px;cursor:pointer;background:#1c1c22;border:1px solid #2e2e3a;display:flex;align-items:center;justify-content:center;transition:background 0.1s,border-color 0.1s,transform 0.1s;}
+.anchor-pt:hover{background:rgba(6,214,160,0.25);border-color:#06d6a0;transform:scale(1.05);}
+.anchor-pt svg{opacity:0.5;transition:opacity 0.1s;}
+.anchor-pt:hover svg{opacity:1;}
+.anchor-pt.center-pt{background:rgba(6,214,160,0.12);border-color:rgba(6,214,160,0.35);}
+/* Style overlay shared */
+.style-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:center;justify-content:center;}
+.style-overlay.visible{display:flex;}
+.style-box{background:#1a1a1e;border:1px solid #35353f;border-radius:8px;padding:16px 18px;width:260px;box-shadow:0 20px 60px rgba(0,0,0,0.9);}
+.style-box-title{font-size:10px;color:#c77dff;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;}
+.style-checks{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-bottom:10px;}
+.style-check{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);cursor:pointer;padding:1px 0;}
+.style-check:hover{color:var(--text);}
+.style-check input{width:11px;height:11px;accent-color:#c77dff;cursor:pointer;flex-shrink:0;}
+.style-box-btns{display:flex;gap:6px;margin-top:2px;}
+.style-box-btn{flex:1;font-family:'DM Mono',monospace;font-size:10px;padding:6px 0;border-radius:4px;border:1px solid #35353f;background:#2a2a32;color:#7070a0;cursor:pointer;transition:filter 0.1s;text-align:center;}
+.style-box-btn.ok{background:rgba(199,125,255,0.15);border-color:rgba(199,125,255,0.35);color:#c77dff;}
+.style-box-btn:hover{filter:brightness(1.3);}
+/* Style editor overlay */
+.se-section{margin-bottom:8px;}
+.se-section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.se-section-name{font-size:9px;color:#c77dff;letter-spacing:0.08em;text-transform:uppercase;}
+.se-section-btns{display:flex;gap:3px;}
+.se-btn{font-size:8px;padding:1px 7px;border-radius:3px;border:1px solid #35353f;background:#2a2a32;color:#7070a0;cursor:pointer;transition:filter 0.1s;}
+.se-btn:hover{filter:brightness(1.4);}
+.se-row{display:flex;align-items:center;gap:5px;margin-bottom:3px;}
+.se-label{font-size:9px;color:var(--muted);width:54px;flex-shrink:0;}
+.se-slider{flex:1;height:3px;accent-color:#c77dff;cursor:pointer;}
+.se-num{width:32px;background:#2a2a32;border:1px solid #35353f;color:var(--text);font-family:'DM Mono',monospace;font-size:9px;padding:2px 3px;border-radius:3px;text-align:center;outline:none;}
+.se-num:focus{border-color:#c77dff;}
+.se-color-swatch{width:28px;height:16px;border-radius:3px;border:1px solid #35353f;cursor:pointer;flex-shrink:0;}
+.se-check{width:12px;height:12px;accent-color:#c77dff;cursor:pointer;}
+.se-select{background:#2a2a32;border:1px solid #35353f;color:var(--text);font-family:'DM Mono',monospace;font-size:9px;padding:1px 4px;border-radius:3px;outline:none;cursor:pointer;}
+/* Layer styles on/off toggle slider in edit overlay */
+.se-slider-toggle{width:28px;height:14px;border-radius:7px;background:#35353f;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
+.se-slider-toggle.on{background:rgba(199,125,255,0.4);}
+.se-slider-thumb{position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:#7070a0;transition:left 0.2s,background 0.2s;}
+.se-slider-toggle.on .se-slider-thumb{left:16px;background:#c77dff;}
+/* Shortcut settings overlay */
+#hk-settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;}
+#hk-settings-overlay.visible{display:flex;}
+#hk-settings-box{background:#1a1a1e;border:1px solid #35353f;border-radius:8px;width:300px;max-height:82vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.9);}
+.hks-head{padding:11px 14px 9px;border-bottom:1px solid #2a2a36;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.hks-title{font-size:10px;color:#7070a0;text-transform:uppercase;letter-spacing:.1em;}
+.hks-close{width:16px;height:16px;background:#1e1e28;border:1px solid #2e2e3a;border-radius:3px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5a5a78;font-size:9px;transition:all .1s;}
+.hks-close:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+.hks-body{flex:1;overflow-y:auto;padding:4px 0;scrollbar-width:thin;scrollbar-color:#35354a transparent;}
+.hks-body::-webkit-scrollbar{width:4px;}
+.hks-body::-webkit-scrollbar-thumb{background:#35354a;border-radius:2px;}
+.hks-row{display:flex;align-items:center;gap:8px;padding:3px 14px;transition:background .1s;}
+.hks-row:hover{background:#222230;}
+.hks-label{flex:1;font-size:10px;color:#c0c0d8;}
+.hks-hint{font-size:8px;color:#44445a;flex-shrink:0;max-width:90px;text-align:right;line-height:1.3;}
+.hks-key{min-width:30px;height:20px;background:#2a2a36;border:1px solid #3a3a50;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--accent);cursor:pointer;padding:0 5px;transition:all .1s;flex-shrink:0;user-select:none;}
+.hks-key:hover{border-color:var(--accent);background:rgba(91,127,255,.15);}
+.hks-key.capturing{background:rgba(91,127,255,.2);border-color:var(--accent);color:#fff;animation:hks-blink .65s infinite;}
+.hks-key.unbound{color:#3a3a5a;border-color:#252535;background:#1c1c26;}
+@keyframes hks-blink{0%,100%{opacity:1}50%{opacity:.35}}
+.hks-footer{padding:8px 14px;border-top:1px solid #2a2a36;display:flex;gap:6px;flex-shrink:0;}
+.hks-btn{flex:1;font-family:'DM Mono',monospace;font-size:9px;padding:5px 0;border-radius:4px;border:1px solid #35353f;background:#2a2a32;color:#7070a0;cursor:pointer;text-align:center;transition:filter .1s;}
+.hks-btn:hover{filter:brightness(1.4);}
+.hks-btn.reset{color:#ff9f43;border-color:rgba(255,159,67,.35);background:rgba(255,159,67,.08);}
+.hks-search{width:100%;background:#141418;border:1px solid #2e2e3a;color:var(--text);font-family:'DM Mono',monospace;font-size:10px;padding:5px 8px;border-radius:4px;outline:none;box-sizing:border-box;}
+.hks-search:focus{border-color:var(--accent);}
+.hks-search::placeholder{color:#3a3a5a;}
+.hks-empty{padding:14px;font-size:10px;color:#44445a;text-align:center;}
+/* Anchor mask toggle */
+.anchor-mask-row{display:flex;justify-content:center;margin-top:10px;}
+.anchor-mask-btn{display:flex;align-items:center;gap:6px;cursor:pointer;padding:4px 10px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);transition:border-color 0.15s;}
+.anchor-mask-btn:hover{border-color:#06d6a0;}
+.anchor-mask-pip{width:20px;height:10px;border-radius:5px;background:#35353f;position:relative;transition:background 0.2s;flex-shrink:0;}
+.anchor-mask-pip::after{content:'';position:absolute;top:2px;left:2px;width:6px;height:6px;border-radius:50%;background:#7070a0;transition:left 0.2s,background 0.2s;}
+.anchor-mask-pip.on{background:rgba(6,214,160,0.3);}
+.anchor-mask-pip.on::after{left:12px;background:#06d6a0;}
+#anchor-mask-label{font-size:9px;color:var(--muted);}
+/* Style status dot */
+.style-status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.se-hint{font-size:9px;color:var(--muted);padding:4px 0;}
+.tool-btn.wip{background:rgba(220,60,60,0.08);border-color:rgba(220,60,60,0.3);color:#ff7070;}
+.tool-btn.wip:hover{background:#dc3c3c;border-color:#dc3c3c;color:#fff;box-shadow:0 3px 10px rgba(220,60,60,0.4);}
+/* 2-column layout */
+.groups-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:#35354a transparent;}
+.groups-scroll::-webkit-scrollbar{width:4px;}
+.groups-scroll::-webkit-scrollbar-thumb{background:#35354a;border-radius:2px;}
+/* hide scrollbars inside overlays/sub-elements */
+.style-box *::-webkit-scrollbar{width:4px;}
+.style-box *::-webkit-scrollbar-thumb{background:#35354a;border-radius:2px;}
+.col-grid{display:grid;grid-template-columns:1fr 1fr;align-items:stretch;}
+.col{display:flex;flex-direction:column;}
+.col .group{border-top:1px solid var(--border);border-right:none;}
+.col:first-child .group{border-right:1px solid var(--border);}
+.col .group:first-child{border-top:none;}
+/* Last group in col 1 stretches to fill remaining height */
+.col:first-child .group:last-child{flex:1;}
+/* Full-width bottom groups */
+.groups-bottom{flex-shrink:0;}
+.group-wide{border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+
+<div id="hotkey-overlay">
+  <h2>⌨ HOTKEYS</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 20px">
+    <div id="hk-col1"></div>
+    <div id="hk-col2"></div>
+  </div>
+  <div class="hk-label" style="margin-top:10px;font-size:9px;color:#40405a">ESC or ? to close · ⚙ to customize</div>
+</div>
+
+<!-- SHORTCUT SETTINGS OVERLAY -->
+<div id="hk-settings-overlay" onclick="if(event.target===this)closeHkSettings()">
+  <div id="hk-settings-box">
+    <div class="hks-head">
+      <span class="hks-title">Customize Shortcuts</span>
+      <div class="hks-close" onclick="closeHkSettings()">✕</div>
+    </div>
+    <div style="padding:6px 14px 2px">
+      <input id="hks-search" class="hks-search" type="text" placeholder="filter actions…" oninput="_renderHkSettings()" autocomplete="off" spellcheck="false">
+    </div>
+    <div id="hks-body" class="hks-body"></div>
+    <div class="hks-footer">
+      <div class="hks-btn reset" onclick="_hkResetAll()">Reset defaults</div>
+      <div class="hks-btn" onclick="closeHkSettings()">Close</div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="tip"></div>
+
+<div id="modal-overlay">
+  <div id="modal-box">
+    <div id="modal-title">Input</div>
+    <input id="modal-input" type="text" placeholder="">
+    <div id="modal-btns">
+      <button class="modal-btn" id="modal-cancel">Cancel</button>
+      <button class="modal-btn ok" id="modal-ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<div id="purge-overlay">
+  <div id="purge-box">
+    <div class="purge-title">⚠ Full Purge — selected layers</div>
+    <label class="purge-check"><input type="checkbox" id="purge-fx" checked> Effects</label>
+    <label class="purge-check"><input type="checkbox" id="purge-keys" checked> Keyframes</label>
+    <label class="purge-check"><input type="checkbox" id="purge-expr" checked> Expressions</label>
+    <label class="purge-check"><input type="checkbox" id="purge-labels"> Reset labels (→ None)</label>
+    <div id="purge-btns">
+      <div class="purge-btn" onclick="closePurgeModal()">Cancel</div>
+      <div class="purge-btn go" onclick="executePurge()">Purge</div>
+    </div>
+  </div>
+</div>
+
+<!-- ANCHOR OVERLAY -->
+<div id="anchor-overlay" onclick="if(event.target===this)closeAnchorOverlay()">
+  <div id="anchor-box">
+    <div class="anchor-box-title">Anchor Point</div>
+    <div class="anchor-pts">
+      <div class="anchor-pt" onclick="doAnchor('TL')" data-tip="Top Left"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor"/><rect x="7" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="2" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/></svg></div>
+      <div class="anchor-pt" onclick="doAnchor('TC')" data-tip="Top Center"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="7" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="2" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><line x1="7" y1="2" x2="7" y2="4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="anchor-pt" onclick="doAnchor('TR')" data-tip="Top Right"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="7" y="2" width="5" height="5" rx="1" fill="currentColor"/><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="2" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/></svg></div>
+      <div class="anchor-pt" onclick="doAnchor('ML')" data-tip="Mid Left"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="2" y1="7" x2="4.5" y2="7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="7" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="2" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/></svg></div>
+      <div class="anchor-pt center-pt" onclick="doAnchor('C')" data-tip="Center"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2.5" fill="currentColor" opacity=".9"/><line x1="7" y1="2" x2="7" y2="4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".5"/><line x1="7" y1="9.5" x2="7" y2="12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".5"/><line x1="2" y1="7" x2="4.5" y2="7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".5"/><line x1="9.5" y1="7" x2="12" y2="7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".5"/></svg></div>
+      <div class="anchor-pt" onclick="doAnchor('MR')" data-tip="Mid Right"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="9.5" y1="7" x2="12" y2="7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="7" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="2" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/></svg></div>
+      <div class="anchor-pt" onclick="doAnchor('BL')" data-tip="Bottom Left"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="7" width="5" height="5" rx="1" fill="currentColor"/><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="7" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/></svg></div>
+      <div class="anchor-pt" onclick="doAnchor('BC')" data-tip="Bottom Center"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="9.5" x2="7" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="7" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="2" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/></svg></div>
+      <div class="anchor-pt" onclick="doAnchor('BR')" data-tip="Bottom Right"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor"/><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="7" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/><rect x="2" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".2"/></svg></div>
+    </div>
+    <div class="anchor-mask-row">
+      <div id="anchor-mask-toggle" class="anchor-mask-btn" onclick="toggleAnchorMask()">
+        <div id="anchor-mask-pip" class="anchor-mask-pip"></div>
+        <span id="anchor-mask-label">Masks: off</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD STYLE OVERLAY -->
+<div id="addstyle-overlay" class="style-overlay" onclick="if(event.target===this)closeAddStyle()">
+  <div class="style-box">
+    <div class="style-box-title">Add Layer Styles</div>
+    <div id="style-add-list" class="style-checks">
+      <label class="style-check"><input type="checkbox" id="sck-shadow"> <span id="sck-shadow-lbl">Drop Shadow</span></label>
+      <label class="style-check"><input type="checkbox" id="sck-ishadow"> <span id="sck-ishadow-lbl">Inner Shadow</span></label>
+      <label class="style-check"><input type="checkbox" id="sck-oglow"> <span id="sck-oglow-lbl">Outer Glow</span></label>
+      <label class="style-check"><input type="checkbox" id="sck-iglow"> <span id="sck-iglow-lbl">Inner Glow</span></label>
+      <label class="style-check"><input type="checkbox" id="sck-bevel"> <span id="sck-bevel-lbl">Bevel &amp; Emboss</span></label>
+      <label class="style-check"><input type="checkbox" id="sck-satin"> <span id="sck-satin-lbl">Satin</span></label>
+      <label class="style-check"><input type="checkbox" id="sck-color"> <span id="sck-color-lbl">Color Overlay</span></label>
+      <label class="style-check"><input type="checkbox" id="sck-grad"> <span id="sck-grad-lbl">Gradient Overlay</span></label>
+      <label class="style-check"><input type="checkbox" id="sck-stroke"> <span id="sck-stroke-lbl">Stroke</span></label>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin:4px 0 8px;font-size:9px;color:#555">
+      <span style="color:#ff6b6b">●</span> all selected have it &nbsp;
+      <span style="color:#ffd166">●</span> some have it (N = missing)
+    </div>
+    <label class="style-check" style="margin-bottom:10px"><input type="checkbox" id="sck-skip" checked> Skip existing styles</label>
+    <div class="style-box-btns">
+      <div class="style-box-btn" style="background:rgba(91,127,255,0.15);border-color:rgba(91,127,255,0.35);color:#5b7fff" onclick="applyStylePicker()">Apply</div>
+      <div class="style-box-btn" onclick="closeAddStyle()">Cancel</div>
+      <div class="style-box-btn" onclick="hideAllStyles()">Hide</div>
+      <div class="style-box-btn" style="background:rgba(255,107,107,0.12);border-color:rgba(255,107,107,0.3);color:#ff6b6b" onclick="removeAllStyles()">Delete All</div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT STYLE OVERLAY -->
+<div id="editstyle-overlay" class="style-overlay" onclick="if(event.target===this)closeEditStyle()">
+  <div class="style-box" style="width:300px;max-height:80vh;display:flex;flex-direction:column;">
+    <div class="style-box-title">Edit Layer Styles</div>
+    <div id="se-toggle-bar" style="display:flex;align-items:center;gap:8px;padding:6px 0 10px;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:8px">
+      <span style="font-size:10px;color:var(--muted);flex:1">Layer Styles</span>
+      <span id="se-toggle-label" style="font-size:10px;color:var(--muted)">ON</span>
+      <div id="se-toggle-track" class="se-slider-toggle on" onclick="seToggleLayerStyles()" title="Toggle all layer styles on/off">
+        <div class="se-slider-thumb"></div>
+      </div>
+    </div>
+    <div id="style-editor-body" style="flex:1;overflow-y:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:#35354a transparent;"><div class="se-hint">Select layers with active styles, then Refresh</div></div>
+    <div class="style-box-btns" style="margin-top:10px">
+      <div class="style-box-btn" onclick="closeEditStyle()">Close</div>
+      <div class="style-box-btn" onclick="refreshStyleEditor()">↺ Refresh</div>
+      <div class="style-box-btn ok" onclick="undoStyleEdits()">↩ Undo All</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="global-bar">
+    <div class="param-group"><label>In</label><input id="param-in" value="1"></div>
+    <div class="param-group"><label>Out</label><input id="param-out" value="1"></div>
+    <div class="divider-v"></div>
+    <div class="param-group"><label>EI</label><input id="param-easein" value="75" style="width:30px"></div>
+    <div class="param-group"><label>EO</label><input id="param-easeout" value="75" style="width:30px"></div>
+    <div class="divider-v"></div>
+    <div class="param-group"><label>Px</label><input id="param-pixels" value="100" style="width:34px"></div>
+    <div class="divider-v"></div>
+    <div class="param-group"><label>Hz</label><input id="param-wfreq" value="3" style="width:30px"></div>
+    <div class="param-group"><label>Amp</label><input id="param-wamp" value="20" style="width:30px"></div>
+    <div class="divider-v"></div>
+    <div class="param-group"><label style="color:#5b7fff">TI</label><input id="param-textin" value="0.5" style="width:30px"></div>
+    <div class="param-group"><label style="color:#5b7fff">TO</label><input id="param-textout" value="0.5" style="width:30px"></div>
+    <div class="top-actions">
+      <div class="tool-btn primary" data-tip="Apply ease in/out [E]" onclick="action_easeInOut()">✓</div>
+      <div class="tool-btn" data-tip="Reset all parameters" onclick="resetParams()">↺</div>
+    </div>
+  </div>
+
+  <!-- ── MARKER OVERLAYS ─────────────────────────────────────────── -->
+
+  <!-- Add Marker overlay -->
+  <div id="mkr-add-ov" class="mkr-ov" onclick="if(event.target===this)mkrClose('mkr-add-ov')">
+    <div class="mkr-box">
+      <div class="mkr-box-head">
+        <span class="mkr-box-title">Add Marker</span>
+        <div class="mkr-box-close" onclick="mkrClose('mkr-add-ov')">✕</div>
+      </div>
+      <div class="mkr-body">
+
+        <div class="mkr-sec-title">Quick</div>
+        <div class="mkr-row">
+          <button class="mkr-btn" onclick="mkrFire('addMarker',[''],'Marker added');mkrClose('mkr-add-ov')">+ Unnamed at playhead</button>
+        </div>
+        <div class="mkr-row">
+          <button class="mkr-btn" onclick="mkrFire('setInMarker',[],'IN set');mkrClose('mkr-add-ov')">→ Set IN (removes existing)</button>
+        </div>
+        <div class="mkr-row">
+          <button class="mkr-btn" onclick="mkrFire('setOutMarker',[],'OUT set');mkrClose('mkr-add-ov')">← Set OUT (removes existing)</button>
+        </div>
+
+        <div class="mkr-sep"></div>
+
+        <div class="mkr-sec-title">Named</div>
+        <div class="mkr-row">
+          <input class="mkr-input" id="mkr-label-in" placeholder="label…" onkeydown="if(event.key==='Enter')mkrAddNamed()">
+          <button class="mkr-btn" style="flex:0;padding:0 10px" onclick="mkrAddNamed()">Add</button>
+        </div>
+
+        <div class="mkr-sep"></div>
+
+        <div class="mkr-sec-title">From Selection (keys or layer range)</div>
+        <div class="mkr-prot-row">
+          <div class="mkr-prot-pip" id="mkr-prot-pip" onclick="mkrTogglePip(this)"></div>
+          <span class="mkr-prot-lbl" onclick="mkrTogglePip(document.getElementById('mkr-prot-pip'))">Protected zone</span>
+        </div>
+        <div class="mkr-row">
+          <input class="mkr-input" id="mkr-sel-label" placeholder="label…">
+          <button class="mkr-btn" style="flex:0;padding:0 10px" onclick="mkrAddFromSelection()">Span</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Remove Marker overlay -->
+  <div id="mkr-del-ov" class="mkr-ov" onclick="if(event.target===this)mkrClose('mkr-del-ov')">
+    <div class="mkr-box">
+      <div class="mkr-box-head">
+        <span class="mkr-box-title">Remove Markers</span>
+        <div class="mkr-box-close" onclick="mkrClose('mkr-del-ov')">✕</div>
+      </div>
+      <div class="mkr-body">
+
+        <div class="mkr-sec-title">Layer markers (selected layers)</div>
+        <div class="mkr-row">
+          <button class="mkr-btn del-btn" onclick="mkrFire('removeInOutMarkers',[],'IN/OUT removed');mkrClose('mkr-del-ov')">Remove IN &amp; OUT</button>
+        </div>
+        <div class="mkr-row">
+          <button class="mkr-btn del-btn" onclick="mkrFire('deleteUnnamedMarkers',[],'Unnamed removed');mkrClose('mkr-del-ov')">Remove unnamed</button>
+        </div>
+        <div class="mkr-row">
+          <button class="mkr-btn del-btn" onclick="mkrFire('deleteAllLayerMarkers',[],'Layer markers removed');mkrClose('mkr-del-ov')">Remove all on layers</button>
+        </div>
+
+        <div class="mkr-sep"></div>
+
+        <div class="mkr-sec-title">Comp markers</div>
+        <div class="mkr-row">
+          <button class="mkr-btn del-btn" onclick="mkrFire('deleteAllCompMarkers',[],'Comp markers removed');mkrClose('mkr-del-ov')">Remove all comp markers</button>
+        </div>
+
+        <div class="mkr-sep"></div>
+
+        <div class="mkr-row">
+          <button class="mkr-btn del-btn" onclick="mkrFire('deleteAllMarkersEverywhere',[],'All markers removed');mkrClose('mkr-del-ov')">Remove everything everywhere</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Number Marker overlay -->
+  <div id="mkr-num-ov" class="mkr-ov" onclick="if(event.target===this)mkrClose('mkr-num-ov')">
+    <div class="mkr-box">
+      <div class="mkr-box-head">
+        <span class="mkr-box-title">Number Markers</span>
+        <div class="mkr-box-close" onclick="mkrClose('mkr-num-ov')">✕</div>
+      </div>
+      <div class="mkr-body">
+
+        <div class="mkr-sec-title">Move to comp</div>
+        <div class="mkr-row">
+          <button class="mkr-btn" onclick="mkrFire('layerMarkersToCompNumbered',[],'Numbered + moved to comp');mkrClose('mkr-num-ov')">Layer markers → Comp (numbered)</button>
+        </div>
+
+        <div class="mkr-sep"></div>
+
+        <div class="mkr-sec-title">Number on layers</div>
+        <div class="mkr-row">
+          <button class="mkr-btn" onclick="mkrFire('countLayerMarkers',[],'Markers numbered');mkrClose('mkr-num-ov')">Number layer markers</button>
+        </div>
+
+        <div class="mkr-sep"></div>
+
+        <div class="mkr-sec-title">Remove numbers</div>
+        <div class="mkr-row">
+          <button class="mkr-btn del-btn" onclick="mkrFire('clearLayerMarkerNumbers',[],'Numbers cleared');mkrClose('mkr-num-ov')">Clear number labels</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Arrow overlay -->
+  <div id="arrow-ov" class="mkr-ov" onclick="if(event.target===this)arrowClose()">
+    <div class="mkr-box" style="width:270px">
+      <div class="mkr-box-head" style="padding:11px 14px 9px">
+        <span class="mkr-box-title" style="color:#ff9f43;font-size:10px">Add Arrowhead</span>
+        <div class="mkr-box-close" onclick="arrowClose()">✕</div>
+      </div>
+      <div class="mkr-body" style="padding:12px 14px 14px">
+
+        <div style="display:flex;gap:12px;margin-bottom:10px">
+          <div style="flex:1">
+            <div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#44445a;margin-bottom:5px">Size</div>
+            <input class="mkr-input" id="arrow-size" value="50" style="width:100%;height:26px;text-align:center;font-size:11px;box-sizing:border-box">
+          </div>
+          <div style="flex:2">
+            <div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#44445a;margin-bottom:5px">Type</div>
+            <select id="arrow-type" style="width:100%;height:26px;background:#0e0e14;border:1px solid #22222e;border-radius:4px;color:#d0d0e8;font-family:inherit;font-size:10px;padding:0 6px;outline:none;box-sizing:border-box">
+              <option value="0">Triangle</option>
+              <option value="1">Circle</option>
+              <option value="2">Null</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:14px;margin-bottom:12px">
+          <label style="font-size:10px;color:#8888a8;display:flex;align-items:center;gap:5px;cursor:pointer">
+            <input type="checkbox" id="arrow-animate" checked style="margin:0"> Animate
+          </label>
+          <label style="font-size:10px;color:#8888a8;display:flex;align-items:center;gap:5px;cursor:pointer">
+            <input type="checkbox" id="arrow-parent" style="margin:0"> Parent
+          </label>
+        </div>
+
+        <div class="mkr-sep" style="margin:0 0 12px"></div>
+        <div style="display:flex;gap:6px">
+          <button class="mkr-btn" style="height:28px;font-size:10px;text-align:center;border-color:rgba(255,159,67,.3)" onclick="arrowGo(0)">End</button>
+          <button class="mkr-btn" style="height:28px;font-size:10px;text-align:center;border-color:rgba(255,159,67,.3)" onclick="arrowGo(1)">Start</button>
+          <button class="mkr-btn" style="height:28px;font-size:10px;text-align:center;border-color:rgba(255,159,67,.3)" onclick="arrowGo(2)">Both</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Follow Path overlay -->
+  <div id="follow-ov" class="mkr-ov" onclick="if(event.target===this)followClose()">
+    <div class="mkr-box" style="width:280px">
+      <div class="mkr-box-head" style="padding:11px 14px 9px">
+        <span class="mkr-box-title" style="color:#ff9f43;font-size:10px">Follow Path</span>
+        <div class="mkr-box-close" onclick="followClose()">✕</div>
+      </div>
+      <div class="mkr-body" style="padding:12px 14px 14px">
+
+        <div id="follow-error" style="display:none;font-size:10px;color:#ff6b6b;margin-bottom:8px"></div>
+
+        <div id="follow-content" style="display:none">
+          <div style="margin-bottom:10px">
+            <div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#44445a;margin-bottom:4px">Path Layer</div>
+            <div id="follow-layer-name" style="font-size:11px;color:#d0d0e8;padding:5px 8px;background:#0e0e14;border:1px solid #22222e;border-radius:4px"></div>
+          </div>
+
+          <div style="margin-bottom:10px">
+            <div style="font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#44445a;margin-bottom:4px">Path</div>
+            <select id="follow-path-select" style="width:100%;height:26px;background:#0e0e14;border:1px solid #22222e;border-radius:4px;color:#d0d0e8;font-family:inherit;font-size:10px;padding:0 6px;outline:none;box-sizing:border-box"></select>
+          </div>
+
+          <div style="display:flex;gap:14px;margin-bottom:12px">
+            <label style="font-size:10px;color:#8888a8;display:flex;align-items:center;gap:5px;cursor:pointer">
+              <input type="checkbox" id="follow-animate" checked style="margin:0"> Animate
+            </label>
+            <label style="font-size:10px;color:#8888a8;display:flex;align-items:center;gap:5px;cursor:pointer">
+              <input type="checkbox" id="follow-parent" style="margin:0"> Parent
+            </label>
+          </div>
+
+          <div id="follow-info" style="font-size:9px;color:#44445a;margin-bottom:10px"></div>
+
+          <div class="mkr-sep" style="margin:0 0 12px"></div>
+          <button class="mkr-btn" style="height:30px;font-size:10px;text-align:center;border-color:rgba(255,159,67,.3);width:100%" onclick="followGo()">Apply</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="groups-scroll">
+    <div class="col-grid">
+
+    <!-- COL 1: Motion / Effects & Styles / Text & Shapes -->
+    <div class="col">
+
+    <!-- MOTION -->
+    <div class="group" style="--panel-color:#5b7fff;--panel-glow:rgba(91,127,255,0.35);--panel-rgb:91,127,255">
+      <div class="group-header">
+        <div class="group-title"><div class="group-dot" style="background:#5b7fff"></div><span class="group-label">Motion</span></div>
+        <span class="group-hotkey">1 2 3 4 Y</span>
+      </div>
+      <div class="group-tools">
+        <div class="tool-btn" data-tip="[1] Slide from bottom&#10;Shift → in only · Ctrl → out only" onclick="action_animDir(event,'up')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2L12 9H2L7 2Z" fill="currentColor" opacity=".9"/><rect x="3" y="11" width="8" height="1.5" rx=".75" fill="currentColor" opacity=".4"/></svg></div>
+        <div class="tool-btn" data-tip="[2] Slide from top&#10;Shift → in only · Ctrl → out only" onclick="action_animDir(event,'down')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="3" y="1.5" width="8" height="1.5" rx=".75" fill="currentColor" opacity=".4"/><path d="M7 12L2 5H12L7 12Z" fill="currentColor" opacity=".9"/></svg></div>
+        <div class="tool-btn" data-tip="[3] Slide from right&#10;Shift → in only · Ctrl → out only" onclick="action_animDir(event,'left')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L9 2V12L2 7Z" fill="currentColor" opacity=".9"/><rect x="10.5" y="3" width="1.5" height="8" rx=".75" fill="currentColor" opacity=".4"/></svg></div>
+        <div class="tool-btn" data-tip="[4] Slide from left&#10;Shift → in only · Ctrl → out only" onclick="action_animDir(event,'right')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="3" width="1.5" height="8" rx=".75" fill="currentColor" opacity=".4"/><path d="M12 7L5 2V12L12 7Z" fill="currentColor" opacity=".9"/></svg></div>
+        <div class="btn-gap"></div>
+        <div class="tool-btn primary" data-tip="Ease In/Out [E]&#10;Apply ease to selected keyframes&#10;Uses EI/EO values from top bar" onclick="action_easeInOut()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8c0-2.5 2-4.5 4.5-4.5S12 5.5 12 8s-2 4.5-4.5 4.5S3 10.5 3 8Z" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".9"/><path d="M5.5 8L7 9.5l3.5-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="btn-gap"></div>
+        <div class="tool-btn" data-tip="Scale In+Out&#10;Shift → in only · Ctrl → out only&#10;0%→100% at inPoint, 100%→0% at outPoint" onclick="action_animScale(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="6" y="6" width="4" height="4" rx=".5" fill="currentColor" opacity=".9"/><path d="M2 2l3 3M14 2l-3 3M2 14l3-3M14 14l-3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".6"/></svg></div>
+        <div class="tool-btn" data-tip="Fade In+Out&#10;Shift → in only · Ctrl → out only&#10;0%→100% at inPoint, 100%→0% at outPoint" onclick="action_animOpacity(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="currentColor" opacity=".85"/><path d="M8 3v10M3 8h10" stroke="white" stroke-width=".8" stroke-linecap="round" opacity=".3"/></svg></div>
+        <div class="btn-gap"></div>
+        <div class="tool-btn" data-tip="Text Animation [Y]&#10;Opens dialog: bounce/master, direction, animate by, properties" onclick="action_textAnim(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M8 4v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M10.5 9.5l2 2.5-2 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity=".75"/></svg></div>
+        <div class="tool-btn" data-tip="Trim Paths In+Out&#10;Shift → in only · Ctrl → out only" onclick="action_trimPaths(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2.5" y1="8" x2="13.5" y2="8" stroke="currentColor" stroke-width="1" stroke-dasharray="1.5 1.5" opacity=".35"/><path d="M6.5 5.5L3 8l3.5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 5.5L13 8l-3.5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
+
+    <!-- TEXT & SHAPES -->
+    <div class="group" style="--panel-color:#ff9f43;--panel-glow:rgba(255,159,67,0.3);--panel-rgb:255,159,67">
+      <div class="group-header">
+        <div class="group-title"><div class="group-dot" style="background:#ff9f43"></div><span class="group-label">Text & Shapes</span></div>
+      </div>
+      <div class="sub">TRANSFORM</div>
+      <div class="group-tools">
+        <div class="tool-btn" data-tip="Swap fill / stroke" onclick="fire('swapFillStroke',[],'Fill/stroke swapped')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="5.5" cy="8" r="3" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="10.5" cy="8" r="3" fill="currentColor" opacity=".7"/></svg></div>
+        <div class="tool-btn" data-tip="Add dashes to shape stroke" onclick="fire('addDashesToStroke',[],'Dashes toggled')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.5" y="4.5" width="11" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3" stroke-dasharray="2.5 2" fill="none"/></svg></div>
+        <div class="tool-btn" data-tip="Size Rig&#10;Slider-driven width + height expression" onclick="fire('applySizeRig',[],'Size rig applied')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="5" width="10" height="6" rx="1.2" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M1.5 6.5L1 8l.5 1.5M14.5 6.5L15 8l-.5 1.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="tool-btn" data-tip="Combine shapes&#10;Merge selected shape layers into one" onclick="fire('combineShapes',[],'Shapes combined')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="8" y="8" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M8 5h3M11 5v3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".5"/></svg></div>
+        <div class="tool-btn" data-tip="Explode shapes&#10;Split each shape group into its own layer" onclick="fire('explodeShapes',[],'Shapes exploded')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="6" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="9" y="6" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M7 8.5h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M8 2v3M6.5 3.5L8 2l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/></svg></div>
+        <div class="tool-btn" data-tip="Add arrowhead to shape path&#10;Shift: Follow path" onclick="if(event.shiftKey){followOpen()}else{arrowOpen()}"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="3" cy="8" r="1.2" fill="currentColor" opacity=".5"/></svg></div>
+        <div class="btn-gap"></div>
+        <div class="tool-btn wip" data-tip="Convert shape to mask&#10;[WIP]" onclick="fire('shapeToMask',[],'Shape converted to mask')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none" stroke-dasharray="2.5 1.5"/><path d="M6 8h4M8 6v4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".7"/></svg></div>
+        <div class="tool-btn wip" data-tip="Convert shape to path (Bezier)&#10;[WIP]" onclick="fire('shapeToPath',[],'Shape converted to path')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 12C4 9 5 5 8 4C11 3 13 6 13 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/><circle cx="3" cy="12" r="1.5" fill="currentColor" opacity=".7"/><circle cx="13" cy="9" r="1.5" fill="currentColor" opacity=".7"/><circle cx="6" cy="4.5" r="1" stroke="currentColor" stroke-width="1" fill="none" opacity=".5"/><circle cx="11" cy="5.5" r="1" stroke="currentColor" stroke-width="1" fill="none" opacity=".5"/></svg></div>
+      </div>
+      <div class="sub-divider">
+        <div class="sub">TEXT</div>
+        <div class="group-tools">
+          <div class="tool-btn wide" data-tip="Stroke style: fill over stroke + round line join&#10;Applies to all strokes on selected shape layers" onclick="fire('applyStrokeStyle',[],'Stroke style applied')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="4.5" fill="currentColor" opacity=".6"/><circle cx="8" cy="8" r="4.5" stroke="currentColor" stroke-width="2.5" fill="none" opacity=".85"/><path d="M5 9.5 Q8 12 11 9.5" stroke="white" stroke-width=".8" fill="none" stroke-linecap="round" opacity=".5"/></svg></div>
+          <div class="tool-btn" data-tip="Find &amp; Replace text&#10;Shift → case sensitive" onclick="action_findReplaceText(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.3" fill="none"/><line x1="9.5" y1="9.5" x2="13.5" y2="13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><text x="4.5" y="9" font-size="5.5" fill="currentColor" font-family="monospace" font-weight="bold" text-anchor="middle">T</text></svg></div>
+          <div class="btn-gap"></div>
+          <div class="tool-btn wip" data-tip="Split text layer into per-character layers&#10;[WIP]" onclick="fire('splitText',[],'Text split')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 5h4M3 8h4M3 11h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M9 5h4M9 8h4M9 11h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="8" y1="3" x2="8" y2="13" stroke="currentColor" stroke-width="1" stroke-dasharray="1.5 1.5" stroke-linecap="round" opacity=".5"/></svg></div>
+          <div class="tool-btn wip" data-tip="Typewriter rig&#10;Expression-driven per-character reveal&#10;[WIP]" onclick="fire('applyTypewriterRig',[],'Typewriter rig applied')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M4 7h2M7 7h2M10 7h2M4 10h1M6 10h1M8 10h1M10 10h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M7 10.5v1.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".5"/></svg></div>
+          <div class="tool-btn wip" data-tip="Number counter rig&#10;Expression-driven animated number&#10;[WIP]" onclick="fire('applyCounterRig',[],'Counter rig applied')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 4v8M5 4l-1.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M8.5 6.5C8.5 5.5 9.2 5 10 5C11 5 11.5 5.7 11.5 6.5C11.5 7.8 8.5 9 8.5 10H11.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EFFECTS & STYLES -->
+    <div class="group" style="--panel-color:#c77dff;--panel-glow:rgba(199,125,255,0.3);--panel-rgb:199,125,255">
+      <div class="group-header">
+        <div class="group-title"><div class="group-dot" style="background:#c77dff"></div><span class="group-label">Effects & Styles</span></div>
+        <span class="group-hotkey">X</span>
+      </div>
+      <div class="sub">APPLY</div>
+      <div class="group-tools">
+        <div class="tool-btn" data-tip="Apply Glow" onclick="fire('applyGlow',[],'Glow applied')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" fill="currentColor" opacity=".85"/><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1" opacity=".35" fill="none"/><circle cx="8" cy="8" r="7.5" stroke="currentColor" stroke-width=".7" opacity=".15" fill="none"/></svg></div>
+        <div class="tool-btn" data-tip="Apply VHS&#10;Chromatic aberration + noise" onclick="fire('applyVHS',[],'VHS applied')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="4" width="13" height="8" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M1.5 6.5h13M1.5 9.5h13" stroke="currentColor" stroke-width=".7" opacity=".4"/><path d="M5 6.5v3M8 6.5v3M11 6.5v3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".5"/></svg></div>
+        <div class="tool-btn" data-tip="Blur focus shift: 0→15→0 in+out&#10;Alt → blur out only (0→15 at outpoint)" onclick="action_blur(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="4.5" fill="currentColor" opacity=".2"/><circle cx="8" cy="8" r="3.5" fill="currentColor" opacity=".25"/><circle cx="8" cy="8" r="2" fill="currentColor" opacity=".5"/></svg></div>
+        <div class="tool-btn" data-tip="Dim + Desaturate&#10;Lumetri: exposure -2, saturation 0" onclick="fire('applyDimDesat',[],'Dim+Desat applied')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M8 2.5v11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M8 2.5a5.5 5.5 0 0 1 0 11" fill="currentColor" opacity=".5"/><line x1="5" y1="5" x2="11" y2="11" stroke="currentColor" stroke-width=".8" opacity=".4"/></svg></div>
+      </div>
+      <div class="sub-divider">
+        <div class="sub">MANAGE</div>
+        <div class="group-tools">
+          <div class="tool-btn wide" data-tip="Add Layer Styles" onclick="openAddStyle()">+ Style</div>
+          <div class="tool-btn wide" data-tip="Edit Layer Styles" onclick="openEditStyle()">✎ Style</div>
+          <div class="tool-btn wide" data-tip="Toggle all layer styles on/off" onclick="fire('toggleAllLayerStyles',[],'Styles toggled')">⊙ Style</div>
+
+          <div class="tool-btn" data-tip="Toggle effects on/off [X]" onclick="fire('toggleEffects',[],'Effects toggled')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 5h10M3 8h7M3 11h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="12" cy="11" r="2.5" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M11.3 11h1.4M12 10.3v1.4" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></div>
+          <div class="tool-btn" data-tip="Copy effects to selected layers" onclick="fire('copyEffects',[],'Effects copied')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 5h7M3 8h5M3 11h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><rect x="9" y="7" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M10.5 5.5V7M11.5 5.5V7M10.5 5.5h1" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></div>
+        </div>
+      </div>
+      <div class="sub-divider">
+        <div class="sub">DELETE</div>
+        <div class="group-tools">
+          <div class="tool-btn del" data-tip="Delete all effects" onclick="fire('deleteAllEffects',[],'Effects deleted')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 5h10M3 8h7M3 11h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M11 9.5l3 3M14 9.5l-3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+          <div class="tool-btn del" data-tip="Delete all expressions" onclick="fire('deleteAllExpressions',[],'Expressions deleted')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M10.5 7.5l2.5 2.5M13 7.5l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+          <div class="tool-btn del" data-tip="Delete all keyframes" onclick="fire('deleteAllKeyframes',[],'Keyframes deleted')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3L12 8L8 13L4 8L8 3Z" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M6 6l4 4M10 6l-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+          <div class="tool-btn del" data-tip="Full Purge&#10;Choose what to delete" onclick="openPurgeModal()" style="border-style:dashed"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4.5 5h7l-.7 8H5.2L4.5 5z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/><path d="M2.5 5h11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M6.5 3h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M6.5 7.5v3M9.5 7.5v3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- /col 1 -->
+
+    <!-- COL 2: Keys & Expr / Layers -->
+    <div class="col">
+
+    <!-- KEYS & EXPR -->
+    <div class="group" style="--panel-color:#ffd166;--panel-glow:rgba(255,209,102,0.3);--panel-rgb:255,209,102">
+      <div class="group-header">
+        <div class="group-title"><div class="group-dot" style="background:#ffd166"></div><span class="group-label">Keys & Expr</span></div>
+        <span class="group-hotkey">O W R C T Z</span>
+      </div>
+      <div class="sub">DYNAMICS</div>
+      <div class="group-tools">
+        <div class="tool-btn" data-tip="Add Overshoot [O]" onclick="action_overshoot()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1.5 10 C3 10 3.5 3 7 3 C9.5 3 9.5 9 11 7.5 C11.8 6.8 12.2 5.5 12.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg></div>
+        <div class="tool-btn" data-tip="Wiggle [W]&#10;Adds 4 expression controls: Enable / Frequency / Amount / Seed&#10;Seeds Freq + Amount from Hz + Amp params" onclick="action_wiggle()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8C2.5 8 2.5 4 4 4C5.5 4 5.5 12 7 12C8.5 12 8.5 4 10 4C11.5 4 11.5 12 13 12C14 12 14.5 9 15 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg></div>
+        <div class="tool-btn" data-tip="Anticipation panel&#10;Opens dialog with Strength / Decay / Steps / Presets&#10;Apply Anticipation only, Both, or Overshoot only" onclick="action_anticipation(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 11 C4 11 4 5 7 5 C9 5 9 9 11 7 C12.5 5.5 13.5 4 14 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/><path d="M5 11l-3 0 0-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sub-divider">
+        <div class="sub">KEYFRAMES</div>
+        <div class="group-tools">
+          <div class="tool-btn" data-tip="Reverse [R]" onclick="action_reverse()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 5h10M3 5l3-2.5M3 5l3 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 11H3M13 11l-3-2.5M13 11l-3 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="tool-btn" data-tip="Clone [C]&#10;Shift → flip" onclick="action_clone(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4h6v6H4z" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M7 7h5v5H7z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-dasharray="1.5 1.2"/></svg></div>
+          <div class="tool-btn" data-tip="Loop cycle&#10;Shift → pingpong · Ctrl → offset" onclick="action_loop(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8a5 5 0 1 1 5 5" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M5 11l-2 2 2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="tool-btn" data-tip="Continuous roving [T]&#10;Shift → disable" onclick="action_roving(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8Q5 4 8 8Q11 12 14 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/><circle cx="5" cy="6.5" r="1.5" fill="currentColor" opacity=".5"/><circle cx="11" cy="9.5" r="1.5" fill="currentColor" opacity=".5"/></svg></div>
+          <div class="tool-btn" data-tip="Align first key → playhead&#10;Shift → last key · Ctrl → layer in · Alt → layer out" onclick="action_alignKeys(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 11h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAYERS -->
+    <div class="group" style="--panel-color:#06d6a0;--panel-glow:rgba(6,214,160,0.2);--panel-rgb:6,214,160">
+      <div class="group-header">
+        <div class="group-title"><div class="group-dot" style="background:#06d6a0"></div><span class="group-label">Layers</span></div>
+        <span class="group-hotkey">S F H L P</span>
+      </div>
+      <div class="sub">ARRANGE</div>
+      <div class="group-tools">
+        <div class="tool-btn" data-tip="Center anchor point&#10;Shift → 9-point picker" onclick="action_anchor(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><line x1="8" y1="2" x2="8" y2="4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="8" y1="11.5" x2="8" y2="14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="2" y1="8" x2="4.5" y2="8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="11.5" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+        <div class="tool-btn" data-tip="Stagger [S]&#10;Shift → reverse" onclick="action_stagger(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="6" y="3" width="8" height="2" rx="1" fill="currentColor" opacity=".9"/><rect x="4" y="7" width="8" height="2" rx="1" fill="currentColor" opacity=".65"/><rect x="2" y="11" width="8" height="2" rx="1" fill="currentColor" opacity=".4"/></svg></div>
+        <div class="tool-btn" data-tip="Pull to playhead [P]&#10;Shift → from outpoint" onclick="action_pull(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4 6l4-4 4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="9" width="10" height="2" rx="1" fill="currentColor" opacity=".4"/></svg></div>
+        <div class="tool-btn" data-tip="Trim to keyframe range" onclick="fire('trimToKeyframes',[],'Trimmed to keys')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="6" width="12" height="4" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><line x1="5" y1="4" x2="5" y2="12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="11" y1="4" x2="11" y2="12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+        <div class="tool-btn" data-tip="Parent to null" onclick="action_parentNull()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="4" r="2" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="4" cy="12" r="1.5" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="12" cy="12" r="1.5" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M8 6v2M8 8l-4 3M8 8l4 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+      </div>
+      <div class="sub sub-divider">SELECT</div>
+      <div class="group-tools">
+        <div class="tool-btn" data-tip="Select all layers at playhead&#10;(overlapping current time)" onclick="fire('selectAtPlayhead',[],'Layers at playhead selected')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="8" y1="1" x2="8" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".6"/><rect x="2" y="5" width="5" height="2.5" rx=".8" fill="currentColor" opacity=".9"/><rect x="2" y="9" width="8" height="2.5" rx=".8" fill="currentColor" opacity=".5"/><rect x="9" y="5" width="5" height="2.5" rx=".8" fill="currentColor" opacity=".3"/></svg></div>
+        <div class="tool-btn" data-tip="Select parents" onclick="fire('selectParents',[],'Parents selected')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="3.5" r="2.2" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="4" cy="12.5" r="1.5" fill="currentColor" opacity=".3"/><circle cx="12" cy="12.5" r="1.5" fill="currentColor" opacity=".3"/><path d="M8 5.7v2.5M8 8.2l-4 3.3M8 8.2l4 3.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M5.5 2.5L8 1l2.5 1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="tool-btn" data-tip="Select children" onclick="fire('selectChildren',[],'Children selected')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="3.5" r="1.5" fill="currentColor" opacity=".3"/><circle cx="4" cy="12.5" r="2.2" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="12" cy="12.5" r="2.2" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M8 5v2.5M8 7.5l-4 3.3M8 7.5l4 3.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M5.5 14l2.5 1.5L10.5 14" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="btn-gap"></div>
+        <div class="btn-gap"></div>
+        <div class="tool-btn" data-tip="Keep only text layers selected" onclick="fire('filterTextLayers',[],'Text layers kept')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M5 8h6M7 12h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="tool-btn" data-tip="Keep only shape layers selected" onclick="fire('keepOnlyShapes',[],'Shape layers kept')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/></svg></div>
+        <div class="tool-btn" data-tip="Keep only footage/image layers selected" onclick="fire('keepOnlyImages',[],'Image layers kept')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M2 10l3.5-3.5 2.5 2.5 2-2 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="sub-divider">
+        <div class="sub">VISIBILITY</div>
+        <div class="group-tools">
+          <div class="tool-btn" data-tip="Solo/Unsolo toggle [S]&#10;Shift → solo exclusive (unsolo rest)" onclick="action_solo(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="4.5" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg></div>
+          <div class="tool-btn" data-tip="Hide/Show toggle [H]&#10;Shift → show ALL layers" onclick="action_hideToggle(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="8" cy="8" r="2" fill="currentColor" opacity=".75"/></svg></div>
+          <div class="tool-btn" data-tip="Lock/Unlock toggle [L]&#10;Shift → unlock at playhead" onclick="action_lockToggle(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="4" y="7.5" width="8" height="5.5" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M5.5 7.5V5.5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.3" fill="none"/></svg></div>
+          <div class="tool-btn" data-tip="Focus/Unfocus [F]&#10;Shift → focus at playhead" onclick="action_focusToggle(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M2 2l3 3M14 2l-3 3M2 14l3-3M14 14l-3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+          <div class="btn-gap"></div>
+          <div class="tool-btn" data-tip="Solo+Focus / Unsolo+Unfocus toggle" onclick="action_soloFocusToggle()"><svg width="17" height="16" viewBox="0 0 17 16" fill="none"><circle cx="5.5" cy="8" r="3.5" stroke="currentColor" stroke-width="1.2"/><circle cx="5.5" cy="8" r="1.5" fill="currentColor" opacity=".8"/><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M9 4.5l1.2 1.2M16.5 1.5l-2 2M9 11.5l1.2-1.2M16.5 14.5l-2-2" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity=".6"/></svg></div>
+        </div>
+      </div>
+      <div class="sub-divider">
+        <div class="sub">COMP OPS</div>
+        <div class="group-tools">
+          <div class="tool-btn" data-tip="Track matte [Tab]&#10;Shift → +parent · Ctrl → +blend · Alt → break" onclick="action_matte(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="3" width="10" height="4.5" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="3" y="8.5" width="10" height="4.5" rx="1" stroke="currentColor" stroke-width="1.3" fill="none" stroke-dasharray="2 1.2"/></svg></div>
+          <div class="tool-btn" data-tip="Precompose [` ]" onclick="action_precomp()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="4" y="2" width="8" height="5" rx="1" stroke="currentColor" stroke-width="1.3" fill="none" stroke-dasharray="2 1"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MARKERS -->
+    <div class="group" style="--panel-color:#ff9999;--panel-glow:rgba(255,153,153,0.3);--panel-rgb:255,153,153">
+      <div class="group-header">
+        <div class="group-title"><div class="group-dot" style="background:#ff9999"></div><span class="group-label">Markers</span></div>
+      </div>
+      <div class="group-tools">
+
+        <!-- Add marker -->
+        <div class="tool-btn mkr-trigger" data-tip="Add Marker" onclick="mkrOpen('mkr-add-ov')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 1h4l-.9 3.2H5.9L5 1z" fill="currentColor" opacity=".85"/><line x1="7" y1="4.2" x2="7" y2="13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="4" y1="8.2" x2="10" y2="8.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </div>
+
+        <!-- Remove marker -->
+        <div class="tool-btn del mkr-trigger" data-tip="Remove Markers" onclick="mkrOpen('mkr-del-ov')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 1h4l-.9 3.2H5.9L5 1z" fill="currentColor" opacity=".4"/><line x1="4.5" y1="4.8" x2="9.5" y2="12" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity=".55"/><line x1="9.5" y1="4.8" x2="4.5" y2="12" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity=".55"/></svg>
+        </div>
+
+        <!-- Number markers -->
+        <div class="tool-btn mkr-trigger" data-tip="Number Markers" onclick="mkrOpen('mkr-num-ov')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 2.5h1.3v5.5M3 8h2.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.5 4h2.2c.7 0 1.3.4 1.3 1.3s-.6 1.2-1.3 1.2H7.5M7.5 6.5h2.2c.7 0 1.3.4 1.3 1.2S10.4 9 9.7 9H7.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><path d="M3 12h2.5M3 11v2" stroke="currentColor" stroke-width=".9" stroke-linecap="round" opacity=".4"/></svg>
+        </div>
+
+      </div>
+    </div>
+
+    </div><!-- /col 2 -->
+
+    </div><!-- /col-grid -->
+
+    <!-- FULL-WIDTH: Labels + Comp -->
+    <div class="groups-bottom">
+
+    <!-- LABELS (full-width) -->
+    <div class="group group-wide" style="--panel-color:#ff6b6b;--panel-glow:rgba(255,107,107,0.3);--panel-rgb:255,107,107">
+      <div class="group-header">
+        <div class="group-title"><div class="group-dot" style="background:#ff6b6b"></div><span class="group-label">Labels</span></div>
+      </div>
+      <div style="font-size:8px;color:#3a3a5a;margin-bottom:4px">click=layer · shift=key · ctrl=marker · alt=recolor</div>
+      <div class="swatch-row">
+        <div class="swatch" style="background:#353535;border:1px solid #666" data-tip="Label: None&#10;Shift → label keyframes&#10;Ctrl → create marker&#10;Alt → recolor marker at playhead" onclick="action_swatch(event,0)"></div>
+        <div class="swatch" style="background:#B53838" data-tip="1 — Red" onclick="action_swatch(event,1)"></div>
+        <div class="swatch" style="background:#E4D84C" data-tip="2 — Yellow" onclick="action_swatch(event,2)"></div>
+        <div class="swatch" style="background:#A9CBC7" data-tip="3 — Aqua" onclick="action_swatch(event,3)"></div>
+        <div class="swatch" style="background:#E5BCC9" data-tip="4 — Pink" onclick="action_swatch(event,4)"></div>
+        <div class="swatch" style="background:#A9A9CA" data-tip="5 — Lavender" onclick="action_swatch(event,5)"></div>
+        <div class="swatch" style="background:#E7C19E" data-tip="6 — Peach" onclick="action_swatch(event,6)"></div>
+        <div class="swatch" style="background:#B3C7B3" data-tip="7 — Sea Foam" onclick="action_swatch(event,7)"></div>
+        <div class="swatch" style="background:#677DE0" data-tip="8 — Blue" onclick="action_swatch(event,8)"></div>
+        <div class="swatch" style="background:#4AA44C" data-tip="9 — Green" onclick="action_swatch(event,9)"></div>
+        <div class="swatch" style="background:#8E2C9A" data-tip="10 — Purple" onclick="action_swatch(event,10)"></div>
+        <div class="swatch" style="background:#E8920D" data-tip="11 — Orange" onclick="action_swatch(event,11)"></div>
+        <div class="swatch" style="background:#7F452A" data-tip="12 — Brown" onclick="action_swatch(event,12)"></div>
+        <div class="swatch" style="background:#F46DD6" data-tip="13 — Fuchsia" onclick="action_swatch(event,13)"></div>
+        <div class="swatch" style="background:#3DA2A5" data-tip="14 — Cyan" onclick="action_swatch(event,14)"></div>
+        <div class="swatch" style="background:#A89677" data-tip="15 — Sandstone" onclick="action_swatch(event,15)"></div>
+        <div class="swatch" style="background:#1E401E" data-tip="16 — Dark Green" onclick="action_swatch(event,16)"></div>
+      </div>
+    </div>
+
+    <!-- COMP -->
+    <div class="group group-wide" style="--panel-color:#a8dadc;--panel-glow:rgba(168,218,220,0.25);--panel-rgb:168,218,220">
+      <div class="group-header">
+        <div class="group-title"><div class="group-dot" style="background:#a8dadc"></div><span class="group-label">Comp</span></div>
+        <span style="font-size:9px;color:#3a3a5a">default=precomps · shift=active</span>
+      </div>
+      <div id="comp-info" class="comp-info"><span>No comp active</span></div>
+      <div class="group-tools">
+        <div class="tool-btn" data-tip="Rename&#10;Shift → rename active comp" onclick="action_renameComp(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M5 8h3M9.5 8h1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M11 6.5v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+        <div class="tool-btn" data-tip="Auto-trim to last layer out&#10;Shift → active comp" onclick="action_autoTrimComp(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="5" width="12" height="6" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M11 3v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M9 2l2 1-2 1" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="tool-btn" data-tip="Crop to content&#10;Shift → active comp&#10;Pad = extra pixels around bounds" onclick="action_cropComp(event)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="4" y="4" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M2 4h2M12 4h2M4 2v2M4 12v2M12 2v2M12 12v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".5"/></svg></div>
+        <div class="tool-btn" data-tip="Quick Render" onclick="fire('quickRender',[],'Quick render started')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M6 5.5l5 2.5-5 2.5V5.5z" fill="currentColor" opacity=".85"/></svg></div>
+        <div class="tool-btn wide" data-tip="Add to render queue" onclick="fire('addToRenderQueue',[],'Added to queue')">▶ Queue</div>
+        <div class="tool-btn wide" data-tip="Refresh comp info" onclick="refreshCompInfo()">↺ Info</div>
+        <div class="btn-gap"></div>
+        <div class="tool-btn wip" data-tip="Decompose comp&#10;Replaces precomp with its contents in-place&#10;[WIP]" onclick="fire('decomposeComp',[],'Comp decomposed')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="4" y="2" width="8" height="5" rx="1" stroke="currentColor" stroke-width="1.3" fill="none" stroke-dasharray="2 1"/><path d="M8 9v4M6 11l2 2 2-2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/></svg></div>
+      </div>
+    </div>
+
+  </div><!-- /groups-bottom -->
+
+  </div><!-- /groups-scroll -->
+
+  <div class="bottom-bar">
+    <div class="indicator"></div>
+    <span>TNK v.3</span>
+    <div class="autoclose-toggle" onclick="toggleAutoClose()">
+      <div class="toggle-pip" id="autoclose-pip"></div>
+      <span id="autoclose-label">auto-close off</span>
+    </div>
+    <span class="hk-hint" onclick="showHotkeys()">? hotkeys</span>
+    <span class="hk-hint" onclick="openHkSettings()" style="margin-left:4px">⚙ keys</span>
+    <span class="hk-hint" onclick="fire('openProber',[],'Prober open')" style="margin-left:4px" title="Inspect selected layers & properties for scripting">🔍 probe</span>
+    <span class="hk-hint" onclick="fire('ffxToBinary',[],'FFX binary')" style="margin-left:4px" title="Convert an .ffx preset to a binary string for embedding in scripts">📦 ffx</span>
+  </div>
+</div>
+
+<script>
+var autoClose = false;
+var _textAnimState = { bounce: false, dir: 'up', animBy: 'words', pos: true, opac: true, scale: false, mode: 'in' };
+
+// ── HOTKEY DATA ───────────────────────────────────────────────────────────────
+var _HK_ACTIONS = [
+  { id:'easeInOut',  def:'e',   label:'Ease In/Out',         hint:'' },
+  { id:'lockToggle', def:'l',   label:'Linear / Lock',       hint:'shift=unlock playhead' },
+  { id:'overshoot',  def:'o',   label:'Overshoot',           hint:'' },
+  { id:'wiggle',     def:'w',   label:'Wiggle',              hint:'' },
+  { id:'textAnim',   def:'y',   label:'Text Anim dialog',    hint:'' },
+  { id:'reverse',    def:'r',   label:'Reverse keyframes',   hint:'' },
+  { id:'clone',      def:'c',   label:'Clone keys',          hint:'shift=flip' },
+  { id:'roving',     def:'t',   label:'Continuous roving',   hint:'shift=off' },
+  { id:'deleteKeys', def:'z',   label:'Delete keyframes',    hint:'' },
+  { id:'stagger',    def:'s',   label:'Stagger layers',      hint:'shift=reverse' },
+  { id:'pull',       def:'p',   label:'Pull to playhead',    hint:'shift=outpoint' },
+  { id:'focus',      def:'f',   label:'Focus layer',         hint:'shift=at playhead' },
+  { id:'hide',       def:'h',   label:'Hide/show layers',    hint:'shift=show all' },
+  { id:'fx',         def:'x',   label:'Toggle effects',      hint:'shift=copy' },
+  { id:'marker',     def:'m',   label:'Add marker',          hint:'' },
+  { id:'precomp',    def:'`',   label:'Precompose',          hint:'' },
+  { id:'matte',      def:'tab', label:'Track matte',         hint:'shift/ctrl/alt variants' },
+  { id:'animUp',     def:'1',   label:'Anim from bottom',    hint:'shift=in · ctrl=out' },
+  { id:'animDown',   def:'2',   label:'Anim from top',       hint:'shift=in · ctrl=out' },
+  { id:'animLeft',   def:'3',   label:'Anim from right',     hint:'shift=in · ctrl=out' },
+  { id:'animRight',  def:'4',   label:'Anim from left',      hint:'shift=in · ctrl=out' },
+];
+
+var _HK_STORE = 'tnk_hotkeys_v1';
+var _hkMap = {}; // id → key
+
+function _hkLoad() {
+  var saved;
+  try { saved = JSON.parse(localStorage.getItem(_HK_STORE)) || {}; } catch(e) { saved = {}; }
+  for (var i = 0; i < _HK_ACTIONS.length; i++) {
+    var a = _HK_ACTIONS[i];
+    _hkMap[a.id] = (saved[a.id] !== undefined) ? saved[a.id] : a.def;
+  }
+}
+
+function _hkSave() {
+  try { localStorage.setItem(_HK_STORE, JSON.stringify(_hkMap)); } catch(e) {}
+}
+
+function _hkByKey(k) {
+  for (var id in _hkMap) { if (_hkMap[id] === k) return id; }
+  return null;
+}
+
+function _hkKeyDisplay(k) {
+  if (!k || k === '') return '—';
+  if (k === 'tab') return 'Tab';
+  if (k === ' ') return 'Spc';
+  return k.toUpperCase();
+}
+
+function _hkIsValidKey(k) {
+  if (!k) return false;
+  if (k === 'escape' || k === 'enter' || k === 'backspace' || k === 'delete') return false;
+  if (k === '?') return false; // reserved for hotkey overlay
+  if (k.length === 1) return true;
+  if (k === 'tab') return true;
+  return false;
+}
+
+function _hkDispatch(actionId, e) {
+  switch (actionId) {
+    case 'easeInOut':  action_easeInOut();       break;
+    case 'lockToggle': action_lockToggle(e);     break;
+    case 'overshoot':  action_overshoot();       break;
+    case 'wiggle':     action_wiggle();          break;
+    case 'textAnim':   action_textAnim(e);       break;
+    case 'reverse':    action_reverse();         break;
+    case 'clone':      action_clone(e);          break;
+    case 'roving':     action_roving(e);         break;
+    case 'deleteKeys': fire('deleteAllKeyframes',[],'Keyframes deleted'); break;
+    case 'stagger':    action_stagger(e);        break;
+    case 'pull':       action_pull(e);           break;
+    case 'focus':      action_focusToggle(e);    break;
+    case 'hide':       action_hideToggle(e);     break;
+    case 'fx':         action_fx(e);             break;
+    case 'marker':     mkrOpen('mkr-add-ov');    break;
+    case 'precomp':    action_precomp();         break;
+    case 'matte':      action_matte(e);          break;
+    case 'animUp':     action_animDir(e,'up');   break;
+    case 'animDown':   action_animDir(e,'down'); break;
+    case 'animLeft':   action_animDir(e,'left'); break;
+    case 'animRight':  action_animDir(e,'right');break;
+  }
+}
+
+_hkLoad();
+
+function toggleAutoClose() {
+  autoClose = !autoClose;
+  document.getElementById('autoclose-pip').className = 'toggle-pip' + (autoClose ? ' on' : '');
+  document.getElementById('autoclose-label').textContent = autoClose ? 'auto-close on' : 'auto-close off';
+}
+
+var toastTimer;
+function toast(msg, isError) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderColor = isError ? 'rgba(255,107,107,0.4)' : 'rgba(91,127,255,0.4)';
+  el.style.color = isError ? '#ff6b6b' : '#5b7fff';
+  el.style.background = isError ? 'rgba(255,107,107,0.1)' : 'rgba(91,127,255,0.15)';
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { el.classList.remove('show'); }, 1800);
+}
+
+function fire(fn, args, label) {
+  TNK.run(fn, args, function(result) {
+    toast(result || label || 'Done');
+    if (autoClose) TNK.closePanel(400);
+  });
+}
+
+function getParams() {
+  return {
+    inTime:  parseFloat(document.getElementById('param-in').value) || 1,
+    outTime: parseFloat(document.getElementById('param-out').value) || 1,
+    pixels:  parseFloat(document.getElementById('param-pixels').value) || 100,
+    easeIn:  parseFloat(document.getElementById('param-easein').value) || 75,
+    easeOut: parseFloat(document.getElementById('param-easeout').value) || 75,
+    wFreq:   parseFloat(document.getElementById('param-wfreq').value) || 3,
+    wAmp:    parseFloat(document.getElementById('param-wamp').value) || 20,
+    textIn:  parseFloat(document.getElementById('param-textin').value) || 0.5,
+    textOut: parseFloat(document.getElementById('param-textout').value) || 0.5,
+  };
+}
+function resetParams() {
+  ['param-in','param-out','param-pixels','param-easein','param-easeout','param-wfreq','param-wamp','param-textin','param-textout'].forEach(function(id,i){
+    document.getElementById(id).value = ['1','1','100','75','75','3','20','0.5','0.5'][i];
+  });
+  toast('Params reset');
+}
+
+var _modalCallback = null;
+function showModal(title, placeholder, okLabel, callback) {
+  _modalCallback = callback;
+  document.getElementById('modal-title').textContent = title || 'Input';
+  document.getElementById('modal-input').value = '';
+  document.getElementById('modal-input').placeholder = placeholder || '';
+  document.getElementById('modal-ok').textContent = okLabel || 'OK';
+  document.getElementById('modal-overlay').classList.add('visible');
+  setTimeout(function() { document.getElementById('modal-input').focus(); }, 50);
+}
+function _closeModal() {
+  document.getElementById('modal-overlay').classList.remove('visible');
+  _modalCallback = null;
+}
+document.getElementById('modal-cancel').onclick = _closeModal;
+document.getElementById('modal-ok').onclick = function() {
+  var val = document.getElementById('modal-input').value;
+  var cb = _modalCallback; _closeModal(); if (cb) cb(val);
+};
+document.getElementById('modal-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('modal-ok').click();
+  if (e.key === 'Escape') _closeModal();
+});
+
+function openPurgeModal()  { document.getElementById('purge-overlay').classList.add('visible'); }
+function closePurgeModal() { document.getElementById('purge-overlay').classList.remove('visible'); }
+function executePurge() {
+  var doFx     = document.getElementById('purge-fx').checked;
+  var doKeys   = document.getElementById('purge-keys').checked;
+  var doExpr   = document.getElementById('purge-expr').checked;
+  var doLabels = document.getElementById('purge-labels').checked;
+  closePurgeModal();
+  fire('fullPurge', [doFx, doKeys, doExpr, doLabels], 'Purge complete');
+}
+
+function action_animDir(e, dir) {
+  var p = getParams();
+  if (e && e.shiftKey)     fire('animInDir',    [p, dir], 'Anim In ('  +dir+')');
+  else if (e && e.ctrlKey) fire('animOutDir',   [p, dir], 'Anim Out (' +dir+')');
+  else                     fire('animInOut',    [p, dir], 'Anim In+Out ('+dir+')');
+}
+function action_animScale(e) {
+  var p = getParams();
+  if (e && e.shiftKey)     fire('animScaleIn',  [p], 'Scale in applied');
+  else if (e && e.ctrlKey) fire('animScaleOut', [p], 'Scale out applied');
+  else                     fire('animScaleInOut',[p], 'Scale in+out applied');
+}
+function action_animOpacity(e) {
+  var p = getParams();
+  if (e && e.shiftKey)     fire('animOpacityIn',  [p], 'Fade in applied');
+  else if (e && e.ctrlKey) fire('animOpacityOut', [p], 'Fade out applied');
+  else                     fire('animOpacityInOut',[p], 'Fade in+out applied');
+}
+function action_easeInOut() { var p = getParams(); fire('applyEaseInOut', [p], 'Ease applied'); }
+function action_linear()    { fire('applyLinear', [], 'Linear applied'); }
+function action_overshoot() { fire('applyOvershoot', [], 'Overshoot applied'); }
+function action_wiggle()    { var p = getParams(); fire('applyWiggleFFX', [p.wFreq, p.wAmp], 'Wiggle added'); }
+function action_reverse()   { fire('reverseKeyframes', [], 'Keys reversed'); }
+function action_clone(e)    { fire('cloneKeyframes', [!!(e&&e.shiftKey)], e&&e.shiftKey?'Cloned & flipped':'Keyframes cloned'); }
+function action_loop(e) {
+  if (e&&e.shiftKey)     fire('applyLoopExpression',['pingpong'],'Loop pingpong');
+  else if (e&&e.ctrlKey) fire('applyLoopExpression',['offset'],'Loop offset');
+  else                   fire('applyLoopExpression',['cycle'],'Loop cycle');
+}
+function action_roving(e)  { fire('setContinuousRoving',[!(e&&e.shiftKey)],e&&e.shiftKey?'Roving disabled':'Roving enabled'); }
+function action_alignKeys(e) {
+  if (e&&e.shiftKey)     fire('alignLastKeyToPlayhead',[],'Last key → playhead');
+  else if (e&&e.ctrlKey) fire('alignFirstKeyToLayerIn',[],'First key → layer in');
+  else if (e&&e.altKey)  fire('alignLastKeyToLayerOut',[],'Last key → layer out');
+  else                   fire('alignKeysToPlayhead',[],'First key → playhead');
+}
+function action_solo(e)    { fire('soloSelected',[!!(e&&e.shiftKey)],e&&e.shiftKey?'Solo exclusive':'Solo toggled'); }
+function action_unsolo()   { fire('unsoloAll',[],'Unsolo all'); }
+function action_soloFocusToggle(){ fire('soloFocusToggle',[],'Solo+Focus toggled'); }
+function action_hideToggle(e){ fire(e&&e.shiftKey?'showAll':'toggleVisibility',[],'Visibility toggled'); }
+function action_hide()     { fire('hideSelected',[],'Layers hidden'); }
+function action_show(e)    { fire(e&&e.shiftKey?'showAll':'showSelected',[],'Layers shown'); }
+function action_lockToggle(e){ fire(e&&e.shiftKey?'unlockAtPlayhead':'toggleLockSelected',[],'Lock toggled'); }
+function action_focusToggle(e){ fire(e&&e.shiftKey?'focusPlayhead':'focusSelected',[],'Focused'); }
+// ── ANCHOR ────────────────────────────────────────────────────────────────
+var _anchorUseMasks = false;
+function action_anchor(e) {
+  if (e && e.shiftKey) openAnchorOverlay();
+  else fire('setAnchorToPoint', ['C', _anchorUseMasks], 'Anchor centered');
+}
+function openAnchorOverlay()  { document.getElementById('anchor-overlay').classList.add('visible'); }
+function closeAnchorOverlay() { document.getElementById('anchor-overlay').classList.remove('visible'); }
+function toggleAnchorMask() {
+  _anchorUseMasks = !_anchorUseMasks;
+  var pip = document.getElementById('anchor-mask-pip');
+  var lbl = document.getElementById('anchor-mask-label');
+  pip.className = 'anchor-mask-pip' + (_anchorUseMasks ? ' on' : '');
+  lbl.textContent = 'Masks: ' + (_anchorUseMasks ? 'on' : 'off');
+}
+function doAnchor(pt) {
+  closeAnchorOverlay();
+  fire('setAnchorToPoint', [pt, _anchorUseMasks], 'Anchor → ' + pt);
+}
+
+// ── ADD STYLE OVERLAY ─────────────────────────────────────────────────────
+var _STYLE_MAP = [
+  { id:'sck-shadow',  cmd:9000, mn:'ADBE Drop Shadow',   gMn:'dropShadow/enabled'  },
+  { id:'sck-ishadow', cmd:9001, mn:'ADBE Inner Shadow',  gMn:'innerShadow/enabled' },
+  { id:'sck-oglow',   cmd:9002, mn:'ADBE Outer Glow',    gMn:'outerGlow/enabled'   },
+  { id:'sck-iglow',   cmd:9003, mn:'ADBE Inner Glow',    gMn:'innerGlow/enabled'   },
+  { id:'sck-bevel',   cmd:9004, mn:'ADBE Bevel Emboss',  gMn:'bevelEmboss/enabled' },
+  { id:'sck-satin',   cmd:9005, mn:'ADBE Satin',         gMn:'chromeFX/enabled'    },
+  { id:'sck-color',   cmd:9006, mn:'ADBE Color Overlay', gMn:'solidFill/enabled'   },
+  { id:'sck-grad',    cmd:9007, mn:'ADBE Grad Overlay',  gMn:'gradientFill/enabled'},
+  { id:'sck-stroke',  cmd:9008, mn:'ADBE Stroke',        gMn:'frameFX/enabled'     }
+];
+
+function openAddStyle() {
+  document.getElementById('addstyle-overlay').classList.add('visible');
+  TNK.run('getStyleStatusJSON', [], function(result) {
+    try {
+      var status = JSON.parse(result);
+      _STYLE_MAP.forEach(function(s) {
+        var lbl = document.getElementById(s.id + '-lbl');
+        if (!lbl) return;
+        var st = status[s.gMn];
+        var count = st ? st.missing : -1;
+        var total = st ? st.total : 0;
+        if (!st || total === 0) {
+          lbl.style.color = '';
+          lbl.textContent = lbl.textContent.replace(/ \(\d+\)$/, '');
+        } else if (st.have === total) {
+          // all selected have it — red = redundant
+          lbl.style.color = '#ff6b6b';
+          lbl.textContent = lbl.textContent.replace(/ \(\d+\)$/, '');
+        } else if (st.have > 0) {
+          // some have it — yellow + counter of missing
+          lbl.style.color = '#ffd166';
+          var baseName = lbl.textContent.replace(/ \(\d+\)$/, '');
+          lbl.textContent = baseName + ' (' + st.missing + ')';
+        } else {
+          lbl.style.color = '';
+          lbl.textContent = lbl.textContent.replace(/ \(\d+\)$/, '');
+        }
+      });
+    } catch(e) {}
+  });
+}
+function closeAddStyle() { document.getElementById('addstyle-overlay').classList.remove('visible'); }
+function removeAllStyles() {
+  closeAddStyle();
+  fire('removeAllLayerStyles', [], 'All styles removed');
+}
+function hideAllStyles() {
+  closeAddStyle();
+  fire('hideAllLayerStyles', [], 'Styles hidden');
+}
+
+function applyStylePicker() {
+  var chosen = _STYLE_MAP.filter(function(s){ return document.getElementById(s.id).checked; });
+  if (!chosen.length) { toast('Select at least one style', true); return; }
+  var skip = document.getElementById('sck-skip').checked;
+  closeAddStyle();
+  fire('applyLayerStyleCmds', [chosen.map(function(s){return s.cmd;}), chosen.map(function(s){return s.mn;}), skip], 'Styles applied');
+}
+
+// ── EDIT STYLE OVERLAY ────────────────────────────────────────────────────
+var _seSnapshot = null;
+function seToggleLayerStyles() {
+  TNK.run('toggleAllLayerStyles', [], function(result) {
+    // Re-check actual state after toggle
+    _seUpdateToggleState();
+    toast(result || 'Styles toggled');
+  });
+}
+
+function _seUpdateToggleState() {
+  TNK.run('getLayerStylesEnabledState', [], function(result) {
+    var track = document.getElementById('se-toggle-track');
+    var label = document.getElementById('se-toggle-label');
+    if (!track || !label) return;
+    var on = (result === 'true' || result === true);
+    track.className = 'se-slider-toggle' + (on ? ' on' : '');
+    label.textContent = on ? 'ON' : 'OFF';
+    label.style.color = on ? '#c77dff' : 'var(--muted)';
+  });
+}
+
+function openEditStyle() {
+  document.getElementById('editstyle-overlay').classList.add('visible');
+  _seUpdateToggleState();
+  refreshStyleEditor();
+}
+function closeEditStyle() { document.getElementById('editstyle-overlay').classList.remove('visible'); }
+
+function refreshStyleEditor() {
+  document.getElementById('style-editor-body').innerHTML = '<div class="se-hint">Loading…</div>';
+  _seUpdateToggleState();
+  TNK.run('getActiveStylesJSON', [], function(result) {
+    try {
+      var data = JSON.parse(result);
+      _seSnapshot = data.snapshot;
+      buildStyleEditor(data.styles);
+    } catch(e) {
+      document.getElementById('style-editor-body').innerHTML = '<div class="se-hint">' + (result || 'No active styles found') + '</div>';
+    }
+  });
+}
+
+function buildStyleEditor(styles) {
+  var body = document.getElementById('style-editor-body');
+  if (!styles || !styles.length) {
+    body.innerHTML = '<div class="style-editor-hint">No active layer styles on selected layers</div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < styles.length; i++) {
+    var s = styles[i];
+    html += '<div class="se-section">';
+    html += '<div class="se-section-hdr"><span class="se-section-name">' + s.label + '</span>';
+    html += '<div class="se-section-btns">';
+    html += '<div class="se-btn" onclick="seEnable(\'' + s.gMn + '\',true)">on</div>';
+    html += '<div class="se-btn" onclick="seEnable(\'' + s.gMn + '\',false)">off</div>';
+    html += '</div></div>';
+    for (var p = 0; p < s.props.length; p++) {
+      var pr = s.props[p];
+      html += '<div class="se-row"><span class="se-label">' + pr.label + '</span>';
+      if (pr.type === 'slider' || pr.type === 'angle') {
+        var mn = pr.type === 'angle' ? 0 : pr.min;
+        var mx = pr.type === 'angle' ? 360 : pr.max;
+        var v  = pr.value !== null ? pr.value : mn;
+        html += '<input type="range" class="se-slider" min="' + mn + '" max="' + mx + '" value="' + v + '" '
+              + 'data-gmn="' + s.gMn + '" data-pmn="' + pr.mn + '" '
+              + 'oninput="seSliderLive(this)" onchange="seSliderCommit(this)">';
+        html += '<input type="text" class="se-num" value="' + Math.round(v) + '" '
+              + 'data-gmn="' + s.gMn + '" data-pmn="' + pr.mn + '" data-min="' + mn + '" data-max="' + mx + '" '
+              + 'onchange="seNumChange(this)">';
+      } else if (pr.type === 'bool') {
+        html += '<input type="checkbox" class="se-check" ' + (pr.value ? 'checked' : '') + ' '
+              + 'data-gmn="' + s.gMn + '" data-pmn="' + pr.mn + '" onchange="seBoolChange(this)">';
+      } else if (pr.type === 'color') {
+        var col = pr.value || [1,0,0];
+        var hex = rgbToHexJS(col);
+        html += '<div class="se-color-swatch" style="background:' + hex + '" '
+              + 'data-gmn="' + s.gMn + '" data-pmn="' + pr.mn + '" '
+              + 'onclick="seColorPick(this,\'' + s.gMn + '\',\'' + pr.mn + '\')"></div>';
+        html += '<span style="font-size:9px;color:var(--muted)">' + hex + '</span>';
+      } else if (pr.type === 'dropdown') {
+        html += '<select class="se-select" data-gmn="' + s.gMn + '" data-pmn="' + pr.mn + '" onchange="seDropChange(this)">';
+        for (var oi = 0; oi < pr.options.length; oi++) {
+          var sel = pr.value === pr.values[oi] ? ' selected' : '';
+          html += '<option value="' + pr.values[oi] + '"' + sel + '>' + pr.options[oi] + '</option>';
+        }
+        html += '</select>';
+      } else if (pr.type === 'gradient_btn') {
+        html += '<div class="se-btn" style="padding:2px 10px;font-size:9px" onclick="seEditGradientBtn()">Edit Gradient…</div>';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  body.innerHTML = html;
+}
+
+function rgbToHexJS(a) {
+  function h(v){ var s=Math.round((v||0)*255).toString(16); return s.length===1?'0'+s:s; }
+  return '#'+h(a[0])+h(a[1])+h(a[2]);
+}
+
+function seSliderLive(el) {
+  var num = el.parentNode.querySelector('.se-num');
+  if (num) num.value = Math.round(el.value);
+  fire('seSetProp', [el.dataset.gmn, el.dataset.pmn, parseFloat(el.value)], '');
+}
+function seSliderCommit(el) {
+  fire('seSetProp', [el.dataset.gmn, el.dataset.pmn, parseFloat(el.value)], 'Style updated');
+}
+function seNumChange(el) {
+  var v = parseFloat(el.value);
+  if (isNaN(v)) return;
+  v = Math.max(parseFloat(el.dataset.min||0), Math.min(parseFloat(el.dataset.max||100), v));
+  el.value = Math.round(v);
+  var sl = el.parentNode.querySelector('.se-slider');
+  if (sl) sl.value = v;
+  fire('seSetProp', [el.dataset.gmn, el.dataset.pmn, v], 'Style updated');
+}
+function seBoolChange(el) {
+  fire('seSetProp', [el.dataset.gmn, el.dataset.pmn, el.checked], 'Style updated');
+}
+function seDropChange(el) {
+  fire('seSetProp', [el.dataset.gmn, el.dataset.pmn, parseFloat(el.value)], 'Style updated');
+}
+function seColorPick(swatchEl, gMn, pMn) {
+  TNK.run('sePickColor', [gMn, pMn], function(result) {
+    if (result && result !== 'cancelled') {
+      try {
+        var col = JSON.parse(result);
+        swatchEl.style.background = rgbToHexJS(col);
+        var hexEl = swatchEl.nextSibling;
+        if (hexEl) hexEl.textContent = rgbToHexJS(col);
+      } catch(e) {}
+    }
+  });
+}
+function seEnable(gMn, state) {
+  fire('seEnableStyle', [gMn, state], state ? 'Style enabled' : 'Style disabled');
+}
+function seEditGradientBtn() {
+  fire('seEditGradient', [], 'Gradient editor opened');
+}
+function undoStyleEdits() {
+  if (!_seSnapshot) { toast('Nothing to undo', true); return; }
+  fire('seRestoreSnapshot', [JSON.stringify(_seSnapshot)], 'Styles restored');
+  _seSnapshot = null;
+}
+
+function action_anticipation(e) {
+  fire('openAnticipation', [], 'Anticipation panel open');
+}
+function action_blur(e) {
+  var p = getParams();
+  if (e && e.altKey) fire('applyBlurOut', [p.outTime, p.easeIn, p.easeOut], 'Blur Out');
+  else               fire('applyBlurInOut', [p.inTime, p.outTime, p.easeIn, p.easeOut], 'Blur In+Out');
+}
+function action_setText() {
+  showModal('Set text content', 'new text…', 'Set', function(t) {
+    if (t !== null && t !== undefined) fire('setTextContent', [t], 'Text set');
+  });
+}
+function action_findReplaceText(e) {
+  // Two-step modal: first find, then replace
+  var caseSensitive = !!(e && e.shiftKey);
+  showModal('Find text', 'find…', 'Next', function(findStr) {
+    if (!findStr) return;
+    showModal('Replace with', 'replace…', 'Replace All', function(replStr) {
+      fire('findReplaceText', [findStr, replStr||'', caseSensitive], 'Text replaced');
+    });
+  });
+}
+// ── ARROW OVERLAY ────────────────────────────────────────────────────────────
+function arrowOpen()  { document.getElementById('arrow-ov').classList.add('visible'); }
+function arrowClose() { document.getElementById('arrow-ov').classList.remove('visible'); }
+function arrowGo(placement) {
+  var size        = document.getElementById('arrow-size').value;
+  var typeIdx     = document.getElementById('arrow-type').value;
+  var doAnimate   = document.getElementById('arrow-animate').checked;
+  var doParent    = document.getElementById('arrow-parent').checked;
+  fire('addArrowhead', [placement, size, typeIdx, doAnimate, doParent], 'Arrowhead added');
+  arrowClose();
+}
+
+// ── FOLLOW PATH OVERLAY ──────────────────────────────────────────────────────
+function followOpen() {
+  var ov      = document.getElementById('follow-ov');
+  var errEl   = document.getElementById('follow-error');
+  var content = document.getElementById('follow-content');
+  errEl.style.display   = 'none';
+  content.style.display = 'none';
+  ov.classList.add('visible');
+
+  TNK.run('getFollowPathInfo', [], function(result) {
+    try {
+      var info = JSON.parse(result);
+      if (info.error) {
+        errEl.textContent     = info.error;
+        errEl.style.display   = 'block';
+        content.style.display = 'none';
+        return;
+      }
+      document.getElementById('follow-layer-name').textContent = info.layerName;
+      var sel = document.getElementById('follow-path-select');
+      sel.innerHTML = '';
+      for (var i = 0; i < info.paths.length; i++) {
+        var opt   = document.createElement('option');
+        opt.value = info.paths[i].index;
+        opt.textContent = info.paths[i].name;
+        sel.appendChild(opt);
+      }
+      document.getElementById('follow-info').textContent = info.followerCount + ' layer' + (info.followerCount > 1 ? 's' : '') + ' will follow';
+      content.style.display = 'block';
+    } catch(e) {
+      errEl.textContent     = 'Failed to read path info';
+      errEl.style.display   = 'block';
+    }
+  });
+}
+
+function followClose() { document.getElementById('follow-ov').classList.remove('visible'); }
+
+function followGo() {
+  var pathIdx   = document.getElementById('follow-path-select').value;
+  var doAnimate = document.getElementById('follow-animate').checked;
+  var doParent  = document.getElementById('follow-parent').checked;
+  fire('followPath', [pathIdx, doAnimate, doParent], 'Following path');
+  followClose();
+}
+
+// ── MARKER OVERLAYS ──────────────────────────────────────────────────────────
+var _mkrProtected = false;
+
+function mkrOpen(id) {
+  document.getElementById(id).classList.add('visible');
+  // Focus first input if any
+  var inp = document.querySelector('#' + id + ' .mkr-input');
+  if (inp) setTimeout(function(){ inp.focus(); }, 60);
+}
+function mkrClose(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.remove('visible');
+}
+
+function mkrFire(fn, args, label) { fire(fn, args, label); }
+
+function mkrAddNamed() {
+  var val = document.getElementById('mkr-label-in').value.trim();
+  fire('addMarker', [val], val ? 'Marker "' + val + '" added' : 'Marker added');
+  document.getElementById('mkr-label-in').value = '';
+  mkrClose('mkr-add-ov');
+}
+
+function mkrTogglePip(el) {
+  _mkrProtected = !_mkrProtected;
+  el.classList.toggle('on', _mkrProtected);
+}
+
+function mkrAddFromSelection() {
+  var label = document.getElementById('mkr-sel-label').value.trim();
+  fire('createProtectedMarker', [0, label, _mkrProtected],
+    (label ? '"' + label + '" ' : '') + 'marker created');
+  document.getElementById('mkr-sel-label').value = '';
+  mkrClose('mkr-add-ov');
+}
+
+// ESC closes any open marker overlay
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    ['mkr-add-ov','mkr-del-ov','mkr-num-ov'].forEach(function(id){ mkrClose(id); });
+  }
+});
+
+// keep these for hotkey handler compatibility
+// keep these for hotkey handler compatibility
+function action_protection(e) {
+  if (e && e.shiftKey) fire('toggleAllMarkerProtection', [], 'All markers toggled');
+  else                 fire('toggleMarkerProtection', [], 'Protection toggled');
+}
+function action_addNamedMarker() {
+  showModal('Marker label','label text…','Add',function(n){ fire('addMarker',[n||''],'Marker added'); });
+}
+function action_fx(e) { fire(e&&e.shiftKey?'copyEffects':'toggleEffects',[],'Effects '+(e&&e.shiftKey?'copied':'toggled')); }
+function action_addStyle()  { openAddStyle(); }
+function action_editStyle() { openEditStyle(); }
+function action_focus(e)   { fire(e&&e.shiftKey?'focusPlayhead':'focusSelected',[],'Focused'); }
+function action_stagger(e) { var p=getParams(); fire('staggerLayers',[p,!(e&&e.shiftKey)],e&&e.shiftKey?'Staggered top→bottom':'Staggered bottom→top'); }
+function action_pull(e)    { fire('pullToPlayhead',[!!(e&&e.shiftKey)],e&&e.shiftKey?'Pulled from outpoint':'Pulled to playhead'); }
+function action_parentNull(){ fire('parentToNull',[],'Parented to null'); }
+function action_precomp()  { fire('precomposeSelected',[],'Precomposed'); }
+function action_matte(e) {
+  if (e&&e.altKey)        fire('applyTrackMatte',['break'],'Matte removed');
+  else if (e&&e.shiftKey) fire('applyTrackMatte',['matte_parent'],'Matte + parent');
+  else if (e&&e.ctrlKey)  fire('applyTrackMatte',['matte_blend'],'Matte + blend');
+  else                    fire('applyTrackMatte',['matte'],'Track matte applied');
+}
+function action_swatch(e,i) {
+  if (e.shiftKey)     fire('labelKeyframes',[i],'Keyframes labeled');
+  else if (e.ctrlKey) showModal('Create marker','label text…','Create',function(c){ fire('createProtectedMarker',[i,c||'',true],'Marker created'); });
+  else if (e.altKey)  fire('recolorMarkerAtPlayhead',[i],'Marker recolored');
+  else                fire('labelLayers',[i],'Layers labeled');
+}
+
+function action_renameComp(e) {
+  var ua=!!(e&&e.shiftKey);
+  showModal('Rename comp','new name…','Rename',function(n){ if(n&&n.length) fire('renameComp',[n,ua],'Comp renamed'); });
+}
+function action_autoTrimComp(e){ fire('autoTrimComp',[!!(e&&e.shiftKey)],'Comp trimmed'); }
+function action_cropComp(e) {
+  var useActive = !!(e && e.shiftKey);
+  showModal('Crop padding (px)', '0', 'Crop', function(val) {
+    var pad = parseFloat(val) || 0;
+    fire('cropComp', [useActive, pad], 'Comp cropped');
+  });
+}
+function action_trimPaths(e) {
+  var p=getParams();
+  if (e&&e.shiftKey)     fire('trimPathsIn',[p.inTime,p.easeIn,p.easeOut],'Trim Paths In');
+  else if (e&&e.ctrlKey) fire('trimPathsOut',[p.outTime,p.easeIn,p.easeOut],'Trim Paths Out');
+  else                   fire('trimPathsInOut',[p.inTime,p.outTime,p.easeIn,p.easeOut],'Trim Paths In+Out');
+}
+
+// TEXT ANIM DIALOG
+function action_textAnim(e) { var p=getParams(); _showTextAnimDialog(p.textIn,p.textOut); }
+function _showTextAnimDialog(textIn,textOut) {
+  var ov=document.getElementById('modal-overlay'), box=document.getElementById('modal-box');
+  box.innerHTML=
+    '<div style="font-size:11px;font-weight:600;color:#e0e0f0;margin-bottom:12px;letter-spacing:.06em">TEXT ANIMATION</div>'+
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
+      '<div id="ta-bounce-toggle" onclick="_taToggleBounce()" style="width:34px;height:16px;border-radius:8px;background:#1c1c28;border:1px solid #3a3a5a;position:relative;cursor:pointer;transition:background .2s">'+
+        '<div id="ta-bounce-pip" style="position:absolute;top:3px;left:3px;width:8px;height:8px;border-radius:50%;background:#555;transition:left .2s,background .2s"></div>'+
+      '</div>'+
+      '<span style="font-size:9px;color:#9090b0;letter-spacing:.08em;text-transform:uppercase">Bounce</span>'+
+    '</div>'+
+    '<div style="font-size:9px;color:#555;letter-spacing:.08em;margin-bottom:4px">MODE</div>'+
+    '<div style="display:flex;gap:4px;margin-bottom:10px">'+
+      [['in','In'],['out','Out'],['both','Both']].map(function(item){
+        return '<div class="ta-opt" id="ta-mode-'+item[0]+'" onclick="_taSetMode(\''+item[0]+'\')" style="flex:1;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;letter-spacing:.06em;text-transform:uppercase;border:1px solid #2e2e3a;background:#1c1c22;color:#7070a0;transition:all .1s">'+item[1]+'</div>';
+      }).join('')+
+    '</div>'+
+    '<div style="font-size:9px;color:#555;letter-spacing:.08em;margin-bottom:4px">DIRECTION</div>'+
+    '<div style="display:flex;gap:4px;margin-bottom:10px">'+
+      ['up','down','left','right'].map(function(d){
+        return '<div class="ta-opt" id="ta-dir-'+d+'" onclick="_taSetDir(\''+d+'\')" style="flex:1;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;letter-spacing:.06em;text-transform:uppercase;border:1px solid #2e2e3a;background:#1c1c22;color:#7070a0;transition:all .1s">'+d+'</div>';
+      }).join('')+
+    '</div>'+
+    '<div style="font-size:9px;color:#555;letter-spacing:.08em;margin-bottom:4px">ANIMATE BY</div>'+
+    '<div style="display:flex;gap:4px;margin-bottom:10px">'+
+      [['chars','Chars'],['words','Words'],['lines','Lines']].map(function(item){
+        return '<div class="ta-opt" id="ta-by-'+item[0]+'" onclick="_taSetBy(\''+item[0]+'\')" style="flex:1;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;letter-spacing:.06em;text-transform:uppercase;border:1px solid #2e2e3a;background:#1c1c22;color:#7070a0;transition:all .1s">'+item[1]+'</div>';
+      }).join('')+
+    '</div>'+
+    '<div style="font-size:9px;color:#555;letter-spacing:.08em;margin-bottom:4px">PROPERTIES</div>'+
+    '<div style="display:flex;gap:4px;margin-bottom:14px">'+
+      [['pos','Position'],['opac','Opacity'],['scale','Scale']].map(function(item){
+        return '<div class="ta-opt ta-prop" id="ta-prop-'+item[0]+'" onclick="_taPropToggle(\''+item[0]+'\')" style="flex:1;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;letter-spacing:.06em;text-transform:uppercase;border:1px solid #2e2e3a;background:#1c1c22;color:#7070a0;transition:all .1s">'+item[1]+'</div>';
+      }).join('')+
+    '</div>'+
+    '<div style="display:flex;gap:6px">'+
+      '<div onclick="_taCancel()" style="flex:1;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;letter-spacing:.06em;border:1px solid #3a3a5a;background:#1c1c28;color:#7070a0">Cancel</div>'+
+      '<div onclick="_taApply('+textIn+','+textOut+')" style="flex:2;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;letter-spacing:.06em;border:1px solid rgba(91,127,255,.5);background:rgba(91,127,255,.15);color:#a0b4ff">Apply</div>'+
+    '</div>';
+  ov.classList.add('visible');
+  _taRefreshUI();
+}
+function _taToggleBounce(){ _textAnimState.bounce=!_textAnimState.bounce; _taRefreshUI(); }
+function _taSetDir(d){ _textAnimState.dir=d; _taRefreshUI(); }
+function _taSetBy(b){ _textAnimState.animBy=b; _taRefreshUI(); }
+function _taSetMode(m){ _textAnimState.mode=m; _taRefreshUI(); }
+function _taPropToggle(p){ _textAnimState[p]=!_textAnimState[p]; _taRefreshUI(); }
+function _taCancel(){ document.getElementById('modal-overlay').classList.remove('visible'); }
+function _taRefreshUI(){
+  var s=_textAnimState;
+  var tog=document.getElementById('ta-bounce-toggle'), pip=document.getElementById('ta-bounce-pip');
+  if(tog) tog.style.background=s.bounce?'rgba(91,127,255,.3)':'#1c1c28';
+  if(pip){ pip.style.left=s.bounce?'21px':'3px'; pip.style.background=s.bounce?'#5b7fff':'#555'; }
+  ['up','down','left','right'].forEach(function(d){
+    var el=document.getElementById('ta-dir-'+d);
+    if(el){ el.style.background=s.dir===d?'rgba(91,127,255,.25)':'#1c1c22'; el.style.borderColor=s.dir===d?'#5b7fff':'#2e2e3a'; el.style.color=s.dir===d?'#a0b4ff':'#7070a0'; }
+  });
+  ['chars','words','lines'].forEach(function(b){
+    var el=document.getElementById('ta-by-'+b);
+    if(el){ el.style.background=s.animBy===b?'rgba(255,209,102,.15)':'#1c1c22'; el.style.borderColor=s.animBy===b?'#ffd166':'#2e2e3a'; el.style.color=s.animBy===b?'#ffd166':'#7070a0'; }
+  });
+  ['in','out','both'].forEach(function(m){
+    var el=document.getElementById('ta-mode-'+m);
+    if(el){ el.style.background=s.mode===m?'rgba(255,153,153,.18)':'#1c1c22'; el.style.borderColor=s.mode===m?'#ff9999':'#2e2e3a'; el.style.color=s.mode===m?'#ff9999':'#7070a0'; }
+  });
+  ['pos','opac','scale'].forEach(function(p){
+    var el=document.getElementById('ta-prop-'+p);
+    if(el){ el.style.background=s[p]?'rgba(6,214,160,.12)':'#1c1c22'; el.style.borderColor=s[p]?'#06d6a0':'#2e2e3a'; el.style.color=s[p]?'#06d6a0':'#7070a0'; }
+  });
+}
+function _taApply(textIn,textOut){
+  document.getElementById('modal-overlay').classList.remove('visible');
+  var s=_textAnimState, byMap={chars:1,words:3,lines:4};
+  fire(s.bounce?'applyTextAnimBounce':'applyTextAnimMaster',[s.dir,byMap[s.animBy]||3,s.pos,s.opac,s.scale,textIn,textOut,s.mode],'Text Anim applied');
+}
+
+function refreshCompInfo(){
+  TNK.run('getCompInfo',[],function(result){
+    try{
+      var info=JSON.parse(result), el=document.getElementById('comp-info');
+      if(info.name==='None'){ el.innerHTML='<span>No comp active</span>'; }
+      else{ el.innerHTML='<span>'+info.name+'</span><span>'+info.w+'×'+info.h+'</span><span>'+info.fps+'fps</span><span>'+info.dur+'s</span>'; }
+    }catch(e){}
+  });
+}
+
+function showHotkeys() {
+  var ov = document.getElementById('hotkey-overlay');
+  if (ov.classList.contains('visible')) { ov.classList.remove('visible'); return; }
+  // Rebuild from current bindings
+  var half = Math.ceil(_HK_ACTIONS.length / 2);
+  function rowHtml(a) {
+    var k = _hkMap[a.id] || '';
+    var hint = a.hint ? ' · ' + a.hint : '';
+    return '<div class="hk-row"><div class="hk-key">' + _hkKeyDisplay(k) + '</div><div class="hk-label">' + a.label + hint + '</div></div>';
+  }
+  document.getElementById('hk-col1').innerHTML = _HK_ACTIONS.slice(0, half).map(rowHtml).join('');
+  document.getElementById('hk-col2').innerHTML = _HK_ACTIONS.slice(half).map(rowHtml).join('');
+  ov.classList.add('visible');
+}
+
+// ── SHORTCUT SETTINGS ────────────────────────────────────────────────────────
+var _hkCapturing = null;
+
+function openHkSettings() {
+  _hkCapturing = null;
+  document.getElementById('hk-settings-overlay').classList.add('visible');
+  var s = document.getElementById('hks-search');
+  s.value = '';
+  s.focus();
+  _renderHkSettings();
+}
+
+function closeHkSettings() {
+  _hkCapturing = null;
+  document.getElementById('hk-settings-overlay').classList.remove('visible');
+}
+
+function _renderHkSettings() {
+  var q = (document.getElementById('hks-search').value || '').toLowerCase().trim();
+  var filtered = q
+    ? _HK_ACTIONS.filter(function(a) { return a.label.toLowerCase().indexOf(q) !== -1; })
+    : _HK_ACTIONS;
+  if (!filtered.length) {
+    document.getElementById('hks-body').innerHTML = '<div class="hks-empty">no match for "' + q + '"</div>';
+    return;
+  }
+  var rows = filtered.map(function(a) {
+    var k = _hkMap[a.id] || '';
+    var isCapturing = _hkCapturing === a.id;
+    var cls = 'hks-key' + (isCapturing ? ' capturing' : '') + (!k ? ' unbound' : '');
+    var keyLabel = isCapturing ? '…' : _hkKeyDisplay(k);
+    var hintHtml = a.hint ? '<span class="hks-hint">' + a.hint + '</span>' : '';
+    return '<div class="hks-row">' +
+      '<span class="hks-label">' + a.label + '</span>' +
+      hintHtml +
+      '<div class="' + cls + '" onclick="_hkStartCapture(\'' + a.id + '\')">' + keyLabel + '</div>' +
+      '</div>';
+  });
+  document.getElementById('hks-body').innerHTML = rows.join('');
+}
+
+function _hkStartCapture(actionId) {
+  _hkCapturing = actionId;
+  _renderHkSettings();
+}
+
+function _hkResetAll() {
+  for (var i = 0; i < _HK_ACTIONS.length; i++) {
+    _hkMap[_HK_ACTIONS[i].id] = _HK_ACTIONS[i].def;
+  }
+  _hkSave();
+  _renderHkSettings();
+}
+
+// ── KEYBOARD SHORTCUTS ───────────────────────────────────────────────────────
+// Tracks whether this panel's document has focus.
+// Keys only fire TNK actions when _panelFocused === true, which prevents
+// AE's native shortcuts from also triggering when the panel is active,
+// and prevents TNK shortcuts from firing when AE (not the panel) has focus.
+var _panelFocused = false;
+
+window.addEventListener('focus',  function() { _panelFocused = true;  });
+window.addEventListener('blur',   function() { _panelFocused = false; });
+document.addEventListener('mouseenter', function() { _panelFocused = true;  });
+document.addEventListener('mouseleave', function() { _panelFocused = false; });
+
+document.addEventListener('keydown', function(e) {
+  // Capture mode: absorb the next keypress as a new shortcut binding
+  if (_hkCapturing !== null && e.target.id !== 'hks-search' && document.getElementById('hk-settings-overlay').classList.contains('visible')) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.key === 'Escape') { _hkCapturing = null; _renderHkSettings(); return; }
+    var ck = e.key === 'Tab' ? 'tab' : e.key.toLowerCase();
+    if (_hkIsValidKey(ck)) {
+      var conflict = _hkByKey(ck);
+      if (conflict && conflict !== _hkCapturing) _hkMap[conflict] = '';
+      _hkMap[_hkCapturing] = ck;
+      _hkSave();
+    }
+    _hkCapturing = null;
+    _renderHkSettings();
+    return;
+  }
+
+  // Always let inputs handle their own keys
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+  // ESC always works — closes overlays or the panel
+  if (e.key === 'Escape') {
+    e.stopPropagation();
+    var ov = document.getElementById('hotkey-overlay');
+    if (ov.classList.contains('visible'))                                                { ov.classList.remove('visible');  return; }
+    if (document.getElementById('hk-settings-overlay').classList.contains('visible'))   { closeHkSettings();               return; }
+    if (document.getElementById('purge-overlay').classList.contains('visible'))         { closePurgeModal();                return; }
+    if (document.getElementById('anchor-overlay').classList.contains('visible'))        { closeAnchorOverlay();             return; }
+    if (document.getElementById('addstyle-overlay').classList.contains('visible'))      { closeAddStyle();                  return; }
+    if (document.getElementById('editstyle-overlay').classList.contains('visible'))     { closeEditStyle();                 return; }
+    if (document.getElementById('mkr-add-ov').classList.contains('visible'))            { mkrClose('mkr-add-ov');           return; }
+    if (document.getElementById('mkr-del-ov').classList.contains('visible'))            { mkrClose('mkr-del-ov');           return; }
+    if (document.getElementById('mkr-num-ov').classList.contains('visible'))            { mkrClose('mkr-num-ov');           return; }
+    TNK.closePanel(0);
+    return;
+  }
+
+  // All other hotkeys: ONLY fire when panel has pointer/focus, never bleed to AE
+  if (!_panelFocused) return;
+
+  var ov = document.getElementById('hotkey-overlay');
+  if (ov.classList.contains('visible')) {
+    if (e.key === '?') { e.preventDefault(); e.stopPropagation(); ov.classList.remove('visible'); }
+    return;
+  }
+
+  // Modifier combos (Ctrl/Cmd + key) pass through to AE (save, undo, etc.)
+  if (e.ctrlKey || e.metaKey) return;
+
+  // ? always opens hotkey overlay
+  if (e.key === '?') { e.preventDefault(); e.stopPropagation(); showHotkeys(); return; }
+
+  var k = e.key === 'Tab' ? 'tab' : e.key.toLowerCase();
+  var actionId = _hkByKey(k);
+  if (actionId) {
+    e.preventDefault();
+    e.stopPropagation();
+    _hkDispatch(actionId, e);
+  }
+});
+
+(function(){
+  var tip=document.getElementById('tip'), hideTimer;
+  document.addEventListener('mouseover',function(e){
+    var el=e.target.closest('[data-tip]');
+    if(!el) return;
+    clearTimeout(hideTimer);
+    tip.innerHTML=el.getAttribute('data-tip').split('\n').map(function(line,i){
+      return i===0?'<span style="color:#e0e0f0;font-weight:600">'+line+'</span>':'<span style="color:#888;margin-top:2px;display:block">'+line+'</span>';
+    }).join('');
+    tip.style.display='block'; positionTip(el);
+  });
+  document.addEventListener('mousemove',function(e){ var el=e.target.closest('[data-tip]'); if(el) positionTip(el); });
+  document.addEventListener('mouseout',function(e){ var el=e.target.closest('[data-tip]'); if(!el) return; hideTimer=setTimeout(function(){ tip.style.display='none'; },80); });
+  function positionTip(el){
+    var r=el.getBoundingClientRect(), tw=tip.offsetWidth, th=tip.offsetHeight, vw=window.innerWidth;
+    var left=r.left+r.width/2-tw/2, top=r.top-th-6;
+    if(left<4) left=4; if(left+tw>vw-4) left=vw-tw-4; if(top<4) top=r.bottom+6;
+    tip.style.left=left+'px'; tip.style.top=top+'px';
+  }
+})();
+
+window.addEventListener('load', function() {
+  refreshCompInfo();
+  // Tell the open-panel script that we are now running
+  if (typeof TNK !== 'undefined') {
+    TNK.cs.evalScript('try { app.settings.saveSetting("TNK_v3","panelOpen","1"); } catch(e) {}');
+  }
+});
+window.addEventListener('beforeunload', function() {
+  // Tell the open-panel script that we are closing
+  if (typeof TNK !== 'undefined') {
+    TNK.cs.evalScript('try { app.settings.saveSetting("TNK_v3","panelOpen","0"); } catch(e) {}');
+  }
+});
+</script>
+</body>
+</html>

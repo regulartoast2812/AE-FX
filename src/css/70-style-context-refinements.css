@@ -1,0 +1,2006 @@
+/* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
+.layer-style-dialog:not(.mask-control-dialog) {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  width: min(1180px, calc(100vw - 54px)) !important;
+  max-height: calc(100vh - 92px) !important;
+  overflow: hidden !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-dialog-head {
+  min-height: 48px !important;
+  padding: 10px 430px 8px 20px !important;
+  flex: 0 0 auto !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-dialog-title {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  min-height: 28px !important;
+  font-size: 17px !important;
+  font-weight: 400 !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-dialog-title span {
+  display: inline-block !important;
+}
+
+.layer-style-shortcut-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 24px !important;
+  height: 22px !important;
+  border: 1px solid rgba(217,119,66,.32) !important;
+  border-radius: var(--tnt-radius-control) !important;
+  background: rgba(217,119,66,.13) !important;
+  color: rgba(255,226,207,.92) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-close {
+  display: none !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) > .layer-style-dialog-actions {
+  top: 12px !important;
+  right: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) > .layer-style-dialog-actions button {
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 12px !important;
+  border-radius: var(--tnt-radius-control) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-dialog-body {
+  min-height: 0 !important;
+  padding: 0 20px 16px !important;
+  overflow: hidden !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-layout {
+  height: 100% !important;
+  min-height: 0 !important;
+  display: grid !important;
+  grid-template-rows: auto auto minmax(0, 1fr) !important;
+  gap: 8px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-section-title {
+  display: none !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-panel {
+  position: relative !important;
+  z-index: 2 !important;
+  flex: 0 0 auto !important;
+  min-height: 34px !important;
+  overflow: hidden !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-presets-panel {
+  position: relative !important;
+  z-index: 2 !important;
+  min-height: 34px !important;
+  padding: 0 2px 4px !important;
+  overflow: hidden !important;
+  border-bottom: 1px solid rgba(255,255,255,.055) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-presets-row {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 0 0 4px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-presets-empty {
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  color: rgba(235,235,245,.42) !important;
+  font-size: 11px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form {
+  display: grid !important;
+  grid-template-columns: minmax(180px, 1fr) auto auto !important;
+  gap: 7px !important;
+  align-items: center !important;
+  min-height: 34px !important;
+  padding: 0 0 6px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form input {
+  min-width: 0 !important;
+  height: 28px !important;
+  padding: 0 10px !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  border-radius: var(--tnt-radius-control) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)),
+    rgba(0,0,0,.24) !important;
+  color: rgba(245,245,247,.92) !important;
+  font-size: 12px !important;
+  outline: none !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form input:focus {
+  border-color: rgba(217,119,66,.55) !important;
+  box-shadow:
+    0 0 0 2px rgba(217,119,66,.14),
+    inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form button {
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 11px !important;
+  border-radius: var(--tnt-radius-control) !important;
+  font-size: 11px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button {
+  display: grid !important;
+  grid-template-columns: minmax(92px, 1fr) auto !important;
+  grid-template-rows: 15px 9px !important;
+  column-gap: 10px !important;
+  row-gap: 1px !important;
+  flex: 0 0 168px !important;
+  height: 36px !important;
+  padding: 5px 8px !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  border-radius: var(--tnt-radius-control) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.018)),
+    rgba(0,0,0,.20) !important;
+  color: rgba(245,245,247,.90) !important;
+  text-align: left !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button:hover {
+  border-color: rgba(217,119,66,.32) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(217,119,66,.05)),
+    rgba(0,0,0,.22) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button span,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button em {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button span {
+  font-size: 11px !important;
+  line-height: 15px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button em {
+  color: rgba(235,235,245,.44) !important;
+  font-size: 9px !important;
+  font-style: normal !important;
+  line-height: 9px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button b {
+  grid-row: 1 / span 2 !important;
+  grid-column: 2 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 3px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button i {
+  width: 5px !important;
+  height: 18px !important;
+  border-radius: 999px !important;
+  background: var(--preset-color, #777) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-header-add-row {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 7px !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 34px !important;
+  margin: 0 !important;
+  padding: 5px 2px 8px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  white-space: nowrap !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-header-add-row::-webkit-scrollbar,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-edit-panel::-webkit-scrollbar,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-props::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-header-add-row::-webkit-scrollbar-track,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-edit-panel::-webkit-scrollbar-track,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-props::-webkit-scrollbar-track {
+  background: rgba(255,255,255,.035) !important;
+  border-radius: 999px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-header-add-row::-webkit-scrollbar-thumb,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-edit-panel::-webkit-scrollbar-thumb,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-props::-webkit-scrollbar-thumb {
+  border-radius: 999px !important;
+  background: rgba(217,119,66,.38) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button {
+  flex: 0 0 auto !important;
+  height: 26px !important;
+  min-height: 26px !important;
+  max-width: none !important;
+  padding: 0 10px 0 18px !important;
+  border-radius: var(--tnt-radius-control) !important;
+  line-height: 24px !important;
+  font-size: 12px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button span {
+  max-width: none !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-edit-panel {
+  min-height: 0 !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 0 0 8px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-row {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+  min-width: max-content !important;
+  width: max-content !important;
+  height: 100% !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node {
+  flex: 0 0 296px !important;
+  width: 296px !important;
+  max-height: 100% !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-head {
+  min-height: 48px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-props {
+  min-height: 0 !important;
+  max-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle {
+  width: 42px !important;
+  height: 24px !important;
+  min-width: 42px !important;
+  min-height: 24px !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle span {
+  top: 3px !important;
+  left: 3px !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 999px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle.on span {
+  left: 18px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"] {
+  height: 18px !important;
+  border-radius: 999px !important;
+  background:
+    linear-gradient(90deg, rgba(217,119,66,.72) 0%, rgba(217,119,66,.72) var(--range-fill, 0%), rgba(255,255,255,.075) var(--range-fill, 0%), rgba(255,255,255,.075) 100%) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]::-webkit-slider-thumb {
+  width: 14px !important;
+  height: 14px !important;
+  margin-top: -5px !important;
+  border-radius: 999px !important;
+  border-color: rgba(217,119,66,.74) !important;
+  background: rgba(52,33,23,.96) !important;
+  box-shadow:
+    0 0 0 3px rgba(217,119,66,.20),
+    0 1px 3px rgba(0,0,0,.55) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-empty,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-loading {
+  align-self: start !important;
+}
+
+/* v104: undo oversized v103 controls while keeping one-row style navigation. */
+.status-row::before {
+  display: none !important;
+  content: none !important;
+}
+
+header {
+  padding-left: 0 !important;
+}
+
+.status-row {
+  display: grid !important;
+  grid-template-columns: 30px minmax(180px, min(545px, 48vw)) minmax(0, 1fr) auto auto !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+header .platform-badge {
+  grid-column: 1 !important;
+  justify-self: center !important;
+  align-self: center !important;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  margin: 0 !important;
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+}
+
+header .comp-select {
+  grid-column: 2 !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) {
+  width: min(860px, calc(100vw - 54px)) !important;
+  max-height: calc(100vh - 92px) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-dialog-head {
+  min-height: 44px !important;
+  padding: 9px 374px 7px 14px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-dialog-title {
+  min-height: 24px !important;
+  gap: 8px !important;
+  font-size: 14px !important;
+  line-height: 1.1 !important;
+}
+
+.layer-style-shortcut-badge {
+  width: 22px !important;
+  height: 20px !important;
+  font-size: 11px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) > .layer-style-dialog-actions {
+  top: 10px !important;
+  right: 14px !important;
+  gap: 6px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) > .layer-style-dialog-actions button {
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 9px !important;
+  font-size: 10px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-dialog-body {
+  padding: 0 14px 12px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-layout {
+  grid-template-rows: auto auto minmax(0, 1fr) !important;
+  gap: 8px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-panel {
+  min-height: 30px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-header-add-row {
+  min-height: 30px !important;
+  gap: 6px !important;
+  padding: 4px 0 6px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button {
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 9px 0 16px !important;
+  line-height: 22px !important;
+  font-size: 10px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button::before {
+  left: 7px !important;
+  top: 7px !important;
+  width: 4px !important;
+  height: 8px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-edit-panel {
+  padding: 0 0 6px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-row {
+  gap: 8px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node {
+  flex: 0 0 220px !important;
+  width: 220px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-head {
+  min-height: 38px !important;
+  padding: 8px 9px 7px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-head strong {
+  font-size: 11px !important;
+  font-weight: 400 !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-controls {
+  gap: 6px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle {
+  width: 34px !important;
+  height: 20px !important;
+  min-width: 34px !important;
+  min-height: 20px !important;
+  border-radius: 999px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle span {
+  top: 3px !important;
+  left: 3px !important;
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle.on span {
+  left: 16px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-delete {
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  min-height: 22px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-props {
+  gap: 6px !important;
+  padding: 8px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop {
+  grid-template-columns: 58px minmax(56px, 1fr) 44px !important;
+  min-height: 24px !important;
+  gap: 6px !important;
+  font-size: 10px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop.inline {
+  grid-template-columns: 58px minmax(0, 1fr) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop span {
+  font-size: 10px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="number"] {
+  width: 44px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  font-size: 10px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"] {
+  height: 18px !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background:
+    linear-gradient(90deg, rgba(217,119,66,.72) 0%, rgba(217,119,66,.72) var(--range-fill, 0%), rgba(255,255,255,.090) var(--range-fill, 0%), rgba(255,255,255,.090) 100%) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]::-webkit-slider-thumb {
+  width: 12px !important;
+  height: 12px !important;
+  margin-top: -4px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(217,119,66,.70) !important;
+  background: rgba(40,28,22,.96) !important;
+  box-shadow: 0 0 0 2px rgba(217,119,66,.16) !important;
+}
+
+/* v105: neutral style controls; no colored sliders. */
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-dialog-title {
+  gap: 6px !important;
+}
+
+.layer-style-shortcut-badge {
+  width: 20px !important;
+  height: 18px !important;
+  border-color: rgba(255,255,255,.14) !important;
+  background: rgba(255,255,255,.070) !important;
+  color: rgba(245,245,247,.90) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  transform: translateY(0) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle {
+  width: 30px !important;
+  height: 16px !important;
+  min-width: 30px !important;
+  min-height: 16px !important;
+  border-radius: 999px !important;
+  border-color: rgba(255,255,255,.14) !important;
+  background: rgba(0,0,0,.26) !important;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.35) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle span {
+  top: 2px !important;
+  left: 2px !important;
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 999px !important;
+  background: rgba(235,235,245,.78) !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,.45) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle.on {
+  border-color: rgba(60,190,112,.46) !important;
+  background: rgba(50,168,96,.34) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle.on span {
+  left: 15px !important;
+  background: rgba(245,255,248,.96) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"] {
+  height: 14px !important;
+  background: transparent !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]::-webkit-slider-runnable-track {
+  height: 2px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background:
+    linear-gradient(90deg, rgba(198,199,203,.52) 0%, rgba(198,199,203,.52) var(--range-fill, 0%), rgba(255,255,255,.105) var(--range-fill, 0%), rgba(255,255,255,.105) 100%) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]::-webkit-slider-thumb {
+  width: 10px !important;
+  height: 10px !important;
+  margin-top: -4px !important;
+  border: 1px solid rgba(220,221,225,.64) !important;
+  background: rgba(58,59,61,.96) !important;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.060),
+    0 1px 2px rgba(0,0,0,.55) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]:focus::-webkit-slider-runnable-track {
+  border: 0 !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]:hover::-webkit-slider-thumb,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]:focus::-webkit-slider-thumb {
+  border-color: rgba(238,239,242,.74) !important;
+  background: rgba(68,69,72,.98) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop select {
+  width: 100% !important;
+  min-width: 92px !important;
+  max-width: 100% !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 24px 0 9px !important;
+  border: 1px solid rgba(255,255,255,.13) !important;
+  border-radius: var(--tnt-radius-control) !important;
+  background-color: rgba(10,10,10,.55) !important;
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(235,235,245,.78) 50%),
+    linear-gradient(135deg, rgba(235,235,245,.78) 50%, transparent 50%) !important;
+  background-position:
+    calc(100% - 13px) 9px,
+    calc(100% - 8px) 9px !important;
+  background-size: 5px 5px, 5px 5px !important;
+  background-repeat: no-repeat !important;
+  color: rgba(245,245,247,.92) !important;
+  outline: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop select:focus {
+  border-color: rgba(255,255,255,.24) !important;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.055) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop.dropdown {
+  grid-template-columns: 58px minmax(92px, 1fr) !important;
+}
+
+/* v106: neutral/thin page scrollbars and centered style toggles. */
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-header-add-row::-webkit-scrollbar,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-edit-panel::-webkit-scrollbar {
+  width: 4px !important;
+  height: 4px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-props::-webkit-scrollbar {
+  width: 4px !important;
+  height: 4px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-header-add-row::-webkit-scrollbar-track,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-edit-panel::-webkit-scrollbar-track,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-props::-webkit-scrollbar-track {
+  background: rgba(255,255,255,.040) !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-header-add-row::-webkit-scrollbar-thumb,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-edit-panel::-webkit-scrollbar-thumb,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-props::-webkit-scrollbar-thumb {
+  background: rgba(185,187,192,.32) !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-header-add-row::-webkit-scrollbar-thumb:hover,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-edit-panel::-webkit-scrollbar-thumb:hover,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-props::-webkit-scrollbar-thumb:hover {
+  background: rgba(210,212,216,.42) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle {
+  position: relative !important;
+  display: block !important;
+  padding: 0 !important;
+  line-height: 0 !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle span {
+  top: 50% !important;
+  left: 2px !important;
+  transform: translateY(-50%) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle.on span {
+  left: 15px !important;
+  transform: translateY(-50%) !important;
+}
+
+/* v107: keep disabled styles visible and pack node rows upward. */
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-row {
+  align-items: flex-start !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node {
+  align-self: flex-start !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node.disabled {
+  display: grid !important;
+  opacity: .50 !important;
+  filter: saturate(.75) brightness(.90) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node.disabled:hover {
+  opacity: .68 !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node-props {
+  align-content: start !important;
+  align-items: center !important;
+  grid-auto-rows: min-content !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-prop {
+  align-self: start !important;
+}
+
+/* v108: style-panel motion and reliable focus highlight. */
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-node {
+  position: relative !important;
+  transform-origin: 50% 50% !important;
+  transition:
+    opacity .18s ease,
+    filter .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease,
+    transform .18s ease !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-delete {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  font-size: 12px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle span {
+  transition:
+    left .18s cubic-bezier(.2,.8,.2,1),
+    background-color .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease,
+    transform .18s cubic-bezier(.2,.8,.2,1) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle:active span {
+  transform: translateY(-50%) scale(.88) !important;
+}
+
+.layer-style-node.style-node-flash {
+  animation: none !important;
+}
+
+.layer-style-node.style-node-flash::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: 5;
+  pointer-events: none;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: calc(var(--tnt-radius-panel) + 3px);
+  box-shadow:
+    0 0 0 10px rgba(217,119,66,.18),
+    0 0 0 24px rgba(217,119,66,.105),
+    0 0 52px 18px rgba(217,119,66,.34),
+    inset 0 1px 0 rgba(255,255,255,.12);
+  animation: styleNodeFocusPulse 1.25s ease-out forwards;
+}
+
+.layer-style-node-row.is-adding .layer-style-node:not(.style-node-new) {
+  animation: styleNodeMakeRoom .42s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.layer-style-node.style-node-new {
+  animation: styleNodeScaleIn .54s cubic-bezier(.18,.9,.22,1) both;
+}
+
+@keyframes styleNodeFocusPulse {
+  0% {
+    opacity: 0;
+    transform: scale(.995);
+    filter: brightness(1);
+  }
+  18% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1.08);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.012);
+    filter: brightness(1);
+  }
+}
+
+@keyframes styleNodeMakeRoom {
+  0% {
+    transform: translateX(10px);
+    opacity: .78;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes styleNodeScaleIn {
+  0% {
+    transform: scale(.88);
+    opacity: 0;
+    filter: blur(2px);
+  }
+  55% {
+    transform: scale(1.025);
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* v109: icon-shape delete button; no text baseline alignment. */
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-delete {
+  position: relative !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  text-indent: -999px !important;
+  overflow: hidden !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-delete::before,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-delete::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9px;
+  height: 1.5px;
+  border-radius: 999px;
+  background: rgba(255,190,190,.88);
+  transform-origin: 50% 50%;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-delete::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-delete::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* v110: explicit centered four-state button hover. */
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button,
+.layer-style-dialog:not(.mask-control-dialog) > .layer-style-dialog-actions button,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-delete,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle {
+  transform-origin: 50% 50% !important;
+  will-change: transform, filter, background-color, border-color, box-shadow !important;
+  transition:
+    transform .16s cubic-bezier(.2,.8,.2,1),
+    filter .16s ease,
+    background-color .16s ease,
+    border-color .16s ease,
+    box-shadow .16s ease !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button:not(.is-added):not(.all-have) {
+  transform: scale(1) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button:not(.is-added):not(.all-have):hover:not(:disabled) {
+  transform: scale(1.035) !important;
+  filter: brightness(1.10) saturate(1.04) !important;
+  border-color: rgba(255,255,255,.18) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 8px 18px rgba(0,0,0,.22) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.is-added,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.all-have {
+  transform: scale(1) !important;
+  border-color: var(--style-color, #d97742) !important;
+  background:
+    linear-gradient(0deg, rgba(18,18,18,.70), rgba(18,18,18,.70)),
+    var(--style-color, #d97742) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.is-added:hover:not(:disabled),
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.all-have:hover:not(:disabled) {
+  transform: scale(1.035) !important;
+  filter: brightness(1.12) saturate(1.08) !important;
+  border-color: var(--style-color, #d97742) !important;
+  background:
+    linear-gradient(0deg, rgba(12,12,12,.58), rgba(12,12,12,.58)),
+    var(--style-color, #d97742) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    0 0 0 1px rgba(255,255,255,.035),
+    0 8px 18px rgba(0,0,0,.24) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.is-added::before,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.all-have::before,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.is-added:hover::before,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.all-have:hover::before {
+  background: var(--style-color, #d97742) !important;
+  box-shadow: 0 0 8px rgba(255,255,255,.16) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) > .layer-style-dialog-actions button,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-delete,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle {
+  transform: scale(1) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) > .layer-style-dialog-actions button:hover,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-delete:hover,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle:hover {
+  transform: scale(1.045) !important;
+  filter: brightness(1.10) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle span,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle.on span,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle:hover span,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle.on:hover span,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle:active span {
+  transform: translateY(-50%) scale(1) !important;
+  transform-origin: 50% 50% !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle:hover span,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle.on:hover span {
+  filter: brightness(1.12) !important;
+}
+
+/* v111: current-mode button and softer timeline layer surfaces. */
+#keyframeModeBtn {
+  min-width: 86px !important;
+  justify-content: center !important;
+}
+
+#keyframeModeBtn[data-mode="edit"],
+#keyframeModeBtn:not(.active) {
+  border-color: rgba(255,255,255,.12) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.058), rgba(255,255,255,.022)),
+    rgba(13,13,13,.58) !important;
+  color: rgba(245,245,247,.82) !important;
+}
+
+#keyframeModeBtn[data-mode="edit"]::before,
+#keyframeModeBtn:not(.active)::before {
+  border-color: rgba(230,230,235,.70) !important;
+  background: rgba(255,255,255,.035) !important;
+  border-radius: 2px !important;
+  transform: rotate(45deg) !important;
+}
+
+#keyframeModeBtn[data-mode="keyframe"],
+#keyframeModeBtn.active {
+  border-color: rgba(232,132,74,.58) !important;
+  background:
+    linear-gradient(180deg, rgba(232,132,74,.24), rgba(232,132,74,.075)),
+    rgba(18,14,12,.78) !important;
+  color: rgba(255,239,228,.96) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.09),
+    0 0 0 1px rgba(232,132,74,.12),
+    0 6px 16px rgba(0,0,0,.20) !important;
+}
+
+#keyframeModeBtn[data-mode="keyframe"]::before,
+#keyframeModeBtn.active::before {
+  border-color: rgba(255,222,199,.94) !important;
+  background: rgba(232,132,74,.56) !important;
+  box-shadow:
+    0 0 0 2px rgba(232,132,74,.14),
+    0 0 10px rgba(232,132,74,.22) !important;
+  border-radius: 2px !important;
+  transform: rotate(45deg) !important;
+}
+
+#keyframeModeBtn:hover {
+  transform: scale(1.025) !important;
+  transform-origin: 50% 50% !important;
+}
+
+.clip,
+.keyframe-focus-clip {
+  color: rgba(245,245,247,.88) !important;
+  border: 1px solid rgba(255,255,255,.145) !important;
+  border-radius: var(--tnt-radius-layer, 4px) !important;
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.030) 42%, rgba(0,0,0,.16)),
+    linear-gradient(90deg, rgba(0,0,0,.12), rgba(0,0,0,.040) 24%, rgba(0,0,0,.20)) !important;
+  background-blend-mode: soft-light, normal !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.135),
+    inset 0 -1px 0 rgba(0,0,0,.22),
+    0 1px 2px rgba(0,0,0,.22) !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,.54) !important;
+  filter: saturate(.56) brightness(.72) !important;
+  transition:
+    filter .14s ease,
+    border-color .14s ease,
+    box-shadow .14s ease,
+    transform .14s cubic-bezier(.2,.8,.2,1) !important;
+}
+
+.clip:hover,
+.keyframe-focus-clip:hover {
+  border-color: rgba(255,255,255,.24) !important;
+  filter: saturate(.72) brightness(.84) !important;
+  transform: scale(1.006) !important;
+  transform-origin: 50% 50% !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.16),
+    inset 0 -1px 0 rgba(0,0,0,.20),
+    0 3px 8px rgba(0,0,0,.24) !important;
+}
+
+.clip.selected,
+.keyframe-focus-clip.selected {
+  color: rgba(255,255,255,.95) !important;
+  border-color: rgba(255,255,255,.36) !important;
+  filter: saturate(.90) brightness(.98) !important;
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.052) 44%, rgba(0,0,0,.12)),
+    linear-gradient(90deg, rgba(255,255,255,.040), rgba(0,0,0,.035) 28%, rgba(0,0,0,.16)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.22),
+    inset 0 0 0 1px rgba(255,255,255,.090),
+    0 4px 12px rgba(0,0,0,.28) !important;
+}
+
+.clip.disabled-layer {
+  filter: saturate(.22) brightness(.46) !important;
+  opacity: .68 !important;
+  border-color: rgba(255,255,255,.085) !important;
+}
+
+.clip.disabled-layer.selected,
+.clip.selected.disabled-layer {
+  filter: saturate(.48) brightness(.70) !important;
+  opacity: .88 !important;
+  border-color: rgba(255,255,255,.18) !important;
+}
+
+.clip-index {
+  min-width: 18px !important;
+  height: 16px !important;
+  padding: 0 5px !important;
+  border: 1px solid rgba(255,255,255,.105) !important;
+  border-radius: 5px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.070), rgba(255,255,255,.020)),
+    rgba(0,0,0,.26) !important;
+  color: rgba(245,245,247,.72) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055) !important;
+}
+
+.clip.selected .clip-index,
+.keyframe-focus-clip.selected .clip-index {
+  color: rgba(255,255,255,.90) !important;
+  border-color: rgba(255,255,255,.18) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.090), rgba(255,255,255,.030)),
+    rgba(0,0,0,.22) !important;
+}
+
+.clip-name {
+  color: inherit !important;
+  font-weight: 400 !important;
+}
+
+/* v112: both timeline modes have explicit color identity. */
+#keyframeModeBtn[data-mode="edit"],
+#keyframeModeBtn:not(.active) {
+  border-color: rgba(232,132,74,.54) !important;
+  background:
+    linear-gradient(180deg, rgba(232,132,74,.22), rgba(232,132,74,.070)),
+    rgba(18,14,12,.76) !important;
+  color: rgba(255,239,228,.95) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.085),
+    0 0 0 1px rgba(232,132,74,.10),
+    0 6px 16px rgba(0,0,0,.18) !important;
+}
+
+#keyframeModeBtn[data-mode="edit"]::before,
+#keyframeModeBtn:not(.active)::before {
+  border-color: rgba(255,224,204,.92) !important;
+  background: rgba(232,132,74,.52) !important;
+  box-shadow:
+    0 0 0 2px rgba(232,132,74,.12),
+    0 0 10px rgba(232,132,74,.18) !important;
+}
+
+#keyframeModeBtn[data-mode="keyframe"],
+#keyframeModeBtn.active {
+  border-color: rgba(118,92,226,.60) !important;
+  background:
+    linear-gradient(180deg, rgba(118,92,226,.30), rgba(118,92,226,.090)),
+    rgba(15,13,24,.80) !important;
+  color: rgba(238,233,255,.97) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.085),
+    0 0 0 1px rgba(118,92,226,.13),
+    0 6px 16px rgba(0,0,0,.20) !important;
+}
+
+#keyframeModeBtn[data-mode="keyframe"]::before,
+#keyframeModeBtn.active::before {
+  border-color: rgba(226,218,255,.94) !important;
+  background: rgba(118,92,226,.62) !important;
+  box-shadow:
+    0 0 0 2px rgba(118,92,226,.16),
+    0 0 12px rgba(118,92,226,.26) !important;
+}
+
+#keyframeModeBtn:hover {
+  filter: brightness(1.08) saturate(1.05) !important;
+}
+
+/* v113: context menus spawn from the click point, not the bottom rail. */
+.layer-menu.open {
+  position: fixed !important;
+  left: var(--menu-left, auto);
+  top: var(--menu-top, auto);
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  width: min(392px, var(--menu-max-width, calc(100vw - 16px))) !important;
+  min-width: min(336px, var(--menu-max-width, calc(100vw - 16px))) !important;
+  max-width: var(--menu-max-width, calc(100vw - 16px)) !important;
+  max-height: var(--menu-max-height, calc(100vh - 16px)) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.layer-style-layer-count,
+.ease-keyframe-count {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 20px !important;
+  padding: 0 8px !important;
+  border: 1px solid rgba(255,255,255,.105) !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.055) !important;
+  color: rgba(235,235,245,.58) !important;
+  font-size: 11px !important;
+  font-style: normal !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+}
+
+/* v114: compact glass right-click menus. Rows are commands, not cards. */
+.layer-menu.open {
+  position: fixed !important;
+  left: var(--menu-left, auto) !important;
+  top: var(--menu-top, auto) !important;
+  right: auto !important;
+  bottom: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  width: min(var(--menu-width, 360px), var(--menu-max-width, calc(100vw - 16px))) !important;
+  min-width: min(300px, var(--menu-max-width, calc(100vw - 16px))) !important;
+  max-width: var(--menu-max-width, calc(100vw - 16px)) !important;
+  max-height: var(--menu-max-height, calc(100vh - 16px)) !important;
+  padding: 7px !important;
+  transform: none !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  border: 1px solid rgba(255,255,255,.115) !important;
+  border-radius: var(--tnt-radius-panel, 12px) !important;
+  background: rgba(18,18,19,.66) !important;
+  color: rgba(245,245,247,.90) !important;
+  box-shadow:
+    0 20px 58px rgba(0,0,0,.50),
+    inset 0 1px 0 rgba(255,255,255,.075),
+    inset 0 0 0 1px rgba(255,255,255,.020) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(112%) !important;
+  backdrop-filter: blur(20px) saturate(112%) !important;
+}
+
+.layer-menu.open::before {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.070), transparent 36%),
+    radial-gradient(ellipse 70% 42% at 50% 0%, rgba(255,255,255,.045), transparent 66%),
+    radial-gradient(ellipse 36% 22% at 58% 15%, rgba(217,119,66,.075), transparent 72%) !important;
+  opacity: 1 !important;
+}
+
+.layer-menu.open::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+
+.layer-menu.open::-webkit-scrollbar-thumb {
+  border: 2px solid transparent !important;
+  border-radius: 999px !important;
+  background: rgba(235,235,245,.24) !important;
+  background-clip: padding-box !important;
+}
+
+.layer-menu-context-strip {
+  flex: 0 0 3px !important;
+  height: 3px !important;
+  min-height: 3px !important;
+  overflow: hidden !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.055) !important;
+}
+
+.layer-menu-context-strip span {
+  opacity: .82 !important;
+}
+
+.layer-menu-context {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 5px !important;
+  margin: 5px 0 3px !important;
+  padding: 8px 9px !important;
+  border: 1px solid rgba(255,255,255,.070) !important;
+  border-radius: var(--tnt-radius-node, 7px) !important;
+  background: rgba(255,255,255,.038) !important;
+}
+
+.layer-menu-context strong,
+.layer-menu-context em {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.layer-menu-context strong {
+  color: rgba(255,255,255,.92) !important;
+  font-size: 12px !important;
+  font-weight: 560 !important;
+  line-height: 15px !important;
+}
+
+.layer-menu-context em {
+  margin-top: 1px !important;
+  color: rgba(235,235,245,.46) !important;
+  font-size: 10px !important;
+  font-style: normal !important;
+  line-height: 12px !important;
+}
+
+.layer-menu-context-chips {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 4px !important;
+  min-width: 0 !important;
+}
+
+.layer-menu-context-chips b,
+.layer-menu-context-chips button {
+  height: 16px !important;
+  max-width: 100% !important;
+  padding: 0 6px !important;
+  border: 1px solid rgba(255,255,255,.075) !important;
+  border-left: 3px solid var(--context-color) !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.048) !important;
+  color: rgba(245,245,247,.68) !important;
+  font-size: 9px !important;
+  font-weight: 560 !important;
+  line-height: 15px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+}
+
+.layer-menu-section,
+.layer-menu .keyframe-value-section,
+.layer-menu .marker-editor-section,
+.layer-menu .label-section {
+  display: block !important;
+  margin: 2px 0 !important;
+  padding: 5px 3px 4px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.layer-menu-section-title,
+.layer-menu-kicker {
+  display: block !important;
+  margin: 6px 7px 4px !important;
+  padding: 0 !important;
+  color: rgba(235,235,245,.42) !important;
+  font-size: 9px !important;
+  font-weight: 650 !important;
+  letter-spacing: 0 !important;
+  line-height: 11px !important;
+  text-transform: uppercase !important;
+}
+
+.layer-menu-swatches {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 5px !important;
+  padding: 0 6px 2px !important;
+}
+
+.layer-menu .label-swatch {
+  width: 18px !important;
+  height: 16px !important;
+  min-width: 18px !important;
+  min-height: 16px !important;
+  padding: 0 !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  border-radius: 5px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    0 1px 3px rgba(0,0,0,.24) !important;
+}
+
+.layer-menu .label-swatch:hover,
+.layer-menu .label-swatch.active {
+  outline: 1px solid rgba(255,255,255,.56) !important;
+  outline-offset: 1px !important;
+  filter: brightness(1.08) saturate(1.04) !important;
+}
+
+.layer-menu .menu-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(72px, 136px) !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  max-height: 28px !important;
+  padding: 0 10px !important;
+  border: 0 !important;
+  border-radius: var(--tnt-radius-node, 7px) !important;
+  background: transparent !important;
+  color: rgba(245,245,247,.88) !important;
+  font-size: 12px !important;
+  font-weight: 430 !important;
+  line-height: 1 !important;
+  text-align: left !important;
+  transform-origin: 50% 50% !important;
+  transition:
+    background-color .10s ease,
+    color .10s ease,
+    transform .12s cubic-bezier(.2,.8,.2,1),
+    filter .10s ease !important;
+}
+
+.layer-menu .menu-row span,
+.layer-menu .menu-row em,
+.layer-menu .menu-row .menu-shortcut {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+}
+
+.layer-menu .menu-row span {
+  display: block !important;
+}
+
+.layer-menu .menu-row em,
+.layer-menu .menu-row .menu-shortcut {
+  display: block !important;
+  justify-self: end !important;
+  max-width: 154px !important;
+  color: rgba(235,235,245,.42) !important;
+  font-size: 10px !important;
+  font-style: normal !important;
+  font-weight: 420 !important;
+  text-align: right !important;
+}
+
+.layer-menu .menu-row:hover {
+  background: rgba(255,255,255,.072) !important;
+  color: rgba(255,255,255,.96) !important;
+  transform: scale(1.006) !important;
+  filter: brightness(1.04) !important;
+}
+
+.layer-menu .menu-row:hover em,
+.layer-menu .menu-row:hover .menu-shortcut {
+  color: rgba(245,245,247,.64) !important;
+}
+
+.layer-menu .menu-row:active {
+  background: rgba(255,255,255,.10) !important;
+  transform: scale(.998) !important;
+}
+
+.layer-menu-separator {
+  height: 1px !important;
+  min-height: 1px !important;
+  margin: 4px 7px !important;
+  border: 0 !important;
+  background: rgba(255,255,255,.075) !important;
+}
+
+.layer-menu button[data-action^="placeholder"] span {
+  font-style: italic !important;
+}
+
+.layer-menu button[data-action^="placeholder"],
+.layer-menu button[data-action^="placeholder"]:hover {
+  opacity: .88 !important;
+}
+
+/* v115: context color cue is a soft blurred gradient, not a hard strip. */
+.layer-menu-context-strip {
+  position: relative !important;
+  flex: 0 0 15px !important;
+  height: 15px !important;
+  min-height: 15px !important;
+  margin: 0 2px 2px !important;
+  overflow: hidden !important;
+  border-radius: var(--tnt-radius-node, 7px) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.050), rgba(255,255,255,.012)),
+    rgba(255,255,255,.026) !important;
+}
+
+.layer-menu-context-strip::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.055), transparent 28%, rgba(255,255,255,.035) 72%, transparent),
+    linear-gradient(180deg, rgba(255,255,255,.06), transparent) !important;
+  pointer-events: none !important;
+}
+
+.layer-menu-context-strip span {
+  height: 100% !important;
+  min-width: 20px !important;
+  opacity: .54 !important;
+  filter: blur(7px) saturate(1.35) !important;
+  transform: scale(1.32, 1.7) !important;
+  transform-origin: 50% 50% !important;
+}
+
+/* v116: the time gutter begins after the filter rail; it must never paint over it. */
+:root {
+  --tnt-filter-gutter: 30px;
+  --tnt-track-gutter: var(--track-gutter, 92px);
+  --tnt-left-gutter: var(--left-gutter, 122px);
+}
+
+.filter-column {
+  left: 0 !important;
+  width: var(--tnt-filter-gutter) !important;
+  min-width: var(--tnt-filter-gutter) !important;
+  max-width: var(--tnt-filter-gutter) !important;
+  padding-left: 3px !important;
+  padding-right: 3px !important;
+  /* ruler is 42px; top is 28px (header); buttons start at 42px offset below column top */
+  padding-top: 44px !important;
+  z-index: 260 !important;
+}
+
+#timeDisplay,
+body.keyframe-mode #timeDisplay {
+  left: var(--tnt-filter-gutter) !important;
+  width: var(--tnt-track-gutter) !important;
+  min-width: var(--tnt-track-gutter) !important;
+  max-width: var(--tnt-track-gutter) !important;
+  padding: 0 9px 0 7px !important;
+  box-sizing: border-box !important;
+  clip-path: inset(0) !important;
+  z-index: 140 !important;
+}
+
+.time-ruler-wrap::before,
+body.keyframe-mode .time-ruler-wrap::before {
+  left: var(--tnt-filter-gutter) !important;
+  width: var(--tnt-track-gutter) !important;
+  max-width: var(--tnt-track-gutter) !important;
+}
+
+.track-label,
+body.keyframe-mode .track-label {
+  left: var(--tnt-filter-gutter) !important;
+  width: var(--tnt-track-gutter) !important;
+  min-width: var(--tnt-track-gutter) !important;
+  max-width: var(--tnt-track-gutter) !important;
+  box-sizing: border-box !important;
+}
+
+.filter-btn.relation-filter {
+  font-size: 9px !important;
+  font-weight: 760 !important;
+  letter-spacing: 0 !important;
+}
+
+.filter-btn.relation-filter.active {
+  border-color: rgba(217,119,66,.38) !important;
+  background: rgba(217,119,66,.15) !important;
+  color: rgba(255,232,218,.96) !important;
+}
+
+/* v117: gradient-map only. Keep existing shadows, borders, and hover details. */
+.clip,
+.keyframe-focus-clip {
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.082), rgba(255,255,255,.034) 42%, rgba(0,0,0,.115)),
+    linear-gradient(90deg, rgba(0,0,0,.095), rgba(0,0,0,.030) 24%, rgba(0,0,0,.155)) !important;
+}
+
+.clip.selected,
+.keyframe-focus-clip.selected {
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.125), rgba(255,255,255,.046) 44%, rgba(0,0,0,.090)),
+    linear-gradient(90deg, rgba(255,255,255,.030), rgba(0,0,0,.024) 28%, rgba(0,0,0,.120)) !important;
+}
+
+.clip.disabled-layer.selected,
+.clip.selected.disabled-layer {
+  background-image:
+    linear-gradient(180deg, rgba(255,255,255,.080), rgba(255,255,255,.030) 44%, rgba(0,0,0,.115)),
+    linear-gradient(90deg, rgba(0,0,0,.075), rgba(0,0,0,.018) 26%, rgba(0,0,0,.140)) !important;
+}
+
+#keyframeModeBtn[data-mode="edit"],
+#keyframeModeBtn:not(.active) {
+  background:
+    linear-gradient(180deg, rgba(232,132,74,.175), rgba(232,132,74,.072)),
+    rgba(18,14,12,.76) !important;
+}
+
+#keyframeModeBtn[data-mode="keyframe"],
+#keyframeModeBtn.active {
+  background:
+    linear-gradient(180deg, rgba(118,92,226,.235), rgba(118,92,226,.082)),
+    rgba(15,13,24,.80) !important;
+}
+
+/* v118: multiline tooltips and color-coded filter groups. */
+.panel-tooltip {
+  max-width: 280px !important;
+  min-width: 148px !important;
+  padding: 8px 10px !important;
+  border-color: rgba(255,255,255,.13) !important;
+  border-radius: var(--tnt-radius-node, 7px) !important;
+  background: rgba(15,16,18,.90) !important;
+  color: rgba(245,245,247,.90) !important;
+  font-size: 11px !important;
+  line-height: 14px !important;
+  white-space: normal !important;
+  -webkit-backdrop-filter: blur(16px) saturate(112%) !important;
+  backdrop-filter: blur(16px) saturate(112%) !important;
+}
+
+.panel-tooltip-line {
+  display: block !important;
+  white-space: nowrap !important;
+}
+
+.panel-tooltip-line.first {
+  margin-bottom: 3px !important;
+  color: rgba(255,255,255,.96) !important;
+  font-weight: 650 !important;
+}
+
+.filter-btn.filter-group-link[data-relation-toggle="matte"],
+.filter-btn.filter-group-matte {
+  border-color: rgba(53,199,255,.28) !important;
+  color: rgba(190,238,255,.86) !important;
+}
+
+.filter-btn.filter-group-link[data-relation-toggle="parent"],
+.filter-btn.filter-group-parent {
+  border-color: rgba(95,211,111,.28) !important;
+  color: rgba(202,255,209,.86) !important;
+}
+
+.filter-btn.filter-group-type {
+  border-color: rgba(150,132,230,.24) !important;
+  color: rgba(226,221,255,.78) !important;
+}
+
+.filter-btn.filter-group-animation {
+  border-color: rgba(217,119,66,.28) !important;
+  color: rgba(255,218,194,.82) !important;
+}
+
+.filter-btn.filter-group-link[data-relation-toggle="matte"].active,
+.filter-btn.filter-group-matte.active {
+  border-color: rgba(53,199,255,.46) !important;
+  background: rgba(53,199,255,.135) !important;
+  color: rgba(222,248,255,.98) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 0 12px rgba(53,199,255,.10) !important;
+}
+
+.filter-btn.filter-group-link[data-relation-toggle="parent"].active,
+.filter-btn.filter-group-parent.active {
+  border-color: rgba(95,211,111,.46) !important;
+  background: rgba(95,211,111,.135) !important;
+  color: rgba(226,255,230,.98) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 0 12px rgba(95,211,111,.10) !important;
+}
+
+.filter-btn.filter-group-type.active {
+  border-color: rgba(150,132,230,.42) !important;
+  background: rgba(150,132,230,.13) !important;
+  color: rgba(239,236,255,.98) !important;
+}
+
+.filter-btn.filter-group-animation.active {
+  border-color: rgba(217,119,66,.44) !important;
+  background: rgba(217,119,66,.14) !important;
+  color: rgba(255,232,218,.98) !important;
+}
+
+/* v119: keyframe rows align to their lane center; property dots use quiet graphite. */
+body.keyframe-mode .keyframe-layer-row {
+  position: relative !important;
+}
+
+body.keyframe-mode .keyframe-focus-clip {
+  top: calc((30px - var(--tnt-layer-h, 22px)) / 2) !important;
+  height: var(--tnt-layer-h, 22px) !important;
+}
+
+body.keyframe-mode .keyframe-layer-row > .track-label,
+body.keyframe-mode .keyframe-property-row > .track-label,
+.edit-property-row > .track-label {
+  align-items: center !important;
+}
+
+.property-row-icon {
+  width: 7px !important;
+  min-width: 7px !important;
+  height: 7px !important;
+}
+
+.property-row-icon::before,
+.property-row-icon.keyed::before {
+  left: 1px !important;
+  top: 1px !important;
+  width: 5px !important;
+  height: 5px !important;
+  border: 1px solid rgba(202,206,214,.34) !important;
+  background: rgba(148,156,168,.42) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 0 0 1px rgba(0,0,0,.42) !important;
+}
+
+.property-row-icon.expression::before {
+  border-color: rgba(209,75,75,.56) !important;
+  background: rgba(209,75,75,.68) !important;
+}
+
+.property-row-icon.both::before {
+  border-color: rgba(217,119,66,.60) !important;
+  background: rgba(217,119,66,.70) !important;
+}
+
+.property-lane-name {
+  top: 3px !important;
+  height: 20px !important;
+  line-height: 20px !important;
+  padding-left: 17px !important;
+}
+
+.property-lane-name::before {
+  top: 8px !important;
+  width: 5px !important;
+  height: 5px !important;
+  background: rgba(148,156,168,.44) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 0 0 1px rgba(0,0,0,.48) !important;
+}
+
+/* v120: keyframe property labels align left; ruler labels stay neutral white. */
+.time-ruler-wrap,
+.time-ruler-wrap.top-ruler,
+body.keyframe-mode .time-ruler-wrap,
+body.keyframe-mode .time-ruler-wrap.top-ruler {
+  z-index: 320 !important;
+}
+
+.time-ruler-wrap .tick,
+.time-ruler-wrap .tick-major,
+.time-ruler-wrap .tick-section,
+.time-ruler-wrap .tick-time,
+.time-ruler-wrap .tick-frame {
+  color: rgba(245,245,247,.82) !important;
+  text-shadow: none !important;
+}
+
+.time-ruler-wrap .tick-frame {
+  color: rgba(245,245,247,.52) !important;
+}
+
+body.keyframe-mode .property-track-label,
+.edit-property-row > .property-track-label {
+  justify-content: flex-start !important;
+  text-align: left !important;
+  gap: 6px !important;
+  padding-left: 10px !important;
+  padding-right: 6px !important;
+}
+
+body.keyframe-mode .property-track-label .property-indent,
+.edit-property-row > .property-track-label .property-indent {
+  display: none !important;
+}
+
+body.keyframe-mode .property-label-text,
+.edit-property-row .property-label-text {
+  flex: 1 1 auto !important;
+  text-align: left !important;
+}
+
+.property-row-icon {
+  width: 6px !important;
+  min-width: 6px !important;
+  height: 6px !important;
+}
+
+.property-row-icon::before,
+.property-row-icon.keyed::before {
+  left: 1px !important;
+  top: 1px !important;
+  width: 4px !important;
+  height: 4px !important;
+  border-width: 1px !important;
+}
+
+.property-lane-name {
+  padding-left: 15px !important;
+}
+
+.property-lane-name::before {
+  top: 9px !important;
+  width: 4px !important;
+  height: 4px !important;
+}
+
+.filter-btn.filter-group-link[data-relation-toggle="matte"],
+.filter-btn.filter-group-parent[data-filter="parent-source"],
+.filter-btn.filter-group-matte[data-filter="matte-child"],
+.filter-btn.filter-group-type[data-filter="text"],
+.filter-btn.filter-group-animation[data-filter="animated"] {
+  margin-top: 7px !important;
+}
+
+/* v121: layer style colors use a styled swatch button that opens Adobe's native picker. */
+.layer-style-color-swatch {
+  width: 44px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 3px !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: var(--tnt-radius-control, 7px) !important;
+  background: rgba(0,0,0,.24) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035),
+    0 1px 2px rgba(0,0,0,.35) !important;
+  cursor: pointer !important;
+}
+
+.layer-style-color-swatch::before {
+  content: "" !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: calc(var(--tnt-radius-control, 7px) - 3px) !important;
+  background: var(--color-value, #000) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.18) !important;
+}
+
+.layer-style-color-swatch:hover {
+  transform: scale(1.04) !important;
+  border-color: rgba(255,255,255,.20) !important;
+}
+
+/* v122: inline layer-style preset naming row uses panel-native controls. */
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form {
+  grid-template-columns: minmax(180px, 1fr) auto auto minmax(150px, auto) !important;
+  align-items: center !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form input,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form button {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  font-family: inherit !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 28px !important;
+  min-width: 70px !important;
+  min-height: 28px !important;
+  padding: 0 12px !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: var(--tnt-radius-control, 7px) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)),
+    rgba(0,0,0,.28) !important;
+  color: rgba(245,245,247,.82) !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 1px 2px rgba(0,0,0,.32) !important;
+  cursor: pointer !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form button.primary {
+  border-color: rgba(217,119,66,.42) !important;
+  background:
+    linear-gradient(180deg, rgba(217,119,66,.34), rgba(217,119,66,.16)),
+    rgba(0,0,0,.28) !important;
+  color: rgba(255,232,218,.95) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form button:hover {
+  transform: translateY(-1px) !important;
+  border-color: rgba(255,255,255,.20) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form button.primary:hover {
+  border-color: rgba(217,119,66,.64) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form button:disabled,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form input:disabled {
+  opacity: .55 !important;
+  cursor: default !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-message {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: rgba(235,235,245,.48) !important;
+  font-size: 10px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-message.error {
+  color: rgba(255,162,150,.88) !important;
+}
+
+/* v123: saved style presets preview as a styled letter sample instead of color bars. */
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button {
+  grid-template-columns: minmax(120px, 1fr) 56px !important;
+  grid-template-rows: 1fr !important;
+  align-items: center !important;
+  column-gap: 12px !important;
+  flex: 0 0 244px !important;
+  width: 244px !important;
+  height: 58px !important;
+  padding: 8px 10px 8px 12px !important;
+  border-color: rgba(217,119,66,.28) !important;
+  border-radius: 8px !important;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(217,119,66,.16), transparent 52%),
+    linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.018)),
+    rgba(12,12,13,.36) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button:hover {
+  border-color: rgba(217,119,66,.52) !important;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(217,119,66,.23), transparent 56%),
+    linear-gradient(180deg, rgba(255,255,255,.09), rgba(217,119,66,.035)),
+    rgba(12,12,13,.42) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-meta {
+  display: grid !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-meta strong,
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-meta em {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-meta strong {
+  color: rgba(245,245,247,.92) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 18px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-meta em {
+  color: rgba(235,235,245,.48) !important;
+  font-size: 11px !important;
+  font-style: normal !important;
+  line-height: 14px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-preview {
+  grid-row: auto !important;
+  grid-column: auto !important;
+  display: grid !important;
+  place-items: center !important;
+  justify-content: initial !important;
+  width: 48px !important;
+  height: 42px !important;
+  border-radius: 6px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.98), rgba(245,238,240,.96)) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.74),
+    0 1px 2px rgba(0,0,0,.32) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-preview span {
+  display: block !important;
+  color: var(--preset-letter-fill, #9b1d32) !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 34px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  -webkit-text-stroke: var(--preset-letter-stroke-width, 1px) var(--preset-letter-stroke, rgba(255,255,255,.88)) !important;
+  text-shadow: var(--preset-letter-shadow, 0 2px 3px rgba(0,0,0,.28)) !important;
+  transform: translateY(1px) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button i {
+  display: none !important;
+}

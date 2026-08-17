@@ -1,0 +1,948 @@
+/* custom duration modal */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,.38);
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 42px;
+}
+.modal-backdrop.show { display: flex; }
+.duration-dialog {
+  width: 260px;
+  background: #2a2a2a;
+  border: 1px solid #4b4b4b;
+  border-radius: 5px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.55);
+  padding: 12px;
+}
+.dialog-title { font-size: 13px; font-weight: 700; color: #e0e0e0; margin-bottom: 3px; }
+.dialog-subtitle { font-size: 10px; color: #9a9a9a; margin-bottom: 9px; }
+#durationInput {
+  width: 100%;
+  height: 26px;
+  background: #171717;
+  border: 1px solid #555;
+  border-radius: 3px;
+  color: #eaeaea;
+  padding: 0 8px;
+  outline: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+#durationInput:focus { border-color: #4da3ff; box-shadow: 0 0 0 1px rgba(77,163,255,.25); }
+.dialog-error { min-height: 14px; margin-top: 5px; font-size: 10px; color: #ff8c8c; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 7px; margin-top: 8px; }
+.dialog-btn {
+  height: 23px;
+  padding: 0 10px;
+  border: 1px solid #555;
+  border-radius: 3px;
+  background: #383838;
+  color: #ddd;
+  font-size: 11px;
+  cursor: pointer;
+}
+.dialog-btn.primary { background: #315f9f; border-color: #4c86d4; color: #fff; }
+.dialog-btn:hover { filter: brightness(1.12); }
+.expression-dialog {
+  width: 520px;
+}
+#expressionInput {
+  width: 100%;
+  height: 160px;
+  padding: 8px;
+  border: 1px solid #555;
+  border-radius: 3px;
+  outline: none;
+  background: #141414;
+  color: #e8e8e8;
+  font: 12px Consolas, "Courier New", monospace;
+  resize: vertical;
+  user-select: text;
+  -webkit-user-select: text;
+}
+#expressionInput:focus {
+  border-color: #4da3ff;
+  box-shadow: 0 0 0 1px rgba(77,163,255,.25);
+}
+
+.anchor-dialog {
+  width: 210px;
+}
+.anchor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 38px);
+  gap: 8px;
+  justify-content: center;
+  margin: 10px 0 12px;
+}
+.anchor-cell {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #4d4d4d;
+  border-radius: 50%;
+  background: #1b1b1b;
+  cursor: pointer;
+}
+.anchor-cell::after {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  background: #cfcfcf;
+}
+.anchor-cell:hover {
+  background: #2c2c2c;
+  border-color: #707070;
+}
+.anchor-cell.active {
+  background: #243f61;
+  border-color: #5b96e0;
+}
+.anchor-cell.active::after {
+  background: #72aeff;
+}
+.anchor-option {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #cfcfcf;
+  font-size: 11px;
+  margin-top: 4px;
+}
+.anchor-option input {
+  margin: 0;
+}
+
+/* v18 marker duration/protected-region display */
+.marker-region-band {
+  position: absolute;
+  top: 15px;
+  height: 7px;
+  border-top: 1px solid;
+  border-left: 1px solid;
+  border-right: 1px solid;
+  z-index: 4;
+  pointer-events: auto;
+}
+.bottom-ruler .marker-region-band {
+  top: 2px;
+  border-top: 0;
+  border-bottom: 1px solid;
+}
+.marker-region-band.protected {
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
+}
+.marker-half {
+  position: absolute;
+  width: 0;
+  height: 0;
+  z-index: 7;
+  pointer-events: auto;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.65));
+}
+.marker-half-start {
+  top: 14px;
+  margin-left: -1px;
+  border-top: 8px solid transparent;
+  border-bottom: 0 solid transparent;
+  border-left: 7px solid #b8b8b8;
+}
+.marker-half-end {
+  top: 14px;
+  margin-left: -6px;
+  border-top: 8px solid transparent;
+  border-bottom: 0 solid transparent;
+  border-right: 7px solid #b8b8b8;
+}
+.bottom-ruler .marker-half-start,
+.bottom-ruler .marker-half-end {
+  top: 2px;
+  transform: scaleY(-1);
+}
+.marker-region-start {
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.7));
+}
+.protected-region-overlay {
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-left: 1px solid;
+  border-right: 1px solid;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+}
+.track-label, .clip { z-index: 3; }
+.layer-marker-region {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  z-index: 1;
+  pointer-events: none;
+  border-left: 1px solid rgba(255,255,255,.25);
+  border-right: 1px solid rgba(255,255,255,.25);
+}
+.layer-marker-region.protected {
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.2);
+}
+.layer-marker-half-end {
+  top: 3px;
+  margin-left: -5px;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-right: 6px solid #b8b8b8;
+}
+.marker-layer.marker-region-start {
+  margin-left: -5px;
+}
+
+/* v19 rule: keep the left track-name column and top time readout frozen forever.
+   Future edits must not undo this single-column sticky layout. */
+#timeDisplay {
+  left: 0;
+  width: 72px;
+  padding-left: 8px;
+  background: linear-gradient(90deg, rgba(31,31,31,.99), rgba(36,36,36,.96));
+  border-right: 1px solid #4a4a4a;
+  border-bottom: 1px solid #383838;
+}
+.track-label {
+  left: 0;
+  width: 72px;
+  z-index: 9;
+  padding: 7px 8px;
+  background: linear-gradient(90deg, rgba(31,31,31,.99), rgba(36,36,36,.96));
+  border-right: 1px solid #4a4a4a;
+  color: #bdbdbd;
+  font-weight: 700;
+}
+.time-ruler-wrap { z-index: 18; }
+.top-ruler { z-index: 19; }
+.bottom-ruler { z-index: 20; }
+
+/* v19 marker pin refinement: text sits down/right so the exact in-point remains readable. */
+.marker-comp.has-text .marker-label {
+  top: 12px;
+  left: 8px;
+}
+.marker-layer.has-text .marker-label {
+  top: 11px;
+  left: 7px;
+}
+.marker-label {
+  color: #fff;
+  border: 1px solid rgba(0,0,0,.38);
+  box-shadow: 0 1px 2px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.16);
+}
+.marker-handle {
+  cursor: ew-resize;
+  pointer-events: auto;
+}
+.marker { cursor: grab; }
+.marker:active { cursor: grabbing; }
+.marker-half-start::after,
+.marker-half-end::after,
+.layer-marker-half-end::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  width: 12px;
+  height: 16px;
+}
+.marker-half-start::after { left: -8px; }
+.marker-half-end::after { left: -4px; }
+.layer-marker-half-end::after { left: -6px; }
+
+/* v19 protected-region column connects from the marker/ruler boundary through the tracks. */
+.protected-region-overlay {
+  top: -24px;
+  z-index: 2;
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(255,255,255,.055) 0,
+    rgba(255,255,255,.055) 1px,
+    transparent 1px,
+    transparent 8px
+  );
+}
+.track-label, .clip { z-index: 4; }
+
+
+/* v20 marker handles + frozen column hardening
+   Rule: the left track/time column must stay frozen and above clips in all future versions. */
+body.marker-resizing, body.marker-resizing * { cursor: ew-resize !important; }
+body.marker-moving, body.marker-moving * { cursor: grabbing !important; }
+
+#timeDisplay {
+  z-index: 60;
+  position: sticky;
+  left: 0;
+}
+.track-label {
+  z-index: 55;
+  position: sticky;
+  left: 0;
+  isolation: isolate;
+  box-shadow: 1px 0 0 #4a4a4a, 6px 0 10px rgba(0,0,0,.18);
+}
+.clip {
+  z-index: 5;
+}
+.marker,
+.marker-half,
+.layer-marker-half-end {
+  z-index: 35;
+}
+.marker-label {
+  z-index: 36;
+}
+.protected-region-overlay {
+  z-index: 2;
+}
+
+.marker-half,
+.layer-marker-half-end {
+  cursor: ew-resize;
+  transform-origin: center;
+  transition: transform .08s ease, filter .08s ease, opacity .08s ease;
+}
+.marker-half::after,
+.layer-marker-half-end::after {
+  pointer-events: auto;
+  cursor: ew-resize;
+}
+.marker-half:hover,
+.layer-marker-half-end:hover,
+.marker-half.is-dragging,
+.layer-marker-half-end.is-dragging {
+  transform: scale(1.25);
+  filter: drop-shadow(0 0 5px rgba(110,181,255,.9)) drop-shadow(0 1px 1px rgba(0,0,0,.75));
+}
+.bottom-ruler .marker-half-start:hover,
+.bottom-ruler .marker-half-end:hover,
+.bottom-ruler .marker-half-start.is-dragging,
+.bottom-ruler .marker-half-end.is-dragging {
+  transform: scaleY(-1) scale(1.25);
+}
+.marker-half-start::before,
+.marker-half-end::before,
+.layer-marker-half-end::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  width: 2px;
+  height: 19px;
+  border-radius: 2px;
+  background: rgba(255,255,255,.86);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.42), 0 0 5px rgba(110,181,255,.55);
+  opacity: .0;
+  transition: opacity .08s ease;
+}
+.marker-half-start::before { left: 1px; }
+.marker-half-end::before { left: -3px; }
+.layer-marker-half-end::before { left: -3px; top: -9px; height: 18px; }
+.marker-half-start:hover::before,
+.marker-half-end:hover::before,
+.layer-marker-half-end:hover::before,
+.marker-half-start.is-dragging::before,
+.marker-half-end.is-dragging::before,
+.layer-marker-half-end.is-dragging::before {
+  opacity: 1;
+}
+
+/* Handles get a stable, generous hit target so the cursor does not flicker between hand/default. */
+.marker-half-start::after,
+.marker-half-end::after,
+.layer-marker-half-end::after {
+  top: -14px;
+  width: 22px;
+  height: 30px;
+}
+.marker-half-start::after { left: -12px; }
+.marker-half-end::after { left: -11px; }
+.layer-marker-half-end::after { left: -12px; }
+
+/* Protected regions must read as one full-height column from top ruler to bottom ruler. */
+.protected-region-overlay {
+  top: -24px;
+  min-height: calc(100vh - 52px);
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(255,255,255,.06) 0,
+    rgba(255,255,255,.06) 1px,
+    transparent 1px,
+    transparent 8px
+  );
+}
+
+
+/* v21 marker handle interaction: use a real hit zone and light the half-triangle itself.
+   No white blinking grabber. The visible half-triangle is the affordance. */
+.marker-half,
+.layer-marker-half-end {
+  width: 28px;
+  height: 32px;
+  border: 0 !important;
+  margin-left: -14px;
+  color: var(--marker-handle-color, currentColor);
+  background: transparent;
+  transform-origin: center center;
+  cursor: ew-resize;
+  pointer-events: auto;
+}
+.marker-half-start,
+.marker-half-end {
+  top: 6px;
+}
+.bottom-ruler .marker-half-start,
+.bottom-ruler .marker-half-end {
+  top: -8px;
+  transform: scaleY(-1);
+}
+.layer-marker-half-end {
+  top: -7px;
+}
+
+.marker-half-start::before,
+.marker-half-end::before,
+.layer-marker-half-end::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  background: transparent !important;
+  box-shadow: none;
+  opacity: .86;
+  transition: transform .10s ease, opacity .10s ease, filter .10s ease;
+}
+.marker-half-start::before {
+  left: 13px;
+  border-left: 8px solid currentColor;
+}
+.marker-half-end::before,
+.layer-marker-half-end::before {
+  left: 7px;
+  border-right: 8px solid currentColor;
+}
+.layer-marker-half-end::before {
+  top: 8px;
+}
+
+/* Stable invisible grab zone around handles. This prevents cursor/hand flicker at the edge. */
+.marker-half-start::after,
+.marker-half-end::after,
+.layer-marker-half-end::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  left: 0;
+  top: 0;
+  cursor: ew-resize;
+  pointer-events: auto;
+  background: rgba(255,255,255,0);
+}
+
+.marker-half:hover,
+.layer-marker-half-end:hover,
+.marker-half.is-dragging,
+.layer-marker-half-end.is-dragging {
+  transform: none;
+  filter: none;
+}
+.bottom-ruler .marker-half-start:hover,
+.bottom-ruler .marker-half-end:hover,
+.bottom-ruler .marker-half-start.is-dragging,
+.bottom-ruler .marker-half-end.is-dragging {
+  transform: scaleY(-1);
+}
+.marker-half:hover::before,
+.layer-marker-half-end:hover::before,
+.marker-half.is-dragging::before,
+.layer-marker-half-end.is-dragging::before,
+body.marker-dragging-in .marker-half-start::before,
+body.marker-dragging-out .marker-half-end::before,
+body.marker-dragging-out .layer-marker-half-end::before {
+  opacity: 1;
+  transform: scale(1.28);
+  filter: brightness(1.8) drop-shadow(0 0 5px currentColor) drop-shadow(0 1px 1px rgba(0,0,0,.8));
+}
+
+/* v22 marker rail: all comp marker handles live on a dedicated line below/above rulers. */
+.time-ruler-wrap {
+  height: 38px;
+}
+#ruler, #bottomRuler {
+  height: 24px;
+}
+.top-ruler #ruler { top: 0; }
+.bottom-ruler #bottomRuler { top: 14px; }
+.marker-rail {
+  position: absolute;
+  left: 0;
+  height: 14px;
+  background: #1b1b1b;
+  border-top: 1px solid rgba(255,255,255,.09);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  z-index: 31;
+  cursor: default;
+}
+.top-ruler .marker-rail { top: 24px; }
+.bottom-ruler .marker-rail { top: 0; }
+.marker-rail::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 6px;
+  height: 1px;
+  background: rgba(255,255,255,.14);
+  pointer-events: none;
+}
+.marker-rail .marker-region-band {
+  top: 3px;
+  height: 8px;
+  z-index: 2;
+}
+.marker-rail .marker-half-start,
+.marker-rail .marker-half-end {
+  top: -9px;
+  z-index: 12;
+}
+.bottom-ruler .marker-rail .marker-half-start,
+.bottom-ruler .marker-rail .marker-half-end {
+  top: -9px;
+  transform: none;
+}
+.marker-rail .marker {
+  top: -13px;
+  z-index: 13;
+}
+.bottom-ruler .marker-rail .marker {
+  top: -13px;
+}
+.marker-rail .marker-label {
+  top: 16px;
+  left: 10px;
+}
+.bottom-ruler .marker-rail .marker-label {
+  top: -20px;
+  left: 10px;
+}
+.marker-rail .marker-half:hover::before,
+.marker-rail .marker-half.is-dragging::before,
+body.marker-dragging-in .marker-rail .marker-half-start::before,
+body.marker-dragging-out .marker-rail .marker-half-end::before {
+  opacity: 1;
+  transform: scale(1.35);
+  filter: brightness(1.9) drop-shadow(0 0 6px currentColor) drop-shadow(0 1px 1px rgba(0,0,0,.8));
+}
+
+/* center the pin head on the marker time; the vertical stem uses the exact same x. */
+.marker {
+  transform: translateX(-50%);
+}
+.marker::before {
+  left: 50%;
+  transform: translateX(-50%);
+}
+.marker::after {
+  left: 50%;
+  transform: translateX(-50%);
+}
+.marker-label {
+  transform: none;
+}
+.marker-no-label-color::before,
+.marker-no-label-color::after {
+  background: #fff;
+}
+.marker-no-label-color .marker-label {
+  color: #fff;
+  background: rgba(255,255,255,.12) !important;
+  border-color: rgba(255,255,255,.88) !important;
+}
+
+/* Layer markers are half-size and live on the clip's top border, not in the middle. */
+.marker-layer {
+  top: -8px;
+  transform: translateX(-50%) scale(.5);
+  transform-origin: 50% 0;
+}
+.marker-layer::before {
+  left: 50%;
+  transform: translateX(-50%);
+}
+.marker-layer::after {
+  left: 50%;
+  height: 16px;
+  transform: translateX(-50%);
+}
+.marker-layer.has-text .marker-label {
+  top: 20px;
+  left: 14px;
+  transform: scale(2);
+  transform-origin: 0 0;
+}
+.layer-marker-half-end {
+  top: -15px;
+  transform: scale(.5);
+  transform-origin: center top;
+}
+.layer-marker-half-end:hover,
+.layer-marker-half-end.is-dragging {
+  transform: scale(.5);
+}
+.layer-marker-half-end:hover::before,
+.layer-marker-half-end.is-dragging::before {
+  transform: scale(1.35);
+}
+.layer-marker-region {
+  top: 0;
+  bottom: auto;
+  height: 8px;
+}
+
+/* keep clip content below the frozen track/time column at every zoom level */
+.clip { z-index: 5; }
+.track-label, #timeDisplay { z-index: 80; }
+
+.layer-menu {
+  position: fixed;
+  display: none;
+  min-width: 132px;
+  padding: 4px;
+  background: #252525;
+  border: 1px solid #555;
+  border-radius: 5px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.55);
+  z-index: 2000;
+}
+.layer-menu.open { display: block; }
+.layer-menu button {
+  display: block;
+  width: 100%;
+  height: 24px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: #e8e8e8;
+  text-align: left;
+  padding: 0 9px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.layer-menu button:hover { background: #3d628d; color: #fff; }
+
+/* v23 marker cleanup
+   - marker handles live on the rail with a stable real hit box, no pseudo hit flicker
+   - no circle/stem gimmick: single markers are rounded tags that point down/up
+   - duration markers use the in/out half-triangles as the visible handles
+   - time display/track-name gutter stays above rulers, marker rail, and clips forever */
+.time-ruler-wrap {
+  height: 42px;
+  overflow: visible;
+}
+#ruler, #bottomRuler {
+  height: 24px;
+}
+.top-ruler #ruler { top: 0; }
+.top-ruler .marker-rail { top: 24px; }
+.bottom-ruler .marker-rail { top: 0; }
+.bottom-ruler #bottomRuler { top: 18px; }
+.marker-rail {
+  height: 18px;
+  z-index: 32;
+  overflow: visible;
+}
+.marker-rail::before {
+  top: 8px;
+}
+#timeDisplay {
+  width: 72px !important;
+  height: 42px !important;
+  line-height: 24px !important;
+  z-index: 120 !important;
+  background: linear-gradient(90deg, rgba(31,31,31,1), rgba(36,36,36,.98)) !important;
+  border-right: 1px solid #4a4a4a !important;
+  border-bottom: 1px solid #383838 !important;
+}
+.time-ruler-wrap::before {
+  content: "";
+  position: sticky;
+  left: 0;
+  top: 0;
+  display: block;
+  width: 72px;
+  height: 42px;
+  z-index: 100;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(31,31,31,1), rgba(36,36,36,.98));
+  border-right: 1px solid #4a4a4a;
+}
+.top-ruler::before { margin-bottom: -42px; }
+.bottom-ruler::before { margin-bottom: -42px; }
+.track-label {
+  z-index: 120 !important;
+}
+.clip, .protected-region-overlay, .marker-rail, #ruler, #bottomRuler, .tick {
+  z-index: auto;
+}
+
+/* Stable marker duration handles: the actual element is the hit zone. */
+.marker-half,
+.layer-marker-half-end {
+  width: 42px !important;
+  height: 34px !important;
+  margin-left: -21px !important;
+  cursor: ew-resize !important;
+  pointer-events: auto !important;
+  border: 0 !important;
+  background: transparent !important;
+  transform: none !important;
+  will-change: transform, filter;
+}
+.marker-rail .marker-half-start,
+.marker-rail .marker-half-end {
+  top: -8px !important;
+}
+.bottom-ruler .marker-rail .marker-half-start,
+.bottom-ruler .marker-rail .marker-half-end {
+  top: -8px !important;
+  transform: none !important;
+}
+.marker-half::after,
+.layer-marker-half-end::after {
+  display: none !important;
+  pointer-events: none !important;
+}
+.marker-half-start::before,
+.marker-half-end::before,
+.layer-marker-half-end::before {
+  top: 11px !important;
+  opacity: .9 !important;
+  transition: transform .12s ease, opacity .12s ease, filter .12s ease, border-color .12s ease !important;
+}
+.marker-half-start::before {
+  left: 22px !important;
+  border-left: 9px solid currentColor !important;
+  border-top: 8px solid transparent !important;
+  border-bottom: 8px solid transparent !important;
+}
+.marker-half-end::before,
+.layer-marker-half-end::before {
+  left: 11px !important;
+  border-right: 9px solid currentColor !important;
+  border-top: 8px solid transparent !important;
+  border-bottom: 8px solid transparent !important;
+}
+.marker-half:hover::before,
+.marker-half.is-dragging::before,
+.layer-marker-half-end:hover::before,
+.layer-marker-half-end.is-dragging::before,
+body.marker-dragging-in .marker-half-start::before,
+body.marker-dragging-out .marker-half-end::before,
+body.marker-dragging-out .layer-marker-half-end::before {
+  opacity: 1 !important;
+  transform: scale(1.42) !important;
+  filter: brightness(2.1) drop-shadow(0 0 7px currentColor) drop-shadow(0 1px 1px rgba(0,0,0,.85)) !important;
+}
+body.marker-resizing, body.marker-resizing *,
+body.marker-dragging-in, body.marker-dragging-in *,
+body.marker-dragging-out, body.marker-dragging-out * {
+  cursor: ew-resize !important;
+}
+
+/* Single comp markers: rounded rectangle pointer, centered exactly on the marker time. */
+.marker {
+  width: 18px;
+  height: 16px;
+  transform: translateX(-50%);
+  cursor: grab;
+  overflow: visible;
+}
+.marker::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 18px;
+  height: 12px;
+  border-radius: 5px;
+  background: var(--marker-color, #b8b8b8);
+  transform: translateX(-50%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 1px 2px rgba(0,0,0,.7);
+}
+.marker::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid var(--marker-color, #b8b8b8);
+  background: transparent !important;
+  transform: translateX(-50%);
+}
+.marker.marker-region-start::before,
+.marker.marker-region-start::after {
+  opacity: 0;
+}
+.marker.marker-region-start {
+  width: 44px;
+  height: 34px;
+  margin-left: 0;
+}
+.marker-rail .marker {
+  top: -1px !important;
+}
+.bottom-ruler .marker-rail .marker {
+  top: 2px !important;
+}
+.marker-rail .marker-label,
+.marker-comp.has-text .marker-label {
+  top: 18px !important;
+  left: 28px !important;
+  color: #fff !important;
+}
+.bottom-ruler .marker-rail .marker-label {
+  top: -20px !important;
+  left: 28px !important;
+}
+.marker.marker-region-start .marker-label {
+  left: 36px !important;
+}
+.marker-no-label-color::before { background: #fff !important; }
+.marker-no-label-color::after { border-top-color: #fff !important; }
+
+/* Layer markers: 50% scale, top edge of the clip, same no-circle marker shape. */
+.marker-layer {
+  top: -8px !important;
+  transform: translateX(-50%) scale(.5) !important;
+  transform-origin: 50% 0 !important;
+}
+.marker-layer.marker-region-start::before,
+.marker-layer.marker-region-start::after {
+  opacity: 0;
+}
+.marker-layer.has-text .marker-label {
+  top: 24px !important;
+  left: 46px !important;
+  transform: scale(2) !important;
+  transform-origin: 0 0 !important;
+  color: #fff !important;
+}
+.layer-marker-half-end {
+  top: -16px !important;
+  transform: scale(.5) !important;
+  transform-origin: center top !important;
+}
+.layer-marker-half-end:hover,
+.layer-marker-half-end.is-dragging { transform: scale(.5) !important; }
+.layer-marker-region { top: 0 !important; height: 8px !important; }
+
+/* v24 marker layout polish
+   Permanent rule: frozen time + track gutter stays a single centered column above clips/rulers. */
+#timeDisplay {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  text-align: center !important;
+  line-height: normal !important;
+}
+.track-label {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  text-align: center !important;
+}
+
+/* remove the distracting center line from marker rows */
+.marker-rail::before { display: none !important; }
+
+/* marker icon lives on the ruler edge; its center point sits on the bottom border of the top ruler */
+.top-ruler .marker-rail .marker {
+  top: -9px !important;              /* rail starts below 24px ruler; triangle center lands on ruler bottom */
+  width: 28px !important;
+  height: 24px !important;
+  transform: translateX(-50%) !important;
+  cursor: grab !important;
+}
+.bottom-ruler .marker-rail .marker {
+  top: 18px !important;
+  width: 28px !important;
+  height: 24px !important;
+  transform: translateX(-50%) scaleY(-1) !important;
+}
+.marker:active { cursor: grabbing !important; }
+
+/* no rounded-rectangle marker anymore: single markers are the same triangle language, rotated downward */
+.marker::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 2px !important;
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 9px solid transparent !important;
+  border-right: 9px solid transparent !important;
+  border-top: 14px solid var(--marker-color, #b8b8b8) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  transform: translateX(-50%) !important;
+  box-shadow: none !important;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.8));
+}
+.marker::after { display: none !important; }
+.marker-no-label-color::before { border-top-color: #fff !important; background: transparent !important; }
+.marker.marker-region-start::before { opacity: 0 !important; }
+
+/* marker text is centered vertically in the marker row, not glued to the icon/handle */
+.marker-rail .marker-label,
+.marker-comp.has-text .marker-label {
+  top: 18px !important;
+  left: 50% !important;
+  transform: translate(-50%, 0) !important;
+  color: #fff !important;
+  pointer-events: none !important;
+}
+.bottom-ruler .marker-rail .marker-label {
+  top: -18px !important;
+  transform: translate(-50%, 0) scaleY(-1) !important;
+}
+.marker.marker-region-start .marker-label { left: 50% !important; }
+
+/* duration handle hit zones remain stable, but only the triangle is visible/highlighted */
+.marker-half,
+.layer-marker-half-end {
+  cursor: ew-resize !important;
+  background: transparent !important;
+  outline: none !important;
+}
+.marker-half:hover::before,
+.marker-half.is-dragging::before,
+.layer-marker-half-end:hover::before,
+.layer-marker-half-end.is-dragging::before {
+  opacity: 1 !important;
+  transform: scale(1.28) !important;
+  filter: brightness(2) drop-shadow(0 0 7px currentColor) drop-shadow(0 1px 1px rgba(0,0,0,.8)) !important;
+}
+
+/* Protected region starts at bottom of top ruler and continues through the track area to the bottom ruler. */
+.protected-region-overlay {
+  top: -18px !important;
+  z-index: 1 !important;
+}
+

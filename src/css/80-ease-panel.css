@@ -1,0 +1,1439 @@
+/* v122: Ease Editor follows the current layer-style glass system. */
+.ease-dialog-backdrop {
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.ease-dialog {
+  width: min(1060px, calc(100vw - 72px)) !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 1px solid rgba(255,255,255,.115) !important;
+  border-radius: var(--tnt-radius-panel, 16px) !important;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.065), rgba(255,255,255,.022) 34%, rgba(0,0,0,.18)),
+    rgba(18,19,20,.80) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    0 24px 58px rgba(0,0,0,.42) !important;
+  color: rgba(245,245,247,.88) !important;
+  overflow: hidden !important;
+  -webkit-backdrop-filter: blur(22px) saturate(118%) !important;
+  backdrop-filter: blur(22px) saturate(118%) !important;
+}
+
+.ease-dialog-head {
+  min-height: 72px !important;
+  padding: 14px 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  border-bottom: 1px solid rgba(255,255,255,.085) !important;
+  background: rgba(255,255,255,.020) !important;
+}
+
+.ease-dialog-title-wrap {
+  min-width: 0 !important;
+}
+
+.ease-dialog-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  color: rgba(255,255,255,.94) !important;
+  font-size: 15px !important;
+  font-weight: 520 !important;
+  letter-spacing: 0 !important;
+}
+
+.ease-shortcut-badge {
+  width: 22px !important;
+  height: 22px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid rgba(255,255,255,.16) !important;
+  border-radius: 7px !important;
+  background: rgba(255,255,255,.060) !important;
+  color: rgba(245,245,247,.92) !important;
+  font-size: 12px !important;
+  font-weight: 760 !important;
+  line-height: 1 !important;
+}
+
+.ease-dialog-subtitle {
+  margin-top: 5px !important;
+  color: rgba(235,235,245,.46) !important;
+  font-size: 12px !important;
+  font-weight: 430 !important;
+}
+
+.ease-close {
+  display: none !important;
+}
+
+.ease-main {
+  padding: 14px 18px 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(340px, 1fr) 292px !important;
+  gap: 14px !important;
+}
+
+.ease-graph-wrap,
+.ease-controls {
+  border: 1px solid rgba(255,255,255,.075) !important;
+  border-radius: var(--tnt-radius-node, 12px) !important;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.040), rgba(255,255,255,.014) 46%, rgba(0,0,0,.10)),
+    rgba(8,9,10,.42) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035),
+    0 8px 22px rgba(0,0,0,.18) !important;
+}
+
+.ease-graph-wrap {
+  height: 246px !important;
+  padding: 10px !important;
+}
+
+.ease-graph {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: calc(var(--tnt-radius-node, 12px) - 4px) !important;
+  background:
+    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px),
+    rgba(8,10,12,.58) !important;
+  background-size: 42px 42px, 42px 42px, auto !important;
+}
+
+.ease-grid {
+  stroke: rgba(235,235,245,.18) !important;
+  stroke-width: 1 !important;
+}
+
+.ease-curve,
+.ease-handle-line {
+  stroke: rgba(232,132,74,.94) !important;
+  stroke-width: 3 !important;
+  stroke-linecap: round !important;
+  fill: none !important;
+}
+
+.ease-handle-line {
+  opacity: .38 !important;
+  stroke-width: 1.5 !important;
+}
+
+.ease-point {
+  r: 6px !important;
+  fill: rgba(232,132,74,.96) !important;
+  stroke: rgba(255,255,255,.84) !important;
+  stroke-width: 2 !important;
+  filter: drop-shadow(0 0 12px rgba(232,132,74,.26)) !important;
+}
+
+.ease-controls {
+  padding: 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.ease-control {
+  min-height: 42px !important;
+  padding: 8px 10px !important;
+  display: grid !important;
+  grid-template-columns: 92px minmax(92px, 1fr) 42px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  border: 1px solid rgba(255,255,255,.070) !important;
+  border-radius: var(--tnt-radius-control, 8px) !important;
+  background: rgba(255,255,255,.030) !important;
+}
+
+.ease-control span {
+  color: rgba(235,235,245,.54) !important;
+  font-size: 11px !important;
+  font-weight: 450 !important;
+  letter-spacing: 0 !important;
+}
+
+.ease-control em {
+  color: rgba(245,245,247,.70) !important;
+  font-size: 11px !important;
+  font-style: normal !important;
+  text-align: right !important;
+}
+
+.ease-control input[type="range"] {
+  width: 100% !important;
+  height: 16px !important;
+  margin: 0 !important;
+  accent-color: rgba(232,132,74,.90) !important;
+  background: transparent !important;
+}
+
+.ease-control input[type="range"]::-webkit-slider-runnable-track {
+  height: 3px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background:
+    linear-gradient(90deg, rgba(232,132,74,.82) 0%, rgba(232,132,74,.82) var(--range-fill, 0%), rgba(255,255,255,.13) var(--range-fill, 0%), rgba(255,255,255,.13) 100%) !important;
+}
+
+.ease-control input[type="range"]::-webkit-slider-thumb {
+  width: 13px !important;
+  height: 13px !important;
+  margin-top: -5px !important;
+  border: 1px solid rgba(255,255,255,.42) !important;
+  border-radius: 50% !important;
+  background: rgba(232,132,74,.96) !important;
+  box-shadow: 0 0 0 3px rgba(232,132,74,.13), 0 1px 2px rgba(0,0,0,.48) !important;
+}
+
+.ease-presets {
+  padding: 14px 18px 0 !important;
+  display: flex !important;
+  gap: 10px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+.ease-presets button {
+  min-width: 178px !important;
+  height: 48px !important;
+  padding: 6px 12px !important;
+  display: inline-grid !important;
+  grid-template-columns: 72px 1fr !important;
+  align-items: center !important;
+  gap: 10px !important;
+  border: 1px solid rgba(255,255,255,.105) !important;
+  border-radius: var(--tnt-radius-control, 8px) !important;
+  background: rgba(255,255,255,.045) !important;
+  color: rgba(245,245,247,.78) !important;
+  font-size: 13px !important;
+  font-weight: 460 !important;
+  text-align: left !important;
+  transform-origin: center !important;
+  transition: transform .12s ease, background-color .12s ease, border-color .12s ease, color .12s ease !important;
+}
+
+.ease-presets button:hover {
+  transform: scale(1.025) !important;
+  border-color: rgba(232,132,74,.32) !important;
+  background: rgba(232,132,74,.10) !important;
+  color: rgba(255,244,237,.94) !important;
+}
+
+.ease-presets button svg {
+  width: 72px !important;
+  height: 34px !important;
+  padding: 5px !important;
+  border-radius: 6px !important;
+  background:
+    linear-gradient(rgba(255,255,255,.040) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.040) 1px, transparent 1px),
+    rgba(0,0,0,.18) !important;
+  background-size: 17px 17px, 17px 17px, auto !important;
+}
+
+.ease-presets button path {
+  stroke: rgba(232,132,74,.94) !important;
+  stroke-width: 3 !important;
+  stroke-linecap: round !important;
+  fill: none !important;
+}
+
+.ease-error {
+  min-height: 18px !important;
+  padding: 6px 18px 0 !important;
+  color: rgba(255,142,142,.88) !important;
+  font-size: 11px !important;
+}
+
+.ease-actions {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  flex: 0 0 auto !important;
+}
+
+.ease-actions button {
+  height: var(--tnt-control-h, 28px) !important;
+  padding: 0 13px !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: var(--tnt-radius-control, 8px) !important;
+  background: rgba(255,255,255,.055) !important;
+  color: rgba(245,245,247,.78) !important;
+  font-size: 12px !important;
+  font-weight: 480 !important;
+  transform-origin: center !important;
+  transition: transform .12s ease, background-color .12s ease, border-color .12s ease, color .12s ease !important;
+}
+
+.ease-actions button:hover {
+  transform: scale(1.035) !important;
+  border-color: rgba(255,255,255,.18) !important;
+  color: rgba(255,255,255,.94) !important;
+}
+
+.ease-actions button.primary {
+  border-color: rgba(232,132,74,.40) !important;
+  background: rgba(232,132,74,.13) !important;
+  color: rgba(255,236,224,.94) !important;
+}
+
+.ease-actions button.primary:hover {
+  border-color: rgba(232,132,74,.56) !important;
+  background: rgba(232,132,74,.19) !important;
+}
+
+@media (max-width: 760px) {
+  .ease-dialog {
+    width: calc(100vw - 24px) !important;
+  }
+  .ease-dialog-head {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+  .ease-main {
+    grid-template-columns: 1fr !important;
+  }
+  .ease-controls {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* v123: Ease Editor compact pass. Keep it closer to the lighter layer-style scale. */
+.ease-dialog {
+  width: min(900px, calc(100vw - 56px)) !important;
+}
+
+.ease-dialog-head {
+  min-height: 56px !important;
+  padding: 10px 14px !important;
+  gap: 12px !important;
+}
+
+.ease-dialog-title {
+  gap: 7px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.ease-shortcut-badge {
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+}
+
+.ease-dialog-subtitle {
+  margin-top: 3px !important;
+  font-size: 11px !important;
+}
+
+.ease-main {
+  padding: 12px 14px 0 !important;
+  grid-template-columns: minmax(300px, 1fr) 258px !important;
+  gap: 12px !important;
+}
+
+.ease-graph-wrap {
+  height: 198px !important;
+  padding: 8px !important;
+}
+
+.ease-graph {
+  background-size: 36px 36px, 36px 36px, auto !important;
+}
+
+.ease-curve {
+  stroke-width: 2.25px !important;
+}
+
+.ease-handle-line {
+  stroke-width: 1.1px !important;
+  opacity: .32 !important;
+}
+
+.ease-point {
+  r: 5px !important;
+  stroke-width: 1.5px !important;
+  filter: drop-shadow(0 0 8px rgba(232,132,74,.22)) !important;
+}
+
+.ease-controls {
+  padding: 8px !important;
+  gap: 6px !important;
+}
+
+.ease-control {
+  min-height: 34px !important;
+  padding: 6px 8px !important;
+  grid-template-columns: 82px minmax(80px, 1fr) 36px !important;
+  gap: 8px !important;
+}
+
+.ease-control span,
+.ease-control em {
+  font-size: 10px !important;
+}
+
+.ease-control input[type="range"] {
+  height: 10px !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+.ease-control input[type="range"]::-webkit-slider-runnable-track {
+  height: 1.5px !important;
+  background:
+    linear-gradient(90deg, rgba(198,199,203,.52) 0%, rgba(198,199,203,.52) var(--range-fill, 0%), rgba(255,255,255,.105) var(--range-fill, 0%), rgba(255,255,255,.105) 100%) !important;
+}
+
+.ease-control input[type="range"]::-webkit-slider-thumb {
+  width: 9px !important;
+  height: 9px !important;
+  margin-top: -3.75px !important;
+  border: 1px solid rgba(220,221,225,.64) !important;
+  background: rgba(58,59,61,.96) !important;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.055), 0 1px 2px rgba(0,0,0,.50) !important;
+}
+
+.ease-presets {
+  padding: 12px 14px 0 !important;
+  gap: 8px !important;
+}
+
+.ease-presets button {
+  min-width: 142px !important;
+  height: 38px !important;
+  padding: 5px 9px !important;
+  grid-template-columns: 54px 1fr !important;
+  gap: 8px !important;
+  font-size: 11px !important;
+}
+
+.ease-presets button svg {
+  width: 54px !important;
+  height: 26px !important;
+  padding: 4px !important;
+  background-size: 13px 13px, 13px 13px, auto !important;
+}
+
+.ease-presets button path {
+  stroke-width: 2.25px !important;
+}
+
+.ease-error {
+  min-height: 16px !important;
+  padding: 5px 14px 0 !important;
+  font-size: 10px !important;
+}
+
+.ease-actions {
+  gap: 7px !important;
+}
+
+.ease-actions button {
+  height: 26px !important;
+  padding: 0 11px !important;
+  font-size: 11px !important;
+}
+
+/* v124: consistent subpanel header rhythm and metadata chips. */
+:root {
+  --tnt-subpanel-header-h: 52px;
+}
+
+.layer-style-dialog-head,
+.ease-dialog-head {
+  height: var(--tnt-subpanel-header-h) !important;
+  min-height: var(--tnt-subpanel-header-h) !important;
+  box-sizing: border-box !important;
+  align-items: center !important;
+  border-bottom: 1px solid rgba(255,255,255,.085) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-dialog-head {
+  padding: 0 374px 0 14px !important;
+}
+
+.mask-control-dialog .layer-style-dialog-head,
+.ease-dialog-head {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) > .layer-style-dialog-actions {
+  top: calc(var(--tnt-subpanel-header-h) / 2) !important;
+  transform: translateY(-50%) !important;
+}
+
+.ease-actions {
+  height: 100% !important;
+}
+
+.layer-style-dialog-title,
+.ease-dialog-title {
+  min-height: 24px !important;
+  align-items: center !important;
+}
+
+.layer-style-layer-count,
+.ease-keyframe-count,
+.mask-control-count {
+  height: 20px !important;
+  max-width: min(340px, 42vw) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  vertical-align: middle !important;
+}
+
+/* v125: final subpanel divider rhythm and Ease utility box. */
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-dialog-head,
+.ease-dialog-head {
+  position: relative !important;
+  border-bottom: 0 !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-dialog-head::after,
+.ease-dialog-head::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  height: 1px !important;
+  background: rgba(255,255,255,.085) !important;
+  pointer-events: none !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) > .layer-style-dialog-actions {
+  top: calc(var(--tnt-subpanel-header-h) / 2) !important;
+  transform: translateY(-50%) !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) > .layer-style-dialog-actions button {
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 12px !important;
+  line-height: 26px !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-dialog-body {
+  padding-top: 0 !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-add-panel {
+  margin: 0 !important;
+  padding-top: 10px !important;
+  padding-bottom: 8px !important;
+  border-top: 0 !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-header-add-row {
+  min-height: 30px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  align-items: center !important;
+}
+
+.layer-style-dialog:not(.mask-control-dialog) .layer-style-edit-panel {
+  padding-top: 10px !important;
+  border-top: 1px solid rgba(255,255,255,.065) !important;
+}
+
+.ease-main {
+  align-items: stretch !important;
+}
+
+.ease-side {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  gap: 10px !important;
+}
+
+.ease-graph-wrap,
+.ease-controls,
+.ease-tools {
+  border: 1px solid rgba(255,255,255,.075) !important;
+  border-radius: var(--tnt-radius-node, 12px) !important;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.040), rgba(255,255,255,.014) 46%, rgba(0,0,0,.10)),
+    rgba(8,9,10,.42) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035),
+    0 8px 22px rgba(0,0,0,.18) !important;
+}
+
+.ease-controls {
+  height: auto !important;
+  min-height: 0 !important;
+  flex: 0 0 auto !important;
+}
+
+.ease-tools {
+  padding: 8px !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+}
+
+.ease-tools button {
+  height: 42px !important;
+  min-width: 0 !important;
+  padding: 5px 4px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  border: 1px solid rgba(255,255,255,.095) !important;
+  border-radius: var(--tnt-radius-control, 8px) !important;
+  background: rgba(255,255,255,.040) !important;
+  color: rgba(245,245,247,.74) !important;
+  font: inherit !important;
+  font-size: 9px !important;
+  font-weight: 520 !important;
+  letter-spacing: 0 !important;
+  overflow: hidden !important;
+  transform-origin: center !important;
+  transition: transform .12s ease, background-color .12s ease, border-color .12s ease, color .12s ease, box-shadow .12s ease !important;
+}
+
+.ease-tools button:hover {
+  transform: scale(1.045) !important;
+  border-color: rgba(232,132,74,.34) !important;
+  background: rgba(232,132,74,.10) !important;
+  color: rgba(255,244,237,.94) !important;
+  box-shadow: 0 7px 18px rgba(0,0,0,.20) !important;
+}
+
+.ease-tools svg {
+  width: 25px !important;
+  height: 17px !important;
+  display: block !important;
+  overflow: visible !important;
+}
+
+.ease-tools path {
+  fill: none !important;
+  stroke: rgba(232,132,74,.94) !important;
+  stroke-width: 2 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+@media (max-width: 760px) {
+  .ease-side {
+    grid-template-rows: auto auto !important;
+  }
+
+  .ease-tools {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* v126: Ease graph frame and split preset/utilities intent. */
+.ease-graph {
+  overflow: visible !important;
+}
+
+.ease-box-edge {
+  fill: none !important;
+  stroke-linecap: square !important;
+  vector-effect: non-scaling-stroke !important;
+}
+
+.ease-box-edge-strong {
+  stroke: rgba(235,235,245,.26) !important;
+  stroke-width: 1.2px !important;
+}
+
+.ease-box-edge-weak {
+  stroke: rgba(235,235,245,.105) !important;
+  stroke-width: 1px !important;
+}
+
+.ease-side {
+  gap: 8px !important;
+}
+
+.ease-tools {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+}
+
+.ease-tools button {
+  height: 48px !important;
+}
+
+.ease-presets button[data-preset="linear"],
+.ease-presets button[data-preset="easy"] {
+  border-color: rgba(232,132,74,.18) !important;
+  background: rgba(232,132,74,.055) !important;
+}
+
+.ease-presets button[data-preset="linear"]:hover,
+.ease-presets button[data-preset="easy"]:hover {
+  border-color: rgba(232,132,74,.34) !important;
+  background: rgba(232,132,74,.115) !important;
+}
+
+/* v127: Ease presets belong to the graph column and handles can overshoot the plot. */
+.ease-main {
+  align-items: start !important;
+}
+
+.ease-curve-column {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-rows: auto auto !important;
+  gap: 10px !important;
+  overflow: visible !important;
+}
+
+.ease-graph-wrap {
+  overflow: visible !important;
+}
+
+.ease-graph {
+  overflow: visible !important;
+  contain: none !important;
+}
+
+.ease-point {
+  transform-box: fill-box !important;
+  transform-origin: center !important;
+  vector-effect: non-scaling-stroke !important;
+}
+
+.ease-handle-line {
+  vector-effect: non-scaling-stroke !important;
+}
+
+.ease-curve-column .ease-presets {
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(110px, 1fr)) !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.ease-curve-column .ease-presets button {
+  min-width: 0 !important;
+  width: auto !important;
+}
+
+.ease-tools button[data-ease-tool="overshoot"] {
+  border-color: rgba(232,132,74,.30) !important;
+  background: rgba(232,132,74,.090) !important;
+  color: rgba(255,224,204,.92) !important;
+}
+
+.ease-tools button[data-ease-tool="overshoot"]:hover {
+  border-color: rgba(232,132,74,.48) !important;
+  background: rgba(232,132,74,.150) !important;
+}
+
+.ease-tools button[data-ease-tool="overshoot"] path {
+  stroke: rgba(232,132,74,.96) !important;
+}
+
+.ease-tools button[data-ease-tool="wiggle"] {
+  border-color: rgba(128,108,232,.32) !important;
+  background: rgba(128,108,232,.090) !important;
+  color: rgba(226,222,255,.92) !important;
+}
+
+.ease-tools button[data-ease-tool="wiggle"]:hover {
+  border-color: rgba(148,128,255,.50) !important;
+  background: rgba(128,108,232,.155) !important;
+}
+
+.ease-tools button[data-ease-tool="wiggle"] path {
+  stroke: rgba(160,142,255,.96) !important;
+}
+
+@media (max-width: 960px) {
+  .ease-curve-column .ease-presets {
+    grid-template-columns: repeat(6, minmax(118px, 1fr)) !important;
+  }
+}
+
+/* v128: compact Ease controls and signed overshoot slider alignment. */
+.ease-actions button {
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 10px !important;
+  font-size: 10px !important;
+}
+
+.ease-control {
+  min-height: 30px !important;
+  padding: 5px 8px !important;
+  grid-template-columns: 80px minmax(76px, 1fr) 42px !important;
+}
+
+.ease-control input[type="range"] {
+  height: 12px !important;
+  min-height: 12px !important;
+  display: block !important;
+}
+
+.ease-control input[type="range"]::-webkit-slider-runnable-track {
+  height: 1.5px !important;
+}
+
+.ease-control input[type="range"]::-webkit-slider-thumb {
+  width: 11px !important;
+  height: 11px !important;
+  margin-top: -4.75px !important;
+}
+
+.ease-curve-column {
+  gap: 8px !important;
+}
+
+.ease-curve-column .ease-presets {
+  grid-template-columns: repeat(6, minmax(82px, 1fr)) !important;
+  gap: 6px !important;
+}
+
+.ease-curve-column .ease-presets button {
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 4px 7px !important;
+  grid-template-columns: 42px 1fr !important;
+  gap: 6px !important;
+  font-size: 10px !important;
+}
+
+.ease-curve-column .ease-presets button svg {
+  width: 42px !important;
+  height: 20px !important;
+  padding: 3px !important;
+  background-size: 10px 10px, 10px 10px, auto !important;
+}
+
+.ease-tools {
+  padding: 6px !important;
+}
+
+.ease-tools button {
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 4px 5px !important;
+  gap: 2px !important;
+  font-size: 9px !important;
+}
+
+.ease-tools svg {
+  width: 22px !important;
+  height: 14px !important;
+}
+
+@media (max-width: 960px) {
+  .ease-curve-column .ease-presets {
+    grid-template-columns: repeat(6, minmax(90px, 1fr)) !important;
+  }
+}
+
+/* v129: compact taller Ease graph and vertical preset cards. */
+.ease-dialog {
+  width: min(920px, calc(100vw - 72px)) !important;
+}
+
+.ease-main {
+  grid-template-columns: minmax(480px, 610px) 260px !important;
+  gap: 12px !important;
+  padding: 12px 16px 0 !important;
+}
+
+.ease-curve-column {
+  gap: 8px !important;
+}
+
+.ease-graph-wrap {
+  height: 286px !important;
+  padding: 8px !important;
+}
+
+.ease-graph {
+  background-size: 32px 32px, 32px 32px, auto !important;
+}
+
+.ease-side {
+  gap: 8px !important;
+}
+
+.ease-control {
+  min-height: 30px !important;
+  padding: 5px 8px !important;
+  grid-template-columns: 76px minmax(70px, 1fr) 42px !important;
+  gap: 8px !important;
+}
+
+.ease-curve-column .ease-presets {
+  grid-template-columns: repeat(6, minmax(68px, 1fr)) !important;
+  gap: 6px !important;
+  overflow-x: hidden !important;
+}
+
+.ease-curve-column .ease-presets button {
+  height: 56px !important;
+  min-height: 56px !important;
+  padding: 5px 5px 6px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  text-align: center !important;
+  font-size: 10px !important;
+  line-height: 1.05 !important;
+}
+
+.ease-curve-column .ease-presets button svg {
+  width: 54px !important;
+  height: 27px !important;
+  padding: 3px !important;
+  flex: 0 0 auto !important;
+  background-size: 12px 12px, 12px 12px, auto !important;
+}
+
+.ease-curve-column .ease-presets button path {
+  stroke-width: 2.35px !important;
+}
+
+.ease-tools button {
+  height: 40px !important;
+  min-height: 40px !important;
+}
+
+@media (max-width: 980px) {
+  .ease-dialog {
+    width: min(860px, calc(100vw - 36px)) !important;
+  }
+
+  .ease-main {
+    grid-template-columns: minmax(420px, 1fr) 250px !important;
+  }
+
+  .ease-curve-column .ease-presets {
+    overflow-x: auto !important;
+    grid-template-columns: repeat(6, minmax(74px, 1fr)) !important;
+  }
+}
+
+/* v130: square Ease graph and centered slider thumbs. */
+.ease-dialog {
+  width: min(760px, calc(100vw - 48px)) !important;
+}
+
+.ease-main {
+  grid-template-columns: 316px 250px !important;
+  justify-content: center !important;
+  gap: 12px !important;
+}
+
+.ease-curve-column {
+  width: 316px !important;
+  max-width: 316px !important;
+}
+
+.ease-graph-wrap {
+  width: 286px !important;
+  height: 286px !important;
+  aspect-ratio: 1 / 1 !important;
+  justify-self: center !important;
+  box-sizing: border-box !important;
+}
+
+.ease-graph {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+.ease-curve-column .ease-presets {
+  width: 286px !important;
+  justify-self: center !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  overflow: visible !important;
+}
+
+.ease-curve-column .ease-presets button {
+  width: auto !important;
+  min-width: 0 !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  padding: 4px 4px 5px !important;
+}
+
+.ease-curve-column .ease-presets button svg {
+  width: 48px !important;
+  height: 24px !important;
+}
+
+.ease-control {
+  min-height: 30px !important;
+  height: 30px !important;
+  align-items: center !important;
+}
+
+.ease-control input[type="range"] {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  height: 14px !important;
+  min-height: 14px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: block !important;
+  background: transparent !important;
+  align-self: center !important;
+}
+
+.ease-control input[type="range"]::-webkit-slider-runnable-track {
+  height: 2px !important;
+  border-radius: 999px !important;
+}
+
+.ease-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 14px !important;
+  height: 14px !important;
+  margin-top: -6px !important;
+  border-radius: 50% !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 760px) {
+  .ease-dialog {
+    width: min(640px, calc(100vw - 28px)) !important;
+  }
+
+  .ease-main {
+    grid-template-columns: 1fr !important;
+  }
+
+  .ease-curve-column,
+  .ease-side {
+    width: 316px !important;
+    max-width: 100% !important;
+    justify-self: center !important;
+  }
+}
+
+/* v131: Ease graph uses 5:4 ratio and the glass shell hugs its content. */
+.ease-dialog {
+  width: min(678px, calc(100vw - 48px)) !important;
+}
+
+.ease-main {
+  grid-template-columns: 360px 250px !important;
+  justify-content: center !important;
+  align-items: start !important;
+  gap: 10px !important;
+  padding: 10px 12px 0 !important;
+}
+
+.ease-curve-column {
+  width: 360px !important;
+  max-width: 360px !important;
+  gap: 7px !important;
+}
+
+.ease-graph-wrap {
+  width: 360px !important;
+  height: 288px !important;
+  aspect-ratio: 5 / 4 !important;
+  padding: 7px !important;
+  justify-self: center !important;
+}
+
+.ease-curve-column .ease-presets {
+  width: 360px !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+  gap: 5px !important;
+}
+
+.ease-curve-column .ease-presets button {
+  height: 47px !important;
+  min-height: 47px !important;
+  padding: 4px 3px 5px !important;
+  gap: 3px !important;
+  font-size: 9.5px !important;
+}
+
+.ease-curve-column .ease-presets button svg {
+  width: 43px !important;
+  height: 22px !important;
+  padding: 2px !important;
+}
+
+.ease-side {
+  width: 250px !important;
+  max-width: 250px !important;
+}
+
+.ease-controls,
+.ease-tools {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.ease-tools button {
+  height: 38px !important;
+  min-height: 38px !important;
+}
+
+@media (max-width: 760px) {
+  .ease-dialog {
+    width: min(402px, calc(100vw - 28px)) !important;
+  }
+
+  .ease-main {
+    grid-template-columns: 360px !important;
+  }
+
+  .ease-side {
+    width: 360px !important;
+    max-width: 360px !important;
+  }
+}
+
+/* v132: unified orange range controls across Style, Mask, and Ease tools. */
+.layer-style-prop input[type="range"],
+.mask-control-prop input[type="range"],
+.ease-control input[type="range"] {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  height: 14px !important;
+  min-height: 14px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  align-self: center !important;
+}
+
+.layer-style-prop input[type="range"]::-webkit-slider-runnable-track,
+.mask-control-prop input[type="range"]::-webkit-slider-runnable-track,
+.ease-control input[type="range"]::-webkit-slider-runnable-track {
+  height: 2px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(232, 132, 74, .92) 0%,
+      rgba(232, 132, 74, .92) var(--range-fill, 0%),
+      #34363a var(--range-fill, 0%),
+      #34363a 100%
+    ) !important;
+}
+
+.layer-style-prop input[type="range"]::-webkit-slider-thumb,
+.mask-control-prop input[type="range"]::-webkit-slider-thumb,
+.ease-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 12px !important;
+  height: 12px !important;
+  margin-top: -5px !important;
+  border: 1px solid rgba(255, 181, 139, .9) !important;
+  border-radius: 50% !important;
+  background: #e8844a !important;
+  box-shadow:
+    0 0 0 2px rgba(232, 132, 74, .13),
+    0 1px 2px rgba(0, 0, 0, .5) !important;
+  box-sizing: border-box !important;
+}
+
+.layer-style-prop input[type="range"]:hover::-webkit-slider-thumb,
+.layer-style-prop input[type="range"]:focus::-webkit-slider-thumb,
+.mask-control-prop input[type="range"]:hover::-webkit-slider-thumb,
+.mask-control-prop input[type="range"]:focus::-webkit-slider-thumb,
+.ease-control input[type="range"]:hover::-webkit-slider-thumb,
+.ease-control input[type="range"]:focus::-webkit-slider-thumb {
+  border-color: rgba(255, 205, 176, .98) !important;
+  background: #f0925a !important;
+  box-shadow:
+    0 0 0 3px rgba(232, 132, 74, .18),
+    0 1px 3px rgba(0, 0, 0, .55) !important;
+}
+
+.layer-style-prop input[type="range"]::-moz-range-track,
+.mask-control-prop input[type="range"]::-moz-range-track,
+.ease-control input[type="range"]::-moz-range-track {
+  height: 2px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: #34363a !important;
+}
+
+.layer-style-prop input[type="range"]::-moz-range-progress,
+.mask-control-prop input[type="range"]::-moz-range-progress,
+.ease-control input[type="range"]::-moz-range-progress {
+  height: 2px !important;
+  border-radius: 999px !important;
+  background: rgba(232, 132, 74, .92) !important;
+}
+
+.layer-style-prop input[type="range"]::-moz-range-thumb,
+.mask-control-prop input[type="range"]::-moz-range-thumb,
+.ease-control input[type="range"]::-moz-range-thumb {
+  width: 12px !important;
+  height: 12px !important;
+  border: 1px solid rgba(255, 181, 139, .9) !important;
+  border-radius: 50% !important;
+  background: #e8844a !important;
+  box-shadow: 0 0 0 2px rgba(232, 132, 74, .13) !important;
+}
+
+/* v133: enforce identical slider geometry against older panel-specific rules. */
+body .layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"],
+body .mask-control-dialog .mask-control-prop input[type="range"],
+body .ease-dialog .ease-control input[type="range"] {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  height: 14px !important;
+  min-height: 14px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+body .layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]::-webkit-slider-runnable-track,
+body .mask-control-dialog .mask-control-prop input[type="range"]::-webkit-slider-runnable-track,
+body .ease-dialog .ease-control input[type="range"]::-webkit-slider-runnable-track {
+  height: 2px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background:
+    linear-gradient(
+      90deg,
+      #e8844a 0%,
+      #e8844a var(--range-fill, 0%),
+      #34363a var(--range-fill, 0%),
+      #34363a 100%
+    ) !important;
+}
+
+body .layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]::-webkit-slider-thumb,
+body .mask-control-dialog .mask-control-prop input[type="range"]::-webkit-slider-thumb,
+body .ease-dialog .ease-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 12px !important;
+  min-width: 12px !important;
+  height: 12px !important;
+  min-height: 12px !important;
+  margin-top: -5px !important;
+  border: 1px solid #ffb58b !important;
+  border-radius: 50% !important;
+  background: #e8844a !important;
+  box-shadow:
+    0 0 0 2px rgba(232, 132, 74, .13),
+    0 1px 2px rgba(0, 0, 0, .5) !important;
+  box-sizing: border-box !important;
+}
+
+body .layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]:hover::-webkit-slider-thumb,
+body .layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]:focus::-webkit-slider-thumb,
+body .mask-control-dialog .mask-control-prop input[type="range"]:hover::-webkit-slider-thumb,
+body .mask-control-dialog .mask-control-prop input[type="range"]:focus::-webkit-slider-thumb,
+body .ease-dialog .ease-control input[type="range"]:hover::-webkit-slider-thumb,
+body .ease-dialog .ease-control input[type="range"]:focus::-webkit-slider-thumb {
+  width: 12px !important;
+  height: 12px !important;
+  border-color: #ffcdb0 !important;
+  background: #f0925a !important;
+}
+
+/* v134: graph camera controls keep extreme ease handles reachable. */
+.ease-graph-wrap {
+  position: relative !important;
+}
+
+.ease-graph-zoom {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  z-index: 4 !important;
+  display: grid !important;
+  grid-template-columns: 22px 42px 22px !important;
+  align-items: center !important;
+  height: 22px !important;
+  padding: 2px !important;
+  border: 1px solid rgba(255, 255, 255, .11) !important;
+  border-radius: 7px !important;
+  background: rgba(20, 21, 23, .78) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .04),
+    0 3px 10px rgba(0, 0, 0, .28) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(115%) !important;
+  backdrop-filter: blur(12px) saturate(115%) !important;
+}
+
+.ease-graph-zoom button {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 5px !important;
+  background: transparent !important;
+  color: rgba(235, 235, 245, .72) !important;
+  font-size: 12px !important;
+  line-height: 22px !important;
+  text-align: center !important;
+  transform-origin: center !important;
+  transition: color .12s ease, background-color .12s ease, transform .12s ease !important;
+}
+
+.ease-graph-zoom button:hover:not(:disabled) {
+  color: #ffd0b5 !important;
+  background: rgba(232, 132, 74, .14) !important;
+  transform: scale(1.06) !important;
+}
+
+.ease-graph-zoom button:disabled {
+  color: rgba(235, 235, 245, .24) !important;
+  cursor: default !important;
+}
+
+.ease-graph-zoom-value {
+  color: rgba(245, 245, 247, .78) !important;
+  font-size: 9px !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+.ease-handle-hit {
+  fill: transparent !important;
+  stroke: transparent !important;
+  pointer-events: all !important;
+  cursor: grab !important;
+}
+
+.ease-handle-target:active {
+  cursor: grabbing !important;
+}
+
+/* v135: editorial header type and geometry-based vertical alignment. */
+:root {
+  --tnt-font-header: "Ivory LL Web", "IvoryLLWeb-Light", "Iowan Old Style", Baskerville, Georgia, serif;
+}
+
+body .dialog-title,
+body .layer-style-dialog-title,
+body .ease-dialog-title,
+body .flow-chart-title,
+body .timeline-command-dialog-title,
+body .mask-control-node-title {
+  font-family: var(--tnt-font-header) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  line-height: 1 !important;
+}
+
+body .dialog-title,
+body .layer-style-dialog-title,
+body .ease-dialog-title,
+body .timeline-command-dialog-title {
+  display: flex !important;
+  align-items: center !important;
+}
+
+body .dialog-title,
+body .timeline-command-dialog-title,
+body .flow-chart-title,
+body .mask-control-node-title {
+  font-size: 16px !important;
+}
+
+body .layer-style-dialog-title,
+body .ease-dialog-title {
+  font-size: 17px !important;
+}
+
+.layer-style-dialog-title > span,
+.ease-dialog-title > span,
+.layer-style-layer-count,
+.ease-keyframe-count,
+.mask-control-count {
+  display: inline-flex !important;
+  align-items: center !important;
+  line-height: 1 !important;
+}
+
+.layer-style-dialog-head,
+.mask-control-head,
+.ease-dialog-head,
+.flow-chart-header {
+  align-items: center !important;
+}
+
+.layer-style-dialog-actions button,
+.ease-actions button,
+.dialog-actions button,
+.flow-chart-header button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+.ease-graph-zoom {
+  align-content: center !important;
+}
+
+.ease-graph-zoom button {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+.ease-graph-zoom-out::before,
+.ease-graph-zoom-in::before,
+.ease-graph-zoom-in::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: 8px !important;
+  height: 1px !important;
+  border-radius: 999px !important;
+  background: currentColor !important;
+  transform: translate(-50%, -50%) !important;
+  pointer-events: none !important;
+}
+
+.ease-graph-zoom-in::after {
+  transform: translate(-50%, -50%) rotate(90deg) !important;
+}
+
+.ease-graph-zoom-value {
+  line-height: 1 !important;
+}
+

@@ -1,0 +1,1610 @@
+/* v78: gradient Apple glyph and explicit OS-equivalent shortcut tooltip target. */
+.platform-badge.mac {
+  background: rgba(255,255,255,.08) !important;
+  border-color: rgba(255,255,255,.16) !important;
+}
+.platform-badge.mac .platform-apple {
+  background: linear-gradient(145deg,
+    #ff9f1c 0%,
+    #ff7a1a 22%,
+    #ff3b30 45%,
+    #d9368f 68%,
+    #6957d9 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  text-shadow: none !important;
+}
+
+.panel-tooltip {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 12000;
+  max-width: 260px;
+  padding: 7px 9px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 6px;
+  background: rgba(18,19,23,.98);
+  box-shadow: 0 10px 24px rgba(0,0,0,.45);
+  color: #f1f2f4;
+  font-size: 11px;
+  line-height: 15px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity .08s ease, transform .08s ease;
+}
+.panel-tooltip.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* v79: clearer zoomed-in ruler subdivisions. */
+.tick-section {
+  top: 9px !important;
+  height: 15px !important;
+  min-width: 0 !important;
+  padding-left: 0 !important;
+  border-left-color: rgba(255,255,255,.18) !important;
+}
+.tick-half {
+  top: 6px !important;
+  height: 18px !important;
+  border-left-color: rgba(255,255,255,.28) !important;
+}
+.bottom-ruler .tick-section {
+  top: 0 !important;
+  height: 14px !important;
+}
+.bottom-ruler .tick-half {
+  height: 18px !important;
+}
+
+/* v80: frame labels on zoomed-in ruler ticks. */
+.tick-time,
+.tick-frame {
+  display: block;
+  pointer-events: none;
+}
+.tick-time {
+  height: 12px;
+  line-height: 12px;
+}
+.tick-frame {
+  margin-top: 1px;
+  color: rgba(255,255,255,.46);
+  font-size: 9px;
+  line-height: 9px;
+}
+.tick-section {
+  color: rgba(255,255,255,.44) !important;
+  font-size: 9px !important;
+  line-height: 12px !important;
+  padding-left: 4px !important;
+}
+.tick-section.tick-half {
+  color: rgba(255,255,255,.58) !important;
+}
+
+/* v81: stop AE sync completely while the CEP panel is inactive. */
+body.panel-sync-paused header,
+body.panel-sync-paused main,
+body.panel-sync-paused .horizontal-scrollbar {
+  filter: blur(1.6px);
+  opacity: .48;
+  transition: filter .04s linear, opacity .04s linear;
+}
+
+/* v82: disabled layers stay muted, but still get a softer selected lift. */
+.clip.disabled-layer {
+  color: rgba(255,255,255,.48) !important;
+  filter: saturate(.28) brightness(.48) !important;
+  opacity: .72 !important;
+  border-color: rgba(255,255,255,.10) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.045), inset 0 0 0 1px rgba(0,0,0,.16), 0 1px 2px rgba(0,0,0,.18) !important;
+}
+.clip.disabled-layer .clip-name,
+.clip.disabled-layer .clip-index {
+  opacity: .58 !important;
+}
+.clip.disabled-layer.selected,
+.clip.selected.disabled-layer {
+  color: rgba(255,255,255,.76) !important;
+  filter: saturate(.56) brightness(.78) !important;
+  opacity: .88 !important;
+  border-color: rgba(255,255,255,.16) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), inset 0 0 0 1px rgba(255,255,255,.035), 0 1px 2px rgba(0,0,0,.22) !important;
+}
+.clip.disabled-layer.selected .clip-name,
+.clip.disabled-layer.selected .clip-index,
+.clip.selected.disabled-layer .clip-name,
+.clip.selected.disabled-layer .clip-index {
+  opacity: .82 !important;
+}
+.clip.disabled-layer.selected::before,
+.clip.selected.disabled-layer::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Relationship links: separate colors keep track mattes and parenting readable when both exist. */
+.relation-toggle[data-relation-toggle="matte"].active {
+  background: rgba(53,199,255,.22);
+  border-color: #35c7ff;
+  color: #bff0ff;
+  box-shadow: 0 0 0 1px rgba(53,199,255,.16), 0 0 8px rgba(53,199,255,.18);
+}
+.relation-toggle[data-relation-toggle="parent"].active {
+  background: rgba(95,211,111,.20);
+  border-color: #5fd36f;
+  color: #ccffd4;
+  box-shadow: 0 0 0 1px rgba(95,211,111,.14), 0 0 8px rgba(95,211,111,.16);
+}
+.clip.has-relation-dots {
+  padding-right: 24px;
+}
+.clip-relation-dots {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  z-index: 7;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 3px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.clip-relation-dot {
+  width: 6px;
+  height: 6px;
+  border: 1px solid rgba(0,0,0,.55);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.18), 0 1px 2px rgba(0,0,0,.45);
+}
+.clip-relation-dot.matte {
+  background: #35c7ff;
+}
+.clip-relation-dot.parent {
+  background: #5fd36f;
+}
+.relationship-line {
+  position: absolute;
+  z-index: 2;
+  height: 0;
+  border-top: 2px solid currentColor;
+  opacity: .62;
+  pointer-events: none;
+  transform-origin: 0 50%;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.65));
+}
+.relationship-line.matte {
+  color: #35c7ff;
+}
+.relationship-line.parent {
+  color: #5fd36f;
+}
+
+/* v83: F opens a node-based mask control panel. */
+.mask-control-dialog {
+  width: min(1040px, calc(100vw - 32px));
+}
+.mask-control-head {
+  border-top: 4px solid #58a6ff;
+}
+.mask-control-count {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 7px;
+  border: 1px solid rgba(88,166,255,.28);
+  border-radius: 999px;
+  background: rgba(88,166,255,.12);
+  color: #9dc9ff;
+  font-size: 10px;
+  font-weight: 700;
+}
+.mask-control-layout {
+  gap: 14px;
+}
+.mask-control-layer {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-top: 4px solid var(--mask-layer-color, #58a6ff);
+  border-radius: 6px;
+  background: rgba(18,18,18,.72);
+}
+.mask-control-layer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  color: #dcdcdc;
+}
+.mask-control-layer-head strong {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  font-weight: 700;
+}
+.mask-control-layer-head span {
+  flex: 0 0 auto;
+  color: #8f8f8f;
+  font-size: 10px;
+}
+.mask-control-node-row {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.mask-control-node {
+  position: relative;
+  display: grid;
+  width: 222px;
+  flex: 0 0 222px;
+  min-height: 220px;
+  padding: 0;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .08s linear, background .08s linear, opacity .08s linear, box-shadow .08s linear;
+}
+.mask-control-node.disabled {
+  opacity: .64;
+  filter: saturate(.55);
+}
+.mask-control-node:hover,
+.mask-control-node.active {
+  border-color: #58a6ff;
+  background: #252a31;
+  opacity: .92;
+}
+.mask-control-node.active {
+  box-shadow: inset 0 0 0 1px rgba(88,166,255,.42);
+}
+.mask-control-node.disabled.active {
+  opacity: .78;
+  background: #22262b;
+}
+.mask-control-node-strip {
+  height: 4px;
+  background: linear-gradient(90deg, var(--mask-layer-color, #58a6ff), #58a6ff);
+}
+.mask-control-node-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px 7px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.mask-control-node-head strong {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #f0f0f0;
+  font-size: 12px;
+}
+.mask-control-node-head em {
+  flex: 0 0 auto;
+  max-width: 82px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #8f8f8f;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.mask-control-empty {
+  width: auto;
+  margin: 0;
+}
+.mask-control-props {
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+}
+.mask-control-prop {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  color: #d6d6d6;
+  font-size: 10px;
+}
+.mask-control-prop.inline {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.mask-control-prop.compact {
+  grid-template-columns: 14px minmax(0, 1fr);
+  min-height: 24px;
+}
+.mask-control-prop span {
+  color: #8f8f8f;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.mask-control-prop-group {
+  display: grid;
+  gap: 6px;
+  padding: 7px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 5px;
+  background: rgba(255,255,255,.025);
+}
+.mask-control-prop-group[data-mask-link-active="true"] {
+  border-color: rgba(88,166,255,.32);
+  background: rgba(88,166,255,.055);
+}
+.mask-control-prop-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 20px;
+}
+.mask-control-prop-group-head span {
+  color: #9a9a9a;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.mask-control-link {
+  position: relative;
+  width: 24px;
+  height: 18px !important;
+  padding: 0 !important;
+  border: 1px solid #3f3f3f !important;
+  border-radius: 4px !important;
+  background: #151515 !important;
+}
+.mask-control-link::before,
+.mask-control-link::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  width: 8px;
+  height: 5px;
+  border: 1px solid #8f8f8f;
+  border-radius: 999px;
+}
+.mask-control-link::before {
+  left: 5px;
+  transform: rotate(-24deg);
+}
+.mask-control-link::after {
+  right: 5px;
+  transform: rotate(-24deg);
+}
+.mask-control-link:not(.linked) {
+  opacity: .62;
+}
+.mask-control-link:not(.linked)::after {
+  border-color: #5f5f5f;
+  transform: rotate(24deg);
+}
+.mask-control-link.linked {
+  border-color: #2f6da8 !important;
+  background: #1b2a3a !important;
+}
+.mask-control-link.linked::before,
+.mask-control-link.linked::after {
+  border-color: #9dc9ff;
+}
+.mask-control-prop input[type="number"],
+.mask-control-prop input[type="range"],
+.mask-control-prop select {
+  width: 100%;
+  min-width: 0;
+  height: 24px;
+  border: 1px solid #3f3f3f;
+  border-radius: 4px;
+  background: #151515;
+  color: #e6e6e6;
+  font-size: 11px;
+}
+.mask-control-prop input[type="range"] {
+  height: 18px;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+}
+.mask-control-prop input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border: 1px solid #30343a;
+  border-radius: 999px;
+  background: #0f1114;
+}
+.mask-control-prop input[type="range"]::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  margin-top: -5px;
+  border: 1px solid #58a6ff;
+  border-radius: 50%;
+  background: #202833;
+  box-shadow: 0 0 0 2px rgba(88,166,255,.16);
+  -webkit-appearance: none;
+}
+.mask-control-prop input[type="range"]:focus {
+  outline: none;
+}
+.mask-control-prop input[type="range"]:focus::-webkit-slider-runnable-track {
+  border-color: #58a6ff;
+}
+.mask-control-prop input[type="range"]:focus::-webkit-slider-thumb,
+.mask-control-prop input[type="range"]:hover::-webkit-slider-thumb {
+  background: #26354a;
+}
+.mask-control-prop input[type="range"]::-moz-range-track {
+  height: 4px;
+  border: 1px solid #30343a;
+  border-radius: 999px;
+  background: #0f1114;
+}
+.mask-control-prop input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 1px solid #58a6ff;
+  border-radius: 50%;
+  background: #202833;
+}
+.mask-control-pair {
+  display: grid;
+  grid-template-columns: minmax(80px, 1fr) 44px;
+  gap: 5px;
+  align-items: center;
+}
+.mask-control-prop input[type="checkbox"] {
+  justify-self: end;
+}
+.mask-control-prop input,
+.mask-control-prop select {
+  cursor: auto;
+}
+
+/* v84: keep the playhead visible under CEP's stacked playhead overrides. */
+#playhead {
+  will-change: transform;
+  overflow: visible;
+}
+
+/* v85: neutral Apple-style glass menus/subpanels. No blue command/menu selection. */
+.fx-console,
+.timeline-command-dialog-backdrop,
+.layer-style-dialog-backdrop {
+  background: rgba(0,0,0,.28) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.fx-console-panel,
+.timeline-command-dialog,
+.layer-menu.open,
+.layer-style-dialog,
+.settings-menu,
+.comp-select-menu {
+  position: relative !important;
+  border: 1px solid rgba(255,255,255,.16) !important;
+  border-radius: 14px !important;
+  background: rgba(48,48,50,.76) !important;
+  box-shadow:
+    0 24px 70px rgba(0,0,0,.46),
+    inset 0 1px 0 rgba(255,255,255,.08) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(118%) !important;
+  backdrop-filter: blur(22px) saturate(118%) !important;
+}
+
+.fx-console-panel::before,
+.timeline-command-dialog::before,
+.layer-style-dialog::before,
+.layer-menu.open::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.10), transparent 34%),
+    radial-gradient(ellipse 72% 46% at 48% 0%, rgba(255,255,255,.075), transparent 64%),
+    radial-gradient(ellipse 38% 28% at 54% 18%, rgba(255,122,42,.10), transparent 68%);
+  pointer-events: none;
+}
+
+.fx-console-panel > *,
+.timeline-command-dialog > *,
+.layer-style-dialog > *,
+.layer-menu.open > * {
+  position: relative;
+  z-index: 1;
+}
+
+.fx-console-panel {
+  width: min(620px, calc(100vw - 32px)) !important;
+}
+
+.fx-console-panel::after {
+  content: "";
+  position: absolute;
+  left: 25px;
+  top: 23px;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(235,235,245,.48);
+  border-radius: 50%;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.fx-console-input {
+  width: calc(100% - 20px) !important;
+  height: 46px !important;
+  margin: 10px !important;
+  padding-left: 48px !important;
+  border: 1px solid rgba(255,255,255,.13) !important;
+  border-radius: 23px !important;
+  background: rgba(255,255,255,.075) !important;
+  color: rgba(245,245,247,.94) !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055) !important;
+}
+
+.fx-console-panel::after {
+  box-shadow: 9px 9px 0 -7px rgba(235,235,245,.48);
+}
+
+.fx-console-input::placeholder {
+  color: rgba(235,235,245,.46) !important;
+}
+
+.fx-console-results {
+  padding: 2px 10px 10px !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.34) transparent;
+}
+
+.fx-console-results::-webkit-scrollbar {
+  width: 10px;
+}
+
+.fx-console-results::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fx-console-results::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: rgba(255,255,255,.34);
+  background-clip: padding-box;
+}
+
+.fx-console-result {
+  height: 36px !important;
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  color: rgba(245,245,247,.92) !important;
+}
+
+.fx-console-result:hover {
+  background: rgba(255,255,255,.075) !important;
+}
+
+.fx-console-result.active,
+.fx-console-result.active:hover {
+  border-color: rgba(255,255,255,.11) !important;
+  background: rgba(255,255,255,.16) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+
+.fx-console-result.has-children.active::after {
+  color: rgba(255,255,255,.70) !important;
+}
+
+.fx-console-result span {
+  font-weight: 600 !important;
+}
+
+.fx-console-result em,
+.fx-console-result.active em {
+  color: rgba(235,235,245,.58) !important;
+}
+
+.fx-console-source,
+.fx-console-result.source-native .fx-console-source,
+.fx-console-result.source-panel .fx-console-source,
+.fx-console-result.source-custom .fx-console-source,
+.fx-console-result.active .fx-console-source {
+  border-color: rgba(255,255,255,.12) !important;
+  background: rgba(255,255,255,.09) !important;
+  color: rgba(235,235,245,.74) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+
+.timeline-command-dialog-actions button.primary,
+.dialog-btn.primary,
+.layer-style-dialog-actions button.primary,
+.marker-confirm-row,
+.comp-select-item:hover,
+.comp-select-item.active,
+.layer-menu .menu-row:hover,
+.timeline-command-dialog-actions button:hover,
+.layer-style-dialog-actions button:hover,
+.settings-menu-row:hover {
+  border-color: rgba(255,255,255,.14) !important;
+  background: rgba(255,255,255,.13) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+
+.timeline-command-dialog-field input:focus,
+.timeline-command-dialog-field textarea:focus,
+.fx-console-input:focus {
+  border-color: rgba(255,255,255,.22) !important;
+  box-shadow: none !important;
+}
+
+/* v86: whole-panel visual pass. Neutral graphite glass, compact Apple-like controls. */
+:root {
+  --tnt-bg: #111214;
+  --tnt-surface: rgba(39,40,43,.78);
+  --tnt-surface-solid: #242529;
+  --tnt-surface-soft: rgba(255,255,255,.055);
+  --tnt-surface-hover: rgba(255,255,255,.105);
+  --tnt-surface-active: rgba(255,255,255,.16);
+  --tnt-border: rgba(255,255,255,.125);
+  --tnt-border-soft: rgba(255,255,255,.075);
+  --tnt-text: rgba(245,245,247,.94);
+  --tnt-text-soft: rgba(235,235,245,.62);
+  --tnt-text-dim: rgba(235,235,245,.42);
+  --tnt-warm-reflect: rgba(255,128,54,.08);
+  --tnt-blue: #5aa7f2;
+  --tnt-shadow: 0 22px 64px rgba(0,0,0,.42);
+}
+
+html,
+body {
+  background: var(--tnt-bg) !important;
+  color: var(--tnt-text) !important;
+}
+
+header {
+  height: 54px !important;
+  background: rgba(31,32,34,.82) !important;
+  border-bottom: 1px solid rgba(255,255,255,.09) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.045), 0 10px 28px rgba(0,0,0,.22) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(115%) !important;
+  backdrop-filter: blur(18px) saturate(115%) !important;
+}
+
+.status-row {
+  min-height: 54px !important;
+  padding: 0 12px !important;
+  gap: 10px !important;
+}
+
+#status {
+  color: var(--tnt-text-soft) !important;
+  font-size: 12px !important;
+}
+
+.platform-badge,
+.comp-select-button,
+#durationBtn,
+#keyframeModeBtn,
+.filter-btn,
+.dialog-btn,
+.layer-style-close,
+.ease-close,
+.flow-chart-close,
+.marker-duration-reset,
+.timeline-command-dialog-actions button,
+.layer-style-dialog-actions button {
+  border: 1px solid var(--tnt-border) !important;
+  border-radius: 10px !important;
+  background: var(--tnt-surface-soft) !important;
+  color: rgba(245,245,247,.86) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055) !important;
+}
+
+.comp-select-button,
+#durationBtn,
+#keyframeModeBtn {
+  height: 34px !important;
+}
+
+.platform-badge:hover,
+.comp-select-button:hover,
+#durationBtn:hover,
+#keyframeModeBtn:hover,
+.filter-btn:hover,
+.dialog-btn:hover,
+.layer-style-close:hover,
+.ease-close:hover,
+.flow-chart-close:hover,
+.timeline-command-dialog-actions button:hover,
+.layer-style-dialog-actions button:hover {
+  border-color: rgba(255,255,255,.20) !important;
+  background: var(--tnt-surface-hover) !important;
+  color: #fff !important;
+}
+
+#keyframeModeBtn.active,
+.filter-btn.active,
+.settings-btn.open,
+.settings-btn.active,
+.relation-toggle.active {
+  border-color: rgba(255,255,255,.18) !important;
+  background: rgba(255,255,255,.15) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 6px 18px rgba(0,0,0,.16) !important;
+}
+
+.relation-toggle[data-relation-toggle="matte"].active {
+  color: #bfeeff !important;
+}
+
+.relation-toggle[data-relation-toggle="parent"].active {
+  color: #caffd1 !important;
+}
+
+.filter-column {
+  width: 32px !important;
+  min-width: 32px !important;
+  padding-top: 52px !important;
+  gap: 5px !important;
+  background: rgba(27,28,30,.78) !important;
+  border-right: 1px solid rgba(255,255,255,.09) !important;
+  box-shadow: 8px 0 22px rgba(0,0,0,.16), inset 1px 0 0 rgba(255,255,255,.035) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(112%) !important;
+  backdrop-filter: blur(16px) saturate(112%) !important;
+}
+
+.filter-btn {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 9px !important;
+  font-weight: 700 !important;
+}
+
+#scrollArea {
+  background: rgba(12,13,15,.96) !important;
+  background-image: none !important;
+}
+
+.time-ruler-wrap,
+.top-ruler .marker-rail,
+.horizontal-scrollbar {
+  background: rgba(23,24,26,.78) !important;
+  border-color: rgba(255,255,255,.085) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(108%) !important;
+  backdrop-filter: blur(12px) saturate(108%) !important;
+}
+
+.tick {
+  color: rgba(235,235,245,.43) !important;
+  border-left-color: rgba(255,255,255,.13) !important;
+}
+
+.tick-major {
+  color: rgba(235,235,245,.60) !important;
+  border-left-color: rgba(255,255,255,.22) !important;
+}
+
+#timeDisplay {
+  color: rgba(90,167,242,.92) !important;
+  background: rgba(27,28,30,.86) !important;
+  text-shadow: 0 0 14px rgba(90,167,242,.18) !important;
+}
+
+.track,
+body.keyframe-mode .keyframe-layer-row,
+body.keyframe-mode .keyframe-property-row,
+.edit-property-row {
+  background: rgba(28,29,32,.42) !important;
+  border-top: 1px solid rgba(255,255,255,.035) !important;
+  border-bottom: 1px solid rgba(255,255,255,.075) !important;
+}
+
+.track:nth-child(even),
+body.keyframe-mode .keyframe-layer-row:nth-child(even),
+body.keyframe-mode .keyframe-property-row:nth-child(even) {
+  background: rgba(23,24,27,.44) !important;
+}
+
+.track:hover,
+body.keyframe-mode .keyframe-layer-row:hover,
+body.keyframe-mode .keyframe-property-row:hover,
+.edit-property-row:hover {
+  background: rgba(255,255,255,.055) !important;
+}
+
+.track-label,
+body.keyframe-mode .track-label,
+body.keyframe-mode .keyframe-layer-row > .track-label,
+body.keyframe-mode .keyframe-property-row > .track-label,
+.edit-property-row > .track-label,
+.keyframe-track-name {
+  background: rgba(30,31,34,.86) !important;
+  border-right: 1px solid rgba(255,255,255,.09) !important;
+  color: rgba(235,235,245,.52) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(110%) !important;
+  backdrop-filter: blur(12px) saturate(110%) !important;
+}
+
+.clip,
+.keyframe-focus-clip {
+  border-color: rgba(255,255,255,.28) !important;
+  border-radius: 6px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    inset 0 -1px 0 rgba(0,0,0,.28),
+    0 2px 7px rgba(0,0,0,.16) !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,.46) !important;
+}
+
+.clip:hover,
+.keyframe-focus-clip:hover {
+  border-color: rgba(255,255,255,.38) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.17),
+    inset 0 -1px 0 rgba(0,0,0,.22),
+    0 4px 12px rgba(0,0,0,.18) !important;
+}
+
+.clip.selected,
+.keyframe-focus-clip.selected {
+  border-color: rgba(255,255,255,.56) !important;
+  filter: saturate(.95) brightness(1.05) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.22),
+    inset 0 0 0 1px rgba(255,255,255,.16),
+    0 5px 16px rgba(0,0,0,.24) !important;
+}
+
+.clip-index {
+  border-radius: 5px !important;
+  background: rgba(0,0,0,.26) !important;
+}
+
+.horizontal-scroll-thumb {
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.18) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10) !important;
+}
+
+.horizontal-scroll-thumb:hover {
+  background: rgba(255,255,255,.28) !important;
+}
+
+.modal-backdrop,
+.ease-dialog-backdrop,
+.flow-chart-overlay {
+  background: rgba(0,0,0,.30) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.duration-dialog,
+.expression-dialog,
+.anchor-dialog,
+.ease-dialog,
+.flow-chart-panel {
+  border: 1px solid rgba(255,255,255,.16) !important;
+  border-radius: 14px !important;
+  background: rgba(48,48,50,.78) !important;
+  box-shadow: var(--tnt-shadow), inset 0 1px 0 rgba(255,255,255,.08) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(118%) !important;
+  backdrop-filter: blur(22px) saturate(118%) !important;
+}
+
+.dialog-title,
+.ease-dialog-title,
+.flow-chart-title,
+.layer-style-dialog-title {
+  color: rgba(255,255,255,.94) !important;
+  font-weight: 650 !important;
+}
+
+.dialog-subtitle,
+.ease-dialog-subtitle,
+.flow-chart-subtitle,
+.layer-style-dialog-subtitle {
+  color: var(--tnt-text-soft) !important;
+}
+
+.duration-dialog input,
+.expression-dialog textarea,
+.timeline-command-dialog-field input,
+.timeline-command-dialog-field textarea,
+.layer-style-prop input[type="number"],
+.layer-style-prop select,
+.mask-control-prop input[type="number"],
+.mask-control-prop select {
+  border-color: rgba(255,255,255,.12) !important;
+  border-radius: 8px !important;
+  background: rgba(255,255,255,.07) !important;
+  color: rgba(245,245,247,.94) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+
+.duration-dialog input:focus,
+.expression-dialog textarea:focus,
+.timeline-command-dialog-field input:focus,
+.timeline-command-dialog-field textarea:focus,
+.layer-style-prop input[type="number"]:focus,
+.layer-style-prop select:focus,
+.mask-control-prop input[type="number"]:focus,
+.mask-control-prop select:focus {
+  border-color: rgba(255,255,255,.24) !important;
+  outline: none !important;
+}
+
+.layer-style-node,
+.mask-control-node,
+.mask-control-layer,
+.layer-style-add-panel,
+.layer-style-edit-panel,
+.mask-control-prop-group {
+  border-color: rgba(255,255,255,.11) !important;
+  border-radius: 10px !important;
+  background: rgba(255,255,255,.055) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+
+.layer-style-node-head,
+.mask-control-node-head,
+.mask-control-layer-head {
+  background: rgba(255,255,255,.045) !important;
+  border-color: rgba(255,255,255,.08) !important;
+}
+
+.layer-style-node-head strong,
+.mask-control-node-head strong,
+.mask-control-layer-head strong {
+  color: rgba(245,245,247,.94) !important;
+}
+
+.layer-style-section-title,
+.mask-control-prop span,
+.layer-style-prop span,
+.mask-control-node-head em,
+.layer-style-node-head div {
+  color: var(--tnt-text-soft) !important;
+}
+
+.layer-style-toggle.on,
+.mask-control-link.linked {
+  border-color: rgba(255,255,255,.20) !important;
+  background: rgba(255,255,255,.16) !important;
+}
+
+.layer-style-prop input[type="range"]::-webkit-slider-runnable-track,
+.mask-control-prop input[type="range"]::-webkit-slider-runnable-track {
+  border-color: rgba(255,255,255,.10) !important;
+  background: rgba(0,0,0,.28) !important;
+}
+
+.layer-style-prop input[type="range"]::-webkit-slider-thumb,
+.mask-control-prop input[type="range"]::-webkit-slider-thumb {
+  border-color: rgba(255,255,255,.26) !important;
+  background: rgba(235,235,245,.30) !important;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.06) !important;
+}
+
+.layer-menu-context,
+.marker-editor-section,
+.layer-menu-section,
+.keyframe-value-section {
+  background: rgba(255,255,255,.035) !important;
+  border-color: rgba(255,255,255,.075) !important;
+  border-radius: 10px !important;
+}
+
+.layer-menu-context-strip span {
+  opacity: .72 !important;
+}
+
+.layer-menu-section-title,
+.layer-menu-kicker {
+  color: rgba(235,235,245,.50) !important;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: rgba(255,255,255,.24);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,.34);
+  background-clip: padding-box;
+}
+
+/* v87: subpanel glass blur belongs to the panel surface, not the whole backdrop. */
+.fx-console,
+.timeline-command-dialog-backdrop,
+.layer-style-dialog-backdrop,
+.modal-backdrop,
+.ease-dialog-backdrop,
+.flow-chart-overlay {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* v88: Claude-orange accent, with timeline grid/purple texture fully removed. */
+:root {
+  --tnt-accent: #d97742;
+  --tnt-accent-soft: rgba(217,119,66,.20);
+  --tnt-accent-glow: rgba(217,119,66,.18);
+  --tnt-blue: var(--tnt-accent);
+  --ae-blue: var(--tnt-accent);
+  --apple-accent: var(--tnt-accent);
+  --apple-accent-soft: var(--tnt-accent-soft);
+}
+
+main#scrollArea,
+#scrollArea {
+  background-color: #0d0e10 !important;
+  background-image: none !important;
+  background-size: auto !important;
+  background-position: 0 0 !important;
+}
+
+#playhead {
+  border-left-color: var(--tnt-accent) !important;
+}
+
+#playhead::before {
+  background: var(--tnt-accent) !important;
+  border-top-color: var(--tnt-accent) !important;
+}
+
+#timeDisplay {
+  color: rgba(217,119,66,.96) !important;
+  text-shadow: 0 0 14px var(--tnt-accent-glow) !important;
+}
+
+.tick-section {
+  color: rgba(217,119,66,.58) !important;
+}
+
+.comp-select.open .comp-select-button,
+.comp-select-button:focus,
+#keyframeModeBtn.active,
+.filter-btn.active,
+.settings-btn.open,
+.settings-btn.active,
+.dialog-btn.primary,
+.timeline-command-dialog-actions button.primary,
+.layer-style-dialog-actions button.primary,
+.ease-actions button.primary {
+  border-color: rgba(217,119,66,.36) !important;
+  background: rgba(217,119,66,.16) !important;
+  color: #fff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 6px 18px rgba(217,119,66,.10) !important;
+}
+
+.platform-badge.mac {
+  border-color: rgba(217,119,66,.34) !important;
+  background: rgba(217,119,66,.12) !important;
+}
+
+.fx-console-panel::before,
+.timeline-command-dialog::before,
+.layer-style-dialog::before,
+.layer-menu.open::before {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.09), transparent 34%),
+    radial-gradient(ellipse 72% 46% at 48% 0%, rgba(255,255,255,.065), transparent 64%),
+    radial-gradient(ellipse 34% 24% at 54% 18%, rgba(217,119,66,.11), transparent 70%) !important;
+}
+
+.ease-curve,
+.ease-handle-line {
+  stroke: var(--tnt-accent) !important;
+}
+
+.ease-point {
+  fill: var(--tnt-accent) !important;
+  stroke: rgba(255,255,255,.72) !important;
+}
+
+.anchor-cell.active {
+  border-color: rgba(217,119,66,.44) !important;
+  background: rgba(217,119,66,.18) !important;
+}
+
+.layer-style-prop input[type="range"]:focus::-webkit-slider-runnable-track,
+.mask-control-prop input[type="range"]:focus::-webkit-slider-runnable-track {
+  border-color: rgba(217,119,66,.48) !important;
+}
+
+.layer-style-prop input[type="range"]:hover::-webkit-slider-thumb,
+.layer-style-prop input[type="range"]:focus::-webkit-slider-thumb,
+.mask-control-prop input[type="range"]:hover::-webkit-slider-thumb,
+.mask-control-prop input[type="range"]:focus::-webkit-slider-thumb {
+  border-color: rgba(217,119,66,.58) !important;
+  background: rgba(217,119,66,.30) !important;
+}
+
+/* v89: proportional radius and uniform control sizing. */
+:root {
+  --tnt-radius-xs: 6px;
+  --tnt-radius-sm: 9px;
+  --tnt-radius-md: 12px;
+  --tnt-radius-lg: 16px;
+  --tnt-control-h: 32px;
+  --tnt-control-sm: 24px;
+  --tnt-control-icon: 28px;
+  --tnt-row-h: 34px;
+  --tnt-gap: 8px;
+}
+
+.comp-select-button,
+#durationBtn,
+#keyframeModeBtn,
+.dialog-btn,
+.timeline-command-dialog-actions button,
+.layer-style-dialog-actions button,
+.ease-actions button,
+.settings-menu-row,
+.layer-menu .menu-row,
+.layer-style-node button,
+.marker-duration-reset {
+  min-height: var(--tnt-control-h) !important;
+  height: var(--tnt-control-h) !important;
+  border-radius: var(--tnt-radius-sm) !important;
+}
+
+.filter-btn,
+.platform-badge,
+.layer-style-close,
+.ease-close,
+.flow-chart-close {
+  width: var(--tnt-control-icon) !important;
+  height: var(--tnt-control-icon) !important;
+  min-width: var(--tnt-control-icon) !important;
+  min-height: var(--tnt-control-icon) !important;
+  border-radius: var(--tnt-radius-sm) !important;
+}
+
+.relation-toggle,
+.settings-btn {
+  width: var(--tnt-control-icon) !important;
+  height: var(--tnt-control-icon) !important;
+}
+
+.fx-console-result,
+.comp-select-item,
+.settings-menu-row,
+.layer-menu .menu-row {
+  min-height: var(--tnt-row-h) !important;
+  border-radius: var(--tnt-radius-md) !important;
+}
+
+.timeline-command-dialog-field input,
+.timeline-command-dialog-field textarea,
+.duration-dialog input,
+.expression-dialog textarea,
+.layer-style-prop input[type="number"],
+.layer-style-prop select,
+.mask-control-prop input[type="number"],
+.mask-control-prop select,
+.marker-editor-field input,
+.marker-editor-field textarea,
+.keyframe-value-input {
+  min-height: var(--tnt-control-h) !important;
+  border-radius: var(--tnt-radius-sm) !important;
+}
+
+.fx-console-input {
+  height: 46px !important;
+  border-radius: 23px !important;
+}
+
+.fx-console-panel,
+.timeline-command-dialog,
+.layer-menu.open,
+.layer-style-dialog,
+.duration-dialog,
+.expression-dialog,
+.anchor-dialog,
+.ease-dialog,
+.flow-chart-panel,
+.settings-menu,
+.comp-select-menu {
+  border-radius: var(--tnt-radius-lg) !important;
+}
+
+.layer-style-node,
+.mask-control-node,
+.mask-control-layer,
+.layer-style-add-panel,
+.layer-style-edit-panel,
+.mask-control-prop-group,
+.layer-menu-context,
+.marker-editor-section,
+.layer-menu-section,
+.keyframe-value-section,
+.clip,
+.keyframe-focus-clip {
+  border-radius: var(--tnt-radius-md) !important;
+}
+
+.clip-index,
+.clip-relation-dot,
+.layer-style-preview-chip,
+.mask-control-count,
+.timeline-command-suggest-wrap {
+  border-radius: var(--tnt-radius-xs) !important;
+}
+
+.status-row,
+.layer-style-layout,
+.mask-control-layout,
+.mask-control-props,
+.layer-style-node-props,
+.layer-menu-context,
+.timeline-command-dialog-actions,
+.layer-style-dialog-actions,
+.ease-actions {
+  gap: var(--tnt-gap) !important;
+}
+
+/* v90: radius and control sizing derived from the timeline layer shape. */
+:root {
+  --tnt-shape-h: var(--timeline-clip-height, 22px);
+  --tnt-radius-xs: 4px;
+  --tnt-radius-sm: 5px;
+  --tnt-radius-md: 7px;
+  --tnt-radius-lg: 12px;
+  --tnt-control-h: calc(var(--tnt-shape-h) + 4px);
+  --tnt-control-sm: var(--tnt-shape-h);
+  --tnt-control-icon: calc(var(--tnt-shape-h) + 2px);
+  --tnt-row-h: calc(var(--tnt-shape-h) + 8px);
+}
+
+.clip,
+.keyframe-focus-clip {
+  border-radius: var(--tnt-radius-xs) !important;
+}
+
+.clip-index {
+  border-radius: 3px !important;
+}
+
+.comp-select-button,
+#durationBtn,
+#keyframeModeBtn,
+.dialog-btn,
+.timeline-command-dialog-actions button,
+.layer-style-dialog-actions button,
+.ease-actions button,
+.settings-menu-row,
+.layer-menu .menu-row,
+.layer-style-node button,
+.marker-duration-reset {
+  min-height: var(--tnt-control-h) !important;
+  height: var(--tnt-control-h) !important;
+  border-radius: var(--tnt-radius-sm) !important;
+}
+
+.filter-btn,
+.platform-badge,
+.layer-style-close,
+.ease-close,
+.flow-chart-close,
+.relation-toggle,
+.settings-btn {
+  width: var(--tnt-control-icon) !important;
+  height: var(--tnt-control-icon) !important;
+  min-width: var(--tnt-control-icon) !important;
+  min-height: var(--tnt-control-icon) !important;
+  border-radius: var(--tnt-radius-sm) !important;
+}
+
+.status-row {
+  min-height: calc(var(--tnt-shape-h) + 18px) !important;
+}
+
+header {
+  height: calc(var(--tnt-shape-h) + 24px) !important;
+}
+
+/* v91: Apple-ratio UI pass. Values are based on the 22px timeline layer height.
+   CEP's older Chromium can ignore calc multiplication, so keep these explicit. */
+:root {
+  --tnt-layer-h: 22px;
+  --tnt-radius-layer: 4px;
+  --tnt-radius-control: 5px;
+  --tnt-radius-node: 7px;
+  --tnt-radius-panel: 12px;
+  --tnt-radius-pill: 999px;
+  --tnt-control-h: 26px;
+  --tnt-control-sm: 22px;
+  --tnt-control-icon: 24px;
+  --tnt-row-h: 30px;
+  --tnt-gap: 6px;
+  --tnt-radius-xs: var(--tnt-radius-layer);
+  --tnt-radius-sm: var(--tnt-radius-control);
+  --tnt-radius-md: var(--tnt-radius-node);
+  --tnt-radius-lg: var(--tnt-radius-panel);
+}
+
+header {
+  height: 42px !important;
+  padding: 5px 10px !important;
+}
+
+.status-row {
+  gap: var(--tnt-gap) !important;
+  min-height: 32px !important;
+}
+
+.comp-select {
+  width: min(545px, 48vw) !important;
+}
+
+.comp-select-button,
+#durationBtn,
+#keyframeModeBtn,
+.dialog-btn,
+.timeline-command-dialog-actions button,
+.layer-style-dialog-actions button,
+.ease-actions button,
+.settings-menu-row,
+.layer-menu .menu-row,
+.layer-style-node button,
+.marker-duration-reset {
+  height: var(--tnt-control-h) !important;
+  min-height: var(--tnt-control-h) !important;
+  border-radius: var(--tnt-radius-control) !important;
+  line-height: calc(var(--tnt-control-h) - 2px) !important;
+}
+
+.comp-select-button {
+  padding: 0 25px 0 10px !important;
+}
+
+.comp-select-button::after {
+  top: 10px !important;
+}
+
+#durationBtn,
+#keyframeModeBtn,
+.dialog-btn,
+.timeline-command-dialog-actions button,
+.layer-style-dialog-actions button,
+.ease-actions button {
+  padding: 0 10px !important;
+}
+
+.filter-btn,
+.platform-badge,
+.layer-style-close,
+.ease-close,
+.flow-chart-close,
+.relation-toggle,
+.settings-btn,
+.layer-style-delete {
+  width: var(--tnt-control-icon) !important;
+  height: var(--tnt-control-icon) !important;
+  min-width: var(--tnt-control-icon) !important;
+  min-height: var(--tnt-control-icon) !important;
+  border-radius: var(--tnt-radius-control) !important;
+}
+
+.filter-column {
+  width: 30px !important;
+  min-width: 30px !important;
+  gap: 5px !important;
+  padding: 6px 3px !important;
+}
+
+.platform-badge {
+  flex-basis: var(--tnt-control-icon) !important;
+  margin-bottom: 5px !important;
+}
+
+.platform-apple {
+  font-size: 15px !important;
+}
+
+.clip,
+.keyframe-focus-clip {
+  height: var(--tnt-layer-h) !important;
+  min-height: var(--tnt-layer-h) !important;
+  border-radius: var(--tnt-radius-layer) !important;
+}
+
+.clip-index,
+.clip-relation-dot,
+.marker-label,
+.top-ruler .marker-rail .marker-label,
+.top-ruler .marker-comp.has-text .marker-label,
+.top-ruler .marker.marker-region-start .marker-label,
+.marker-layer.has-text .marker-label,
+.marker-layer.marker-region-start.has-text .marker-label {
+  border-radius: 3px !important;
+}
+
+.comp-select-menu,
+.layer-menu.open,
+.timeline-command-dialog,
+.layer-style-dialog,
+.duration-dialog,
+.expression-dialog,
+.anchor-dialog,
+.ease-dialog,
+.flow-chart-panel,
+.settings-menu,
+.fx-console-panel {
+  border-radius: var(--tnt-radius-panel) !important;
+}
+
+.layer-style-node,
+.mask-control-node,
+.mask-control-layer,
+.layer-style-add-panel,
+.layer-style-edit-panel,
+.mask-control-prop-group,
+.layer-menu-context,
+.marker-editor-section,
+.layer-menu-section,
+.keyframe-value-section,
+.ease-control,
+.ease-graph-wrap,
+.flow-node,
+.fx-console-result,
+.comp-select-item,
+.settings-menu-row,
+.layer-menu .menu-row,
+.layer-style-add-item {
+  border-radius: var(--tnt-radius-node) !important;
+}
+
+.timeline-command-dialog-field input,
+.timeline-command-dialog-field textarea,
+.duration-dialog input,
+.expression-dialog textarea,
+.layer-style-prop input[type="number"],
+.layer-style-prop select,
+.mask-control-prop input[type="number"],
+.mask-control-prop select,
+.marker-editor-field input,
+.marker-editor-field textarea,
+.keyframe-value-input,
+.layer-style-prop input[type="color"] {
+  min-height: var(--tnt-control-h) !important;
+  border-radius: var(--tnt-radius-control) !important;
+}
+
+.layer-style-add-button {
+  width: var(--tnt-control-icon) !important;
+  height: var(--tnt-control-icon) !important;
+  min-width: var(--tnt-control-icon) !important;
+  min-height: var(--tnt-control-icon) !important;
+  border-radius: var(--tnt-radius-control) !important;
+  line-height: calc(var(--tnt-control-icon) - 2px) !important;
+}
+
+.layer-style-toggle {
+  width: 32px !important;
+  height: 18px !important;
+  border-radius: var(--tnt-radius-pill) !important;
+}
+
+.layer-style-toggle span {
+  border-radius: 50% !important;
+}
+
+.layer-style-toggle.on span {
+  left: 15px !important;
+}
+
+.layer-style-preview-chip,
+.preview-prop,
+.mask-control-count,
+.timeline-command-suggest-wrap,
+.layer-menu-context-chips b,
+.settings-menu-row b,
+.fx-console-input {
+  border-radius: var(--tnt-radius-pill) !important;
+}
+
+.layer-style-layout,
+.mask-control-layout,
+.mask-control-props,
+.layer-style-node-props,
+.layer-menu-context,
+.timeline-command-dialog-actions,
+.layer-style-dialog-actions,
+.ease-actions,
+.ease-presets,
+.ease-controls,
+.layer-style-add-grid,
+.layer-style-header-add-row {
+  gap: var(--tnt-gap) !important;
+}
+
+.layer-style-node-head,
+.flow-chart-header,
+.layer-style-dialog-head,
+.layer-style-dialog-actions,
+.ease-actions {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+.timeline-command-dialog,
+.duration-dialog,
+.expression-dialog,
+.anchor-dialog {
+  padding: 12px !important;
+}
+
+.layer-menu.open {
+  padding: 7px !important;
+}
+
+.layer-menu-section {
+  padding: 7px !important;
+}
+
+.layer-menu .menu-row,
+.settings-menu-row,
+.comp-select-item,
+.fx-console-result {
+  min-height: var(--tnt-row-h) !important;
+}
+
+.layer-style-prop,
+.mask-control-prop {
+  min-height: var(--tnt-control-h) !important;
+}
+
+.layer-style-prop input[type="range"],
+.mask-control-prop input[type="range"],
+.ease-control input[type="range"] {
+  height: 16px !important;
+}
+
+.layer-style-prop input[type="range"]::-webkit-slider-runnable-track,
+.mask-control-prop input[type="range"]::-webkit-slider-runnable-track,
+.ease-control input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px !important;
+  border-radius: var(--tnt-radius-pill) !important;
+}
+
+.layer-style-prop input[type="range"]::-webkit-slider-thumb,
+.mask-control-prop input[type="range"]::-webkit-slider-thumb,
+.ease-control input[type="range"]::-webkit-slider-thumb {
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 50% !important;
+}
+

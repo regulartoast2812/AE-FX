@@ -1,0 +1,259 @@
+.mass-edit-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1180;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 12px 12px;
+  background: transparent;
+}
+
+.mass-edit-backdrop.show {
+  display: flex;
+}
+
+.mass-edit-dialog {
+  width: min(610px, calc(100vw - 24px));
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.115);
+  border-radius: var(--tnt-radius-panel, 16px);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.052), rgba(255,255,255,.015) 38%, rgba(0,0,0,.16)),
+    rgba(18,19,20,.88);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.065), 0 24px 58px rgba(0,0,0,.44);
+  color: rgba(245,245,247,.88);
+  -webkit-backdrop-filter: blur(22px) saturate(116%);
+  backdrop-filter: blur(22px) saturate(116%);
+}
+
+.mass-edit-head {
+  min-height: 42px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,.085);
+}
+
+.mass-edit-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  font-family: "Ivory LL Web", "IvoryLLWeb-Light", "Iowan Old Style", Baskerville, Georgia, serif;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.mass-edit-title b {
+  width: 25px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 7px;
+  background: rgba(255,255,255,.06);
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.mass-edit-title em,
+.mass-edit-count {
+  padding: 3px 7px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 9px;
+  background: rgba(255,255,255,.045);
+  color: rgba(235,235,245,.56);
+  font-family: inherit;
+  font-size: 9px;
+  font-style: normal;
+}
+
+.mass-edit-body {
+  padding: 10px 12px 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.mass-edit-source,
+.mass-edit-section {
+  padding: 9px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: var(--tnt-radius-node, 12px);
+  background: rgba(8,9,10,.36);
+}
+
+.mass-edit-source {
+  display: grid;
+  grid-template-columns: minmax(190px, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+}
+
+.mass-edit-source label,
+.mass-edit-property-grid label {
+  display: grid;
+  gap: 5px;
+}
+
+.mass-edit-source label > span,
+.mass-edit-property-grid label > span,
+.mass-edit-section-title {
+  color: rgba(235,235,245,.48);
+  font-size: 9px;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.mass-edit-target-summary {
+  padding-bottom: 6px;
+  color: rgba(235,235,245,.55);
+  font-size: 10px;
+}
+
+.mass-edit-dialog select,
+.mass-edit-dialog input {
+  min-height: 26px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 7px;
+  background: rgba(0,0,0,.28);
+  color: rgba(245,245,247,.90);
+  padding: 0 7px;
+  font: inherit;
+}
+
+.mass-edit-actions {
+  margin-top: 7px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.mass-edit-actions button {
+  min-height: 44px;
+  padding: 7px 9px;
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 8px;
+  background: rgba(255,255,255,.035);
+  color: rgba(245,245,247,.86);
+}
+
+.mass-edit-actions button:hover:not(:disabled),
+.mass-edit-apply-value:hover:not(:disabled) {
+  border-color: rgba(217,119,66,.34);
+  background: rgba(217,119,66,.09);
+  transform: scale(1.01);
+}
+
+.mass-edit-actions strong {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.mass-edit-actions span {
+  color: rgba(235,235,245,.48);
+  font-size: 8px;
+  font-weight: 430;
+}
+
+.mass-edit-wrangler-copy {
+  margin-top: 5px;
+  color: rgba(235,235,245,.54);
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.mass-edit-wrangler-actions button:first-child {
+  border-color: rgba(217,119,66,.24);
+  background: rgba(217,119,66,.065);
+}
+
+.mass-edit-actions button:disabled,
+.mass-edit-apply-value:disabled {
+  opacity: .36;
+}
+
+.mass-edit-property-grid {
+  margin-top: 7px;
+  display: grid;
+  grid-template-columns: minmax(140px, .8fr) minmax(180px, 1.2fr) auto;
+  align-items: end;
+  gap: 6px;
+}
+
+.mass-edit-apply-value {
+  min-height: 26px;
+  padding: 0 9px;
+  border: 1px solid rgba(217,119,66,.30);
+  border-radius: 7px;
+  background: rgba(217,119,66,.10);
+  color: rgba(255,239,230,.92);
+}
+
+.mass-edit-error {
+  min-height: 12px;
+  color: #efa0a0;
+  font-size: 9px;
+}
+
+.layer-menu-keyframe-context {
+  margin: 8px;
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 6px;
+  background: rgba(8,9,10,.34);
+}
+
+.layer-menu-keyframe-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.layer-menu-keyframe-title b {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 6px;
+  background: rgba(255,255,255,.05);
+  font-size: 9px;
+}
+
+.layer-menu-keyframe-title strong {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.layer-menu-keyframe-title > span {
+  margin-left: auto;
+  color: rgba(235,235,245,.48);
+  font-size: 9px;
+}
+
+.layer-menu-keyframe-properties {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.layer-menu-keyframe-properties span {
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: rgba(217,119,66,.09);
+  color: rgba(242,196,169,.82);
+  font-size: 8px;
+}
+
+@media (max-width: 620px) {
+  .mass-edit-actions,
+  .mass-edit-property-grid {
+    grid-template-columns: 1fr;
+  }
+}

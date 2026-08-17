@@ -1,0 +1,307 @@
+.text-animation-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1185;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 12px 12px;
+  background: transparent;
+}
+
+.text-animation-backdrop.show {
+  display: flex;
+}
+
+.text-animation-dialog {
+  width: min(760px, calc(100vw - 24px));
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.115);
+  border-radius: var(--tnt-radius-panel, 14px);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.050), rgba(255,255,255,.014) 42%, rgba(0,0,0,.16)),
+    rgba(18,19,21,.91);
+  box-shadow: inset 0 1px rgba(255,255,255,.055), 0 20px 48px rgba(0,0,0,.42);
+  color: rgba(245,245,247,.88);
+  -webkit-backdrop-filter: blur(20px) saturate(114%);
+  backdrop-filter: blur(20px) saturate(114%);
+}
+
+.text-animation-head {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 10px 0 11px;
+  border-bottom: 1px solid rgba(255,255,255,.085);
+}
+
+.text-animation-title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--tnt-font-main, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif);
+  font-size: 13px;
+  line-height: 1;
+}
+
+.text-animation-title b {
+  display: grid;
+  width: 24px;
+  height: 20px;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 6px;
+  background: rgba(255,255,255,.05);
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.text-animation-title em {
+  padding: 3px 6px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 8px;
+  background: rgba(255,255,255,.04);
+  color: rgba(235,235,245,.54);
+  font-size: 8px;
+  font-style: normal;
+}
+
+.text-animation-close {
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: var(--tnt-radius-control, 6px);
+  background: rgba(255,255,255,.04);
+  color: rgba(235,235,245,.68);
+  cursor: pointer;
+}
+
+.text-animation-close:hover {
+  border-color: rgba(217,119,66,.34);
+  background: rgba(217,119,66,.12);
+  color: rgba(255,238,228,.95);
+}
+
+.text-animation-body {
+  display: grid;
+  grid-template-columns: minmax(180px, .75fr) minmax(310px, 1.25fr);
+  gap: 8px;
+  padding: 10px 11px 8px;
+}
+
+.text-animation-builder {
+  grid-row: span 2;
+}
+
+.text-animation-section {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: var(--tnt-radius-node, 7px);
+  background: rgba(0,0,0,.18);
+}
+
+.text-animation-section-head {
+  display: grid;
+  gap: 2px;
+}
+
+.text-animation-section-head strong {
+  color: rgba(245,245,247,.88);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.text-animation-section-head span {
+  color: rgba(235,235,245,.48);
+  font-size: 8px;
+}
+
+.text-animation-command-row,
+.text-animation-preset-grid {
+  display: grid;
+  gap: 6px;
+}
+
+.text-animation-command-row button,
+.text-animation-preset-grid button,
+.text-animation-apply {
+  display: grid;
+  min-height: 38px;
+  align-content: center;
+  gap: 2px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255,255,255,.085);
+  border-radius: var(--tnt-radius-node, 7px);
+  background: rgba(255,255,255,.03);
+  color: rgba(245,245,247,.84);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.text-animation-command-row button:hover:not(:disabled),
+.text-animation-preset-grid button:hover:not(:disabled),
+.text-animation-apply:hover:not(:disabled) {
+  border-color: rgba(217,119,66,.30);
+  background: rgba(217,119,66,.075);
+  color: rgba(255,238,228,.95);
+}
+
+.text-animation-command-row strong,
+.text-animation-preset-grid strong,
+.text-animation-apply {
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.text-animation-command-row span,
+.text-animation-preset-grid span {
+  color: rgba(235,235,245,.45);
+  font-size: 7px;
+}
+
+.text-animation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.text-animation-field {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.text-animation-field > span {
+  color: rgba(235,235,245,.48);
+  font-size: 8px;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.text-animation-segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 7px;
+  background: rgba(5,6,7,.30);
+}
+
+.text-animation-segmented.direction {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.text-animation-segmented.based-on {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.text-animation-segmented button {
+  min-height: 22px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: rgba(235,235,245,.56);
+  font: inherit;
+  font-size: 8px;
+}
+
+.text-animation-segmented button:hover,
+.text-animation-segmented button.active {
+  border-color: rgba(217,119,66,.34);
+  background: rgba(217,119,66,.13);
+  color: rgba(255,238,228,.95);
+}
+
+.text-animation-checks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.text-animation-checks label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 26px;
+  padding: 0 7px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: var(--tnt-radius-control, 6px);
+  background: rgba(255,255,255,.03);
+  color: rgba(235,235,245,.66);
+  font-size: 8px;
+}
+
+.text-animation-times {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.text-animation-times label {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+  color: rgba(235,235,245,.56);
+  font-size: 8px;
+}
+
+.text-animation-times input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 25px;
+  padding: 0 6px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: var(--tnt-radius-control, 6px);
+  outline: none;
+  background: rgba(0,0,0,.28);
+  color: rgba(245,245,247,.90);
+  font: inherit;
+  font-size: 9px;
+}
+
+.text-animation-apply {
+  min-height: 30px;
+  justify-content: center;
+  border-color: rgba(217,119,66,.24);
+  background: rgba(217,119,66,.12);
+  text-align: center;
+}
+
+.text-animation-error {
+  min-height: 12px;
+  padding: 0 11px 9px;
+  color: #efa0a0;
+  font-size: 8px;
+}
+
+.text-animation-preset-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.text-animation-preset-grid button:disabled,
+.text-animation-apply:disabled {
+  opacity: .34;
+  cursor: default;
+}
+
+@media (max-width: 700px) {
+  .text-animation-dialog {
+    width: min(360px, calc(100vw - 18px));
+  }
+
+  .text-animation-body,
+  .text-animation-grid {
+    grid-template-columns: 1fr;
+  }
+}
