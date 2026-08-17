@@ -37,6 +37,16 @@ one on Windows, and it is no longer needed on either platform.
 **The panel must be open in After Effects.** With it closed, the bridge refuses
 the connection and every request returns `{"ok":false,"error":"..."}` immediately.
 
+The macOS helper does not have this limitation — it bootstraps the panel with a
+one-shot AppleScript `DoScript` that runs `app.findMenuCommandId` /
+`app.executeCommand` on the panel's Window-menu entry. After Effects exposes no
+equivalent scripting IPC on Windows, so there is no way to open the panel from
+outside AE here. Options, none implemented:
+
+- Tell the user to open the panel (current behavior — the error message says so).
+- Ship a stub `.jsx` in the Scripts folder bound to a keyboard shortcut, which
+  opens the panel from *inside* AE. Cross-platform, but costs a shortcut slot.
+
 ## Hotkeys
 
 `Ctrl+Space` summons the overlay. Control keys match the macOS helper:

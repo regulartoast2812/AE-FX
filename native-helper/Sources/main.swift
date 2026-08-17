@@ -3,7 +3,6 @@ import Carbon
 import Network
 import WebKit
 
-private let afterEffectsBundleIdentifier = "com.adobe.AfterEffects.application"
 private let quickControlsLauncherSize = NSSize(width: 620, height: 310)
 private let quickControlsHotKeySignature = OSType(
     UInt32(UInt8(ascii: "T")) << 24 |
@@ -72,13 +71,6 @@ private func isQuickPanelSummonShortcut(_ event: NSEvent) -> Bool {
     return character == " " || character == "k"
 }
 
-private func appleScriptQuoted(_ value: String) -> String {
-    var result = value.replacingOccurrences(of: "\\", with: "\\\\")
-    result = result.replacingOccurrences(of: "\"", with: "\\\"")
-    result = result.replacingOccurrences(of: "\r", with: "\\r")
-    result = result.replacingOccurrences(of: "\n", with: "\\n")
-    return "\"\(result)\""
-}
 
 private func javaScriptLiteral(_ value: String) -> String {
     let data = try? JSONSerialization.data(withJSONObject: [value], options: [])

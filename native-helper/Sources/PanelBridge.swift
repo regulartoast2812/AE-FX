@@ -14,6 +14,19 @@ import Network
 
 let panelBridgeHost = "127.0.0.1"
 let panelBridgeTimeout: TimeInterval = 15
+let afterEffectsBundleIdentifier = "com.adobe.AfterEffects.application"
+
+/// How long to wait for the panel to come up after we ask AE to open it.
+private let panelBootstrapTimeout: TimeInterval = 12
+private let panelBootstrapPollInterval: TimeInterval = 0.25
+
+func appleScriptQuoted(_ value: String) -> String {
+    var result = value.replacingOccurrences(of: "\\", with: "\\\\")
+    result = result.replacingOccurrences(of: "\"", with: "\\\"")
+    result = result.replacingOccurrences(of: "\r", with: "\\r")
+    result = result.replacingOccurrences(of: "\n", with: "\\n")
+    return "\"\(result)\""
+}
 
 struct PanelBridgeEndpoint {
     let port: UInt16
@@ -56,20 +69,103 @@ func loadPanelBridgeEndpoint() -> PanelBridgeEndpoint? {
 private let panelUnreachableMessage =
     "Could not reach the panel bridge. Open the Premiere Style Timeline panel in After Effects."
 
-/// Sends one ExtendScript request to the CEP panel's loopback bridge and returns
-/// the raw result string. The panel runs it via CSInterface.evalScript, so this
-/// matches CEP semantics exactly - no AppleScript, no temp files.
+// MARK: - Bootstrap
+
+/// Asks After Effects to open our CEP panel, by finding its Window-menu command.
+///
+/// This is the *only* remaining AppleScript call, and it is not in the hot path -
+/// it runs once when the panel is closed, purely to bring the bridge up. Every
+/// subsequent request goes over the socket. AE has no scripting IPC of this kind
+/// on Windows, which is why the Windows helper asks the user to open the panel
+/// instead of bootstrapping it.
+@discardableResult
+func openTimelinePanelViaAppleScript() -> Bool {
+    let jsx = """
+    (function () {
+        var id = app.findMenuCommandId("Premiere Style Timeline");
+        if (id !== 0) { app.executeCommand(id); return "opened"; }
+        return "notfound";
+    }())
+    """
+    let source = """
+    tell application id "\(afterEffectsBundleIdentifier)"
+        DoScript \(appleScriptQuoted(jsx))
+    end tell
+    """
+
+    var failed = false
+    let run = {
+        var error: NSDictionary?
+        NSAppleScript(source: source)?.executeAndReturnError(&error)
+        failed = error != nil
+    }
+    // NSAppleScript is not thread-safe; keep it on the main thread.
+    if Thread.isMainThread { run() } else { DispatchQueue.main.sync(execute: run) }
+    return !failed
+}
+
+/// Blocks until the panel publishes its discovery file, or the timeout expires.
+/// Only ever called on a background queue.
+private func waitForPanelBridge(timeout: TimeInterval) -> PanelBridgeEndpoint? {
+    let deadline = Date().addingTimeInterval(timeout)
+    while Date() < deadline {
+        if let endpoint = loadPanelBridgeEndpoint() { return endpoint }
+        Thread.sleep(forTimeInterval: panelBootstrapPollInterval)
+    }
+    return loadPanelBridgeEndpoint()
+}
+
+/// Sends one ExtendScript request, opening the panel first if the bridge is down.
+/// Callers get a result either way; they never need to know the panel was closed.
 func sendToPanelBridge(
     requestId: String,
     script: String,
     queue: DispatchQueue,
     completion: @escaping (String) -> Void
 ) {
-    guard let endpoint = loadPanelBridgeEndpoint() else {
-        completion(bridgeErrorJSON(panelUnreachableMessage))
+    func attempt(_ endpoint: PanelBridgeEndpoint, allowBootstrap: Bool) {
+        sendOnceToPanelBridge(endpoint: endpoint, requestId: requestId, script: script, queue: queue) { result, unreachable in
+            guard unreachable, allowBootstrap else {
+                completion(result)
+                return
+            }
+            // Stale discovery file: panel was closed since it was written.
+            queue.async {
+                guard openTimelinePanelViaAppleScript(),
+                      let refreshed = waitForPanelBridge(timeout: panelBootstrapTimeout)
+                else {
+                    completion(bridgeErrorJSON(panelUnreachableMessage))
+                    return
+                }
+                attempt(refreshed, allowBootstrap: false)
+            }
+        }
+    }
+
+    if let endpoint = loadPanelBridgeEndpoint() {
+        attempt(endpoint, allowBootstrap: true)
         return
     }
 
+    // No discovery file at all - the panel has not run this session.
+    queue.async {
+        guard openTimelinePanelViaAppleScript(),
+              let endpoint = waitForPanelBridge(timeout: panelBootstrapTimeout)
+        else {
+            completion(bridgeErrorJSON(panelUnreachableMessage))
+            return
+        }
+        attempt(endpoint, allowBootstrap: false)
+    }
+}
+
+private func sendOnceToPanelBridge(
+    endpoint: PanelBridgeEndpoint,
+    requestId: String,
+    script: String,
+    queue: DispatchQueue,
+    completion: @escaping (String, Bool) -> Void
+) {
     guard
         let port = NWEndpoint.Port(rawValue: endpoint.port),
         let payload = try? JSONSerialization.data(
@@ -78,7 +174,7 @@ func sendToPanelBridge(
         ),
         var line = String(data: payload, encoding: .utf8)
     else {
-        completion(bridgeErrorJSON("Could not encode bridge request."))
+        completion(bridgeErrorJSON("Could not encode bridge request."), false)
         return
     }
     line += "\n"
@@ -93,7 +189,7 @@ func sendToPanelBridge(
     var settled = false
     let settleLock = NSLock()
 
-    func finish(_ result: String) {
+    func finish(_ result: String, unreachable: Bool = false) {
         settleLock.lock()
         if settled {
             settleLock.unlock()
@@ -102,7 +198,7 @@ func sendToPanelBridge(
         settled = true
         settleLock.unlock()
         connection.cancel()
-        completion(result)
+        completion(result, unreachable)
     }
 
     func receiveLoop() {
@@ -126,7 +222,7 @@ func sendToPanelBridge(
             }
 
             if error != nil || isComplete {
-                finish(bridgeErrorJSON("Panel bridge closed the connection. Is the panel open in After Effects?"))
+                finish(bridgeErrorJSON("Panel bridge closed the connection."), unreachable: true)
                 return
             }
             receiveLoop()
@@ -144,9 +240,9 @@ func sendToPanelBridge(
         case .waiting:
             // Nothing is listening (panel closed). NWConnection would otherwise sit
             // in .waiting and retry until our timeout, stalling every hotkey press.
-            finish(bridgeErrorJSON(panelUnreachableMessage))
+            finish(bridgeErrorJSON(panelUnreachableMessage), unreachable: true)
         case .failed, .cancelled:
-            finish(bridgeErrorJSON(panelUnreachableMessage))
+            finish(bridgeErrorJSON(panelUnreachableMessage), unreachable: true)
         default:
             break
         }
