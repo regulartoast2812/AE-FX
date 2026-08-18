@@ -8347,7 +8347,12 @@ function setOutMarker() {
 function TNT_removeTextAnimSide(side) {
   var comp = getComp(); if (!comp) return "No comp";
   var layers = comp.selectedLayers; if (!layers.length) return "No layers selected";
-  var animName = "Animator - " + side;
+  // applyTextAnimMaster writes "Animator - In"/"Animator - Out"; applyTextAnimBounce
+  // writes "Animator In"/"Animator Out" plus a separate "Animator Out Opacity".
+  // Match every name both creators produce, or bounce animators survive removal.
+  var animNames = (side === "In")
+    ? ["Animator - In", "Animator In"]
+    : ["Animator - Out", "Animator Out", "Animator Out Opacity"];
   var upper = side.toUpperCase();
   var markerNames = (side === "In") ? ["IN", "_IN", "in"] : ["OUT", "_OUT", "out"];
   return _undo("TNT: Remove Text Animator " + upper, function() {
@@ -8363,9 +8368,13 @@ function TNT_removeTextAnimSide(side) {
       try { group = textProp.property("Animators"); } catch (_) {}
       if (group) {
         for (var a = group.numProperties; a >= 1; a--) {
-          if (group.property(a).name === animName) {
-            group.property(a).remove();
-            animators++;
+          var an = group.property(a).name;
+          for (var n = 0; n < animNames.length; n++) {
+            if (an === animNames[n]) {
+              group.property(a).remove();
+              animators++;
+              break;
+            }
           }
         }
       }
