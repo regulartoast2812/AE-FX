@@ -386,9 +386,14 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         }
 
         NSApp.setActivationPolicy(.accessory)
-        registerGlobalHotKeys()
+        // The NSEvent global monitor duplicates the Carbon hot keys, so running both
+        // fires every shortcut twice. It is also the only thing here that needs an
+        // Accessibility grant, so it stays off unless Carbon registration failed.
+        let carbonHotKeysReady = registerGlobalHotKeys()
         startControlRightClickMonitor()
-        startGlobalShortcutFallbackMonitor()
+        if !carbonHotKeysReady {
+            startGlobalShortcutFallbackMonitor()
+        }
         startApplicationVisibilityMonitor()
         if !launchInBackground {
             showPanel()
@@ -618,7 +623,8 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         }
     }
 
-    private func registerGlobalHotKeys() {
+    @discardableResult
+    private func registerGlobalHotKeys() -> Bool {
         var eventType = EventTypeSpec(
             eventClass: OSType(kEventClassKeyboard),
             eventKind: UInt32(kEventHotKeyPressed)
@@ -654,19 +660,18 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             nil,
             &hotKeyEventHandler
         )
-        guard installStatus == noErr else { return }
+        guard installStatus == noErr else { return false }
 
-        registerHotKey(keyCode: UInt32(kVK_Space), modifiers: UInt32(controlKey), id: 1)
-        registerHotKey(keyCode: UInt32(kVK_ANSI_K), modifiers: UInt32(controlKey), id: 2)
-        registerHotKey(keyCode: UInt32(kVK_ANSI_A), modifiers: UInt32(controlKey), id: 10)
-        registerHotKey(keyCode: UInt32(kVK_ANSI_C), modifiers: UInt32(controlKey), id: 11)
-        registerHotKey(keyCode: UInt32(kVK_ANSI_E), modifiers: UInt32(controlKey), id: 12)
-        registerHotKey(keyCode: UInt32(kVK_ANSI_F), modifiers: UInt32(controlKey), id: 13)
-        registerHotKey(keyCode: UInt32(kVK_ANSI_S), modifiers: UInt32(controlKey), id: 14)
-        registerHotKey(keyCode: UInt32(kVK_ANSI_M), modifiers: UInt32(controlKey), id: 15)
-        registerHotKey(keyCode: UInt32(kVK_ANSI_T), modifiers: UInt32(controlKey), id: 16)
-        registerHotKey(keyCode: UInt32(kVK_ANSI_O), modifiers: UInt32(controlKey), id: 17)
-        registerHotKey(keyCode: UInt32(kVK_ANSI_X), modifiers: UInt32(controlKey), id: 18)
+        let requested: [(keyCode: Int, id: UInt32)] = [
+            (kVK_Space, 1), (kVK_ANSI_K, 2),
+            (kVK_ANSI_A, 10), (kVK_ANSI_C, 11), (kVK_ANSI_E, 12), (kVK_ANSI_F, 13),
+            (kVK_ANSI_S, 14), (kVK_ANSI_M, 15), (kVK_ANSI_T, 16), (kVK_ANSI_O, 17),
+            (kVK_ANSI_X, 18)
+        ]
+        requested.forEach { entry in
+            registerHotKey(keyCode: UInt32(entry.keyCode), modifiers: UInt32(controlKey), id: entry.id)
+        }
+        return hotKeyRefs.count == requested.count
     }
 
     private func registerHotKey(keyCode: UInt32, modifiers: UInt32, id: UInt32) {
