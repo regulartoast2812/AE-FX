@@ -215,10 +215,13 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
   display: grid;
   width: 100%;
   min-height: 40px;
-  grid-template-columns: 40px minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "name detail"
+    "tags tags";
   align-items: center;
-  gap: 9px;
-  padding: 6px 10px;
+  gap: 4px 9px;
+  padding: 7px 10px;
   border: 0;
   border-bottom: 1px solid rgba(255, 255, 255, .065);
   border-radius: 0;
@@ -718,4 +721,27 @@ body.quick-panel-mode .anchor-dialog {
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
   box-shadow: none !important;
+}
+
+
+/* v98: search rows carry the same two-axis chips as the CEP function grid.
+   The old layout gave the source label a fixed 40px column, so "AE SHORTCUT"
+   wrapped onto two lines and collided with the command name. Name and shortcut
+   share the first row; chips get a full-width row of their own and can never
+   squeeze the name. */
+.quick-panel-search-result .quick-panel-search-name {
+  grid-area: name;
+}
+
+.quick-panel-search-result .quick-panel-search-detail {
+  grid-area: detail;
+  white-space: nowrap;
+}
+
+.quick-panel-search-result .tnt-tags {
+  grid-area: tags;
+}
+
+.quick-panel-search-result:empty {
+  display: none;
 }

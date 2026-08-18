@@ -1433,6 +1433,13 @@ function quickPanelSearchEntries() {
   return searchFxConsoleEntries(quickPanelSearchEl.value, quickPanelSearchParentEntry, 12);
 }
 
+function tntTagChips(entry) {
+  const tags = typeof safeFxConsoleEntryTags === "function" ? safeFxConsoleEntryTags(entry) : [];
+  return tags.map(tag =>
+    `<i class="tnt-tag tnt-tag-${escapeHtml(tag.kind)} ${escapeHtml(tag.key)}" title="${escapeHtml(tag.title)}">${escapeHtml(tag.label)}</i>`
+  ).join("");
+}
+
 function renderQuickPanelSearchResults() {
   if (!quickPanelShellEl || !quickPanelSearchResultsEl || !quickPanelSearchEl) return;
   const searching = !!quickPanelSearchEl.value.trim() || !!quickPanelSearchParentEntry;
@@ -1450,13 +1457,12 @@ function renderQuickPanelSearchResults() {
     return;
   }
   quickPanelSearchResultsEl.innerHTML = entries.map((entry, index) => {
-    const source = fxConsoleSourceMeta(entry);
-    const detail = [entry.category || entry.matchName || "", entry.shortcut || "", entry.children ? "Open" : ""].filter(Boolean).join(" · ");
+    const detail = [entry.shortcut || "", entry.children ? "Open" : ""].filter(Boolean).join(" · ");
     return `
       <button type="button" class="quick-panel-search-result${index === quickPanelSearchSelectedIndex ? " active" : ""}" data-quick-search-index="${index}">
-        <i class="quick-panel-search-source">${escapeHtml(source.label)}</i>
         <span class="quick-panel-search-name">${escapeHtml(entry.name || entry.matchName || "Effect")}</span>
         <em class="quick-panel-search-detail">${escapeHtml(detail)}</em>
+        <span class="tnt-tags">${tntTagChips(entry)}</span>
       </button>
     `;
   }).join("");
@@ -1707,14 +1713,10 @@ function renderAssistantFunctions() {
     return;
   }
   assistantFunctionListEl.innerHTML = entries.map((entry, index) => {
-    const source = fxConsoleSourceMeta(entry);
-    const tags = typeof safeFxConsoleEntryTags === "function" ? safeFxConsoleEntryTags(entry) : [{ key: `source-${source.key}`, label: source.label, title: source.detail }];
     return `
       <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}" data-assistant-function-index="${index}">
         <strong>${escapeHtml(entry.name || entry.matchName || "Function")}</strong>
-        <span class="assistant-function-tags">
-          ${tags.map(tag => `<i class="${escapeHtml(tag.key)}" title="${escapeHtml(tag.title)}">${escapeHtml(tag.label)}</i>`).join("")}
-        </span>
+        <span class="assistant-function-tags tnt-tags">${tntTagChips(entry)}</span>
         <em>${escapeHtml(assistantFunctionDetail(entry))}</em>
       </button>
     `;

@@ -502,11 +502,13 @@ body:not(.quick-panel-mode) #activeFilterNotice {
 
 .assistant-function-card {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
-    "name source"
-    "meta meta";
-  gap: 6px 8px;
+    "name"
+    "source"
+    "meta";
+  align-content: start;
+  gap: 6px;
   min-height: 58px;
   padding: 10px;
   border: 1px solid rgba(255,255,255,.075);
@@ -526,27 +528,13 @@ body:not(.quick-panel-mode) #activeFilterNotice {
 .assistant-function-card strong {
   grid-area: name;
   min-width: 0;
+  overflow-wrap: anywhere;
   font-size: 12px;
   line-height: 1.25;
 }
 
-.assistant-function-card i {
-  align-self: start;
-  padding: 2px 5px;
-  border-radius: 5px;
-  background: rgba(255,255,255,.06);
-  color: rgba(235,235,245,.55);
-  font-size: 9px;
-  font-style: normal;
-}
-
 .assistant-function-tags {
   grid-area: source;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 4px;
-  max-width: 100%;
 }
 
 .assistant-function-card em {
@@ -1832,4 +1820,49 @@ body:not(.quick-panel-mode) #assistantHub {
 .assistant-send-btn::after {
   left: 15px !important;
   top: 10px !important;
+}
+
+
+/* Two-axis tag chips, shared by the CEP function grid and the Quick Controls
+   overlay so both surfaces read identically.
+   Action = what the command does (warm accent, one per entry).
+   Target = what it acts on (quiet, at most two). Animation carries the panel's
+   keyframe purple, matching the timeline's keyframe state colour. */
+.tnt-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.tnt-tag {
+  padding: 2px 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, .06);
+  color: rgba(235, 235, 245, .55);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+.tnt-tag-action {
+  border-color: rgba(213, 111, 58, .3);
+  background: rgba(213, 111, 58, .14);
+  color: rgba(240, 176, 137, .95);
+}
+
+.tnt-tag-target {
+  border-color: rgba(255, 255, 255, .09);
+  background: rgba(255, 255, 255, .05);
+  color: rgba(226, 226, 233, .6);
+}
+
+.tnt-tag.target-animation {
+  border-color: rgba(150, 122, 214, .32);
+  background: rgba(139, 110, 210, .16);
+  color: rgba(198, 180, 240, .95);
 }

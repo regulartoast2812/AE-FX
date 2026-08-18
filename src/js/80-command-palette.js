@@ -266,35 +266,75 @@ function fxConsoleSourceMeta(entry) {
 }
 
 function fxConsoleEntryTags(entry) {
-  const source = fxConsoleSourceMeta(entry);
-  const text = [
-    entry && entry.name,
-    entry && entry.category,
-    entry && entry.parentName,
-    entry && entry.matchName,
-    entry && entry.tntFunction,
-    entry && entry.shortcut,
-    source.label,
-    source.detail
-  ].filter(Boolean).join(" ").toLowerCase();
+  // Two axes, deliberately: what the command DOES and what it TARGETS.
+  // Exactly one action, at most two targets. The old version emitted up to five
+  // tags mixing source/category/domain, which both read as noise and blew out the
+  // card layout. Matching is over name/category/parent only - the previous version
+  // also searched the source description, whose boilerplate ("layer", "comp")
+  // matched nearly every entry.
+  const name = String(entry && entry.name || "");
+  const category = String(entry && entry.category || "");
+  const parent = String(entry && entry.parentName || "");
+  const text = [name, category, parent].join(" ").toLowerCase();
+
+  const ACTIONS = [
+    ["open", "Open", "Opens a panel, editor, or inspector",
+      /(^open\b|\b(controls?|editors?|master|tools?|menus?|panels?|inspector|styles\.\.\.|browser)\b)/],
+    // Arrange before navigate: "Pull ... to Playhead" moves layers in time, so the
+    // explicit arrange verb should win over the incidental "playhead".
+    ["arrange", "Arrange", "Reorders, aligns, distributes, or spaces things out",
+      /\b(align|distribute|order|stagger|sequence|snap|pull|reverse|sort|flip|stack|arrange|center)\b/],
+    ["navigate", "Navigate", "Moves the playhead, time, or view position",
+      /\b(go to|goto|next|previous|prev|jump|playhead|boundary|seek|scrub)\b/],
+    ["reveal", "Reveal", "Shows, hides, expands, or collapses what is visible",
+      /\b(reveal|expand|collapse|show|hide|focus|toggle|solo|isolate|view)\b/],
+    ["create", "Create", "Adds new items to the project or comp",
+      /\b(add|new|create|duplicate|import|precompose|pre-compose|generate|build|insert)\b/],
+    ["remove", "Remove", "Deletes or cleans up existing items",
+      /\b(delete|remove|clear|clean|cleanup|purge|strip|reset)\b/],
+    ["edit", "Edit", "Changes values or properties on existing items",
+      /\b(set|apply|rename|trim|split|adjust|change|scale|wiggle|ease|link|parent|copy|paste|replace|convert|toggle)\b/]
+  ];
+
+  // Most specific target first; we keep at most two so the chips stay readable.
+  const TARGETS = [
+    ["text", "Text", "Acts on text layers or text properties",
+      /\b(text|source text|animator|font|typograph)/],
+    ["shape", "Shape", "Acts on shape layers or vector properties",
+      /\b(shape|stroke|fill|trim paths|vector|dash|arrowhead|path)\b/],
+    ["mask", "Mask", "Acts on masks or track mattes",
+      /\b(mask|matte)\b/],
+    ["effect", "Effect", "Applies or manages effects and presets",
+      /\b(effect|preset|glow|blur|grain|desat)\b/],
+    ["animation", "Animation", "Creates, edits, or depends on keyframes",
+      /\b(keyframe|keyframes|ease|animation|animate|stagger|roving|loop|overshoot|expression|wiggle|interpolat)/],
+    ["marker", "Marker", "Acts on composition or layer markers",
+      /\b(marker|markers)\b/],
+    ["style", "Style", "Acts on layer styles or labels",
+      /\b(style|styles|label|colou?r)\b/],
+    ["comp", "Comp", "Composition-level action",
+      /\b(composition|comp|duration|resolution|render)\b/],
+    ["layer", "Layer", "Acts on the selected layers themselves",
+      /\b(layer|layers|parent|solo|lock|visibility|selection|anchor|transform)\b/]
+  ];
+
   const tags = [];
-  const add = (key, label, title) => {
-    if (!key || tags.some(tag => tag.key === key || tag.label === label)) return;
-    tags.push({ key, label, title: title || label });
-  };
-  add(`source-${source.key}`, source.label, source.detail);
-  const category = String(entry && entry.category || "").trim();
-  if (category && !/^\d+ selected layers$|^\d+ comp layers$/i.test(category)) {
-    add(`category-${category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`, category, "Command category");
+
+  let action = ACTIONS.find(entry => entry[3].test(text));
+  // Effects and saved scripts are things you run, whatever their wording.
+  const source = String(entry && entry.source || "");
+  if (!action && (source === "native" || entry && entry.type === "effect")) {
+    action = ["create", "Apply", "Applies an effect or preset to the selection"];
   }
-  if (/text|source text|animator/.test(text)) add("domain-text", "Text", "Works on text layers or text properties");
-  if (/shape|stroke|fill|path|trim paths|vector|dashes|arrowhead|size rig/.test(text)) add("domain-shape", "Shape", "Works on shape layers or vector properties");
-  if (/mask|matte/.test(text)) add("domain-mask", "Mask", "Works with masks or track mattes");
-  if (/effect|preset|glow|blur|grain|vhs|desat|sweep|wiggle ffx/.test(text)) add("domain-effect", "Effect", "Applies or manages effects");
-  if (/keyframe|keyframes|stagger|ease|animate|animation|anim|in\+out|in from|out to|opacity in|scale in|trim paths|loop|roving|wiggle|overshoot|expression/.test(text)) add("domain-animation", "Animation", "Creates, edits, or depends on animation/keyframes");
-  if (/composition|comp\b|duration/.test(text)) add("domain-comp", "Comp", "Composition-level action");
-  if (/layer|parent|precompose|solo|lock|visibility|selection|order|stack|pull|snap/.test(text)) add("domain-layer", "Layer", "Layer-level action");
-  return tags.slice(0, 5);
+  if (!action) action = ["edit", "Edit", "Changes values or properties on existing items"];
+  tags.push({ kind: "action", key: `action-${action[0]}`, label: action[1], title: action[2] });
+
+  const targets = TARGETS.filter(entry => entry[3].test(text)).slice(0, 2);
+  targets.forEach(target => {
+    tags.push({ kind: "target", key: `target-${target[0]}`, label: target[1], title: target[2] });
+  });
+
+  return tags;
 }
 
 function safeFxConsoleEntryTags(entry) {
