@@ -1071,11 +1071,15 @@ async function runTntV3Command(command) {
   focusPanel(2);
 }
 
+// Confirms are for commands whose blast radius is wider than the current
+// selection, or that are awkward to undo. Matching on the name (delete/remove/
+// purge/clear) prompted just as loudly for "remove one marker on the selected
+// layer" as for "purge the project", which trained the prompt into noise. Every
+// genuinely destructive command is named explicitly below, so the name test was
+// only ever catching selection-scoped, single-undo edits.
 function isDangerousCommand(command) {
   const fn = String(command && command.tntFunction || "");
-  const name = String(command && command.name || "").toLowerCase();
-  return /delete|remove|purge|clear/.test(name) ||
-    [
+  return [
       "deleteAllKeyframes",
       "deleteAllEffects",
       "deleteAllExpressions",
