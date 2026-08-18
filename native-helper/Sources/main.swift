@@ -378,6 +378,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         windowBridge.panel = panel
         self.bridge = bridge
         self.windowBridge = windowBridge
+        webView.uiDelegate = self
         self.webView = webView
         self.panel = panel
 
@@ -812,3 +813,53 @@ let application = NSApplication.shared
 private let delegate = AppDelegate()
 application.delegate = delegate
 application.run()
+
+
+extension AppDelegate: WKUIDelegate {
+    func webView(
+        _ webView: WKWebView,
+        runJavaScriptConfirmPanelWithMessage message: String,
+        initiatedByFrame frame: WKFrameInfo,
+        completionHandler: @escaping (Bool) -> Void
+    ) {
+        let alert = NSAlert()
+        alert.messageText = "TNT Quick Controls"
+        alert.informativeText = message
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Continue")
+        alert.addButton(withTitle: "Cancel")
+        completionHandler(alert.runModal() == .alertFirstButtonReturn)
+    }
+
+    func webView(
+        _ webView: WKWebView,
+        runJavaScriptAlertPanelWithMessage message: String,
+        initiatedByFrame frame: WKFrameInfo,
+        completionHandler: @escaping () -> Void
+    ) {
+        let alert = NSAlert()
+        alert.messageText = "TNT Quick Controls"
+        alert.informativeText = message
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
+        completionHandler()
+    }
+
+    func webView(
+        _ webView: WKWebView,
+        runJavaScriptTextInputPanelWithPrompt prompt: String,
+        defaultText: String?,
+        initiatedByFrame frame: WKFrameInfo,
+        completionHandler: @escaping (String?) -> Void
+    ) {
+        let alert = NSAlert()
+        alert.messageText = "TNT Quick Controls"
+        alert.informativeText = prompt
+        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: "Cancel")
+        let field = NSTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 24))
+        field.stringValue = defaultText ?? ""
+        alert.accessoryView = field
+        completionHandler(alert.runModal() == .alertFirstButtonReturn ? field.stringValue : nil)
+    }
+}
