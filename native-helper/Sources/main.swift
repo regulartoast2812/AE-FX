@@ -264,6 +264,8 @@ private final class WindowBridge: NSObject, WKScriptMessageHandler {
         )
         let frame = afterEffectsOverlayFrame(for: size) ?? NSRect(origin: panel.frame.origin, size: size)
         panel.setFrame(frame, display: true, animate: false)
+        // Reveal once sizes settle, not on the first one.
+        activeAppDelegate?.scheduleReveal(after: 0.07)
     }
 }
 
@@ -280,6 +282,7 @@ private final class DragStrip: NSView {
 
 private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var panel: BorderlessPanel?
+    private var pendingRevealWorkItem: DispatchWorkItem?
     private var bridge: AfterEffectsBridge?
     private var windowBridge: WindowBridge?
     private weak var webView: WKWebView?
@@ -448,16 +451,46 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         activeAppDelegate = nil
     }
 
+    /// Reveals the panel once resizes stop arriving. scheduleNativeQuickPanelResize
+    /// deliberately measures across two animation frames, so a single open can send
+    /// two sizes; revealing on the first would show the second as a visible jump.
+    func scheduleReveal(after delay: TimeInterval) {
+        guard let panel, panel.alphaValue < 1 else { return }
+        pendingRevealWorkItem?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            self?.pendingRevealWorkItem = nil
+            guard let panel = self?.panel, panel.alphaValue < 1 else { return }
+            panel.alphaValue = 1
+        }
+        pendingRevealWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
+    }
+
     private func showPanel(openControl controlName: String? = nil) {
         guard let panel, let frame = afterEffectsOverlayFrame(for: quickControlsLauncherSize) else {
             panel?.orderOut(nil)
             return
         }
+        // Opening straight into a subpanel means the window is ordered front at the
+        // launcher size, then resized (and recentred) once the page measures its
+        // content. Showing both states is the multiple blink. Order it front fully
+        // transparent instead and reveal it on the first resize.
+        let deferReveal = controlName != nil && !panel.isVisible
+        pendingRevealWorkItem?.cancel()
+        pendingRevealWorkItem = nil
+        panel.alphaValue = deferReveal ? 0 : 1
+
         panel.setFrame(frame, display: true, animate: false)
         NSApp.unhide(nil)
         NSApp.activate(ignoringOtherApps: true)
         panel.makeKeyAndOrderFront(nil)
         panel.orderFrontRegardless()
+
+        if deferReveal {
+            // Safety net: reveal anyway if the page never reports a size.
+            scheduleReveal(after: 0.45)
+        }
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) { [weak self] in
             let showScript: String
             if let controlName {
