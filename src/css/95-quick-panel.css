@@ -215,12 +215,10 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
   display: grid;
   width: 100%;
   min-height: 40px;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    "name detail"
-    "tags tags";
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas: "name tags detail";
   align-items: center;
-  gap: 4px 9px;
+  gap: 9px;
   padding: 7px 10px;
   border: 0;
   border-bottom: 1px solid rgba(255, 255, 255, .065);
@@ -740,6 +738,8 @@ body.quick-panel-mode .anchor-dialog {
 
 .quick-panel-search-result .tnt-tags {
   grid-area: tags;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
 }
 
 .quick-panel-search-result:empty {

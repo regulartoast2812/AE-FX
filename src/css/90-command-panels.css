@@ -494,6 +494,8 @@ body:not(.quick-panel-mode) #activeFilterNotice {
 .assistant-function-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(178px, 1fr));
+  grid-auto-rows: min-content;
+  align-items: start;
   gap: 8px;
   min-height: 0;
   padding: 12px;
@@ -509,7 +511,6 @@ body:not(.quick-panel-mode) #activeFilterNotice {
     "meta";
   align-content: start;
   gap: 6px;
-  min-height: 58px;
   padding: 10px;
   border: 1px solid rgba(255,255,255,.075);
   border-radius: 8px;
@@ -1581,91 +1582,17 @@ body:not(.quick-panel-mode) #assistantHub {
   padding: 8px;
 }
 
-.assistant-function-card i {
-  max-width: max-content;
-  padding: 2px 7px !important;
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 5px !important;
-  font-size: 10px !important;
-  font-weight: 760 !important;
-  letter-spacing: 0 !important;
-}
 
-.assistant-function-card i.source-panel {
-  border-color: rgba(125,169,255,.28);
-  background: rgba(74,108,179,.18);
-  color: rgba(185,207,255,.88);
-}
 
-.assistant-function-card i.source-custom {
-  border-color: rgba(223,119,85,.34);
-  background: rgba(223,119,85,.17);
-  color: rgba(255,194,168,.92);
-}
 
-.assistant-function-card i.source-native {
-  border-color: rgba(98,202,146,.3);
-  background: rgba(56,142,98,.16);
-  color: rgba(174,232,198,.9);
-}
 
-.assistant-function-card i.source-assistant {
-  border-color: rgba(214,169,80,.36);
-  background: rgba(214,169,80,.16);
-  color: rgba(246,216,147,.92);
-}
 
-.assistant-function-card i.category-text,
-.assistant-function-card i.domain-text {
-  border-color: rgba(93,181,255,.3);
-  background: rgba(63,136,210,.15);
-  color: rgba(184,220,255,.9);
-}
 
-.assistant-function-card i.category-animation,
-.assistant-function-card i.category-keyframes,
-.assistant-function-card i.category-stagger,
-.assistant-function-card i.domain-animation {
-  border-color: rgba(154,130,255,.34);
-  background: rgba(117,92,230,.16);
-  color: rgba(211,201,255,.92);
-}
 
-.assistant-function-card i.category-shape,
-.assistant-function-card i.category-shapes,
-.assistant-function-card i.domain-shape {
-  border-color: rgba(83,207,184,.3);
-  background: rgba(42,146,129,.15);
-  color: rgba(174,236,224,.9);
-}
 
-.assistant-function-card i.category-effects,
-.assistant-function-card i.domain-effect {
-  border-color: rgba(98,202,146,.3);
-  background: rgba(56,142,98,.16);
-  color: rgba(174,232,198,.9);
-}
 
-.assistant-function-card i.category-masks,
-.assistant-function-card i.domain-mask {
-  border-color: rgba(246,128,189,.3);
-  background: rgba(178,73,128,.15);
-  color: rgba(249,196,225,.9);
-}
 
-.assistant-function-card i.category-layers,
-.assistant-function-card i.domain-layer {
-  border-color: rgba(226,171,83,.3);
-  background: rgba(172,118,45,.15);
-  color: rgba(244,216,164,.9);
-}
 
-.assistant-function-card i.category-composition,
-.assistant-function-card i.domain-comp {
-  border-color: rgba(139,196,111,.3);
-  background: rgba(90,142,68,.15);
-  color: rgba(204,236,188,.9);
-}
 
 .assistant-function-card em {
   color: rgba(205,205,205,.58) !important;
