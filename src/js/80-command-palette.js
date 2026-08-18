@@ -265,75 +265,91 @@ function fxConsoleSourceMeta(entry) {
   return { key: "panel", label: "Panel Tool", detail: "CEP panel control or utility" };
 }
 
+const TNT_ACTION_TITLES = {
+  "Set": "Changes a value or property on something that already exists",
+  "Apply": "Applies an effect, preset, or ease to the selection",
+  "Add": "Creates something new in the comp",
+  "Delete": "Removes something from the comp",
+  "Show": "Changes what is visible or expanded, without altering the project",
+  "Go To": "Moves the playhead or view to a position",
+  "Open": "Opens a panel, editor, or inspector",
+  "Space": "Distributes or staggers timing across a selection",
+  "Play": "Controls playback"
+};
+
+const TNT_TARGET_TITLES = {
+  "Text": "Acts on text layers or text properties",
+  "Shape": "Acts on shape layers or vector properties",
+  "Mask": "Acts on masks or track mattes",
+  "Effect": "Acts on effects or presets",
+  "Animation": "Acts on keyframes, easing, or expressions",
+  "Marker": "Acts on composition or layer markers",
+  "Style": "Acts on layer styles or labels",
+  "Comp": "Acts on the composition itself",
+  "Layer": "Acts on the selected layers"
+};
+
+function tntTagSlug(value) {
+  return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+// Targets only, for entries we cannot hand-tag (AE effects, saved assistant
+// scripts, TNT v3 menu items). Deliberately does NOT guess an action: deriving
+// verbs from titles is what produced "Trim In to Playhead -> Navigate", because
+// a title names what a command references, not what it acts on.
+const TNT_DERIVED_TARGETS = [
+  ["Text", /\b(text|source text|animator|font|typograph)/i],
+  ["Shape", /\b(shape|stroke|fill|trim paths|vector|dash|arrowhead)\b/i],
+  ["Mask", /\b(mask|matte)\b/i],
+  ["Animation", /\b(keyframe|keyframes|ease|expression|loop|wiggle|roving)\b/i],
+  ["Marker", /\b(marker|markers)\b/i],
+  ["Style", /\b(layer style|styles?|label)\b/i],
+  ["Comp", /\b(composition|comp)\b/i],
+  ["Layer", /\b(layer|layers)\b/i]
+];
+
 function fxConsoleEntryTags(entry) {
-  // Two axes, deliberately: what the command DOES and what it TARGETS.
-  // Exactly one action, at most two targets. The old version emitted up to five
-  // tags mixing source/category/domain, which both read as noise and blew out the
-  // card layout. Matching is over name/category/parent only - the previous version
-  // also searched the source description, whose boilerplate ("layer", "comp")
-  // matched nearly every entry.
-  const name = String(entry && entry.name || "");
-  const category = String(entry && entry.category || "");
-  const parent = String(entry && entry.parentName || "");
-  const text = [name, category, parent].join(" ").toLowerCase();
-
-  const ACTIONS = [
-    ["open", "Open", "Opens a panel, editor, or inspector",
-      /(^open\b|\b(controls?|editors?|master|tools?|menus?|panels?|inspector|styles\.\.\.|browser)\b)/],
-    // Arrange before navigate: "Pull ... to Playhead" moves layers in time, so the
-    // explicit arrange verb should win over the incidental "playhead".
-    ["arrange", "Arrange", "Reorders, aligns, distributes, or spaces things out",
-      /\b(align|distribute|order|stagger|sequence|snap|pull|reverse|sort|flip|stack|arrange|center)\b/],
-    ["navigate", "Navigate", "Moves the playhead, time, or view position",
-      /\b(go to|goto|next|previous|prev|jump|playhead|boundary|seek|scrub)\b/],
-    ["reveal", "Reveal", "Shows, hides, expands, or collapses what is visible",
-      /\b(reveal|expand|collapse|show|hide|focus|toggle|solo|isolate|view)\b/],
-    ["create", "Create", "Adds new items to the project or comp",
-      /\b(add|new|create|duplicate|import|precompose|pre-compose|generate|build|insert)\b/],
-    ["remove", "Remove", "Deletes or cleans up existing items",
-      /\b(delete|remove|clear|clean|cleanup|purge|strip|reset)\b/],
-    ["edit", "Edit", "Changes values or properties on existing items",
-      /\b(set|apply|rename|trim|split|adjust|change|scale|wiggle|ease|link|parent|copy|paste|replace|convert|toggle)\b/]
-  ];
-
-  // Most specific target first; we keep at most two so the chips stay readable.
-  const TARGETS = [
-    ["text", "Text", "Acts on text layers or text properties",
-      /\b(text|source text|animator|font|typograph)/],
-    ["shape", "Shape", "Acts on shape layers or vector properties",
-      /\b(shape|stroke|fill|trim paths|vector|dash|arrowhead|path)\b/],
-    ["mask", "Mask", "Acts on masks or track mattes",
-      /\b(mask|matte)\b/],
-    ["effect", "Effect", "Applies or manages effects and presets",
-      /\b(effect|preset|glow|blur|grain|desat)\b/],
-    ["animation", "Animation", "Creates, edits, or depends on keyframes",
-      /\b(keyframe|keyframes|ease|animation|animate|stagger|roving|loop|overshoot|expression|wiggle|interpolat)/],
-    ["marker", "Marker", "Acts on composition or layer markers",
-      /\b(marker|markers)\b/],
-    ["style", "Style", "Acts on layer styles or labels",
-      /\b(style|styles|label|colou?r)\b/],
-    ["comp", "Comp", "Composition-level action",
-      /\b(composition|comp|duration|resolution|render)\b/],
-    ["layer", "Layer", "Acts on the selected layers themselves",
-      /\b(layer|layers|parent|solo|lock|visibility|selection|anchor|transform)\b/]
-  ];
-
   const tags = [];
+  const pushAction = label => {
+    if (!label) return;
+    tags.push({
+      kind: "action",
+      key: `action-${tntTagSlug(label)}`,
+      label,
+      title: TNT_ACTION_TITLES[label] || "What this command does"
+    });
+  };
+  const pushTarget = label => {
+    if (!label || tags.some(tag => tag.label === label)) return;
+    tags.push({
+      kind: "target",
+      key: `target-${tntTagSlug(label)}`,
+      label,
+      title: TNT_TARGET_TITLES[label] || "What this command acts on"
+    });
+  };
 
-  let action = ACTIONS.find(entry => entry[3].test(text));
-  // Effects and saved scripts are things you run, whatever their wording.
-  const source = String(entry && entry.source || "");
-  if (!action && (source === "native" || entry && entry.type === "effect")) {
-    action = ["create", "Apply", "Applies an effect or preset to the selection"];
+  // 1. Hand-tagged registry commands are authoritative.
+  if (entry && entry.does) {
+    pushAction(entry.does);
+    (Array.isArray(entry.targets) ? entry.targets : []).slice(0, 2).forEach(pushTarget);
+    return tags;
   }
-  if (!action) action = ["edit", "Edit", "Changes values or properties on existing items"];
-  tags.push({ kind: "action", key: `action-${action[0]}`, label: action[1], title: action[2] });
 
-  const targets = TARGETS.filter(entry => entry[3].test(text)).slice(0, 2);
-  targets.forEach(target => {
-    tags.push({ kind: "target", key: `target-${target[0]}`, label: target[1], title: target[2] });
-  });
+  // 2. Native AE effects and presets: the action is always Apply, and the target
+  //    comes from real effect metadata rather than a reading of the title.
+  const source = String(entry && entry.source || "");
+  if (source === "native" || (entry && entry.type === "effect")) {
+    pushAction("Apply");
+    pushTarget("Effect");
+    return tags;
+  }
 
+  // 3. Everything else: Apply plus at most two targets matched from the title.
+  pushAction("Apply");
+  const text = [entry && entry.name, entry && entry.category, entry && entry.parentName]
+    .filter(Boolean).join(" ");
+  TNT_DERIVED_TARGETS.filter(pair => pair[1].test(text)).slice(0, 2).forEach(pair => pushTarget(pair[0]));
   return tags;
 }
 
