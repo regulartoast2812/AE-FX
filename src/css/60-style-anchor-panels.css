@@ -1211,7 +1211,7 @@
 
 /* v101: anchored comp menu, icon command buttons, Apple-system typography. */
 :root {
-  --tnt-font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  --tnt-font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "Segoe UI Variable Text", "Segoe UI", Arial, sans-serif;
 }
 
 html,

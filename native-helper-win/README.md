@@ -68,6 +68,34 @@ concept.
 
 - Overlay centers on the primary screen; the macOS helper positions it over the
   After Effects window (see `afterEffectsOverlayFrame` in `native-helper/`).
-- No transparent/borderless chrome polish — WinForms shows a plain rectangle.
 - No single-instance guard (macOS has `terminateDuplicateQuickControlsInstances`).
 - Not built or run on Windows yet. The macOS half of the bridge is tested.
+
+## Transparency
+
+The window is WPF with `AllowsTransparency=True` + `WindowStyle=None`, giving
+per-pixel alpha so the page's `border-radius: 18px` shell renders with clean
+antialiased corners. `WebView2.DefaultBackgroundColor = Transparent` is required
+as well — without it the control paints an opaque sheet over the window.
+
+WinForms was the wrong tool here: its only option is `TransparencyKey`, a binary
+colour key with no alpha blending, which produces jagged corners and no shadow.
+
+**Unverified:** the shell uses `backdrop-filter: blur(8px)`. On macOS, WebKit in a
+transparent window can sample what is behind the window; Chromium generally
+samples only page content, so the blur may read as flat on Windows. If it does,
+the options are a more opaque shell background on Windows, or DWM-level blur via
+`SetWindowCompositionAttribute`. Test this before tuning anything else visual.
+
+## Fonts
+
+`--tnt-font-main` now lists `"Segoe UI Variable Text", "Segoe UI"` before Arial,
+matching the five other stacks in the CSS that already did.
+
+Still open: `"Ivory LL Web"` (used for headers in the keyframes, ease, mass-edit,
+and timing-order panels) is not bundled — there is no `@font-face` and no font
+file in the repo. It resolves on macOS only because it is installed there. On
+Windows the chain falls through `Iowan Old Style` and `Baskerville`, both
+Mac-only, and lands on Georgia. Either bundle it via `@font-face` if licensing
+allows, or pick a deliberate Windows serif so it is a decision rather than an
+accident.
