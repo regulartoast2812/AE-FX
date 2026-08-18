@@ -8339,6 +8339,59 @@ function setOutMarker() {
 }
 
 
+// ── fn/removeTextAnim.jsx
+// Removes one side of the text animation applied by applyTextAnimMaster: the
+// "Animator - In"/"Animator - Out" animator group and the matching IN/OUT layer
+// marker its range-selector expressions read from. Names match the ones
+// applyTextAnimMaster writes, so the two stay in step.
+function TNT_removeTextAnimSide(side) {
+  var comp = getComp(); if (!comp) return "No comp";
+  var layers = comp.selectedLayers; if (!layers.length) return "No layers selected";
+  var animName = "Animator - " + side;
+  var upper = side.toUpperCase();
+  var markerNames = (side === "In") ? ["IN", "_IN", "in"] : ["OUT", "_OUT", "out"];
+  return _undo("TNT: Remove Text Animator " + upper, function() {
+    var animators = 0, markers = 0, textLayers = 0;
+    for (var i = 0; i < layers.length; i++) {
+      var layer = layers[i];
+      var textProp = null;
+      try { textProp = layer.property("Text"); } catch (_) {}
+      if (!textProp) continue;
+      textLayers++;
+
+      var group = null;
+      try { group = textProp.property("Animators"); } catch (_) {}
+      if (group) {
+        for (var a = group.numProperties; a >= 1; a--) {
+          if (group.property(a).name === animName) {
+            group.property(a).remove();
+            animators++;
+          }
+        }
+      }
+
+      var mp = layer.property("Marker");
+      for (var m = mp.numKeys; m >= 1; m--) {
+        var c = mp.keyValue(m).comment;
+        for (var k = 0; k < markerNames.length; k++) {
+          if (c === markerNames[k]) { mp.removeKey(m); markers++; break; }
+        }
+      }
+    }
+    if (!textLayers) return "No text layers selected";
+    if (!animators && !markers) return "No " + upper + " animator or marker found";
+    return "Removed " + animators + " " + upper + " animator" + (animators !== 1 ? "s" : "") +
+      " and " + markers + " marker" + (markers !== 1 ? "s" : "");
+  });
+}
+
+
+function removeTextAnimIn() { return TNT_removeTextAnimSide("In"); }
+
+
+function removeTextAnimOut() { return TNT_removeTextAnimSide("Out"); }
+
+
 // ── fn/removeInMarker.jsx
 function removeInMarker() {
   var comp = getComp(); if (!comp) return "No comp";
