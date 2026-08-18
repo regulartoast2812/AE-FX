@@ -392,6 +392,8 @@ const TNT_V3_COMMANDS = [
   { name: "Shape to Mask", category: "Shape", tntFunction: "shapeToMask" },
   { name: "Markers: Set In Marker", category: "Markers", tntFunction: "setInMarker" },
   { name: "Markers: Set Out Marker", category: "Markers", tntFunction: "setOutMarker" },
+  { name: "Markers: Remove In Marker", category: "Markers", tntFunction: "removeInMarker", does: "Delete", targets: ["Marker"] },
+  { name: "Markers: Remove Out Marker", category: "Markers", tntFunction: "removeOutMarker", does: "Delete", targets: ["Marker"] },
   { name: "Markers: Add Marker...", category: "Markers", action: promptAddMarker },
   { name: "Markers: Remove In/Out Markers", category: "Markers", tntFunction: "removeInOutMarkers" },
   { name: "Markers: Layer to Comp", category: "Markers", tntFunction: "layerMarkersToComp", args: [false] },

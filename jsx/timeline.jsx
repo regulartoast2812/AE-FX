@@ -8339,6 +8339,44 @@ function setOutMarker() {
 }
 
 
+// ── fn/removeInMarker.jsx
+function removeInMarker() {
+  var comp = getComp(); if (!comp) return "No comp";
+  var layers = comp.selectedLayers; if (!layers.length) return "No layers selected";
+  return _undo("TNT: Remove IN Marker", function() {
+    var removed = 0;
+    for (var i = 0; i < layers.length; i++) {
+      var mp = layers[i].property("Marker");
+      for (var m = mp.numKeys; m >= 1; m--) {
+        var c = mp.keyValue(m).comment;
+        if (c === "IN" || c === "_IN" || c === "in") { mp.removeKey(m); removed++; }
+      }
+    }
+    if (!removed) return "No IN markers on the selected layers";
+    return "Removed " + removed + " IN marker" + (removed !== 1 ? "s" : "");
+  });
+}
+
+
+// ── fn/removeOutMarker.jsx
+function removeOutMarker() {
+  var comp = getComp(); if (!comp) return "No comp";
+  var layers = comp.selectedLayers; if (!layers.length) return "No layers selected";
+  return _undo("TNT: Remove OUT Marker", function() {
+    var removed = 0;
+    for (var i = 0; i < layers.length; i++) {
+      var mp = layers[i].property("Marker");
+      for (var m = mp.numKeys; m >= 1; m--) {
+        var c = mp.keyValue(m).comment;
+        if (c === "OUT" || c === "_OUT" || c === "out") { mp.removeKey(m); removed++; }
+      }
+    }
+    if (!removed) return "No OUT markers on the selected layers";
+    return "Removed " + removed + " OUT marker" + (removed !== 1 ? "s" : "");
+  });
+}
+
+
 // ── fn/countLayerMarkers.jsx
 function countLayerMarkers() {
   var comp = getComp(); if (!comp) return "No comp";
