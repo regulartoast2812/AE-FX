@@ -6474,6 +6474,44 @@ function TNT_setEffectPropertyIfExists(effect, names, value) {
   return false;
 }
 
+// Works out where CC Light Sweep's Center must sit, in layer space, for the sweep
+// to cross the whole composition along the visible content's vertical centre.
+//
+// sourceRectAtTime is the closest thing ExtendScript has to pixel detection: it is
+// corrected for text and shape layer content, so it reports the real ink bounds.
+// For footage, solids and precomps there is no alpha trimming available to script,
+// so it returns the full source rect and the centre is the geometric one.
+//
+// Effect point controls are in layer space, so the comp's left and right borders
+// have to be converted through the layer transform. AVLayer.fromComp does not
+// exist in this host, so it is done from Position/Anchor Point/Scale directly.
+// Rotation and parenting are not accounted for; callers are told when that applies.
+function TNT_lightSweepPoints(layer, comp, t) {
+  var rect = layer.sourceRectAtTime(t, false);
+  var yCenter = rect.top + rect.height / 2;
+
+  var pos = layer.property("Position").valueAtTime(t, false);
+  var anc = layer.property("Anchor Point").valueAtTime(t, false);
+  var scl = layer.property("Scale").valueAtTime(t, false);
+  var sx = (scl && scl.length && scl[0]) ? (scl[0] / 100) : 1;
+  if (!sx) sx = 1;
+
+  function toLayerX(compX) { return (compX - pos[0]) / sx + anc[0]; }
+
+  var skewed = false;
+  try { skewed = (layer.property("Rotation").valueAtTime(t, false) !== 0); } catch (_) {}
+  if (layer.parent) skewed = true;
+
+  return {
+    start: [toLayerX(0), yCenter],
+    end: [toLayerX(comp.width), yCenter],
+    yCenter: yCenter,
+    height: rect.height,
+    skewed: skewed
+  };
+}
+
+
 function applyLightSweep(params) {
   var comp = getComp(); if (!comp) return "No comp";
   var layers = comp.selectedLayers; if (!layers.length) return "No layers selected";
@@ -6482,7 +6520,7 @@ function applyLightSweep(params) {
   var eo = params ? (params.easeOut || 75) : 75;
   return _undo("TNT: Light Sweep", function() {
     var eIn = new KeyframeEase(0, ei), eOut = new KeyframeEase(0, eo);
-    var changed = 0;
+    var changed = 0, skewed = 0, unmeasured = 0;
     for (var i = 0; i < layers.length; i++) {
       var layer = layers[i];
       var fx = layer.property("Effects");
@@ -6507,15 +6545,32 @@ function applyLightSweep(params) {
       try {
         while (center.numKeys > 0) center.removeKey(1);
       } catch (_) {}
-      center.setValueAtTime(layer.inPoint, [0, 0]);
-      center.setValueAtTime(layer.inPoint + inTime, [comp.width, 0]);
+
+      // Default to the old full-width-at-top sweep only if the measurement fails.
+      var startPt = [0, 0];
+      var endPt = [comp.width, 0];
+      try {
+        var pts = TNT_lightSweepPoints(layer, comp, layer.inPoint);
+        startPt = pts.start;
+        endPt = pts.end;
+        if (pts.skewed) skewed++;
+      } catch (_) {
+        unmeasured++;
+      }
+
+      center.setValueAtTime(layer.inPoint, startPt);
+      center.setValueAtTime(layer.inPoint + inTime, endPt);
       try {
         center.setTemporalEaseAtKey(1, [eIn], [eOut]);
         center.setTemporalEaseAtKey(2, [eIn], [eOut]);
       } catch (_) {}
       changed++;
     }
-    return changed ? "Light sweep applied to " + changed + " layer" + (changed !== 1 ? "s" : "") : "CC Light Sweep not available";
+    if (!changed) return "CC Light Sweep not available";
+    var msg = "Light sweep applied to " + changed + " layer" + (changed !== 1 ? "s" : "");
+    if (unmeasured) msg += " (" + unmeasured + " could not be measured)";
+    if (skewed) msg += " (" + skewed + " rotated/parented - sweep line is approximate)";
+    return msg;
   });
 }
 
