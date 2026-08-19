@@ -1000,6 +1000,22 @@ function evalFileRaw(relativePath) {
 }
 
 function focusPanel(retries = 3) {
+  // Never pull focus out of a field the user is typing in. focusPanel exists to
+  // keep keyboard shortcuts inside the panel instead of leaking to After Effects,
+  // but it moves focus to <body> and retries on an 80ms timer. Without this guard,
+  // clicking into a text input handed focus straight back moments later, which
+  // made the Functions search box impossible to type in.
+  const active = document.activeElement;
+  const activeTag = String((active && active.tagName) || "").toLowerCase();
+  if (
+    activeTag === "input" ||
+    activeTag === "textarea" ||
+    activeTag === "select" ||
+    (active && active.isContentEditable)
+  ) {
+    return;
+  }
+
   try { window.focus(); } catch (_) {}
   try {
     if (!document.body.hasAttribute("tabindex")) document.body.setAttribute("tabindex", "-1");
