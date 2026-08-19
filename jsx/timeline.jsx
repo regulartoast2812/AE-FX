@@ -6474,6 +6474,9 @@ function TNT_setEffectPropertyIfExists(effect, names, value) {
   return false;
 }
 
+var SWEEP_EFFECT_NAME = "Animation - Light Sweep";
+
+
 function applyLightSweep(params) {
   var comp = getComp(); if (!comp) return "No comp";
   var layers = comp.selectedLayers; if (!layers.length) return "No layers selected";
@@ -6488,13 +6491,13 @@ function applyLightSweep(params) {
       var fx = layer.property("Effects");
       if (!fx) continue;
       try {
-        var old = layer.effect("Animation - Light Sweep");
-        if (old) fx.property("Animation - Light Sweep").remove();
+        var old = layer.effect(SWEEP_EFFECT_NAME);
+        if (old) fx.property(SWEEP_EFFECT_NAME).remove();
       } catch (_) {}
       var sweep = null;
       try { sweep = fx.addProperty("CC Light Sweep"); } catch (_) {}
       if (!sweep) continue;
-      try { sweep.name = "Animation - Light Sweep"; } catch (_) {}
+      try { sweep.name = SWEEP_EFFECT_NAME; } catch (_) {}
 
       TNT_setEffectPropertyIfExists(sweep, ["Direction"], 90);
       TNT_setEffectPropertyIfExists(sweep, ["Width"], Math.max(80, comp.width * 0.18));
@@ -6519,11 +6522,18 @@ function applyLightSweep(params) {
       // borders for any layer regardless of how it is transformed or parented.
       var t0 = layer.inPoint;
       var t1 = layer.inPoint + inTime;
+      var halfWidth = Math.max(80, comp.width * 0.18) / 2;
       try {
+        // Start and end a half sweep-width outside the comp so the light enters
+        // and leaves cleanly, instead of the sweep being half-formed on frame at
+        // either end. Reads the effect's own Width where it can, so tuning Width
+        // keeps the inset in step; the baked value is the fallback.
         center.expression =
           "var t0 = " + t0 + ";\n" +
           "var t1 = " + t1 + ";\n" +
-          "var x = ease(time, t0, t1, 0, thisComp.width);\n" +
+          "var pad = " + halfWidth.toFixed(2) + ";\n" +
+          "try { pad = effect(\"" + SWEEP_EFFECT_NAME + "\")(\"Width\") / 2; } catch (err) {}\n" +
+          "var x = ease(time, t0, t1, -pad, thisComp.width + pad);\n" +
           "fromComp([x, thisComp.height / 2]);";
       } catch (_) {
         unmeasured++;
