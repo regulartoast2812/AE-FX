@@ -6475,28 +6475,31 @@ function TNT_setEffectPropertyIfExists(effect, names, value) {
 }
 
 // Works out where CC Light Sweep's Center must sit, in layer space, for the sweep
-// to cross the whole composition along the visible content's vertical centre.
+// to cross the whole composition along its vertical centre.
 //
-// sourceRectAtTime is the closest thing ExtendScript has to pixel detection: it is
-// corrected for text and shape layer content, so it reports the real ink bounds.
-// For footage, solids and precomps there is no alpha trimming available to script,
-// so it returns the full source rect and the centre is the geometric one.
+// Deliberately uses the comp centre rather than measuring the layer's content.
+// sourceRectAtTime is only content-corrected for text and shape layers - for
+// footage, solids and precomps it returns the full source rect - so measuring
+// was accurate for some layer types and meaningless for others. The comp centre
+// behaves identically for every layer type.
 //
-// Effect point controls are in layer space, so the comp's left and right borders
-// have to be converted through the layer transform. AVLayer.fromComp does not
-// exist in this host, so it is done from Position/Anchor Point/Scale directly.
-// Rotation and parenting are not accounted for; callers are told when that applies.
+// Effect point controls are in layer space, so the comp's borders and centre have
+// to be converted through the layer transform. AVLayer.fromComp does not exist in
+// this host, so it is done from Position/Anchor Point/Scale directly. Rotation and
+// parenting are not accounted for; callers are told when that applies.
 function TNT_lightSweepPoints(layer, comp, t) {
-  var rect = layer.sourceRectAtTime(t, false);
-  var yCenter = rect.top + rect.height / 2;
-
   var pos = layer.property("Position").valueAtTime(t, false);
   var anc = layer.property("Anchor Point").valueAtTime(t, false);
   var scl = layer.property("Scale").valueAtTime(t, false);
   var sx = (scl && scl.length && scl[0]) ? (scl[0] / 100) : 1;
+  var sy = (scl && scl.length > 1 && scl[1]) ? (scl[1] / 100) : 1;
   if (!sx) sx = 1;
+  if (!sy) sy = 1;
 
   function toLayerX(compX) { return (compX - pos[0]) / sx + anc[0]; }
+  function toLayerY(compY) { return (compY - pos[1]) / sy + anc[1]; }
+
+  var yCenter = toLayerY(comp.height / 2);
 
   var skewed = false;
   try { skewed = (layer.property("Rotation").valueAtTime(t, false) !== 0); } catch (_) {}
@@ -6506,7 +6509,6 @@ function TNT_lightSweepPoints(layer, comp, t) {
     start: [toLayerX(0), yCenter],
     end: [toLayerX(comp.width), yCenter],
     yCenter: yCenter,
-    height: rect.height,
     skewed: skewed
   };
 }
