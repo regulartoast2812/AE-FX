@@ -17,9 +17,13 @@ function toggleSettingsMenu() {
 function openSettingsMenu() {
   const menu = ensureSettingsMenu();
   renderSettingsMenu();
-  const rect = settingsBtnEl ? settingsBtnEl.getBoundingClientRect() : { right: 30, top: 40 };
-  menu.style.left = `${Math.max(4, rect.right + 7)}px`;
-  menu.style.top = `${Math.max(32, rect.top)}px`;
+  const rect = settingsBtnEl ? settingsBtnEl.getBoundingClientRect() : { right: 30, top: 40, bottom: 62 };
+  // The gear sits at the right edge of the tab row, so the callout hangs below it
+  // and is right-aligned to it, clamped to the viewport.
+  const menuWidth = menu.offsetWidth || 240;
+  const maxLeft = Math.max(4, window.innerWidth - menuWidth - 6);
+  menu.style.left = `${Math.min(maxLeft, Math.max(4, rect.right - menuWidth))}px`;
+  menu.style.top = `${Math.max(32, (rect.bottom || rect.top) + 6)}px`;
   menu.classList.add("open");
   menu.setAttribute("aria-hidden", "false");
   if (settingsBtnEl) settingsBtnEl.classList.add("open");

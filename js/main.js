@@ -3326,9 +3326,13 @@ function toggleSettingsMenu() {
 function openSettingsMenu() {
   const menu = ensureSettingsMenu();
   renderSettingsMenu();
-  const rect = settingsBtnEl ? settingsBtnEl.getBoundingClientRect() : { right: 30, top: 40 };
-  menu.style.left = `${Math.max(4, rect.right + 7)}px`;
-  menu.style.top = `${Math.max(32, rect.top)}px`;
+  const rect = settingsBtnEl ? settingsBtnEl.getBoundingClientRect() : { right: 30, top: 40, bottom: 62 };
+  // The gear sits at the right edge of the tab row, so the callout hangs below it
+  // and is right-aligned to it, clamped to the viewport.
+  const menuWidth = menu.offsetWidth || 240;
+  const maxLeft = Math.max(4, window.innerWidth - menuWidth - 6);
+  menu.style.left = `${Math.min(maxLeft, Math.max(4, rect.right - menuWidth))}px`;
+  menu.style.top = `${Math.max(32, (rect.bottom || rect.top) + 6)}px`;
   menu.classList.add("open");
   menu.setAttribute("aria-hidden", "false");
   if (settingsBtnEl) settingsBtnEl.classList.add("open");
@@ -11396,14 +11400,7 @@ document.addEventListener("keyup", consumeSuppressedEscapeKeyup, true);
 window.addEventListener("keyup", consumePanelShortcutKeyup, true);
 document.addEventListener("keyup", consumePanelShortcutKeyup, true);
 if (filterColumnEl) {
-  filterColumnEl.addEventListener("mousedown", e => e.stopPropagation(), true);
-  filterColumnEl.addEventListener("click", e => {
-    if (e.target.closest && e.target.closest("#settingsBtn")) {
-      e.preventDefault();
-      toggleSettingsMenu();
-      return;
-    }
-  });
+
 }
 
 async function refreshQuickPanelState() {
@@ -12120,6 +12117,17 @@ const assistantHubEl = document.getElementById("assistantHub");
 const assistantFunctionSearchEl = document.getElementById("assistantFunctionSearch");
 const assistantFunctionListEl = document.getElementById("assistantFunctionList");
 const assistantFunctionCountEl = document.getElementById("assistantFunctionCount");
+
+// The gear moved from the (now removed) left gutter into the tab row, so it can
+// no longer rely on the gutter's delegated click handler.
+if (settingsBtnEl) {
+  settingsBtnEl.addEventListener("mousedown", event => event.stopPropagation(), true);
+  settingsBtnEl.addEventListener("click", event => {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleSettingsMenu();
+  });
+}
 const assistantRefreshFunctionsEl = document.getElementById("assistantRefreshFunctions");
 const assistantChatMessagesEl = document.getElementById("assistantChatMessages");
 const assistantChatInputEl = document.getElementById("assistantChatInput");

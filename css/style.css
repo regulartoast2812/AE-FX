@@ -17212,6 +17212,51 @@ body:not(.quick-panel-mode) #assistantHub {
 .quick-panel-search-result[data-fx-source="custom"] {
   box-shadow: inset 3px 0 0 rgba(104, 190, 130, .8);
 }
+
+/* v128: tab row carries the panel actions.
+   The Functions/count/refresh header row is gone, so the gear (moved out of the
+   removed left gutter) and the refresh button live at the right edge of the tab
+   row. The row stretches full width for that; it was a 172px inline pill. */
+.assistant-tabs {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  width: 100%;
+}
+
+.assistant-tab-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+/* .assistant-tabs button sets padding: 0 12px for the tabs; the action buttons
+   need to stay square. */
+.assistant-tabs .assistant-tab-actions button {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  place-items: center;
+}
+
+.assistant-tabs .settings-btn {
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .035);
+  color: rgba(235, 235, 245, .7);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.assistant-tabs .settings-btn:hover,
+.assistant-tabs .settings-btn.open {
+  border-color: rgba(217, 119, 66, .3);
+  background: rgba(217, 119, 66, .14);
+  color: rgba(240, 176, 137, .95);
+}
 .quick-panel-shell {
   display: none;
 }
