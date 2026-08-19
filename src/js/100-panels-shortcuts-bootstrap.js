@@ -1467,7 +1467,7 @@ function renderQuickPanelSearchResults() {
     const shortcut = String(entry.shortcut || "").trim();
     const keyLabel = entry.children ? "Open" : (shortcut || "\u2014");
     return `
-      <button type="button" class="quick-panel-search-result${index === quickPanelSearchSelectedIndex ? " active" : ""}" data-quick-search-index="${index}" data-fx-source="${tntSourceGroup(entry)}">
+      <button type="button" class="quick-panel-search-result${index === quickPanelSearchSelectedIndex ? " active" : ""}${tntRunClassFor(entry)}" data-quick-search-index="${index}" data-fx-source="${tntSourceGroup(entry)}"${tntRunStyleFor(entry)}>
         ${tntActionIconMarkup(entry)}
         <span class="quick-panel-search-name">${escapeHtml(entry.name || entry.matchName || "Effect")}</span>
         <span class="tnt-tags">${tntTagChips(entry, 2)}</span>
@@ -1802,9 +1802,34 @@ function tntFormatRunTime(ms) {
   return `${(ms / 1000).toFixed(ms < 10000 ? 1 : 0)}s`;
 }
 
+// Progress state lives here rather than only on the element, because finishing a
+// command triggers a re-render that replaces the row. Renderers re-apply these to
+// the matching row, so the fill survives being rebuilt mid-animation.
+let tntRunName = "";
+let tntRunPhase = "";
+let tntRunFrom = "";
+let tntRunElapsed = 0;
+let tntRunClearTimer = 0;
+
+function tntRunClassFor(entry) {
+  const name = String((entry && entry.name) || "");
+  if (!name || name !== tntRunName) return "";
+  return tntRunPhase === "done" ? " tnt-run-done" : " tnt-running";
+}
+
+function tntRunStyleFor(entry) {
+  const name = String((entry && entry.name) || "");
+  if (!name || name !== tntRunName || tntRunPhase !== "done" || !tntRunFrom) return "";
+  return ` style="--tnt-run-from:${tntRunFrom}"`;
+}
+
 async function tntRunWithProgress(element, label, run) {
   if (!element) return run();
   const started = Date.now();
+  if (tntRunClearTimer) clearTimeout(tntRunClearTimer);
+  tntRunName = String(label || "");
+  tntRunPhase = "running";
+  tntRunFrom = "";
   element.classList.remove("tnt-run-done");
   // Force a reflow so a repeated run restarts the animation instead of being
   // treated as the same running state.
@@ -1819,16 +1844,23 @@ async function tntRunWithProgress(element, label, run) {
     // hardcoded start point.
     let reached = "0px";
     try { reached = getComputedStyle(element, "::after").width || "0px"; } catch (_) {}
+    tntRunFrom = reached;
+    tntRunPhase = "done";
+    tntRunElapsed = elapsed;
     element.style.setProperty("--tnt-run-from", reached);
     element.classList.remove("tnt-running");
     void element.offsetWidth;
     element.classList.add("tnt-run-done");
     if (statusEl && label) statusEl.textContent = `${label} · ${tntFormatRunTime(elapsed)}`;
-    // Must outlast the 2s completion animation, or the class is stripped mid-fade
-    // and the fill vanishes instantly instead of dissolving.
-    setTimeout(() => {
-      element.classList.remove("tnt-run-done");
-      element.style.removeProperty("--tnt-run-from");
+    // Must outlast the 2s completion animation, or the fill is dropped mid-fade.
+    // Re-renders in between re-apply the state, so this owns clearing it.
+    tntRunClearTimer = setTimeout(() => {
+      tntRunClearTimer = 0;
+      tntRunName = "";
+      tntRunPhase = "";
+      tntRunFrom = "";
+      try { renderAssistantFunctions(); } catch (_) {}
+      try { if (typeof renderQuickPanelSearchResults === "function") renderQuickPanelSearchResults(); } catch (_) {}
     }, 2100);
   }
 }
@@ -1978,7 +2010,7 @@ function renderAssistantFunctions() {
     const capturing = tntShortcutCaptureName && tntShortcutCaptureName === String(entry.name || "");
     const custom = Object.prototype.hasOwnProperty.call(tntUserShortcuts, String(entry.name || ""));
     return `
-      <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}" data-assistant-function-index="${index}" data-fx-source="${tntSourceGroup(entry)}">
+      <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}${tntRunClassFor(entry)}" data-assistant-function-index="${index}" data-fx-source="${tntSourceGroup(entry)}"${tntRunStyleFor(entry)}>
         ${tntActionIconMarkup(entry)}
         <strong>${escapeHtml(entry.name || entry.matchName || "Function")}</strong>
         <span class="assistant-function-tags tnt-tags">${tntTagChips(entry, 2)}</span>
@@ -2326,7 +2358,7 @@ async function runAssistantFunction(index = assistantFunctionSelectedIndex) {
   try {
     const ran = await tntRunWithProgress(runRow, entry.name, () => executeFxConsoleEntry(entry));
     if (ran) {
-      statusEl.textContent = `${entry.name || "Function"} applied`;
+      statusEl.textContent = `${entry.name || "Function"} · ${tntFormatRunTime(tntRunElapsed)}`;
       await refreshLayers({ forceRender: true });
     }
   } catch (err) {
