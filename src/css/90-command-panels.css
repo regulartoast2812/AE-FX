@@ -1906,3 +1906,17 @@ body:not(.quick-panel-mode) #assistantHub {
   max-height: calc(100vh - 16px);
   overflow-y: auto;
 }
+
+/* Settings rows carry a label, a hint and sometimes a toggle, but they are swept
+   into grouped control rules in 50-modern-theme-controls.css that pin
+   height: var(--tnt-control-h) !important. A fixed height cannot hold that
+   content, so rows overflowed into each other. Size to content instead. */
+.settings-menu-row {
+  height: auto !important;
+  min-height: var(--tnt-row-h, 28px) !important;
+  align-items: center !important;
+}
+
+.settings-menu-section {
+  clear: both;
+}
