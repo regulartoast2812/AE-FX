@@ -6499,7 +6499,7 @@ function applyLightSweep(params) {
       if (!sweep) continue;
       try { sweep.name = SWEEP_EFFECT_NAME; } catch (_) {}
 
-      TNT_setEffectPropertyIfExists(sweep, ["Direction"], 90);
+      TNT_setEffectPropertyIfExists(sweep, ["Direction"], 135);
       TNT_setEffectPropertyIfExists(sweep, ["Width"], Math.max(80, comp.width * 0.18));
       TNT_setEffectPropertyIfExists(sweep, ["Sweep Intensity", "Intensity"], 65);
       TNT_setEffectPropertyIfExists(sweep, ["Edge Intensity"], 25);
@@ -6521,13 +6521,16 @@ function applyLightSweep(params) {
       // fromComp(), and AE computes it exactly, so the sweep lands on the comp
       // borders for any layer regardless of how it is transformed or parented.
       var midY = comp.height / 2;
+      // 25% of the comp width of run-up on each side, so the sweep is clear of the
+      // frame at both ends rather than starting and finishing on the border.
+      var pad = comp.width * 0.25;
       try {
         center.expression = "";
         center.expressionEnabled = false;
       } catch (_) {}
 
-      center.setValueAtTime(layer.inPoint, [0, midY]);
-      center.setValueAtTime(layer.inPoint + inTime, [comp.width, midY]);
+      center.setValueAtTime(layer.inPoint, [-pad, midY]);
+      center.setValueAtTime(layer.inPoint + inTime, [comp.width + pad, midY]);
       try {
         center.setTemporalEaseAtKey(1, [eIn], [eOut]);
         center.setTemporalEaseAtKey(2, [eIn], [eOut]);
