@@ -4190,8 +4190,13 @@ function TNT_getEffects() {
   try {
     var effects = [];
     try {
-      for (var i = 0; i < app.effects.length; i++) {
-        var effect = app.effects[i];
+      // app.effects rebuilds the whole list on every access, so reading it in the
+      // loop condition and body enumerated it twice per iteration - roughly 1000
+      // full rebuilds for ~500 installed effects. Fetch it once.
+      var installed = app.effects;
+      var count = installed ? installed.length : 0;
+      for (var i = 0; i < count; i++) {
+        var effect = installed[i];
         if (!effect) continue;
         effects.push({
           name: effect.displayName || effect.matchName || "",
