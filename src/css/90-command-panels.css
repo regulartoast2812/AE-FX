@@ -1793,3 +1793,24 @@ body:not(.quick-panel-mode) #assistantHub {
   background: rgba(139, 110, 210, .16);
   color: rgba(198, 180, 240, .95);
 }
+
+
+/* Source stripe: a colour down the left edge says where an item comes from
+   without tinting the whole card. Built-in AE effects are the overwhelming
+   majority, so they carry no stripe and stay the visual default; anything with
+   a stripe is something this panel added. Uses an inset shadow because
+   .quick-panel-search-result sets `border: 0` and would drop a border-left. */
+.assistant-function-card[data-fx-source],
+.quick-panel-search-result[data-fx-source] {
+  box-shadow: inset 3px 0 0 transparent;
+}
+
+.assistant-function-card[data-fx-source="panel"],
+.quick-panel-search-result[data-fx-source="panel"] {
+  box-shadow: inset 3px 0 0 rgba(104, 148, 214, .75);
+}
+
+.assistant-function-card[data-fx-source="custom"],
+.quick-panel-search-result[data-fx-source="custom"] {
+  box-shadow: inset 3px 0 0 rgba(104, 190, 130, .8);
+}

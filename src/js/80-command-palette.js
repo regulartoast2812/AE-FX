@@ -231,6 +231,16 @@ function filteredFxEffects() {
   return searchFxConsoleEntries(query, fxConsoleParentEntry, 24);
 }
 
+// Three visual groups for the left-edge stripe. Assistant-saved scripts share the
+// custom stripe deliberately: the distinction that matters at a glance is "not
+// built into After Effects", not who authored it.
+function tntSourceGroup(entry) {
+  const source = String((entry && entry.source) || "");
+  if (source === "native" || (entry && entry.type === "effect")) return "native";
+  if (source === "custom" || source === "assistant") return "custom";
+  return "panel";
+}
+
 function fxConsoleSourceMeta(entry) {
   const source = String(entry && entry.source || (entry && entry.type === "effect" ? "native" : "panel"));
   const category = String(entry && entry.category || "").toLowerCase();

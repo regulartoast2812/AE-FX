@@ -1459,7 +1459,7 @@ function renderQuickPanelSearchResults() {
   quickPanelSearchResultsEl.innerHTML = entries.map((entry, index) => {
     const detail = [entry.shortcut || "", entry.children ? "Open" : ""].filter(Boolean).join(" · ");
     return `
-      <button type="button" class="quick-panel-search-result${index === quickPanelSearchSelectedIndex ? " active" : ""}" data-quick-search-index="${index}">
+      <button type="button" class="quick-panel-search-result${index === quickPanelSearchSelectedIndex ? " active" : ""}" data-quick-search-index="${index}" data-fx-source="${tntSourceGroup(entry)}">
         <span class="quick-panel-search-name">${escapeHtml(entry.name || entry.matchName || "Effect")}</span>
         <em class="quick-panel-search-detail">${escapeHtml(detail)}</em>
         <span class="tnt-tags">${tntTagChips(entry)}</span>
@@ -1714,7 +1714,7 @@ function renderAssistantFunctions() {
   }
   assistantFunctionListEl.innerHTML = entries.map((entry, index) => {
     return `
-      <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}" data-assistant-function-index="${index}">
+      <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}" data-assistant-function-index="${index}" data-fx-source="${tntSourceGroup(entry)}">
         <strong>${escapeHtml(entry.name || entry.matchName || "Function")}</strong>
         <span class="assistant-function-tags tnt-tags">${tntTagChips(entry)}</span>
         <em>${escapeHtml(assistantFunctionDetail(entry))}</em>
