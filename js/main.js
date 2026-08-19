@@ -12377,10 +12377,12 @@ async function tntRunWithProgress(element, label, run) {
     void element.offsetWidth;
     element.classList.add("tnt-run-done");
     if (statusEl && label) statusEl.textContent = `${label} · ${tntFormatRunTime(elapsed)}`;
+    // Must outlast the 2s completion animation, or the class is stripped mid-fade
+    // and the fill vanishes instantly instead of dissolving.
     setTimeout(() => {
       element.classList.remove("tnt-run-done");
       element.style.removeProperty("--tnt-run-from");
-    }, 1400);
+    }, 2100);
   }
 }
 

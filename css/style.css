@@ -17669,7 +17669,7 @@ body:not(.quick-panel-mode) #assistantHub {
 
 .assistant-function-card.tnt-run-done::after,
 .quick-panel-search-result.tnt-run-done::after {
-  animation: tnt-run-finish 1.25s cubic-bezier(.33, 0, .2, 1) forwards;
+  animation: tnt-run-finish 2s cubic-bezier(.33, 0, .2, 1) forwards;
 }
 
 @keyframes tnt-run-fill {
@@ -17677,9 +17677,14 @@ body:not(.quick-panel-mode) #assistantHub {
   to { width: 86%; opacity: 1; }
 }
 
+/* Fill the button completely, hold it there long enough to register, and only
+   then dissolve. Previously the sweep to full took 250ms and the fade started
+   immediately after, so the row never read as "filled" before it began resetting.
+   Over 2s: sweep 0-600ms, hold 600-900ms, fade 900-2000ms. */
 @keyframes tnt-run-finish {
   0% { width: var(--tnt-run-from, 86%); opacity: 1; }
-  20% { width: 100%; opacity: 1; }
+  30% { width: 100%; opacity: 1; }
+  45% { width: 100%; opacity: 1; }
   100% { width: 100%; opacity: 0; }
 }
 .quick-panel-shell {
