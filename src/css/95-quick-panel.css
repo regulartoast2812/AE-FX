@@ -746,3 +746,59 @@ body.quick-panel-mode .timing-order-layout {
 .quick-panel-search-result:empty {
   display: none;
 }
+
+/* v129: subpanel buttons stack icon / name / shortcut.
+   Icons are inline SVG so they inherit the button's colour through currentColor
+   and stay crisp at any panel scale. */
+.quick-panel-grid > button {
+  justify-content: flex-start;
+  gap: 5px;
+  padding: 9px 5px 7px;
+  min-height: 74px;
+}
+
+.quick-panel-icon {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: rgba(226, 227, 232, .82);
+  opacity: .9;
+}
+
+.quick-panel-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #d9dade;
+  font-size: 11px;
+  line-height: 1.1;
+}
+
+.quick-panel-grid > button > kbd {
+  margin-top: auto;
+  padding: 2px 5px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, .05);
+  color: rgba(228, 228, 234, .58);
+  font-family: inherit;
+  font-size: 9.5px;
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+
+.quick-panel-grid > button:hover .quick-panel-icon {
+  color: rgba(240, 176, 137, .95);
+  opacity: 1;
+}
+
+.quick-panel-grid > button:hover > kbd {
+  border-color: rgba(213, 111, 58, .3);
+  color: rgba(238, 200, 178, .8);
+}
