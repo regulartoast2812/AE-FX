@@ -1894,3 +1894,15 @@ body:not(.quick-panel-mode) #assistantHub {
 .assistant-tabs .settings-btn.open .tnt-action-icon {
   color: rgba(240, 176, 137, .95);
 }
+
+/* The callout is positioned in viewport coordinates, so it must be fixed. A
+   grouped rule in 50-modern-theme-controls.css sweeps .settings-menu in with
+   `position: relative !important`, which left it sitting in document flow at the
+   bottom of the page - the inline top/left were applied as relative offsets and
+   the menu rendered off screen, so the gear looked like it did nothing.
+   Also capped so a tall callout scrolls instead of running past the panel edge. */
+.settings-menu {
+  position: fixed !important;
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+}

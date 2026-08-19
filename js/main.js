@@ -3326,15 +3326,37 @@ function toggleSettingsMenu() {
 function openSettingsMenu() {
   const menu = ensureSettingsMenu();
   renderSettingsMenu();
-  const rect = settingsBtnEl ? settingsBtnEl.getBoundingClientRect() : { right: 30, top: 40, bottom: 62 };
-  // The gear sits at the right edge of the tab row, so the callout hangs below it
-  // and is right-aligned to it, clamped to the viewport.
-  const menuWidth = menu.offsetWidth || 240;
-  const maxLeft = Math.max(4, window.innerWidth - menuWidth - 6);
-  menu.style.left = `${Math.min(maxLeft, Math.max(4, rect.right - menuWidth))}px`;
-  menu.style.top = `${Math.max(32, (rect.bottom || rect.top) + 6)}px`;
+
+  // Show it before measuring. While hidden, offsetWidth/offsetHeight are 0, so the
+  // width fell back to a guess and the height could not be clamped at all - the
+  // callout was placed below the gear and ran straight off the bottom of a short
+  // panel, which looked like the button did nothing.
   menu.classList.add("open");
   menu.setAttribute("aria-hidden", "false");
+
+  const rect = settingsBtnEl
+    ? settingsBtnEl.getBoundingClientRect()
+    : { right: 30, top: 40, bottom: 62 };
+  const margin = 6;
+  const width = menu.offsetWidth || 240;
+  const height = menu.offsetHeight || 320;
+
+  // Right-aligned to the gear, clamped to the viewport.
+  const left = Math.min(
+    Math.max(margin, window.innerWidth - width - margin),
+    Math.max(margin, rect.right - width)
+  );
+
+  // Below the gear when it fits, otherwise above it, otherwise pinned on screen.
+  let top = (rect.bottom || rect.top) + margin;
+  if (top + height > window.innerHeight - margin) {
+    const above = (rect.top || 0) - height - margin;
+    top = above >= margin ? above : Math.max(margin, window.innerHeight - height - margin);
+  }
+
+  menu.style.left = `${left}px`;
+  menu.style.top = `${top}px`;
+
   if (settingsBtnEl) settingsBtnEl.classList.add("open");
 }
 
