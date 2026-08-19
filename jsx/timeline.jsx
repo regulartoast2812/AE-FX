@@ -6485,7 +6485,7 @@ function applyLightSweep(params) {
   var eo = params ? (params.easeOut || 75) : 75;
   return _undo("TNT: Light Sweep", function() {
     var eIn = new KeyframeEase(0, ei), eOut = new KeyframeEase(0, eo);
-    var changed = 0, unmeasured = 0;
+    var changed = 0;
     for (var i = 0; i < layers.length; i++) {
       var layer = layers[i];
       var fx = layer.property("Effects");
@@ -6520,30 +6520,23 @@ function applyLightSweep(params) {
       // not exposed to scripting in this host. The expression language does have
       // fromComp(), and AE computes it exactly, so the sweep lands on the comp
       // borders for any layer regardless of how it is transformed or parented.
-      var t0 = layer.inPoint;
-      var t1 = layer.inPoint + inTime;
-      var halfWidth = Math.max(80, comp.width * 0.18) / 2;
+      var midY = comp.height / 2;
       try {
-        // Start and end a half sweep-width outside the comp so the light enters
-        // and leaves cleanly, instead of the sweep being half-formed on frame at
-        // either end. Reads the effect's own Width where it can, so tuning Width
-        // keeps the inset in step; the baked value is the fallback.
-        center.expression =
-          "var t0 = " + t0 + ";\n" +
-          "var t1 = " + t1 + ";\n" +
-          "var pad = " + halfWidth.toFixed(2) + ";\n" +
-          "try { pad = effect(\"" + SWEEP_EFFECT_NAME + "\")(\"Width\") / 2; } catch (err) {}\n" +
-          "var x = ease(time, t0, t1, -pad, thisComp.width + pad);\n" +
-          "fromComp([x, thisComp.height / 2]);";
-      } catch (_) {
-        unmeasured++;
-      }
+        center.expression = "";
+        center.expressionEnabled = false;
+      } catch (_) {}
+
+      center.setValueAtTime(layer.inPoint, [0, midY]);
+      center.setValueAtTime(layer.inPoint + inTime, [comp.width, midY]);
+      try {
+        center.setTemporalEaseAtKey(1, [eIn], [eOut]);
+        center.setTemporalEaseAtKey(2, [eIn], [eOut]);
+      } catch (_) {}
+
       changed++;
     }
     if (!changed) return "CC Light Sweep not available";
-    var msg = "Light sweep applied to " + changed + " layer" + (changed !== 1 ? "s" : "");
-    if (unmeasured) msg += " (" + unmeasured + " could not be driven by expression)";
-    return msg;
+    return "Light sweep applied to " + changed + " layer" + (changed !== 1 ? "s" : "");
   });
 }
 
