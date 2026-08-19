@@ -6474,46 +6474,6 @@ function TNT_setEffectPropertyIfExists(effect, names, value) {
   return false;
 }
 
-// Works out where CC Light Sweep's Center must sit, in layer space, for the sweep
-// to cross the whole composition along its vertical centre.
-//
-// Deliberately uses the comp centre rather than measuring the layer's content.
-// sourceRectAtTime is only content-corrected for text and shape layers - for
-// footage, solids and precomps it returns the full source rect - so measuring
-// was accurate for some layer types and meaningless for others. The comp centre
-// behaves identically for every layer type.
-//
-// Effect point controls are in layer space, so the comp's borders and centre have
-// to be converted through the layer transform. AVLayer.fromComp does not exist in
-// this host, so it is done from Position/Anchor Point/Scale directly. Rotation and
-// parenting are not accounted for; callers are told when that applies.
-function TNT_lightSweepPoints(layer, comp, t) {
-  var pos = layer.property("Position").valueAtTime(t, false);
-  var anc = layer.property("Anchor Point").valueAtTime(t, false);
-  var scl = layer.property("Scale").valueAtTime(t, false);
-  var sx = (scl && scl.length && scl[0]) ? (scl[0] / 100) : 1;
-  var sy = (scl && scl.length > 1 && scl[1]) ? (scl[1] / 100) : 1;
-  if (!sx) sx = 1;
-  if (!sy) sy = 1;
-
-  function toLayerX(compX) { return (compX - pos[0]) / sx + anc[0]; }
-  function toLayerY(compY) { return (compY - pos[1]) / sy + anc[1]; }
-
-  var yCenter = toLayerY(comp.height / 2);
-
-  var skewed = false;
-  try { skewed = (layer.property("Rotation").valueAtTime(t, false) !== 0); } catch (_) {}
-  if (layer.parent) skewed = true;
-
-  return {
-    start: [toLayerX(0), yCenter],
-    end: [toLayerX(comp.width), yCenter],
-    yCenter: yCenter,
-    skewed: skewed
-  };
-}
-
-
 function applyLightSweep(params) {
   var comp = getComp(); if (!comp) return "No comp";
   var layers = comp.selectedLayers; if (!layers.length) return "No layers selected";
@@ -6522,7 +6482,7 @@ function applyLightSweep(params) {
   var eo = params ? (params.easeOut || 75) : 75;
   return _undo("TNT: Light Sweep", function() {
     var eIn = new KeyframeEase(0, ei), eOut = new KeyframeEase(0, eo);
-    var changed = 0, skewed = 0, unmeasured = 0;
+    var changed = 0, unmeasured = 0;
     for (var i = 0; i < layers.length; i++) {
       var layer = layers[i];
       var fx = layer.property("Effects");
@@ -6548,30 +6508,31 @@ function applyLightSweep(params) {
         while (center.numKeys > 0) center.removeKey(1);
       } catch (_) {}
 
-      // Default to the old full-width-at-top sweep only if the measurement fails.
-      var startPt = [0, 0];
-      var endPt = [comp.width, 0];
+      // Drive Center with an expression rather than computed keyframes.
+      //
+      // Effect point controls are in layer space, so sweeping across the comp means
+      // converting the comp's borders into that space. Doing that arithmetic from
+      // Position/Anchor Point/Scale gets it wrong - it has to account for the layer
+      // box origin, scale, rotation and any parent chain - and AVLayer.fromComp is
+      // not exposed to scripting in this host. The expression language does have
+      // fromComp(), and AE computes it exactly, so the sweep lands on the comp
+      // borders for any layer regardless of how it is transformed or parented.
+      var t0 = layer.inPoint;
+      var t1 = layer.inPoint + inTime;
       try {
-        var pts = TNT_lightSweepPoints(layer, comp, layer.inPoint);
-        startPt = pts.start;
-        endPt = pts.end;
-        if (pts.skewed) skewed++;
+        center.expression =
+          "var t0 = " + t0 + ";\n" +
+          "var t1 = " + t1 + ";\n" +
+          "var x = ease(time, t0, t1, 0, thisComp.width);\n" +
+          "fromComp([x, thisComp.height / 2]);";
       } catch (_) {
         unmeasured++;
       }
-
-      center.setValueAtTime(layer.inPoint, startPt);
-      center.setValueAtTime(layer.inPoint + inTime, endPt);
-      try {
-        center.setTemporalEaseAtKey(1, [eIn], [eOut]);
-        center.setTemporalEaseAtKey(2, [eIn], [eOut]);
-      } catch (_) {}
       changed++;
     }
     if (!changed) return "CC Light Sweep not available";
     var msg = "Light sweep applied to " + changed + " layer" + (changed !== 1 ? "s" : "");
-    if (unmeasured) msg += " (" + unmeasured + " could not be measured)";
-    if (skewed) msg += " (" + skewed + " rotated/parented - sweep line is approximate)";
+    if (unmeasured) msg += " (" + unmeasured + " could not be driven by expression)";
     return msg;
   });
 }
