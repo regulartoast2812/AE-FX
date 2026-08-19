@@ -17629,6 +17629,51 @@ body:not(.quick-panel-mode) #assistantHub {
 @keyframes tnt-key-listening {
   50% { opacity: .55; }
 }
+
+/* Run progress: a wash that fills the row while its command runs, completing
+   when the run resolves. Shared by the docked catalogue and the overlay results,
+   so both give the same feedback. */
+.assistant-function-card,
+.quick-panel-search-result {
+  position: relative;
+  overflow: hidden;
+}
+
+.assistant-function-card.tnt-running::after,
+.assistant-function-card.tnt-run-done::after,
+.quick-panel-search-result.tnt-running::after,
+.quick-panel-search-result.tnt-run-done::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background:
+    linear-gradient(90deg, rgba(213, 111, 58, .26), rgba(233, 147, 96, .12));
+  border-right: 1px solid rgba(240, 176, 137, .55);
+  pointer-events: none;
+}
+
+.assistant-function-card.tnt-running::after,
+.quick-panel-search-result.tnt-running::after {
+  animation: tnt-run-fill 2.6s cubic-bezier(.12, .82, .28, 1) forwards;
+}
+
+.assistant-function-card.tnt-run-done::after,
+.quick-panel-search-result.tnt-run-done::after {
+  animation: tnt-run-finish .55s ease forwards;
+}
+
+@keyframes tnt-run-fill {
+  from { width: 0; opacity: 1; }
+  to { width: 88%; opacity: 1; }
+}
+
+@keyframes tnt-run-finish {
+  0% { width: 88%; opacity: 1; }
+  35% { width: 100%; opacity: 1; }
+  100% { width: 100%; opacity: 0; }
+}
 .quick-panel-shell {
   display: none;
 }

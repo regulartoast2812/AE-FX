@@ -1516,7 +1516,10 @@ async function applyQuickPanelSearchEntry(index = quickPanelSearchSelectedIndex)
     quickPanelSearchEl.focus();
     return;
   }
-  const ran = await executeFxConsoleEntry(entry);
+  const runRow = quickPanelSearchResultsEl
+    ? quickPanelSearchResultsEl.querySelector(`[data-quick-search-index="${index}"]`)
+    : null;
+  const ran = await tntRunWithProgress(runRow, entry.name, () => executeFxConsoleEntry(entry));
   if (!ran) return;
   if (!activeQuickPanelSurface() && closeNativeQuickPanelWindow()) return;
   resetQuickPanelSearch();
@@ -1787,6 +1790,37 @@ if (assistantFunctionListEl) {
 // them, so cancel and clear never fired.
 window.addEventListener("keydown", tntShortcutCaptureKeydown, true);
 tntLoadUserShortcuts();
+
+// Progress fill for a running command.
+//
+// The duration is unknown up front, so the bar eases toward 90% and only
+// completes when the run resolves - the usual indeterminate pattern. A run that
+// finishes instantly still shows a brief flash, so there is always feedback that
+// something happened, and the elapsed time is reported when it lands.
+function tntFormatRunTime(ms) {
+  if (ms < 1000) return `${Math.round(ms)}ms`;
+  return `${(ms / 1000).toFixed(ms < 10000 ? 1 : 0)}s`;
+}
+
+async function tntRunWithProgress(element, label, run) {
+  if (!element) return run();
+  const started = Date.now();
+  element.classList.remove("tnt-run-done");
+  // Force a reflow so a repeated run restarts the animation instead of being
+  // treated as the same running state.
+  void element.offsetWidth;
+  element.classList.add("tnt-running");
+  try {
+    return await run();
+  } finally {
+    const elapsed = Date.now() - started;
+    element.classList.remove("tnt-running");
+    void element.offsetWidth;
+    element.classList.add("tnt-run-done");
+    if (statusEl && label) statusEl.textContent = `${label} · ${tntFormatRunTime(elapsed)}`;
+    setTimeout(() => element.classList.remove("tnt-run-done"), 900);
+  }
+}
 
 const ASSISTANT_SEARCH_LIMIT = 5000;
 const ASSISTANT_RENDER_LIMIT = 200;
@@ -2275,8 +2309,11 @@ async function runAssistantFunction(index = assistantFunctionSelectedIndex) {
   }
   assistantFunctionBusy = true;
   if (assistantFunctionCountEl) assistantFunctionCountEl.textContent = `Running ${entry.name || "function"}...`;
+  const runRow = assistantFunctionListEl
+    ? assistantFunctionListEl.querySelector(`[data-assistant-function-index="${index}"]`)
+    : null;
   try {
-    const ran = await executeFxConsoleEntry(entry);
+    const ran = await tntRunWithProgress(runRow, entry.name, () => executeFxConsoleEntry(entry));
     if (ran) {
       statusEl.textContent = `${entry.name || "Function"} applied`;
       await refreshLayers({ forceRender: true });
