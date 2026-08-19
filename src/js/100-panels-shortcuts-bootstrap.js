@@ -1814,11 +1814,20 @@ async function tntRunWithProgress(element, label, run) {
     return await run();
   } finally {
     const elapsed = Date.now() - started;
+    // Hand the completion animation the width the fill actually reached, so a
+    // command that finished early sweeps on from there instead of jumping to a
+    // hardcoded start point.
+    let reached = "0px";
+    try { reached = getComputedStyle(element, "::after").width || "0px"; } catch (_) {}
+    element.style.setProperty("--tnt-run-from", reached);
     element.classList.remove("tnt-running");
     void element.offsetWidth;
     element.classList.add("tnt-run-done");
     if (statusEl && label) statusEl.textContent = `${label} · ${tntFormatRunTime(elapsed)}`;
-    setTimeout(() => element.classList.remove("tnt-run-done"), 900);
+    setTimeout(() => {
+      element.classList.remove("tnt-run-done");
+      element.style.removeProperty("--tnt-run-from");
+    }, 1400);
   }
 }
 

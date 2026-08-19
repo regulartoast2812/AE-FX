@@ -249,13 +249,25 @@ const TNT_ACTION_ICONS = {
   "Play":   '<path d="M6.6 4.4l8.4 5.6-8.4 5.6z"/>'
 };
 
+// Target glyphs that override the action icon. Markers earn one because they are
+// a large, visually distinct slice of the catalogue; add more here as needed.
+const TNT_TARGET_ICONS = {
+  "Marker": '<path d="M5 2.4v15.2"/><path d="M5 3.6h9.9l-2.3 3.2 2.3 3.2H5z"/>'
+};
+
 function tntActionIconMarkup(entry) {
-  let label = "Apply";
+  let paths = TNT_ACTION_ICONS["Apply"];
   try {
-    const action = (safeFxConsoleEntryTags(entry) || []).filter(tag => tag.kind === "action")[0];
-    if (action && TNT_ACTION_ICONS[action.label]) label = action.label;
+    const tags = safeFxConsoleEntryTags(entry) || [];
+    const target = tags.filter(tag => tag.kind === "target" && TNT_TARGET_ICONS[tag.label])[0];
+    if (target) {
+      paths = TNT_TARGET_ICONS[target.label];
+    } else {
+      const action = tags.filter(tag => tag.kind === "action")[0];
+      if (action && TNT_ACTION_ICONS[action.label]) paths = TNT_ACTION_ICONS[action.label];
+    }
   } catch (_) {}
-  return `<svg class="assistant-function-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">${TNT_ACTION_ICONS[label]}</svg>`;
+  return `<svg class="assistant-function-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">${paths}</svg>`;
 }
 
 function tntSourceGroup(entry) {

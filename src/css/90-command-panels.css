@@ -2233,8 +2233,10 @@ body:not(.quick-panel-mode) #assistantHub {
 }
 
 /* Run progress: a wash that fills the row while its command runs, completing
-   when the run resolves. Shared by the docked catalogue and the overlay results,
-   so both give the same feedback. */
+   when the run resolves. Shared by the docked catalogue and the overlay results.
+   The leading edge fades out through the gradient rather than ending on a hard
+   rule, and the completed fill takes a full second to dissolve back to the
+   row's normal state. */
 .assistant-function-card,
 .quick-panel-search-result {
   position: relative;
@@ -2250,29 +2252,35 @@ body:not(.quick-panel-mode) #assistantHub {
   top: 0;
   bottom: 0;
   left: 0;
-  background:
-    linear-gradient(90deg, rgba(213, 111, 58, .26), rgba(233, 147, 96, .12));
-  border-right: 1px solid rgba(240, 176, 137, .55);
+  background: linear-gradient(
+    90deg,
+    rgba(213, 111, 58, .30) 0%,
+    rgba(219, 124, 74, .26) 55%,
+    rgba(236, 158, 111, .20) 84%,
+    rgba(240, 176, 137, .07) 95%,
+    rgba(240, 176, 137, 0) 100%
+  );
   pointer-events: none;
 }
 
+/* Slow and eased, so the movement is readable rather than a flick. */
 .assistant-function-card.tnt-running::after,
 .quick-panel-search-result.tnt-running::after {
-  animation: tnt-run-fill 2.6s cubic-bezier(.12, .82, .28, 1) forwards;
+  animation: tnt-run-fill 4.5s cubic-bezier(.25, .55, .3, 1) forwards;
 }
 
 .assistant-function-card.tnt-run-done::after,
 .quick-panel-search-result.tnt-run-done::after {
-  animation: tnt-run-finish .55s ease forwards;
+  animation: tnt-run-finish 1.25s cubic-bezier(.33, 0, .2, 1) forwards;
 }
 
 @keyframes tnt-run-fill {
   from { width: 0; opacity: 1; }
-  to { width: 88%; opacity: 1; }
+  to { width: 86%; opacity: 1; }
 }
 
 @keyframes tnt-run-finish {
-  0% { width: 88%; opacity: 1; }
-  35% { width: 100%; opacity: 1; }
+  0% { width: var(--tnt-run-from, 86%); opacity: 1; }
+  20% { width: 100%; opacity: 1; }
   100% { width: 100%; opacity: 0; }
 }
