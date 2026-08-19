@@ -459,17 +459,6 @@ body:not(.quick-panel-mode) #activeFilterNotice {
   cursor: pointer;
 }
 
-.assistant-icon-btn::before {
-  content: "";
-  display: block;
-  width: 12px;
-  height: 12px;
-  margin: 6px auto;
-  border: 1.5px solid rgba(245,245,247,.72);
-  border-left-color: transparent;
-  border-radius: 50%;
-}
-
 .assistant-function-search {
   padding: 10px 12px;
   border-bottom: 1px solid rgba(255,255,255,.06);
@@ -1857,5 +1846,51 @@ body:not(.quick-panel-mode) #assistantHub {
 .assistant-tabs .settings-btn.open {
   border-color: rgba(217, 119, 66, .3);
   background: rgba(217, 119, 66, .14);
+  color: rgba(240, 176, 137, .95);
+}
+
+
+/* v130: one shared style for the tab-row action buttons. The refresh icon used
+   to be a CSS ring with a transparent left border - a broken circle with no
+   arrowhead - sitting beside a text-glyph gear, so the two could never align
+   optically. Both are inline SVG on the same 20px grid now. */
+.assistant-tabs .tnt-action-btn {
+  display: grid;
+  flex: 0 0 auto;
+  /* Matches the panel's control sizing token, which .settings-btn is already
+     pinned to with !important in three places in 50-modern-theme-controls.css.
+     Using the same token keeps both buttons identical instead of fighting it. */
+  width: var(--tnt-control-icon, 24px) !important;
+  height: var(--tnt-control-icon, 24px) !important;
+  min-width: var(--tnt-control-icon, 24px) !important;
+  min-height: var(--tnt-control-icon, 24px) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  align-self: center !important;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .035);
+  cursor: pointer;
+}
+
+.tnt-action-icon {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: rgba(235, 235, 245, .68);
+}
+
+.assistant-tabs .tnt-action-btn:hover {
+  border-color: rgba(217, 119, 66, .3);
+  background: rgba(217, 119, 66, .14);
+}
+
+.assistant-tabs .tnt-action-btn:hover .tnt-action-icon,
+.assistant-tabs .settings-btn.open .tnt-action-icon {
   color: rgba(240, 176, 137, .95);
 }

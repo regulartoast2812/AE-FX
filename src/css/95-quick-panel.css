@@ -802,3 +802,35 @@ body.quick-panel-mode .timing-order-layout {
   border-color: rgba(213, 111, 58, .3);
   color: rgba(238, 200, 178, .8);
 }
+
+/* v130: shortcut badge moves to the top-right corner.
+   Stacking icon / name / key in one column left the name squeezed between two
+   fixed-height rows, so descenders were being clipped. Lifting the badge out of
+   the flow gives the icon and name the full height and centres them properly. */
+.quick-panel-grid > button {
+  position: relative;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 6px 9px;
+  min-height: 68px;
+}
+
+.quick-panel-grid > button > kbd {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  margin-top: 0;
+  padding: 1px 4px;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, .045);
+  color: rgba(228, 228, 234, .5);
+  font-size: 8.5px;
+  line-height: 1.35;
+}
+
+.quick-panel-name {
+  overflow: visible;
+  line-height: 1.3;
+  padding: 0 2px;
+}
