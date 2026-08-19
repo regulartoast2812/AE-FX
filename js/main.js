@@ -11967,8 +11967,9 @@ function quickPanelSearchEntries() {
   return searchFxConsoleEntries(quickPanelSearchEl.value, quickPanelSearchParentEntry, 12);
 }
 
-function tntTagChips(entry) {
-  const tags = typeof safeFxConsoleEntryTags === "function" ? safeFxConsoleEntryTags(entry) : [];
+function tntTagChips(entry, limit) {
+  let tags = typeof safeFxConsoleEntryTags === "function" ? safeFxConsoleEntryTags(entry) : [];
+  if (limit) tags = tags.slice(0, limit);
   return tags.map(tag =>
     `<i class="tnt-tag tnt-tag-${escapeHtml(tag.kind)} ${escapeHtml(tag.key)}" title="${escapeHtml(tag.title)}">${escapeHtml(tag.label)}</i>`
   ).join("");
@@ -12300,13 +12301,19 @@ function renderAssistantFunctions() {
     return;
   }
   const shown = entries.slice(0, ASSISTANT_RENDER_LIMIT);
-  assistantFunctionListEl.innerHTML = shown.map((entry, index) => {
+  // Emitted inside the list so it shares the rows' exact content width - as a
+  // sibling it was wider by the list padding plus the scrollbar, so the columns
+  // never lined up with the header.
+  const columnHeader =
+    '<div class="assistant-function-columns" aria-hidden="true">' +
+    '<span></span><span>Command</span><span>Type</span><span>Shortcut</span></div>';
+  assistantFunctionListEl.innerHTML = columnHeader + shown.map((entry, index) => {
     const shortcut = String(entry.shortcut || "").trim();
     return `
       <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}" data-assistant-function-index="${index}" data-fx-source="${tntSourceGroup(entry)}">
         ${tntActionIconMarkup(entry)}
         <strong>${escapeHtml(entry.name || entry.matchName || "Function")}</strong>
-        <span class="assistant-function-tags tnt-tags">${tntTagChips(entry)}</span>
+        <span class="assistant-function-tags tnt-tags">${tntTagChips(entry, 2)}</span>
         <em>${escapeHtml(assistantFunctionDetail(entry))}</em>
         <kbd class="assistant-function-key${shortcut ? "" : " empty"}">${shortcut ? escapeHtml(shortcut) : "&mdash;"}</kbd>
       </button>

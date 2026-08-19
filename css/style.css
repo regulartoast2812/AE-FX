@@ -17540,6 +17540,69 @@ body:not(.quick-panel-mode) #assistantHub {
   background: rgba(213, 111, 58, .18);
   color: rgba(240, 176, 137, .95);
 }
+
+/* v133: the catalogue reads as a table.
+   One line per command with fixed Type and Shortcut columns, so those cells line
+   up down the whole list instead of shifting with each command name. The shared
+   column template is the single source of truth for the header and the rows. */
+.assistant-function-columns,
+.assistant-function-card {
+  grid-template-columns: 24px minmax(0, 1fr) 148px 86px;
+}
+
+.assistant-function-columns {
+  display: grid;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px 6px 12px;
+  color: rgba(228, 228, 234, .38);
+  font-size: 9.5px;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.assistant-function-card {
+  grid-template-areas: "icon name tags key";
+  gap: 10px;
+  padding: 9px 10px 9px 12px;
+}
+
+.assistant-function-card strong {
+  grid-area: name;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assistant-function-tags {
+  grid-area: tags;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.assistant-function-key {
+  justify-self: start;
+  text-align: left;
+}
+
+/* Header is the list's first row, so it inherits the exact content width the
+   cards get - padding and scrollbar included - and the columns line up. */
+.assistant-function-columns {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  /* Transparent border matches the cards' 1px border, so both content boxes are
+     the same width and the header sits exactly over the columns. */
+  border: 1px solid transparent;
+  padding: 2px 10px 7px 12px;
+  background: #1b1b1b;
+}
+
+/* The hover lift is an affordance; on the persistently .active row it scaled the
+   cells out of column alignment and gave the list two row heights. Hover only. */
+.assistant-function-card.active {
+  transform: none;
+}
 .quick-panel-shell {
   display: none;
 }
