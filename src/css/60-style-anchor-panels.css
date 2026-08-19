@@ -1019,7 +1019,11 @@
 }
 
 /* v99: anchor glass blur, quiet style add actions, bounded comp menu. */
-#anchorModal.show {
+/* Docked panel only. In quick-panel mode the overlay window is transparent, so
+   a modal scrim renders as a square black rectangle behind the floating cards.
+   Uses an ID, so the generic body.quick-panel-mode .modal-backdrop clear in
+   95-quick-panel.css cannot outrank it - it has to be scoped here. */
+body:not(.quick-panel-mode) #anchorModal.show {
   background: rgba(0,0,0,.30) !important;
 }
 

@@ -714,7 +714,8 @@ body.quick-panel-mode .timing-order-layout {
    .duration-dialog, so the quick-mode glass rules above match it and paint the
    shell back on: opaque fill, blur and shadow, with border-radius: 0 surviving
    from v96. The result is a square black box framing two rounded cards. */
-body.quick-panel-mode .anchor-dialog {
+body.quick-panel-mode .anchor-dialog,
+body.quick-panel-mode .timing-order-layout {
   background-color: transparent !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
