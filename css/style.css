@@ -17595,7 +17595,11 @@ body:not(.quick-panel-mode) #assistantHub {
      the same width and the header sits exactly over the columns. */
   border: 1px solid transparent;
   padding: 2px 10px 7px 12px;
-  background: #1b1b1b;
+  /* Translucent with a blur rather than a flat #1b1b1b block, so rows scrolling
+     under the header stay faintly visible instead of hitting a hard edge. */
+  background: rgba(27, 27, 27, .82);
+  -webkit-backdrop-filter: blur(10px) saturate(115%);
+  backdrop-filter: blur(10px) saturate(115%);
 }
 
 /* The hover lift is an affordance; on the persistently .active row it scaled the
@@ -18520,4 +18524,35 @@ body.quick-panel-mode .timing-order-layout {
   border-color: transparent;
   background: transparent;
   color: rgba(228, 228, 234, .28);
+}
+
+/* v135: search rows are glass too.
+   The launcher buttons carried the gradient surface but the result rows were
+   flat fills inside an opaque results box, so searching dropped the whole glass
+   treatment. Rows now use the same surface as the buttons and the container
+   steps back to let them read. */
+.quick-panel-search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 5px;
+  border-color: rgba(255, 255, 255, .07);
+  background: rgba(8, 9, 10, .18);
+}
+
+.quick-panel-search-result {
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .02)),
+    rgba(13, 14, 15, .26);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07);
+}
+
+.quick-panel-search-result:hover,
+.quick-panel-search-result.active {
+  border-color: rgba(233, 147, 96, .5);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .1), rgba(213, 111, 58, .09)),
+    rgba(13, 14, 15, .3);
 }

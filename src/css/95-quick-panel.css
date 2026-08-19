@@ -894,3 +894,34 @@ body.quick-panel-mode .timing-order-layout {
   background: transparent;
   color: rgba(228, 228, 234, .28);
 }
+
+/* v135: search rows are glass too.
+   The launcher buttons carried the gradient surface but the result rows were
+   flat fills inside an opaque results box, so searching dropped the whole glass
+   treatment. Rows now use the same surface as the buttons and the container
+   steps back to let them read. */
+.quick-panel-search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 5px;
+  border-color: rgba(255, 255, 255, .07);
+  background: rgba(8, 9, 10, .18);
+}
+
+.quick-panel-search-result {
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .02)),
+    rgba(13, 14, 15, .26);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07);
+}
+
+.quick-panel-search-result:hover,
+.quick-panel-search-result.active {
+  border-color: rgba(233, 147, 96, .5);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .1), rgba(213, 111, 58, .09)),
+    rgba(13, 14, 15, .3);
+}
