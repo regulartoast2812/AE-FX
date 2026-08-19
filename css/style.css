@@ -17727,26 +17727,6 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
   pointer-events: auto;
 }
 
-.quick-panel-refresh::before {
-  content: "";
-  position: absolute;
-  inset: 8px;
-  border: 1.5px solid #c2c3c7;
-  border-right-color: transparent;
-  border-radius: 50%;
-}
-
-.quick-panel-refresh::after {
-  content: "";
-  position: absolute;
-  right: 6px;
-  top: 7px;
-  border-left: 4px solid #b4b6bb;
-  border-top: 3px solid transparent;
-  border-bottom: 3px solid transparent;
-  transform: rotate(-25deg);
-}
-
 .quick-panel-refresh:hover {
   background: rgba(255, 255, 255, .08);
 }
@@ -18555,4 +18535,28 @@ body.quick-panel-mode .timing-order-layout {
   background:
     linear-gradient(145deg, rgba(255, 255, 255, .1), rgba(213, 111, 58, .09)),
     rgba(13, 14, 15, .3);
+}
+
+
+/* Feather "rotate-cw" (MIT) rather than a CSS-drawn ring: the pseudo-element
+   version was an open circle with a separate rotated triangle and never lined
+   up. Same glyph as the docked panel's refresh. */
+.quick-panel-refresh {
+  display: grid;
+  place-items: center;
+}
+
+.quick-panel-refresh .tnt-action-icon {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: rgba(226, 227, 232, .72);
+}
+
+.quick-panel-refresh:hover .tnt-action-icon {
+  color: rgba(240, 176, 137, .95);
 }
