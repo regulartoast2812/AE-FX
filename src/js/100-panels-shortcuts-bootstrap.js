@@ -1861,7 +1861,7 @@ async function tntRunWithProgress(element, label, run) {
       tntRunFrom = "";
       try { renderAssistantFunctions(); } catch (_) {}
       try { if (typeof renderQuickPanelSearchResults === "function") renderQuickPanelSearchResults(); } catch (_) {}
-    }, 2100);
+    }, 900);
   }
 }
 

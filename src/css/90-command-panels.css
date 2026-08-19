@@ -2263,15 +2263,17 @@ body:not(.quick-panel-mode) #assistantHub {
   pointer-events: none;
 }
 
-/* Slow and eased, so the movement is readable rather than a flick. */
+/* Linear and time-proportional: the fill position reads directly as elapsed
+   time, so a run that takes twice as long fills twice as far. An easing curve
+   front-loaded the travel and made every run look about the same length. */
 .assistant-function-card.tnt-running::after,
 .quick-panel-search-result.tnt-running::after {
-  animation: tnt-run-fill 4.5s cubic-bezier(.25, .55, .3, 1) forwards;
+  animation: tnt-run-fill 3s linear forwards;
 }
 
 .assistant-function-card.tnt-run-done::after,
 .quick-panel-search-result.tnt-run-done::after {
-  animation: tnt-run-finish 2s cubic-bezier(.33, 0, .2, 1) forwards;
+  animation: tnt-run-finish .8s cubic-bezier(.33, 0, .2, 1) forwards;
 }
 
 @keyframes tnt-run-fill {
@@ -2279,13 +2281,12 @@ body:not(.quick-panel-mode) #assistantHub {
   to { width: 86%; opacity: 1; }
 }
 
-/* Fill the button completely, hold it there long enough to register, and only
-   then dissolve. Previously the sweep to full took 250ms and the fade started
-   immediately after, so the row never read as "filled" before it began resetting.
-   Over 2s: sweep 0-600ms, hold 600-900ms, fade 900-2000ms. */
+/* Completion is a short tail so it does not stretch the perceived run time:
+   over 800ms, ~200ms sweeping to full, a brief hold so it registers as filled,
+   then a ~550ms fade - half the previous dissolve. */
 @keyframes tnt-run-finish {
   0% { width: var(--tnt-run-from, 86%); opacity: 1; }
-  30% { width: 100%; opacity: 1; }
-  45% { width: 100%; opacity: 1; }
+  25% { width: 100%; opacity: 1; }
+  31% { width: 100%; opacity: 1; }
   100% { width: 100%; opacity: 0; }
 }
