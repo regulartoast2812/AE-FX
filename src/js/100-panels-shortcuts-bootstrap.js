@@ -588,6 +588,11 @@ function shortcutAllowedInEditable(shortcutKey, easeDialogOpen) {
 }
 
 function panelShortcutActionForKey(shortcutKey) {
+  const boundName = tntUserShortcutIndex[shortcutKey];
+  if (boundName) {
+    const entry = tntFindEntryByName(boundName);
+    if (entry) return () => executeFxConsoleEntry(entry);
+  }
   if (QUICK_PANEL_MODE && QUICK_PANEL_CONTROL_SHORTCUTS[shortcutKey]) {
     return () => openQuickPanelControl(QUICK_PANEL_CONTROL_SHORTCUTS[shortcutKey]);
   }
@@ -624,6 +629,10 @@ function criticalShortcutBaseKey(event) {
 }
 
 function handleCriticalPanelShortcut(event) {
+  // While a shortcut cell is listening, capture owns the keyboard. These handlers
+  // are registered on window earlier in the bundle, so without this they consume
+  // Escape and Delete before the capture listener ever sees them.
+  if (tntShortcutCaptureName) return;
   if (event.__tntShortcutHandled) return;
   const baseKey = criticalShortcutBaseKey(event);
   if (activeCriticalShortcut && baseKey &&
@@ -650,6 +659,10 @@ function handleCriticalPanelShortcut(event) {
 }
 
 function handleShortcut(event) {
+  // While a shortcut cell is listening, capture owns the keyboard. These handlers
+  // are registered on window earlier in the bundle, so without this they consume
+  // Escape and Delete before the capture listener ever sees them.
+  if (tntShortcutCaptureName) return;
   if (event.__tntShortcutHandled) return;
   if (handleLayerMenuShortcut(event)) return;
   const shortcutKey = shortcutKeyForEvent(event);
@@ -1451,12 +1464,14 @@ function renderQuickPanelSearchResults() {
     return;
   }
   quickPanelSearchResultsEl.innerHTML = entries.map((entry, index) => {
-    const detail = [entry.shortcut || "", entry.children ? "Open" : ""].filter(Boolean).join(" · ");
+    const shortcut = String(entry.shortcut || "").trim();
+    const keyLabel = entry.children ? "Open" : (shortcut || "\u2014");
     return `
       <button type="button" class="quick-panel-search-result${index === quickPanelSearchSelectedIndex ? " active" : ""}" data-quick-search-index="${index}" data-fx-source="${tntSourceGroup(entry)}">
+        ${tntActionIconMarkup(entry)}
         <span class="quick-panel-search-name">${escapeHtml(entry.name || entry.matchName || "Effect")}</span>
-        <em class="quick-panel-search-detail">${escapeHtml(detail)}</em>
-        <span class="tnt-tags">${tntTagChips(entry)}</span>
+        <span class="tnt-tags">${tntTagChips(entry, 2)}</span>
+        <kbd class="quick-panel-search-key${shortcut || entry.children ? "" : " empty"}">${escapeHtml(keyLabel)}</kbd>
       </button>
     `;
   }).join("");
@@ -1626,6 +1641,153 @@ const assistantFunctionCountEl = document.getElementById("assistantFunctionCount
 // Search wide enough to cover the whole catalogue, so the type and shortcut
 // filters see every entry rather than only the first page of results. The
 // display cap is applied after filtering, in the renderer.
+// ---- User shortcut bindings -------------------------------------------------
+// Stored against the command name rather than the built-in key, so any catalogue
+// entry can be bound - not just the 62 with a hardcoded SHORTCUT_ACTIONS entry.
+// Looked up before SHORTCUT_ACTIONS, so a user binding wins over a built-in.
+const TNT_USER_SHORTCUTS_KEY = "tntUserShortcuts.v1";
+let tntUserShortcuts = {};
+let tntUserShortcutIndex = {};
+let tntShortcutCaptureName = "";
+
+function tntLoadUserShortcuts() {
+  try {
+    const raw = window.localStorage.getItem(TNT_USER_SHORTCUTS_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    tntUserShortcuts = parsed && typeof parsed === "object" ? parsed : {};
+  } catch (_) {
+    tntUserShortcuts = {};
+  }
+  tntRebuildUserShortcutIndex();
+}
+
+function tntSaveUserShortcuts() {
+  try {
+    window.localStorage.setItem(TNT_USER_SHORTCUTS_KEY, JSON.stringify(tntUserShortcuts));
+  } catch (_) {}
+  tntRebuildUserShortcutIndex();
+}
+
+function tntRebuildUserShortcutIndex() {
+  tntUserShortcutIndex = {};
+  Object.keys(tntUserShortcuts).forEach(name => {
+    const key = String(tntUserShortcuts[name] || "").trim();
+    if (key) tntUserShortcutIndex[key] = name;
+  });
+}
+
+// Display form ("Ctrl+Shift+E") from the normalised form ("ctrl+shift+e").
+function tntShortcutLabel(key) {
+  return String(key || "")
+    .split("+")
+    .map(part => {
+      if (part === "ctrl") return "Ctrl";
+      if (part === "shift") return "Shift";
+      if (part === "alt") return "Alt";
+      if (part === "meta") return "Cmd";
+      if (part === "space") return "Space";
+      if (part === "escape") return "Esc";
+      if (part.length === 1) return part.toUpperCase();
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join("+");
+}
+
+function tntShortcutForEntry(entry) {
+  const name = String((entry && entry.name) || "");
+  if (name && Object.prototype.hasOwnProperty.call(tntUserShortcuts, name)) {
+    return tntShortcutLabel(tntUserShortcuts[name]);
+  }
+  return String((entry && entry.shortcut) || "").trim();
+}
+
+// shortcutKeyForEvent already emits the full normalised combo including
+// modifiers ("ctrl+shift+e"), which is exactly the form SHORTCUT_ACTIONS is keyed
+// by. Re-adding modifiers here produced "ctrl+shift+ctrl+shift+e".
+function tntCaptureComboFromEvent(event) {
+  return shortcutKeyForEvent(event);
+}
+
+function tntFindEntryByName(name) {
+  const all = searchFxConsoleEntries("", null, ASSISTANT_SEARCH_LIMIT) || [];
+  return all.filter(entry => String(entry.name || "") === name)[0] || null;
+}
+
+function tntConflictForKey(key, exceptName) {
+  const owner = tntUserShortcutIndex[key];
+  if (owner && owner !== exceptName) return owner;
+  if (SHORTCUT_ACTIONS[key]) return "a built-in panel shortcut";
+  return "";
+}
+
+function tntBeginShortcutCapture(name) {
+  tntShortcutCaptureName = String(name || "");
+  renderAssistantFunctions();
+  if (statusEl) statusEl.textContent = `Press a key for "${tntShortcutCaptureName}" - Esc to cancel, Delete to clear`;
+}
+
+function tntEndShortcutCapture() {
+  tntShortcutCaptureName = "";
+  renderAssistantFunctions();
+}
+
+// Capture runs on capture-phase keydown so it beats the normal shortcut handler.
+function tntShortcutCaptureKeydown(event) {
+  if (!tntShortcutCaptureName) return;
+  event.preventDefault();
+  event.stopPropagation();
+
+  const combo = shortcutKeyForEvent(event);
+  if (!combo) return;
+  const base = combo.split("+").pop();
+  if (base === "escape") {
+    if (statusEl) statusEl.textContent = "Shortcut unchanged.";
+    tntEndShortcutCapture();
+    return;
+  }
+  if (base === "delete" || base === "backspace") {
+    delete tntUserShortcuts[tntShortcutCaptureName];
+    tntSaveUserShortcuts();
+    if (statusEl) statusEl.textContent = "Shortcut cleared.";
+    tntEndShortcutCapture();
+    return;
+  }
+
+  const clash = tntConflictForKey(combo, tntShortcutCaptureName);
+  tntUserShortcuts[tntShortcutCaptureName] = combo;
+  tntSaveUserShortcuts();
+  if (statusEl) {
+    statusEl.textContent = clash
+      ? `${tntShortcutLabel(combo)} assigned - also used by ${clash}`
+      : `${tntShortcutLabel(combo)} assigned.`;
+  }
+  tntEndShortcutCapture();
+}
+
+if (assistantFunctionListEl) {
+  assistantFunctionListEl.addEventListener("dblclick", event => {
+    const cell = event.target.closest("[data-shortcut-for]");
+    if (!cell) return;
+    event.preventDefault();
+    event.stopPropagation();
+    tntBeginShortcutCapture(cell.dataset.shortcutFor || "");
+  });
+  // Clicking a row runs the command, so swallow clicks that land on the key cell.
+  assistantFunctionListEl.addEventListener("click", event => {
+    if (event.target.closest("[data-shortcut-for]")) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }, true);
+}
+
+// On window, not document: capture runs window -> document, and handleShortcut is
+// registered on document earlier in the bundle. Keys with a built-in action -
+// Escape and Delete among them - were consumed there before capture could see
+// them, so cancel and clear never fired.
+window.addEventListener("keydown", tntShortcutCaptureKeydown, true);
+tntLoadUserShortcuts();
+
 const ASSISTANT_SEARCH_LIMIT = 5000;
 const ASSISTANT_RENDER_LIMIT = 200;
 const assistantFilterTypeEl = document.getElementById("assistantFilterType");
@@ -1767,14 +1929,16 @@ function renderAssistantFunctions() {
     '<div class="assistant-function-columns" aria-hidden="true">' +
     '<span></span><span>Command</span><span>Type</span><span>Shortcut</span></div>';
   assistantFunctionListEl.innerHTML = columnHeader + shown.map((entry, index) => {
-    const shortcut = String(entry.shortcut || "").trim();
+    const shortcut = tntShortcutForEntry(entry);
+    const capturing = tntShortcutCaptureName && tntShortcutCaptureName === String(entry.name || "");
+    const custom = Object.prototype.hasOwnProperty.call(tntUserShortcuts, String(entry.name || ""));
     return `
       <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}" data-assistant-function-index="${index}" data-fx-source="${tntSourceGroup(entry)}">
         ${tntActionIconMarkup(entry)}
         <strong>${escapeHtml(entry.name || entry.matchName || "Function")}</strong>
         <span class="assistant-function-tags tnt-tags">${tntTagChips(entry, 2)}</span>
         <em>${escapeHtml(assistantFunctionDetail(entry))}</em>
-        <kbd class="assistant-function-key${shortcut ? "" : " empty"}">${shortcut ? escapeHtml(shortcut) : "&mdash;"}</kbd>
+        <kbd class="assistant-function-key${shortcut ? "" : " empty"}${custom ? " custom" : ""}${capturing ? " listening" : ""}" data-shortcut-for="${escapeHtml(String(entry.name || ""))}" title="Double-click to set a shortcut">${capturing ? "Press key&hellip;" : (shortcut ? escapeHtml(shortcut) : "&mdash;")}</kbd>
       </button>
     `;
   }).join("");

@@ -2205,3 +2205,25 @@ body:not(.quick-panel-mode) #assistantHub {
 .assistant-function-card.active {
   transform: none;
 }
+
+/* Shortcut cell is editable: double-click to listen for a key. */
+.assistant-function-key {
+  cursor: pointer;
+}
+
+.assistant-function-key.custom {
+  border-color: rgba(213, 111, 58, .34);
+  background: rgba(213, 111, 58, .14);
+  color: rgba(240, 176, 137, .95);
+}
+
+.assistant-function-key.listening {
+  border-color: rgba(225, 128, 73, .8);
+  background: rgba(213, 111, 58, .2);
+  color: rgba(245, 206, 183, 1);
+  animation: tnt-key-listening 1s ease-in-out infinite;
+}
+
+@keyframes tnt-key-listening {
+  50% { opacity: .55; }
+}
