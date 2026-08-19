@@ -1,0 +1,375 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Timeline CEP</title>
+  <link rel="stylesheet" href="./css/style.css?v=20260815-function-repair" />
+</head>
+<body>
+  <section id="quickPanelShell" class="quick-panel-shell" aria-label="TNT Quick Controls">
+    <div class="quick-panel-status">
+      <p id="quickPanelContext">Reading active composition...</p>
+      <button id="quickPanelRefresh" class="quick-panel-refresh" type="button" title="Refresh native selection" aria-label="Refresh native selection"></button>
+    </div>
+    <div class="quick-panel-search-wrap">
+      <span class="quick-panel-search-icon" aria-hidden="true"></span>
+      <input id="quickPanelSearch" class="quick-panel-search" type="text" spellcheck="false" autocomplete="off" placeholder="Search commands or effects" aria-label="Search commands or effects">
+      <kbd class="quick-panel-search-key">Enter</kbd>
+    </div>
+    <div id="quickPanelSearchResults" class="quick-panel-search-results" aria-live="polite"></div>
+    <div class="quick-panel-grid">
+      <button type="button" data-quick-panel="anchor" data-tooltip="Anchor and Align\nShortcut: Ctrl+A\nSet anchor points, align layers, and distribute a selection."><kbd>Ctrl+A</kbd><span>Anchor</span></button>
+      <button type="button" data-quick-panel="composition" data-tooltip="Composition\nShortcut: Ctrl+C\nOpen composition-level utilities."><kbd>Ctrl+C</kbd><span>Comp</span></button>
+      <button type="button" data-quick-panel="rename-comp" data-tooltip="Rename Composition\nRename the active composition directly."><kbd>RN</kbd><span>Rename Comp</span></button>
+      <button type="button" data-quick-panel="ease" data-tooltip="Ease Editor\nShortcut: Ctrl+E\nEdit selected native keyframes."><kbd>Ctrl+E</kbd><span>Ease</span></button>
+      <button type="button" data-quick-panel="mask" data-tooltip="Mask Control\nShortcut: Ctrl+F\nEdit masks on selected layers."><kbd>Ctrl+F</kbd><span>Mask</span></button>
+      <button type="button" data-quick-panel="effects" data-tooltip="Effects Control\nSearch, apply, toggle, and delete effects on selected layers."><kbd>FX</kbd><span>Effects</span></button>
+      <button type="button" data-quick-panel="shapes" data-tooltip="Shape Control\nInspect selected shape contents and add common shape items."><kbd>SH</kbd><span>Shapes</span></button>
+      <button type="button" data-quick-panel="styles" data-tooltip="Layer Styles\nShortcut: Ctrl+S\nAdd and edit styles on selected layers."><kbd>Ctrl+S</kbd><span>Styles</span></button>
+      <button type="button" data-quick-panel="layer-menu" data-tooltip="Layer Menu\nOpen the selected-layer right-click menu from Quick Controls."><kbd>RC</kbd><span>Layer Menu</span></button>
+      <button type="button" data-quick-panel="mass-edit" data-tooltip="Mass Edit\nShortcut: Ctrl+M\nCopy, wrangle, and edit properties across selected layers."><kbd>Ctrl+M</kbd><span>Mass Edit</span></button>
+      <button type="button" data-quick-panel="text-animation" data-tooltip="Text Animation\nShortcut: Ctrl+T\nBuild text animators and manage selected text layers."><kbd>Ctrl+T</kbd><span>Text Anim</span></button>
+      <button type="button" data-quick-panel="timing-order" data-tooltip="Timing and Order\nShortcut: Ctrl+O\nStagger layers and reorganize selected layer order."><kbd>Ctrl+O</kbd><span>Timing / Order</span></button>
+      <button type="button" data-quick-panel="filter" data-tooltip="Selection Filter\nShortcut: Ctrl+X\nBuild or refine the native layer selection."><kbd>Ctrl+X</kbd><span>Filter</span></button>
+    </div>
+    <p class="quick-panel-hint">Uses the current native Timeline or Composition selection.</p>
+  </section>
+  <header>
+    <div class="status-row">
+      <div id="platformBadge" class="platform-badge" aria-label="Platform"></div>
+      <div id="compSelect" class="comp-select" title="Composition">
+        <button id="compSelectButton" class="comp-select-button" type="button">No active comp</button>
+        <input id="compSelectSearch" class="comp-select-search" type="text" spellcheck="false" autocomplete="off" aria-label="Search compositions">
+        <div id="compSelectMenu" class="comp-select-menu" aria-hidden="true"></div>
+      </div>
+      <span id="status">Open a comp.</span>
+      <button id="durationBtn" title="Set comp duration">Set Length</button>
+      <button id="keyframeModeBtn" title="Toggle keyframe focus mode">Keyframes</button>
+    </div>
+  </header>
+
+  <div id="durationModal" class="modal-backdrop" aria-hidden="true">
+    <div class="duration-dialog">
+      <div class="dialog-title">Set Composition Duration</div>
+      <div class="dialog-subtitle">Seconds, mm:ss, or hh:mm:ss</div>
+      <input id="durationInput" type="text" spellcheck="false" />
+      <div id="durationError" class="dialog-error"></div>
+      <div class="dialog-actions">
+        <button id="durationCancel" class="dialog-btn">Cancel</button>
+        <button id="durationApply" class="dialog-btn primary">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="expressionModal" class="modal-backdrop" aria-hidden="true">
+    <div class="duration-dialog expression-dialog">
+      <div id="expressionTitle" class="dialog-title">Expression</div>
+      <div id="expressionSubtitle" class="dialog-subtitle">Alt-click a property row to edit</div>
+      <textarea id="expressionInput" spellcheck="false"></textarea>
+      <div id="expressionError" class="dialog-error"></div>
+      <div class="dialog-actions">
+        <button id="expressionDisable" class="dialog-btn">Disable</button>
+        <button id="expressionCancel" class="dialog-btn">Cancel</button>
+        <button id="expressionApply" class="dialog-btn primary">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="anchorModal" class="modal-backdrop" aria-hidden="true">
+    <div class="duration-dialog anchor-dialog">
+      <div class="dialog-title">Anchor Point</div>
+      <div class="dialog-subtitle">Pick where the selected layer anchor should sit</div>
+      <div class="anchor-panel">
+        <div class="anchor-section">
+          <div class="anchor-section-title">Anchor</div>
+          <div id="anchorGrid" class="anchor-grid" role="group" aria-label="Anchor point position">
+            <button type="button" class="anchor-cell" data-point="TL" title="Top left"></button>
+            <button type="button" class="anchor-cell" data-point="TC" title="Top center"></button>
+            <button type="button" class="anchor-cell" data-point="TR" title="Top right"></button>
+            <button type="button" class="anchor-cell" data-point="ML" title="Middle left"></button>
+            <button type="button" class="anchor-cell active" data-point="C" title="Center"></button>
+            <button type="button" class="anchor-cell" data-point="MR" title="Middle right"></button>
+            <button type="button" class="anchor-cell" data-point="BL" title="Bottom left"></button>
+            <button type="button" class="anchor-cell" data-point="BC" title="Bottom center"></button>
+            <button type="button" class="anchor-cell" data-point="BR" title="Bottom right"></button>
+          </div>
+          <label class="anchor-option">
+            <input id="anchorUseMasks" type="checkbox" checked>
+            <span>Use mask bounds</span>
+          </label>
+        </div>
+        <div class="anchor-section anchor-align-section">
+          <div class="anchor-section-title">Align</div>
+          <label class="anchor-align-target">
+            <span>Align Layers to:</span>
+            <select aria-label="Align layers to" disabled>
+              <option>Selection</option>
+            </select>
+          </label>
+          <div id="anchorAlignGrid" class="anchor-align-grid" role="group" aria-label="Align selected layers">
+            <button type="button" class="anchor-align-btn align-left" data-align="left" title="Align left"></button>
+            <button type="button" class="anchor-align-btn align-hcenter" data-align="hcenter" title="Align horizontal center"></button>
+            <button type="button" class="anchor-align-btn align-right" data-align="right" title="Align right"></button>
+            <button type="button" class="anchor-align-btn align-top" data-align="top" title="Align top"></button>
+            <button type="button" class="anchor-align-btn align-vcenter" data-align="vcenter" title="Align vertical center"></button>
+            <button type="button" class="anchor-align-btn align-bottom" data-align="bottom" title="Align bottom"></button>
+          </div>
+          <div class="anchor-section-title anchor-distribute-title">Distribute Layers</div>
+          <div id="anchorDistributeGrid" class="anchor-align-grid anchor-distribute-grid" role="group" aria-label="Distribute selected layers">
+            <button type="button" class="anchor-align-btn dist-top" data-align="dist-top" title="Distribute top edges"></button>
+            <button type="button" class="anchor-align-btn dist-vcenter" data-align="dist-vcenter" title="Distribute vertical centers"></button>
+            <button type="button" class="anchor-align-btn dist-bottom" data-align="dist-bottom" title="Distribute bottom edges"></button>
+            <button type="button" class="anchor-align-btn dist-left" data-align="dist-left" title="Distribute left edges"></button>
+            <button type="button" class="anchor-align-btn dist-hcenter" data-align="dist-hcenter" title="Distribute horizontal centers"></button>
+            <button type="button" class="anchor-align-btn dist-right" data-align="dist-right" title="Distribute right edges"></button>
+          </div>
+        </div>
+      </div>
+      <div id="anchorError" class="dialog-error"></div>
+    </div>
+  </div>
+
+  <div id="compositionModal" class="modal-backdrop composition-backdrop" aria-hidden="true">
+    <div class="composition-dialog" role="dialog" aria-modal="true" aria-labelledby="compositionTitle">
+      <div class="composition-head">
+        <div class="composition-title-wrap">
+          <b class="subpanel-shortcut-badge">C</b>
+          <div id="compositionTitle" class="composition-title">Composition</div>
+          <span id="compositionName" class="composition-name">No active comp</span>
+        </div>
+      </div>
+      <div class="composition-body">
+        <section class="composition-section">
+          <div class="composition-section-title">Current Composition</div>
+          <div class="composition-tool-grid">
+            <button type="button" class="composition-tool" data-composition-action="trim" title="Trim the active composition to the latest layer out point">
+              <span class="composition-tool-icon icon-trim" aria-hidden="true"></span>
+              <span>Auto Trim Comp</span>
+            </button>
+            <button type="button" class="composition-tool" data-composition-action="crop" title="Crop selected precomposition layers to their visible content">
+              <span class="composition-tool-icon icon-crop" aria-hidden="true"></span>
+              <span>Auto Crop Comps</span>
+            </button>
+            <button type="button" class="composition-tool" data-composition-action="precompose" title="Move selected layers into a new precomposition">
+              <span class="composition-tool-icon icon-precompose" aria-hidden="true"></span>
+              <span>Pre-compose Selected</span>
+            </button>
+            <button type="button" class="composition-tool" data-composition-action="rename" title="Rename the active composition">
+              <span class="composition-tool-icon icon-rename" aria-hidden="true"></span>
+              <span>Rename Composition</span>
+            </button>
+            <button type="button" class="composition-tool" data-composition-action="duration" title="Set the active composition duration">
+              <span class="composition-tool-icon icon-duration" aria-hidden="true"></span>
+              <span>Set Composition Length</span>
+            </button>
+            <button type="button" class="composition-tool" data-composition-action="render" title="Add the active composition to the render queue">
+              <span class="composition-tool-icon icon-render" aria-hidden="true"></span>
+              <span>Add to Render Queue</span>
+            </button>
+          </div>
+        </section>
+        <section class="composition-section composition-roadmap">
+          <div class="composition-section-title">Planned</div>
+          <div class="composition-roadmap-list">
+            <span>Decompose</span>
+            <span>Duplicate Comps</span>
+            <span>Batch Rename Comps</span>
+            <span>Batch Scale Comps</span>
+            <span>Batch Resize Canvas</span>
+            <span>Batch Comp Settings</span>
+            <span>Batch Color Replace</span>
+            <span>Export Comps as New Projects</span>
+          </div>
+        </section>
+      </div>
+      <div id="compositionError" class="composition-error"></div>
+    </div>
+  </div>
+
+  <div id="layerSelectionModal" class="modal-backdrop layer-selection-backdrop" aria-hidden="true">
+    <div class="layer-selection-dialog" role="dialog" aria-modal="true" aria-labelledby="layerSelectionTitle">
+      <div class="layer-selection-head">
+        <div class="layer-selection-title-wrap">
+          <span class="subpanel-shortcut-badge layer-selection-title-icon" aria-hidden="true"></span>
+          <div id="layerSelectionTitle" class="layer-selection-title">Filter / Select</div>
+          <span id="layerSelectionCount" class="layer-selection-count">0 selected</span>
+        </div>
+      </div>
+      <div class="layer-selection-controls">
+        <div class="layer-filter-panels">
+          <section class="layer-filter-panel layer-filter-view-panel">
+            <div class="layer-filter-panel-head">
+              <strong>Filter</strong>
+              <span>Timeline</span>
+            </div>
+            <div id="layerViewFilters" class="layer-selection-filters" aria-label="Filter timeline view">
+              <div class="layer-selection-filter-group filter-group-general">
+                <button type="button" data-layer-view-filter="" class="active">All</button>
+              </div>
+              <div class="layer-selection-filter-group filter-group-parent">
+                <button type="button" data-layer-view-filter="parent-source">Parents</button>
+                <button type="button" data-layer-view-filter="parented">Children</button>
+              </div>
+              <div class="layer-selection-filter-group filter-group-matte">
+                <button type="button" data-layer-view-filter="matte-source">Matte Sources</button>
+                <button type="button" data-layer-view-filter="matte-child">Matte Users</button>
+              </div>
+              <div class="layer-selection-filter-group filter-group-type">
+                <button type="button" data-layer-view-filter="text">Text</button>
+                <button type="button" data-layer-view-filter="shape">Shape</button>
+                <button type="button" data-layer-view-filter="media">Media</button>
+              </div>
+              <div class="layer-selection-filter-group filter-group-animation">
+                <button type="button" data-layer-view-filter="animated">Animated</button>
+                <button type="button" data-layer-view-filter="unanimated">Static</button>
+              </div>
+            </div>
+          </section>
+          <section class="layer-filter-panel layer-filter-selection-panel">
+            <div class="layer-filter-panel-head">
+              <strong>Select</strong>
+              <span>Native AE</span>
+            </div>
+            <div id="layerSelectionScopes" class="layer-selection-scopes" aria-label="Selection filter scope">
+              <button type="button" data-selection-scope="selected" class="active">Selection</button>
+              <button type="button" data-selection-scope="playhead">Playhead</button>
+              <button type="button" data-selection-scope="all">All</button>
+            </div>
+            <div id="layerSelectionModes" class="layer-selection-modes" aria-label="Select by">
+              <button type="button" data-selection-mode="layer" class="active">Name</button>
+              <button type="button" data-selection-mode="property">Props</button>
+              <button type="button" data-selection-mode="effect">FX</button>
+            </div>
+            <div class="layer-selection-search-wrap">
+              <span class="layer-selection-search-icon" aria-hidden="true"></span>
+              <input id="layerSelectionSearch" class="layer-selection-search" type="text" placeholder="Select layers by name" spellcheck="false" />
+              <button id="layerSelectionSelectMatches" class="layer-selection-select-matches" type="button">Select</button>
+              <button id="layerSelectionSearchClear" class="layer-selection-search-clear" type="button" title="Clear search" aria-label="Clear search"></button>
+            </div>
+            <div id="layerSelectionQuickFilters" class="layer-selection-quick-filters" aria-label="Selection filter actions"></div>
+          </section>
+        </div>
+      </div>
+      <div class="layer-selection-list-head">
+        <span id="layerSelectionShownCount">0 layers</span>
+        <span>Click toggles · Shift range</span>
+      </div>
+      <div id="layerSelectionList" class="layer-selection-list" role="listbox" aria-multiselectable="true"></div>
+      <div class="layer-selection-actions">
+        <button type="button" data-layer-selection-action="clear">Clear</button>
+        <button type="button" data-layer-selection-action="invert">Invert</button>
+        <button type="button" data-layer-selection-action="select">Select</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="flowChartOverlay" class="flow-chart-overlay" aria-hidden="true">
+    <div class="flow-chart-panel">
+      <div class="flow-chart-header">
+        <div>
+          <div class="flow-chart-title">Composition Flow</div>
+          <div id="flowChartSubtitle" class="flow-chart-subtitle">Tab to close</div>
+        </div>
+        <button id="flowChartClose" class="flow-chart-close" type="button" title="Close">x</button>
+      </div>
+      <div id="flowChartBody" class="flow-chart-body"></div>
+    </div>
+  </div>
+
+  <main id="scrollArea">
+    <div id="filterColumn" class="filter-column subpanel-rail" aria-label="Panel controls">
+      <button id="settingsBtn" class="filter-btn settings-btn" type="button" title="Settings">&#9881;</button>
+    </div>
+    <section id="assistantHub" class="assistant-hub" aria-label="Assistant Hub">
+      <div class="assistant-tabs" role="tablist" aria-label="Assistant workspace">
+        <button id="assistantFunctionsTab" class="assistant-tab active" type="button" role="tab" aria-selected="true" data-assistant-tab="functions">Functions</button>
+        <button id="assistantChatTab" class="assistant-tab" type="button" role="tab" aria-selected="false" data-assistant-tab="chat">Assistant</button>
+      </div>
+      <div id="assistantFunctionsPanel" class="assistant-panel active" role="tabpanel" aria-labelledby="assistantFunctionsTab" data-assistant-panel="functions">
+        <div class="assistant-panel-head">
+          <div>
+            <strong>Functions</strong>
+            <span id="assistantFunctionCount">0 ready</span>
+          </div>
+          <button id="assistantRefreshFunctions" class="assistant-icon-btn" type="button" title="Refresh functions" aria-label="Refresh functions"></button>
+        </div>
+        <div class="assistant-function-search">
+          <input id="assistantFunctionSearch" type="text" spellcheck="false" autocomplete="off" placeholder="Search functions" aria-label="Search functions">
+        </div>
+        <div id="assistantFunctionList" class="assistant-function-list"></div>
+      </div>
+      <div id="assistantChatPanel" class="assistant-panel" role="tabpanel" aria-labelledby="assistantChatTab" data-assistant-panel="chat">
+        <div class="assistant-agent-shell">
+          <div class="assistant-agent-topbar">
+            <div class="assistant-provider-tabs" aria-label="Assistant provider">
+              <button type="button" class="assistant-provider active provider-claude" data-assistant-provider="claude"><span>Claude</span></button>
+              <button type="button" class="assistant-provider provider-codex" data-assistant-provider="codex"><span>Codex</span></button>
+              <button type="button" class="assistant-provider provider-ollama" data-assistant-provider="ollama"><span>Ollama</span></button>
+              <button type="button" class="assistant-provider provider-auto" data-assistant-provider="auto"><span>Auto</span></button>
+            </div>
+            <div class="assistant-agent-actions">
+              <button type="button" class="assistant-history-btn" data-assistant-history>History</button>
+              <button type="button" class="assistant-new-btn">New</button>
+            </div>
+          </div>
+          <div id="assistantHistoryMenu" class="assistant-history-menu" aria-hidden="true"></div>
+          <div id="assistantChatMessages" class="assistant-chat-messages" aria-live="polite">
+            <div class="assistant-message assistant-message-system">Connected to the local assistant bridge. It can read the current After Effects context and the panel function registry.</div>
+          </div>
+          <div id="assistantDraftActions" class="assistant-draft-actions" aria-hidden="true">
+            <span id="assistantDraftStatus">Script draft ready</span>
+            <button id="assistantAutoTestDraft" type="button">Auto Test</button>
+            <button id="assistantTestDraft" type="button">Test</button>
+            <button id="assistantApplyDraft" type="button">Apply</button>
+            <button id="assistantSaveDraft" type="button">Save</button>
+          </div>
+          <div class="assistant-chat-compose">
+            <textarea id="assistantChatInput" spellcheck="false" placeholder="Message the agent..."></textarea>
+            <div class="assistant-compose-tools">
+              <button id="assistantChatSend" class="assistant-send-btn" type="button" title="Send" aria-label="Send"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div id="assistantSaveModal" class="modal-backdrop assistant-save-backdrop" aria-hidden="true">
+      <div class="duration-dialog assistant-save-dialog">
+        <div class="dialog-title">Save Assistant Function</div>
+        <div class="dialog-subtitle">Name the tested script so it appears in Functions and quick search.</div>
+        <label class="assistant-save-field">
+          <span>Name</span>
+          <input id="assistantSaveName" type="text" spellcheck="false" autocomplete="off" />
+        </label>
+        <label class="assistant-save-field">
+          <span>Category</span>
+          <input id="assistantSaveCategory" type="text" spellcheck="false" autocomplete="off" value="Assistant" />
+        </label>
+        <div id="assistantSaveError" class="dialog-error"></div>
+        <div class="dialog-actions">
+          <button id="assistantSaveCancel" class="dialog-btn" type="button">Cancel</button>
+          <button id="assistantSaveApply" class="dialog-btn primary" type="button">Save</button>
+        </div>
+      </div>
+    </div>
+    <div id="rulerWrap" class="time-ruler-wrap top-ruler">
+      <span id="timeDisplay">0:00:00</span>
+      <div id="ruler"></div>
+      <div id="topMarkerRail" class="marker-rail"></div>
+      <div id="playhead"></div>
+    </div>
+    <div id="timeline"></div>
+    <div id="selectionBox"></div>
+    <div id="layerMenu" class="layer-menu" aria-hidden="true"></div>
+  </main>
+  <div id="horizontalScrollBar" class="horizontal-scrollbar" aria-hidden="true">
+    <div id="horizontalScrollThumb" class="horizontal-scroll-thumb"></div>
+  </div>
+  <button id="activeFilterNotice" class="active-filter-notice" type="button" aria-hidden="true">
+    <span class="active-filter-notice-label">Filter active</span>
+    <span class="active-filter-notice-action">Turn off</span>
+  </button>
+
+  <script src="./js/CSInterface.js"></script>
+  <script src="./js/main.js?v=20260815-function-repair"></script>
+</body>
+</html>

@@ -1,15 +1,30 @@
-# Generated runtime bundles (built by scripts/build.sh)
-js/main.js
-css/style.css
-quick.html
+# This repo is the deployment unit: After Effects loads the extension straight
+# out of this folder, and it gets copied to other machines as-is. So the built
+# bundles (js/main.js, css/style.css, quick.html) ARE tracked - a clone has to be
+# runnable on a machine with no bash to run scripts/build.sh.
+#
+# Only genuinely per-machine, per-platform build output is ignored below.
 
-# Native helper build output
+# Compiled native helpers - rebuilt per platform, never shared between them
 native/*.app/
 native-helper/.build/
-
-# macOS
-.DS_Store
-
-# .NET build output (native-helper-win)
 native-helper-win/bin/
 native-helper-win/obj/
+
+# Packaged extension output
+*.zxp
+
+# Dependencies
+node_modules/
+
+# Logs and scratch
+*.log
+*.tmp
+*.bak
+*~
+*.swp
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
