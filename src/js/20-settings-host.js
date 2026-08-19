@@ -44,7 +44,6 @@ function renderSettingsMenu() {
     ${settingsToggleRow("showNativeEffects", "Native AE Effects", "Show in Ctrl+K")}
     ${settingsToggleRow("showTntCommands", "Timeline Commands", "Show in Ctrl+K")}
     <div class="settings-menu-section">Safety</div>
-    ${settingsToggleRow("confirmDanger", "Danger Confirms", "Delete/purge prompts")}
     <div class="settings-menu-section">Layer Styles</div>
     ${settingsToggleRow("keepStyleEditorOpen", "Keep Editor Open", "After style edits")}
     <div class="settings-menu-section">About</div>

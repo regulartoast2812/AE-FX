@@ -493,7 +493,6 @@ const MASK_PROPORTIONAL_GROUPS = {
 const PANEL_SETTINGS_DEFAULTS = {
   showNativeEffects: true,
   showTntCommands: true,
-  confirmDanger: true,
   keepStyleEditorOpen: true
 };
 const LAYER_STYLE_PANEL_KEEP_OPEN = true;
@@ -1069,7 +1068,6 @@ async function ensureVendoredTntCommands(options = {}) {
 
 async function runTntV3Command(command) {
   if (!command || !command.tntFunction) return;
-  if (isDangerousCommand(command) && panelSettings.confirmDanger && !window.confirm(`${command.name || "This command"} can remove or overwrite data. Continue?`)) return;
   suppressSyncUntil = Date.now() + 1200;
   const loaded = await ensureVendoredTntCommands();
   if (!loaded.ok) {
@@ -1085,30 +1083,6 @@ async function runTntV3Command(command) {
   closeFxConsole();
   await refreshLayers({ forceRender: true });
   focusPanel(2);
-}
-
-// Confirms are for commands whose blast radius is wider than the current
-// selection, or that are awkward to undo. Matching on the name (delete/remove/
-// purge/clear) prompted just as loudly for "remove one marker on the selected
-// layer" as for "purge the project", which trained the prompt into noise. Every
-// genuinely destructive command is named explicitly below, so the name test was
-// only ever catching selection-scoped, single-undo edits.
-function isDangerousCommand(command) {
-  const fn = String(command && command.tntFunction || "");
-  return [
-      "deleteAllKeyframes",
-      "deleteAllEffects",
-      "deleteAllExpressions",
-      "deleteAllCompMarkers",
-      "deleteAllLayerMarkers",
-      "deleteAllMarkersEverywhere",
-      "deleteUnnamedMarkers",
-      "removeAllLayerStyles",
-      "removeInOutMarkers",
-      "clearLayerMarkerNumbers",
-      "clearExpressions",
-      "fullPurge"
-    ].indexOf(fn) >= 0;
 }
 
 async function callTntV3Command(functionName, args = [], options = {}) {
