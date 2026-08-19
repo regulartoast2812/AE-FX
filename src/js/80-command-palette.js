@@ -234,6 +234,30 @@ function filteredFxEffects() {
 // Three visual groups for the left-edge stripe. Assistant-saved scripts share the
 // custom stripe deliberately: the distinction that matters at a glance is "not
 // built into After Effects", not who authored it.
+// One icon per action verb, reused across every entry. Drawing per-command icons
+// is not viable at ~640 entries, and the action is the axis that says what a
+// command does - the source stripe already carries where it came from.
+const TNT_ACTION_ICONS = {
+  "Open":   '<rect x="2.5" y="4" width="10" height="12" rx="1.6"/><path d="M12.5 10h5M15.2 7.4L17.7 10l-2.5 2.6"/>',
+  "Set":    '<path d="M3 6h14M3 10h14M3 14h14"/><circle cx="7" cy="6" r="1.8"/><circle cx="13" cy="10" r="1.8"/><circle cx="9" cy="14" r="1.8"/>',
+  "Apply":  '<path d="M8 2.6l1.5 4L13.4 8 9.5 9.5 8 13.4 6.5 9.5 2.6 8l3.9-1.5z"/><path d="M14.8 12.4l.8 2.1 2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8z"/>',
+  "Add":    '<circle cx="10" cy="10" r="7"/><path d="M10 6.6v6.8M6.6 10h6.8"/>',
+  "Delete": '<path d="M3.5 5.5h13M8 5.5V3.8h4v1.7"/><path d="M5.4 5.5l.8 10.2a1 1 0 0 0 1 .9h5.6a1 1 0 0 0 1-.9l.8-10.2"/>',
+  "Show":   '<path d="M1.6 10S4.6 4.6 10 4.6 18.4 10 18.4 10 15.4 15.4 10 15.4 1.6 10 1.6 10z"/><circle cx="10" cy="10" r="2.4"/>',
+  "Go To":  '<circle cx="10" cy="10" r="7"/><path d="M8.6 6.9L11.8 10l-3.2 3.1"/>',
+  "Space":  '<path d="M3 3.2v13.6M17 3.2v13.6"/><rect x="6.6" y="7.4" width="6.8" height="5.2" rx="1.2"/>',
+  "Play":   '<path d="M6.6 4.4l8.4 5.6-8.4 5.6z"/>'
+};
+
+function tntActionIconMarkup(entry) {
+  let label = "Apply";
+  try {
+    const action = (safeFxConsoleEntryTags(entry) || []).filter(tag => tag.kind === "action")[0];
+    if (action && TNT_ACTION_ICONS[action.label]) label = action.label;
+  } catch (_) {}
+  return `<svg class="assistant-function-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">${TNT_ACTION_ICONS[label]}</svg>`;
+}
+
 function tntSourceGroup(entry) {
   const source = String((entry && entry.source) || "");
   if (source === "native" || (entry && entry.type === "effect")) return "native";

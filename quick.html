@@ -287,8 +287,27 @@
         </div>
       </div>
       <div id="assistantFunctionsPanel" class="assistant-panel active" role="tabpanel" aria-labelledby="assistantFunctionsTab" data-assistant-panel="functions">
-        <div class="assistant-function-search">
-          <input id="assistantFunctionSearch" type="text" spellcheck="false" autocomplete="off" placeholder="Search functions" aria-label="Search functions">
+        <div class="assistant-function-filters">
+          <div class="assistant-function-search">
+            <input id="assistantFunctionSearch" type="text" spellcheck="false" autocomplete="off" placeholder="Search functions" aria-label="Search functions">
+            <span id="assistantFunctionCount" class="assistant-function-count">0 commands</span>
+          </div>
+          <div class="assistant-filter-row">
+            <label class="assistant-filter-type">
+              <span>Type</span>
+              <select id="assistantFilterType" aria-label="Filter by type">
+                <option value="all">All types</option>
+                <option value="native">AE Effect</option>
+                <option value="panel">Panel</option>
+                <option value="custom">Custom</option>
+              </select>
+            </label>
+            <div class="assistant-filter-seg" id="assistantFilterKey" role="group" aria-label="Filter by shortcut">
+              <button type="button" class="active" data-key-filter="all">All</button>
+              <button type="button" data-key-filter="assigned">Assigned</button>
+              <button type="button" data-key-filter="unassigned">Unassigned</button>
+            </div>
+          </div>
         </div>
         <div id="assistantFunctionList" class="assistant-function-list"></div>
       </div>

@@ -8789,6 +8789,30 @@ function filteredFxEffects() {
 // Three visual groups for the left-edge stripe. Assistant-saved scripts share the
 // custom stripe deliberately: the distinction that matters at a glance is "not
 // built into After Effects", not who authored it.
+// One icon per action verb, reused across every entry. Drawing per-command icons
+// is not viable at ~640 entries, and the action is the axis that says what a
+// command does - the source stripe already carries where it came from.
+const TNT_ACTION_ICONS = {
+  "Open":   '<rect x="2.5" y="4" width="10" height="12" rx="1.6"/><path d="M12.5 10h5M15.2 7.4L17.7 10l-2.5 2.6"/>',
+  "Set":    '<path d="M3 6h14M3 10h14M3 14h14"/><circle cx="7" cy="6" r="1.8"/><circle cx="13" cy="10" r="1.8"/><circle cx="9" cy="14" r="1.8"/>',
+  "Apply":  '<path d="M8 2.6l1.5 4L13.4 8 9.5 9.5 8 13.4 6.5 9.5 2.6 8l3.9-1.5z"/><path d="M14.8 12.4l.8 2.1 2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8z"/>',
+  "Add":    '<circle cx="10" cy="10" r="7"/><path d="M10 6.6v6.8M6.6 10h6.8"/>',
+  "Delete": '<path d="M3.5 5.5h13M8 5.5V3.8h4v1.7"/><path d="M5.4 5.5l.8 10.2a1 1 0 0 0 1 .9h5.6a1 1 0 0 0 1-.9l.8-10.2"/>',
+  "Show":   '<path d="M1.6 10S4.6 4.6 10 4.6 18.4 10 18.4 10 15.4 15.4 10 15.4 1.6 10 1.6 10z"/><circle cx="10" cy="10" r="2.4"/>',
+  "Go To":  '<circle cx="10" cy="10" r="7"/><path d="M8.6 6.9L11.8 10l-3.2 3.1"/>',
+  "Space":  '<path d="M3 3.2v13.6M17 3.2v13.6"/><rect x="6.6" y="7.4" width="6.8" height="5.2" rx="1.2"/>',
+  "Play":   '<path d="M6.6 4.4l8.4 5.6-8.4 5.6z"/>'
+};
+
+function tntActionIconMarkup(entry) {
+  let label = "Apply";
+  try {
+    const action = (safeFxConsoleEntryTags(entry) || []).filter(tag => tag.kind === "action")[0];
+    if (action && TNT_ACTION_ICONS[action.label]) label = action.label;
+  } catch (_) {}
+  return `<svg class="assistant-function-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">${TNT_ACTION_ICONS[label]}</svg>`;
+}
+
 function tntSourceGroup(entry) {
   const source = String((entry && entry.source) || "");
   if (source === "native" || (entry && entry.type === "effect")) return "native";
@@ -12139,6 +12163,47 @@ const assistantHubEl = document.getElementById("assistantHub");
 const assistantFunctionSearchEl = document.getElementById("assistantFunctionSearch");
 const assistantFunctionListEl = document.getElementById("assistantFunctionList");
 const assistantFunctionCountEl = document.getElementById("assistantFunctionCount");
+// Search wide enough to cover the whole catalogue, so the type and shortcut
+// filters see every entry rather than only the first page of results. The
+// display cap is applied after filtering, in the renderer.
+const ASSISTANT_SEARCH_LIMIT = 5000;
+const ASSISTANT_RENDER_LIMIT = 200;
+const assistantFilterTypeEl = document.getElementById("assistantFilterType");
+const assistantFilterKeyEl = document.getElementById("assistantFilterKey");
+let assistantFilterType = "all";
+let assistantFilterKey = "all";
+
+// Source group and shortcut presence, applied after the text search so the count
+// reflects what is actually on screen.
+function assistantApplyFilters(entries) {
+  return (entries || []).filter(entry => {
+    if (assistantFilterType !== "all" && tntSourceGroup(entry) !== assistantFilterType) return false;
+    if (assistantFilterKey === "all") return true;
+    const hasKey = !!String((entry && entry.shortcut) || "").trim();
+    return assistantFilterKey === "assigned" ? hasKey : !hasKey;
+  });
+}
+
+if (assistantFilterTypeEl) {
+  assistantFilterTypeEl.addEventListener("change", () => {
+    assistantFilterType = assistantFilterTypeEl.value || "all";
+    assistantFunctionSelectedIndex = 0;
+    renderAssistantFunctions();
+  });
+}
+
+if (assistantFilterKeyEl) {
+  assistantFilterKeyEl.addEventListener("click", event => {
+    const button = event.target.closest("[data-key-filter]");
+    if (!button) return;
+    assistantFilterKey = button.dataset.keyFilter || "all";
+    assistantFilterKeyEl.querySelectorAll("[data-key-filter]").forEach(el => {
+      el.classList.toggle("active", el === button);
+    });
+    assistantFunctionSelectedIndex = 0;
+    renderAssistantFunctions();
+  });
+}
 
 // The gear moved from the (now removed) left gutter into the tab row, so it can
 // no longer rely on the gutter's delegated click handler.
@@ -12187,12 +12252,13 @@ function assistantFunctionEntries() {
   if (!assistantFunctionSearchEl) return [];
   const query = assistantFunctionSearchEl.value;
   try {
-    let entries = searchFxConsoleEntries(query, assistantFunctionsParentEntry, 96);
+    let entries = searchFxConsoleEntries(query, assistantFunctionsParentEntry, ASSISTANT_SEARCH_LIMIT);
     if (!entries.length && assistantFunctionsParentEntry && !String(query || "").trim()) {
       assistantFunctionsParentEntry = null;
       assistantFunctionSearchEl.placeholder = "Search functions";
-      entries = searchFxConsoleEntries("", null, 96);
+      entries = searchFxConsoleEntries("", null, ASSISTANT_SEARCH_LIMIT);
     }
+    entries = assistantApplyFilters(entries);
     if (entries.length) return entries;
   } catch (err) {
     statusEl.textContent = `Function search failed: ${String(err && err.message || err)}`;
@@ -12207,7 +12273,7 @@ function assistantFunctionEntries() {
       source: "custom",
       type: command.action ? "command" : (command.children ? "tntMenu" : "tntCommand")
     })));
-  if (!terms.length) return fallback.slice(0, 96);
+  if (!terms.length) return assistantApplyFilters(fallback);
   return fallback.filter(entry => {
     const source = fxConsoleSourceMeta(entry);
     const tags = (typeof safeFxConsoleEntryTags === "function" ? safeFxConsoleEntryTags(entry) : [{ label: source.label }]).map(tag => tag.label).join(" ");
@@ -12227,18 +12293,22 @@ function renderAssistantFunctions() {
   if (assistantFunctionCountEl) {
     assistantFunctionCountEl.textContent = assistantFunctionsParentEntry
       ? `${entries.length} in ${assistantFunctionsParentEntry.name || "group"}`
-      : `${entries.length} ready`;
+      : `${entries.length} command${entries.length === 1 ? "" : "s"}`;
   }
   if (!entries.length) {
     assistantFunctionListEl.innerHTML = `<div class="assistant-message">No functions found.</div>`;
     return;
   }
-  assistantFunctionListEl.innerHTML = entries.map((entry, index) => {
+  const shown = entries.slice(0, ASSISTANT_RENDER_LIMIT);
+  assistantFunctionListEl.innerHTML = shown.map((entry, index) => {
+    const shortcut = String(entry.shortcut || "").trim();
     return `
       <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}" data-assistant-function-index="${index}" data-fx-source="${tntSourceGroup(entry)}">
+        ${tntActionIconMarkup(entry)}
         <strong>${escapeHtml(entry.name || entry.matchName || "Function")}</strong>
         <span class="assistant-function-tags tnt-tags">${tntTagChips(entry)}</span>
         <em>${escapeHtml(assistantFunctionDetail(entry))}</em>
+        <kbd class="assistant-function-key${shortcut ? "" : " empty"}">${shortcut ? escapeHtml(shortcut) : "&mdash;"}</kbd>
       </button>
     `;
   }).join("");

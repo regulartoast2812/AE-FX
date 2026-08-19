@@ -1622,6 +1622,47 @@ const assistantHubEl = document.getElementById("assistantHub");
 const assistantFunctionSearchEl = document.getElementById("assistantFunctionSearch");
 const assistantFunctionListEl = document.getElementById("assistantFunctionList");
 const assistantFunctionCountEl = document.getElementById("assistantFunctionCount");
+// Search wide enough to cover the whole catalogue, so the type and shortcut
+// filters see every entry rather than only the first page of results. The
+// display cap is applied after filtering, in the renderer.
+const ASSISTANT_SEARCH_LIMIT = 5000;
+const ASSISTANT_RENDER_LIMIT = 200;
+const assistantFilterTypeEl = document.getElementById("assistantFilterType");
+const assistantFilterKeyEl = document.getElementById("assistantFilterKey");
+let assistantFilterType = "all";
+let assistantFilterKey = "all";
+
+// Source group and shortcut presence, applied after the text search so the count
+// reflects what is actually on screen.
+function assistantApplyFilters(entries) {
+  return (entries || []).filter(entry => {
+    if (assistantFilterType !== "all" && tntSourceGroup(entry) !== assistantFilterType) return false;
+    if (assistantFilterKey === "all") return true;
+    const hasKey = !!String((entry && entry.shortcut) || "").trim();
+    return assistantFilterKey === "assigned" ? hasKey : !hasKey;
+  });
+}
+
+if (assistantFilterTypeEl) {
+  assistantFilterTypeEl.addEventListener("change", () => {
+    assistantFilterType = assistantFilterTypeEl.value || "all";
+    assistantFunctionSelectedIndex = 0;
+    renderAssistantFunctions();
+  });
+}
+
+if (assistantFilterKeyEl) {
+  assistantFilterKeyEl.addEventListener("click", event => {
+    const button = event.target.closest("[data-key-filter]");
+    if (!button) return;
+    assistantFilterKey = button.dataset.keyFilter || "all";
+    assistantFilterKeyEl.querySelectorAll("[data-key-filter]").forEach(el => {
+      el.classList.toggle("active", el === button);
+    });
+    assistantFunctionSelectedIndex = 0;
+    renderAssistantFunctions();
+  });
+}
 
 // The gear moved from the (now removed) left gutter into the tab row, so it can
 // no longer rely on the gutter's delegated click handler.
@@ -1670,12 +1711,13 @@ function assistantFunctionEntries() {
   if (!assistantFunctionSearchEl) return [];
   const query = assistantFunctionSearchEl.value;
   try {
-    let entries = searchFxConsoleEntries(query, assistantFunctionsParentEntry, 96);
+    let entries = searchFxConsoleEntries(query, assistantFunctionsParentEntry, ASSISTANT_SEARCH_LIMIT);
     if (!entries.length && assistantFunctionsParentEntry && !String(query || "").trim()) {
       assistantFunctionsParentEntry = null;
       assistantFunctionSearchEl.placeholder = "Search functions";
-      entries = searchFxConsoleEntries("", null, 96);
+      entries = searchFxConsoleEntries("", null, ASSISTANT_SEARCH_LIMIT);
     }
+    entries = assistantApplyFilters(entries);
     if (entries.length) return entries;
   } catch (err) {
     statusEl.textContent = `Function search failed: ${String(err && err.message || err)}`;
@@ -1690,7 +1732,7 @@ function assistantFunctionEntries() {
       source: "custom",
       type: command.action ? "command" : (command.children ? "tntMenu" : "tntCommand")
     })));
-  if (!terms.length) return fallback.slice(0, 96);
+  if (!terms.length) return assistantApplyFilters(fallback);
   return fallback.filter(entry => {
     const source = fxConsoleSourceMeta(entry);
     const tags = (typeof safeFxConsoleEntryTags === "function" ? safeFxConsoleEntryTags(entry) : [{ label: source.label }]).map(tag => tag.label).join(" ");
@@ -1710,18 +1752,22 @@ function renderAssistantFunctions() {
   if (assistantFunctionCountEl) {
     assistantFunctionCountEl.textContent = assistantFunctionsParentEntry
       ? `${entries.length} in ${assistantFunctionsParentEntry.name || "group"}`
-      : `${entries.length} ready`;
+      : `${entries.length} command${entries.length === 1 ? "" : "s"}`;
   }
   if (!entries.length) {
     assistantFunctionListEl.innerHTML = `<div class="assistant-message">No functions found.</div>`;
     return;
   }
-  assistantFunctionListEl.innerHTML = entries.map((entry, index) => {
+  const shown = entries.slice(0, ASSISTANT_RENDER_LIMIT);
+  assistantFunctionListEl.innerHTML = shown.map((entry, index) => {
+    const shortcut = String(entry.shortcut || "").trim();
     return `
       <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}" data-assistant-function-index="${index}" data-fx-source="${tntSourceGroup(entry)}">
+        ${tntActionIconMarkup(entry)}
         <strong>${escapeHtml(entry.name || entry.matchName || "Function")}</strong>
         <span class="assistant-function-tags tnt-tags">${tntTagChips(entry)}</span>
         <em>${escapeHtml(assistantFunctionDetail(entry))}</em>
+        <kbd class="assistant-function-key${shortcut ? "" : " empty"}">${shortcut ? escapeHtml(shortcut) : "&mdash;"}</kbd>
       </button>
     `;
   }).join("");
