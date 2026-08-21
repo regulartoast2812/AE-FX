@@ -10,11 +10,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>AEFXQuickControls</AssemblyName>
     <RootNamespace>AEFXQuickControls</RootNamespace>
-    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4129.50" />
   </ItemGroup>
 
 </Project>
