@@ -8,8 +8,8 @@
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>AEPRQuickControls</AssemblyName>
-    <RootNamespace>AEPRQuickControls</RootNamespace>
+    <AssemblyName>AEFXQuickControls</AssemblyName>
+    <RootNamespace>AEFXQuickControls</RootNamespace>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
   </PropertyGroup>
 

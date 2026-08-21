@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ExtensionManifest Version="7.0" ExtensionBundleId="com.tnk.ae.pr" ExtensionBundleVersion="0.1.0" ExtensionBundleName="AE PR">
+<ExtensionManifest Version="7.0" ExtensionBundleId="com.tnk.ae.fx" ExtensionBundleVersion="0.1.0" ExtensionBundleName="AE FX">
   <ExtensionList>
-    <Extension Id="com.tnk.ae.pr.panel" Version="0.1.0" />
+    <Extension Id="com.tnk.ae.fx.panel" Version="0.1.0" />
   </ExtensionList>
   <ExecutionEnvironment>
     <HostList>
@@ -15,7 +15,7 @@
     </RequiredRuntimeList>
   </ExecutionEnvironment>
   <DispatchInfoList>
-    <Extension Id="com.tnk.ae.pr.panel">
+    <Extension Id="com.tnk.ae.fx.panel">
       <DispatchInfo>
         <Resources>
           <MainPath>./index.html</MainPath>
@@ -32,7 +32,7 @@
         </Lifecycle>
         <UI>
           <Type>Panel</Type>
-          <Menu>AE PR</Menu>
+          <Menu>AE FX</Menu>
           <Geometry>
             <Size>
               <Width>900</Width>

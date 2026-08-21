@@ -1,4 +1,4 @@
-// AE PR Quick Controls - Windows overlay helper.
+// AE FX Quick Controls - Windows overlay helper.
 //
 // Windows counterpart to native-helper/ (macOS Swift). Same job, same contract:
 //   - grab global hotkeys while After Effects has focus  (RegisterHotKey)
@@ -25,7 +25,7 @@ using System.Windows.Media;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
 
-namespace AEPRQuickControls;
+namespace AEFXQuickControls;
 
 internal static class Program
 {
@@ -47,14 +47,14 @@ internal static class PanelBridge
 
     private const string Unreachable =
         "Could not reach the panel bridge. " +
-        "Open the AE PR panel in After Effects.";
+        "Open the AE FX panel in After Effects.";
 
     private static string ErrorJson(string message) =>
         JsonSerializer.Serialize(new { ok = false, error = message });
 
     private static string DiscoveryPath() => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-        ".ae-pr-quick-controls",
+        ".ae-fx-quick-controls",
         "bridge.json");
 
     /// <summary>

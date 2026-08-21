@@ -1,4 +1,4 @@
-AE PR - v41
+AE FX - v41
 
 Docs:
 - General UI design guide: docs/ui-design-guide.md

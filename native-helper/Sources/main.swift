@@ -196,7 +196,7 @@ private final class AfterEffectsBridge: NSObject, WKScriptMessageHandler {
     weak var webView: WKWebView?
     var onExecutionStarted: (() -> Void)?
     var onExecutionFinished: (() -> Void)?
-    private let executionQueue = DispatchQueue(label: "com.tnk.ae.pr.quickcontrols.jsx", qos: .userInitiated)
+    private let executionQueue = DispatchQueue(label: "com.tnk.ae.fx.quickcontrols.jsx", qos: .userInitiated)
 
     func userContentController(
         _ userContentController: WKUserContentController,
@@ -823,7 +823,7 @@ extension AppDelegate: WKUIDelegate {
         completionHandler: @escaping (Bool) -> Void
     ) {
         let alert = NSAlert()
-        alert.messageText = "AE PR Quick Controls"
+        alert.messageText = "AE FX Quick Controls"
         alert.informativeText = message
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Continue")
@@ -838,7 +838,7 @@ extension AppDelegate: WKUIDelegate {
         completionHandler: @escaping () -> Void
     ) {
         let alert = NSAlert()
-        alert.messageText = "AE PR Quick Controls"
+        alert.messageText = "AE FX Quick Controls"
         alert.informativeText = message
         alert.addButton(withTitle: "OK")
         alert.runModal()
@@ -853,7 +853,7 @@ extension AppDelegate: WKUIDelegate {
         completionHandler: @escaping (String?) -> Void
     ) {
         let alert = NSAlert()
-        alert.messageText = "AE PR Quick Controls"
+        alert.messageText = "AE FX Quick Controls"
         alert.informativeText = prompt
         alert.addButton(withTitle: "OK")
         alert.addButton(withTitle: "Cancel")

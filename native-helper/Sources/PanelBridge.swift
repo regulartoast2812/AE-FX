@@ -6,7 +6,7 @@
 // be compiled into a test harness without dragging in the AppKit UI.
 //
 // Port and token are not hardcoded - the panel publishes them to a 0600 file at
-// ~/.ae-pr-quick-controls/bridge.json. The token is required: without it any local
+// ~/.ae-fx-quick-controls/bridge.json. The token is required: without it any local
 // process could run arbitrary ExtendScript in After Effects.
 
 import Foundation
@@ -41,7 +41,7 @@ func bridgeErrorJSON(_ message: String) -> String {
 
 func panelBridgeDiscoveryURL() -> URL {
     FileManager.default.homeDirectoryForCurrentUser
-        .appendingPathComponent(".ae-pr-quick-controls", isDirectory: true)
+        .appendingPathComponent(".ae-fx-quick-controls", isDirectory: true)
         .appendingPathComponent("bridge.json", isDirectory: false)
 }
 
@@ -67,7 +67,7 @@ func loadPanelBridgeEndpoint() -> PanelBridgeEndpoint? {
 }
 
 private let panelUnreachableMessage =
-    "Could not reach the panel bridge. Open the AE PR panel in After Effects."
+    "Could not reach the panel bridge. Open the AE FX panel in After Effects."
 
 // MARK: - Bootstrap
 
@@ -82,7 +82,7 @@ private let panelUnreachableMessage =
 func openTimelinePanelViaAppleScript() -> Bool {
     let jsx = """
     (function () {
-        var id = app.findMenuCommandId("AE PR");
+        var id = app.findMenuCommandId("AE FX");
         if (id !== 0) { app.executeCommand(id); return "opened"; }
         return "notfound";
     }())
