@@ -717,7 +717,7 @@ function extensionRootPath() {
 async function launchNativeQuickControls() {
   suppressSyncUntil = Date.now() + 700;
   await loadJSX();
-  const appPath = `${extensionRootPath()}/native/TNT Quick Controls.app`;
+  const appPath = `${extensionRootPath()}/native/AE PR Quick Controls.app`;
   const result = await aeCall("TNT_launchNativeQuickControls", [appPath]);
   if (!result.ok) {
     statusEl.textContent = result.error || "Could not open Quick Controls.";
@@ -3630,7 +3630,7 @@ function allRelationshipLayerSets(layers = state.layers || []) {
 // and file I/O. The token and the chosen port are published to a 0600 discovery
 // file in the user's home directory; helpers read it instead of hardcoding a port.
 //
-//   ~/.tnt-quick-controls/bridge.json   {"port":8099,"token":"...","pid":123}
+//   ~/.ae-pr-quick-controls/bridge.json   {"port":8099,"token":"...","pid":123}
 //
 // Protocol: newline-delimited JSON, one object per line.
 //   -> {"id":"7","token":"...","script":"tntGetTimeline()"}
@@ -3654,7 +3654,7 @@ function bridgeRequire(moduleName) {
 }
 
 function bridgeDiscoveryPath(nodeOs, nodePath) {
-  return nodePath.join(nodeOs.homedir(), ".tnt-quick-controls", "bridge.json");
+  return nodePath.join(nodeOs.homedir(), ".ae-pr-quick-controls", "bridge.json");
 }
 
 function bridgeWriteDiscoveryFile(port, token) {
@@ -13450,7 +13450,7 @@ function assistantAeContextText(topicText = "") {
   }));
   const context = {
     host: "Adobe After Effects 2026",
-    extension: "Premiere Style Timeline CEP panel",
+    extension: "AE PR CEP panel",
     extensionRoot: extensionRootPath(),
     activeComp: comp ? {
       id: comp.id,
@@ -13476,7 +13476,7 @@ function assistantAeContextText(topicText = "") {
     functionRegistry: functions
   };
   return [
-    "You are running inside Adobe After Effects 2026 through the Premiere Style Timeline CEP assistant panel.",
+    "You are running inside Adobe After Effects 2026 through the AE PR CEP assistant panel.",
     "You may use local CLI tools, MCP servers, and files available to this machine. The user expects After Effects scripting help and panel automation.",
     "You can see the panel's current function registry in context.functionRegistry. When the user asks what functions the tool has, answer from that registry.",
     "Safety mode is enabled for generated scripts. Do not use app.project.save/saveWithDialog, app.quit/exit, system.callSystem, File/Folder filesystem access, importFile/ImportOptions, renderQueue/outputModule, remove(), or executeCommand(). Generated scripts should only mutate the active comp, selected layers, and their properties for the requested task.",
@@ -14011,7 +14011,7 @@ setupFilterTooltips();
 updateModeButton();
 
 if (QUICK_PANEL_MODE) {
-  document.title = "TNT Quick Controls";
+  document.title = "AE PR Quick Controls";
   document.documentElement.classList.add("quick-panel-mode");
   document.body.classList.add("quick-panel-mode");
   refreshQuickPanelState();
