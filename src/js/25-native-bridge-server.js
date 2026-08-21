@@ -11,7 +11,7 @@
 // and file I/O. The token and the chosen port are published to a 0600 discovery
 // file in the user's home directory; helpers read it instead of hardcoding a port.
 //
-//   ~/.tnt-quick-controls/bridge.json   {"port":8099,"token":"...","pid":123}
+//   ~/.ae-pr-quick-controls/bridge.json   {"port":8099,"token":"...","pid":123}
 //
 // Protocol: newline-delimited JSON, one object per line.
 //   -> {"id":"7","token":"...","script":"tntGetTimeline()"}
@@ -35,7 +35,7 @@ function bridgeRequire(moduleName) {
 }
 
 function bridgeDiscoveryPath(nodeOs, nodePath) {
-  return nodePath.join(nodeOs.homedir(), ".tnt-quick-controls", "bridge.json");
+  return nodePath.join(nodeOs.homedir(), ".ae-pr-quick-controls", "bridge.json");
 }
 
 function bridgeWriteDiscoveryFile(port, token) {

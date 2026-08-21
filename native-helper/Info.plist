@@ -5,15 +5,15 @@
   <key>CFBundleDevelopmentRegion</key>
   <string>en</string>
   <key>CFBundleDisplayName</key>
-  <string>TNT Quick Controls</string>
+  <string>AE PR Quick Controls</string>
   <key>CFBundleExecutable</key>
-  <string>TNTQuickControls</string>
+  <string>AEPRQuickControls</string>
   <key>CFBundleIdentifier</key>
-  <string>com.tnt.ae.quickcontrols</string>
+  <string>com.tnk.ae.pr.quickcontrols</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>CFBundleName</key>
-  <string>TNT Quick Controls</string>
+  <string>AE PR Quick Controls</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>
@@ -25,6 +25,6 @@
   <key>LSUIElement</key>
   <true/>
   <key>NSAppleEventsUsageDescription</key>
-  <string>TNT Quick Controls sends the selected command to Adobe After Effects.</string>
+  <string>AE PR Quick Controls sends the selected command to Adobe After Effects.</string>
 </dict>
 </plist>

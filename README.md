@@ -1,4 +1,4 @@
-Premiere Style Timeline - v41
+AE PR - v41
 
 Docs:
 - General UI design guide: docs/ui-design-guide.md

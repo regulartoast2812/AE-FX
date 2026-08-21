@@ -1,4 +1,4 @@
-# TNT Quick Controls — Windows helper
+# AE PR Quick Controls — Windows helper
 
 Windows counterpart to `native-helper/` (macOS Swift). Same contract, same hotkeys.
 
@@ -16,7 +16,7 @@ Run it with the extension folder discoverable — the app walks up from its own
 directory looking for `quick.html`, or you can point it explicitly:
 
 ```
-set TNT_EXTENSION_ROOT=C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\ae_premiere_timeline_panel
+set TNT_EXTENSION_ROOT=C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\AE PR
 dotnet run -c Release
 ```
 

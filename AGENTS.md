@@ -1,6 +1,6 @@
 # Codex Project Guide
 
-This guide keeps future work compact and consistent for the `ae_premiere_timeline_panel` CEP project.
+This guide keeps future work compact and consistent for the `AE PR` CEP project.
 
 ## Token Discipline
 

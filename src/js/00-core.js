@@ -714,7 +714,7 @@ function extensionRootPath() {
 async function launchNativeQuickControls() {
   suppressSyncUntil = Date.now() + 700;
   await loadJSX();
-  const appPath = `${extensionRootPath()}/native/TNT Quick Controls.app`;
+  const appPath = `${extensionRootPath()}/native/AE PR Quick Controls.app`;
   const result = await aeCall("TNT_launchNativeQuickControls", [appPath]);
   if (!result.ok) {
     statusEl.textContent = result.error || "Could not open Quick Controls.";
