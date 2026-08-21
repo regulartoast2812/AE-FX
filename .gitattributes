@@ -1,0 +1,24 @@
+# Normalise line endings so the same file is not rewritten wholesale when it is
+# checked out on Windows and committed back. Git for Windows defaults to
+# core.autocrlf=true, which converts LF to CRLF on checkout; without this every
+# file would look modified after a clone and every commit would fight the Mac.
+* text=auto eol=lf
+
+# Shell scripts must keep LF or they will not run under Git Bash / WSL.
+*.sh text eol=lf
+
+# Windows-native scripts want CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Never touch these.
+*.jsxbin binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
