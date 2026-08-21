@@ -19,7 +19,11 @@ node_modules/
 
 # Editor / IDE
 .vs/
-.vscode/
+# Track shared VS Code settings so both machines behave the same; ignore the
+# rest of .vscode, which is per-machine state.
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 *.user
 *.suo
 *.userprefs
