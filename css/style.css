@@ -17688,6 +17688,55 @@ body:not(.quick-panel-mode) #assistantHub {
   31% { width: 100%; opacity: 1; }
   100% { width: 100%; opacity: 0; }
 }
+
+/* Update banner: sits above the tab row, dismissible per version so it does not
+   nag once acknowledged. */
+.tnt-update-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(233, 147, 96, .38);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .07), rgba(213, 111, 58, .1)),
+    rgba(13, 14, 15, .3);
+  color: rgba(245, 226, 214, .92);
+  font-size: 11.5px;
+}
+
+.tnt-update-banner strong {
+  flex: 0 0 auto;
+  color: rgba(240, 176, 137, .98);
+  font-size: 11.5px;
+}
+
+.tnt-update-banner span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(235, 226, 220, .62);
+}
+
+.tnt-update-banner button {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 3px 9px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .05);
+  color: rgba(238, 226, 219, .8);
+  font: inherit;
+  font-size: 10.5px;
+  cursor: pointer;
+}
+
+.tnt-update-banner button:hover {
+  border-color: rgba(233, 147, 96, .5);
+  background: rgba(213, 111, 58, .16);
+}
 .quick-panel-shell {
   display: none;
 }

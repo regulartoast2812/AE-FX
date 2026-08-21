@@ -73,7 +73,17 @@ function renderSettingsMenu() {
     <div class="settings-menu-section">Layer Styles</div>
     ${settingsToggleRow("keepStyleEditorOpen", "Keep Editor Open", "After style edits")}
     <div class="settings-menu-section">About</div>
-    <div class="settings-menu-info">Timeline CEP<br>Comp: ${escapeHtml(state.comp && state.comp.name || "None")}</div>
+    ${settingsActionRow("checkUpdate", "Check for Updates", tntUpdateStatusLabel())}
+    <div class="settings-menu-info">Timeline CEP v${escapeHtml(typeof TNT_VERSION === "string" ? TNT_VERSION : "?")}<br>Comp: ${escapeHtml(state.comp && state.comp.name || "None")}</div>
+  `;
+}
+
+function settingsActionRow(key, label, detail) {
+  return `
+    <button type="button" class="settings-menu-row" data-action="${escapeHtml(key)}">
+      <span>${escapeHtml(label)}</span>
+      <em>${escapeHtml(detail)}</em>
+    </button>
   `;
 }
 
