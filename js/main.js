@@ -512,6 +512,17 @@ function isMacPlatform() {
   return platform.indexOf("mac") >= 0;
 }
 
+// Shown in Settings > About. Distinguishes the two native-helper hosts as well as
+// the OS, because "Windows" alone would not say whether the page is running in the
+// docked CEP panel or inside the WebView2 overlay - and those render differently
+// enough (see the .native-win rules in 95-quick-panel.css) that it matters when
+// someone reports a visual bug.
+function platformLabel() {
+  const os = isMacPlatform() ? "macOS" : "Windows";
+  if (!window.__TNT_NATIVE_HELPER__) return `${os} · CEP panel`;
+  return `${os} · Quick Controls overlay`;
+}
+
 function primaryModifierLabel() {
   return "Ctrl";
 }
@@ -1501,6 +1512,7 @@ async function promptAddMarker() {
   else if (response.action === "protected") await runTntV3Command({ name: "Create Protected Marker", tntFunction: "createProtectedMarker", args: [0, label, true] });
   else await runTntV3Command({ name: "Add Marker", tntFunction: "addMarker", args: [label] });
 }
+
 function ensureLayerStyleDialog() {
   if (layerStyleDialogEl) return layerStyleDialogEl;
   layerStyleDialogEl = document.createElement("div");
@@ -3310,6 +3322,7 @@ async function setLayerStyleProp(input, value) {
   await callTntV3Command("seSetProp", [input.dataset.gmn, input.dataset.pmn, value], { status: false, localFirst: true });
   if (!LAYER_STYLE_PANEL_KEEP_OPEN && !panelSettings.keepStyleEditorOpen) closeLayerStyleDialog();
 }
+
 function ensureSettingsMenu() {
   if (settingsMenuEl) return settingsMenuEl;
   settingsMenuEl = document.createElement("div");
@@ -3374,6 +3387,7 @@ function closeSettingsMenu() {
 
 function renderSettingsMenu() {
   const menu = ensureSettingsMenu();
+  const listener = nativeListenerStatus();
   menu.innerHTML = `
     <div class="settings-menu-title">Settings</div>
     <button type="button" class="settings-menu-row" data-action="shortcuts"><span>Shortcuts</span><em>View rundown</em></button>
@@ -3384,9 +3398,23 @@ function renderSettingsMenu() {
     <div class="settings-menu-section">Safety</div>
     <div class="settings-menu-section">Layer Styles</div>
     ${settingsToggleRow("keepStyleEditorOpen", "Keep Editor Open", "After style edits")}
+    <div class="settings-menu-section">Listeners</div>
+    ${settingsStatusRow("Panel Bridge", bridgeStatusLabel(), bridgeStatusClass())}
+    ${settingsStatusRow("Quick Controls", listener.detail, listener.statusClass)}
+    ${settingsActionRow("installNativeListener", listener.actionLabel, listener.actionDetail)}
     <div class="settings-menu-section">About</div>
     ${settingsActionRow("checkUpdate", "Check for Updates", tntUpdateStatusLabel())}
-    <div class="settings-menu-info">Timeline CEP v${escapeHtml(typeof TNT_VERSION === "string" ? TNT_VERSION : "?")}<br>Comp: ${escapeHtml(state.comp && state.comp.name || "None")}</div>
+    <div class="settings-menu-info">Timeline CEP v${escapeHtml(typeof TNT_VERSION === "string" ? TNT_VERSION : "?")}<br>Platform: ${escapeHtml(platformLabel())}<br>Comp: ${escapeHtml(state.comp && state.comp.name || "None")}</div>
+  `;
+}
+
+function settingsStatusRow(label, detail, statusClass) {
+  return `
+    <div class="settings-menu-row settings-menu-status">
+      <span>${escapeHtml(label)}</span>
+      <em>${escapeHtml(detail)}</em>
+      <i class="${escapeHtml(statusClass || "unknown")}"></i>
+    </div>
   `;
 }
 
@@ -3409,6 +3437,163 @@ function settingsToggleRow(key, label, detail) {
   `;
 }
 
+function bridgeStatusLabel() {
+  const status = window.__TNT_BRIDGE_STATUS__ || (typeof tntBridgeStatus !== "undefined" ? tntBridgeStatus : {}) || {};
+  if (status.state === "ok") return status.message || "Active";
+  if (status.state === "error") return status.message || "Unavailable";
+  return "Starting";
+}
+
+function bridgeStatusClass() {
+  const status = window.__TNT_BRIDGE_STATUS__ || (typeof tntBridgeStatus !== "undefined" ? tntBridgeStatus : {}) || {};
+  if (status.state === "ok") return "ok";
+  if (status.state === "error") return "bad";
+  return "warn";
+}
+
+function settingsNodeRequire(moduleName) {
+  try {
+    if (typeof require === "function") return require(moduleName);
+  } catch (_) {}
+  try {
+    if (window.cep_node && typeof window.cep_node.require === "function") {
+      return window.cep_node.require(moduleName);
+    }
+  } catch (_) {}
+  return null;
+}
+
+function nativeListenerExtensionRoot() {
+  try {
+    if (typeof SystemPath !== "undefined" && cs && typeof cs.getSystemPath === "function") {
+      const value = cs.getSystemPath(SystemPath.EXTENSION);
+      if (value) return value;
+    }
+  } catch (_) {}
+  try {
+    let pathname = decodeURIComponent(window.location.pathname || "");
+    if (isMacPlatform() && pathname.charAt(0) === "/") return pathname.replace(/\/[^\/]*$/, "");
+    pathname = pathname.replace(/^\/([A-Za-z]:\/)/, "$1").replace(/\//g, "\\");
+    return pathname.replace(/\\[^\\]*$/, "");
+  } catch (_) {
+    return "";
+  }
+}
+
+function nativeListenerStatus() {
+  const fs = settingsNodeRequire("fs");
+  const path = settingsNodeRequire("path");
+  const childProcess = settingsNodeRequire("child_process");
+  const root = nativeListenerExtensionRoot();
+  const mac = isMacPlatform();
+  if (!fs || !path || !childProcess || !root) {
+    return {
+      detail: "CEP Node unavailable",
+      statusClass: "bad",
+      actionLabel: "Install Listener",
+      actionDetail: "Unavailable here"
+    };
+  }
+
+  const artifact = mac
+    ? path.join(root, "native", "AE FX Quick Controls.app", "Contents", "MacOS", "AEFXQuickControls")
+    : path.join(root, "native-helper-win", "bin", "Release", "net8.0-windows", "AEFXQuickControls.exe");
+  const installed = fs.existsSync(artifact);
+  const active = nativeListenerProcessActive(childProcess, mac);
+
+  return {
+    detail: active ? "Installed and active" : (installed ? "Installed, not running" : "Not installed"),
+    statusClass: active ? "ok" : (installed ? "warn" : "bad"),
+    actionLabel: active ? "Open Listener" : (installed ? "Start Listener" : "Install Listener"),
+    actionDetail: active ? "Already active" : (mac ? "macOS helper" : "Windows helper")
+  };
+}
+
+function nativeListenerProcessActive(childProcess, mac) {
+  try {
+    if (mac) {
+      childProcess.execFileSync("/usr/bin/pgrep", ["-x", "AEFXQuickControls"], { stdio: "ignore" });
+      return true;
+    }
+    const output = childProcess.execFileSync(
+      "tasklist.exe",
+      ["/FI", "IMAGENAME eq AEFXQuickControls.exe", "/FO", "CSV", "/NH"],
+      { encoding: "utf8", windowsHide: true }
+    );
+    return /AEFXQuickControls\.exe/i.test(output);
+  } catch (_) {
+    return false;
+  }
+}
+
+function installNativeListener() {
+  const fs = settingsNodeRequire("fs");
+  const path = settingsNodeRequire("path");
+  const childProcess = settingsNodeRequire("child_process");
+  const root = nativeListenerExtensionRoot();
+  if (!fs || !path || !childProcess || !root) {
+    statusEl.textContent = "Native listener install is unavailable in this CEP runtime.";
+    renderSettingsMenu();
+    return;
+  }
+
+  const mac = isMacPlatform();
+  const message = mac
+    ? "Install or start the macOS Quick Controls listener?"
+    : "Install or start the Windows Quick Controls listener?";
+  if (!window.confirm(message)) return;
+
+  statusEl.textContent = mac ? "Starting macOS listener..." : "Starting Windows listener...";
+  if (mac) installMacNativeListener(childProcess, root);
+  else installWindowsNativeListener(fs, path, childProcess, root);
+}
+
+function installMacNativeListener(childProcess, root) {
+  const script = `${root}/scripts/launch-native-helper.sh`;
+  childProcess.execFile("/bin/bash", [script], { cwd: root }, error => {
+    statusEl.textContent = error ? `Listener failed: ${error.message}` : "Quick Controls listener is starting.";
+    if (settingsMenuEl && settingsMenuEl.classList.contains("open")) renderSettingsMenu();
+  });
+}
+
+function installWindowsNativeListener(fs, path, childProcess, root) {
+  const helperDir = path.join(root, "native-helper-win");
+  const exe = path.join(helperDir, "bin", "Release", "net8.0-windows", "AEFXQuickControls.exe");
+  const launch = () => {
+    try {
+      const child = childProcess.spawn(exe, [], {
+        cwd: helperDir,
+        detached: true,
+        stdio: "ignore",
+        windowsHide: true,
+        env: Object.assign({}, (typeof process !== "undefined" && process.env) || {}, { TNT_EXTENSION_ROOT: root })
+      });
+      child.unref();
+      statusEl.textContent = "Quick Controls listener is starting.";
+    } catch (e) {
+      statusEl.textContent = `Listener failed: ${e.message || e}`;
+    }
+    if (settingsMenuEl && settingsMenuEl.classList.contains("open")) {
+      window.setTimeout(renderSettingsMenu, 600);
+    }
+  };
+
+  if (fs.existsSync(exe)) {
+    launch();
+    return;
+  }
+
+  statusEl.textContent = "Building Windows listener...";
+  childProcess.execFile("dotnet", ["build", "-c", "Release"], { cwd: helperDir, windowsHide: true }, error => {
+    if (error) {
+      statusEl.textContent = `Listener build failed: ${error.message}`;
+      if (settingsMenuEl && settingsMenuEl.classList.contains("open")) renderSettingsMenu();
+      return;
+    }
+    launch();
+  });
+}
+
 async function handleSettingsMenuClick(event) {
   const toggle = event.target.closest && event.target.closest("[data-toggle]");
   if (toggle) {
@@ -3429,6 +3614,8 @@ async function handleSettingsMenuClick(event) {
     statusEl.textContent = "Refreshing...";
     await refreshLayers({ forceRender: true });
     statusEl.textContent = "Refreshed.";
+  } else if (action.dataset.action === "installNativeListener") {
+    installNativeListener();
   }
 }
 
@@ -3617,6 +3804,7 @@ function allRelationshipLayerSets(layers = state.layers || []) {
   });
   return { parented, parentSources, matteChildren, matteSources };
 }
+
 // Native bridge server.
 //
 // Runs only in the real CEP panel (inside After Effects), never in quick.html.
@@ -3814,6 +4002,7 @@ function bridgeSetStatus(state, message) {
 }
 
 const tntBridgeServer = startNativeBridgeServer();
+
 // Version and update check.
 //
 // TNT_VERSION is stamped into the bundle by scripts/build.sh from
@@ -4009,6 +4198,7 @@ if (settingsMenuEl) {
     try { renderSettingsMenu(); } catch (_) {}
   });
 }
+
 const FILTER_LABELS = {
   comp: "comps",
   text: "text",
@@ -4416,6 +4606,7 @@ async function applyLayerSelectionQuickFilter(filter) {
   renderLayerSelectionPanel();
   await queueLayerSelectionHostUpdate(next);
 }
+
 function packLayers(layers) {
   // Compact, stack-aware interval packing.
   // Goal:
@@ -5700,6 +5891,7 @@ function renderLayerRelationships(layers) {
     if (showParentLinks && parentIndex && visible[parentIndex]) renderRelationshipLine("parent", layerIndex, parentIndex);
   });
 }
+
 function render() {
   if (timelineMode === "keyframe") {
     renderKeyframeMode();
@@ -6908,6 +7100,7 @@ function escapeHtml(value) {
 function isLayerMenuOpen() {
   return !!(layerMenuEl && layerMenuEl.classList.contains("open"));
 }
+
 async function refreshLayers(options = {}) {
   if (QUICK_PANEL_MODE) {
     await refreshQuickPanelState();
@@ -7829,6 +8022,7 @@ function showMarkerContextMenu(event, marker, options = {}) {
 function bindMarkerContextMenu(el, marker, options = {}) {
   el.addEventListener("contextmenu", e => showMarkerContextMenu(e, marker, options));
 }
+
 function timeFromPointerEvent(event, options = {}) {
   if (!state.comp) return 0;
 
@@ -8761,6 +8955,7 @@ async function drainUndoRequests() {
   panelPointerInside = true;
   focusPanel(2);
 }
+
 function ensureFxConsole() {
   if (fxConsoleEl) return fxConsoleEl;
   fxConsoleEl = document.createElement("div");
@@ -9306,6 +9501,7 @@ async function executeFxConsoleEntry(effect) {
   await refreshLayers({ forceRender: true });
   return true;
 }
+
 function ensureEaseDialog() {
   if (easeDialogEl) return easeDialogEl;
   easeDialogEl = document.createElement("div");
@@ -9818,6 +10014,7 @@ async function applyEaseToSelected(options = {}) {
   if ((options.close || options.refresh) && !keepDialogOpen) focusPanel(2);
 }
 
+
 let massEditDialogEl = null;
 let massEditSourceIndex = 0;
 
@@ -10024,6 +10221,7 @@ function hideMassEditPanel() {
   massEditDialogEl.classList.remove("show");
   massEditDialogEl.setAttribute("aria-hidden", "true");
 }
+
 let textAnimationBackdropEl = null;
 let textAnimationState = {
   style: "master",
@@ -10276,6 +10474,7 @@ async function applyTextAnimationPreset(name) {
   await runTntV3Command({ name: "Text Animation Preset", tntFunction: preset[0], args: preset[1] });
   renderTextAnimationPanel();
 }
+
 let timingOrderBackdropEl = null;
 let timingOrderDirection = "asc";
 let timingOrderUnit = "frames";
@@ -10759,6 +10958,7 @@ function hideTimingOrderPanel() {
   timingOrderBackdropEl.classList.remove("show");
   timingOrderBackdropEl.setAttribute("aria-hidden", "true");
 }
+
 function currentFrameRate() {
   return Math.max(1, Math.round(Number(state.comp && state.comp.frameRate || 30)));
 }
@@ -12116,6 +12316,27 @@ function quickPanelNaturalHeight(surface) {
   return Math.ceil(contentBottom + 16);
 }
 
+// Extra transparent space the native window carries around the panel so drop
+// shadows can fade out instead of being clipped square at the window edge.
+//
+// Only the Windows overlay needs it. The macOS window is not sized this tightly
+// and its shadow is drawn by AppKit, not by CSS. On Windows the window is sized
+// to the measured content, so without a gutter any shadow reaching past the edge
+// is cut off at full strength - which reads as a dark rectangle around the panel
+// rather than as depth.
+//
+// This has to stay above the largest shadow's reach (offset + blur) in the
+// `.native-win` rules of 95-quick-panel.css, which is 8 + 24 = 32. Equalling it is
+// not enough: a Gaussian tail is still faintly visible at its nominal extent, so
+// the last pixels get clipped and the edge stays detectable. 40 leaves 8px of
+// clean margin. The CSS insets the panel by this same amount, so the panel keeps
+// its intended size and the gutter is pure transparent margin.
+const QUICK_PANEL_SHADOW_GUTTER = 40;
+
+function quickPanelShadowGutter() {
+  return window.__TNT_NATIVE_PLATFORM__ === "win" ? QUICK_PANEL_SHADOW_GUTTER : 0;
+}
+
 function resizeNativeQuickPanel() {
   if (!QUICK_PANEL_MODE || typeof window.__tntNativeResize !== "function") return;
   const surface = activeQuickPanelSurface();
@@ -12126,9 +12347,10 @@ function resizeNativeQuickPanel() {
   }
   document.body.classList.toggle("quick-subpanel-open", !!surface || quickPanelSurfaceSwitching);
   if (!surface && quickPanelSurfaceSwitching) return;
-  const width = quickPanelSurfaceWidth(surface);
+  const gutter = quickPanelShadowGutter();
+  const width = quickPanelSurfaceWidth(surface) + gutter * 2;
   const contentHeight = quickPanelNaturalHeight(surface);
-  const height = Math.max(quickPanelSurfaceMinimumHeight(surface), contentHeight);
+  const height = Math.max(quickPanelSurfaceMinimumHeight(surface), contentHeight) + gutter * 2;
   const signature = `${Math.round(width)}x${Math.round(height)}`;
   if (signature === quickPanelLastSize) return;
   quickPanelLastSize = signature;
@@ -12309,6 +12531,16 @@ window.__tntQuickPanelDidShow = async function () {
 window.__tntQuickPanelOpenControl = async function (name) {
   if (!QUICK_PANEL_MODE) return;
   await openQuickPanelControl(name);
+  // A direct hotkey asked for one specific control. If that control declined to
+  // open - Ease with no keyframes selected, for instance - the shell is what is
+  // left on screen, so the request lands as the search launcher instead. Asking
+  // for Ease and being handed a search box is worse than nothing happening, so
+  // on Windows the overlay just dismisses itself. Scoped to the native-win
+  // helper: this is the behaviour the user asked to change on that side only.
+  if (window.__TNT_NATIVE_PLATFORM__ === "win" && !activeQuickPanelSurface()) {
+    closeNativeQuickPanelWindow();
+    return;
+  }
   focusPanel(1);
   scheduleNativeQuickPanelResize(0);
 };
@@ -12317,6 +12549,102 @@ window.__tntQuickPanelOpenLayerMenu = async function () {
   if (!QUICK_PANEL_MODE) return;
   await openQuickPanelLayerMenu();
 };
+
+// Windows only. The overlay is a per-pixel-alpha layered window, and Windows
+// hit-tests those against the alpha channel - but WebView2 renders through its own
+// composition visual, so nothing the page paints contributes to that mask and the
+// whole overlay is click-through. Filling the window with a near-transparent
+// colour fixes the clicks but tints the entire window rectangle, which shows up as
+// a faint rectangle around floating layouts like the anchor panel.
+//
+// So instead the helper draws WPF rectangles that match only the surfaces actually
+// painted here, and puts them *behind* the WebView. They supply the alpha the hit
+// test needs, they are completely hidden behind the page's own opaque surfaces,
+// and the gaps between cards stay transparent and click-through.
+window.__tntQuickPanelHitRects = function () {
+  if (!QUICK_PANEL_MODE) return [];
+  const selectors = [
+    ".quick-panel-shell",
+    ".anchor-section",
+    ".timing-order-section",
+    ".quick-layer-menu-dialog",
+    ".layer-style-dialog",
+    ".timeline-command-dialog",
+    ".duration-dialog",
+    ".expression-dialog",
+    ".composition-dialog",
+    ".layer-selection-dialog",
+    ".ease-dialog",
+    ".mass-edit-dialog",
+    ".text-animation-dialog",
+    ".layer-menu.open"
+  ];
+  const rects = [];
+  const add = (el, style) => {
+    const rect = el.getBoundingClientRect();
+    if (rect.width < 4 || rect.height < 4) return;
+    rects.push({
+      x: Math.floor(rect.left),
+      y: Math.floor(rect.top),
+      w: Math.ceil(rect.width),
+      h: Math.ceil(rect.height),
+      r: Math.ceil(parseFloat(style.borderTopLeftRadius) || 0)
+    });
+  };
+
+  document.querySelectorAll(selectors.join(",")).forEach(el => {
+    const style = window.getComputedStyle(el);
+    if (style.display === "none" || style.visibility === "hidden") return;
+    // The bare wrappers are transparent frames; their child cards are the real
+    // surfaces and are matched separately.
+    if (el.classList.contains("anchor-dialog") || el.classList.contains("timing-order-layout")) return;
+    add(el, style);
+  });
+
+  // The list above covers the known panel surfaces, but anything that floats
+  // outside them - a colour picker, a select drop-down, a context menu, an editor
+  // card positioned beyond its dialog - would render and then refuse clicks,
+  // because a surface with no hit shape behind it is a hole in the alpha mask.
+  // Rather than maintain a second list of those, sweep for anything that paints
+  // an opaque surface and is not already covered.
+  const covered = (x, y) => rects.some(r => x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h);
+  document.querySelectorAll("body *").forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.width < 24 || rect.height < 16) return;
+    if (covered(rect.left + rect.width / 2, rect.top + rect.height / 2)) return;
+    const style = window.getComputedStyle(el);
+    if (style.display === "none" || style.visibility === "hidden") return;
+    if (parseFloat(style.opacity) < 0.1) return;
+    const match = /rgba?\(([^)]+)\)/.exec(style.backgroundColor);
+    if (!match) return;
+    const parts = match[1].split(",");
+    const alpha = parts.length > 3 ? parseFloat(parts[3]) : 1;
+    if (alpha < 0.3) return;
+    add(el, style);
+  });
+
+  return rects;
+};
+
+// Pushes the current hit shapes to the native helper. Sizing alone is not enough
+// to keep them current: opening an editor inside a dialog, or a drop-down over it,
+// changes what the page paints without changing the window size, and stale shapes
+// leave the new surface unclickable. Cheap to send - a handful of rectangles.
+function pushNativeQuickPanelHitShapes() {
+  if (!QUICK_PANEL_MODE || window.__TNT_NATIVE_PLATFORM__ !== "win") return;
+  if (typeof window.__tntNativePost !== "function") return;
+  window.__tntNativePost("tntWindow", {
+    action: "hitshapes",
+    rects: window.__tntQuickPanelHitRects()
+  });
+}
+
+let quickPanelHitShapeTimer = 0;
+function scheduleNativeQuickPanelHitShapes(delay = 60) {
+  if (!QUICK_PANEL_MODE || window.__TNT_NATIVE_PLATFORM__ !== "win") return;
+  window.clearTimeout(quickPanelHitShapeTimer);
+  quickPanelHitShapeTimer = window.setTimeout(pushNativeQuickPanelHitShapes, delay);
+}
 
 window.__tntQuickPanelRestoreFocus = function () {
   if (!QUICK_PANEL_MODE) return;
@@ -14014,6 +14342,26 @@ if (QUICK_PANEL_MODE) {
   document.title = "AE FX Quick Controls";
   document.documentElement.classList.add("quick-panel-mode");
   document.body.classList.add("quick-panel-mode");
+  // Windows-only marker, set by native-helper-win. WebKit on macOS can sample the
+  // desktop behind a transparent window, so backdrop-filter genuinely blurs there.
+  // Chromium samples page content only, so the same rule renders as a black slab
+  // over the After Effects timeline. The .native-win rules in 95-quick-panel.css
+  // swap it for an opaque shell plus real DWM blur behind the window.
+  if (window.__TNT_NATIVE_PLATFORM__ === "win") {
+    document.documentElement.classList.add("native-win");
+    document.body.classList.add("native-win");
+    // Anything that changes what the page paints changes where clicks may land,
+    // so recompute the hit shapes off the DOM itself rather than off resizes.
+    // Debounced, and a no-op on every other platform.
+    const watcher = new MutationObserver(() => scheduleNativeQuickPanelHitShapes());
+    watcher.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class", "style", "hidden", "aria-hidden"]
+    });
+    window.addEventListener("transitionend", () => scheduleNativeQuickPanelHitShapes(), true);
+  }
   refreshQuickPanelState();
   } else {
   // Initial read, then a lightweight focused/hovered fingerprint watch.
@@ -14024,3 +14372,4 @@ if (QUICK_PANEL_MODE) {
     startNativeSelectionMonitor();
   });
 }
+

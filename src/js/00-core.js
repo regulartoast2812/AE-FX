@@ -509,6 +509,17 @@ function isMacPlatform() {
   return platform.indexOf("mac") >= 0;
 }
 
+// Shown in Settings > About. Distinguishes the two native-helper hosts as well as
+// the OS, because "Windows" alone would not say whether the page is running in the
+// docked CEP panel or inside the WebView2 overlay - and those render differently
+// enough (see the .native-win rules in 95-quick-panel.css) that it matters when
+// someone reports a visual bug.
+function platformLabel() {
+  const os = isMacPlatform() ? "macOS" : "Windows";
+  if (!window.__TNT_NATIVE_HELPER__) return `${os} · CEP panel`;
+  return `${os} · Quick Controls overlay`;
+}
+
 function primaryModifierLabel() {
   return "Ctrl";
 }

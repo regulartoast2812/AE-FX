@@ -1920,6 +1920,7 @@ body:not(.quick-panel-mode) #assistantHub {
   position: fixed !important;
   max-height: calc(100vh - 16px);
   overflow-y: auto;
+  padding: 6px !important;
 }
 
 /* Settings rows carry a label, a hint and sometimes a toggle, but they are swept
@@ -1927,13 +1928,102 @@ body:not(.quick-panel-mode) #assistantHub {
    height: var(--tnt-control-h) !important. A fixed height cannot hold that
    content, so rows overflowed into each other. Size to content instead. */
 .settings-menu-row {
-  height: auto !important;
-  min-height: var(--tnt-row-h, 28px) !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  grid-template-rows: auto auto !important;
+  gap: 2px 8px !important;
   align-items: center !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 0 4px !important;
+  padding: 7px 8px !important;
+  border: 1px solid rgba(255, 255, 255, .14) !important;
+  border-radius: 8px !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .085), rgba(255, 255, 255, .025)),
+    rgba(13, 14, 15, .28) !important;
+  color: rgba(245, 245, 247, .9) !important;
+  line-height: 1.15 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .08),
+    0 5px 14px rgba(0, 0, 0, .14) !important;
+}
+
+.settings-menu-row:hover {
+  border-color: rgba(217, 119, 66, .38) !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .03)),
+    rgba(217, 119, 66, .08) !important;
+  color: rgba(245, 245, 247, .96) !important;
+}
+
+.settings-menu-row span {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+}
+
+.settings-menu-row em {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+  color: rgba(232, 232, 238, .52) !important;
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+}
+
+.settings-menu-row b,
+.settings-menu-status i {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  align-self: center !important;
 }
 
 .settings-menu-section {
   clear: both;
+  margin: 6px 0 3px !important;
+  padding: 4px 6px 0 !important;
+  border-top-color: rgba(255, 255, 255, .055) !important;
+  color: rgba(228, 228, 234, .42) !important;
+  font-size: 9.5px !important;
+  line-height: 1.15 !important;
+}
+
+.settings-menu-status {
+  cursor: default !important;
+}
+
+.settings-menu-status:hover {
+  border-color: rgba(255, 255, 255, .14) !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .085), rgba(255, 255, 255, .025)),
+    rgba(13, 14, 15, .28) !important;
+  color: rgba(245, 245, 247, .9) !important;
+}
+
+.settings-menu-status i {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(170, 170, 176, .75);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .08);
+}
+
+.settings-menu-status i.ok {
+  background: #64d686;
+  box-shadow: 0 0 10px rgba(100, 214, 134, .28);
+}
+
+.settings-menu-status i.warn {
+  background: #e5a84d;
+  box-shadow: 0 0 10px rgba(229, 168, 77, .22);
+}
+
+.settings-menu-status i.bad {
+  background: #e16464;
+  box-shadow: 0 0 10px rgba(225, 100, 100, .24);
 }
 
 

@@ -62,6 +62,7 @@ function closeSettingsMenu() {
 
 function renderSettingsMenu() {
   const menu = ensureSettingsMenu();
+  const listener = nativeListenerStatus();
   menu.innerHTML = `
     <div class="settings-menu-title">Settings</div>
     <button type="button" class="settings-menu-row" data-action="shortcuts"><span>Shortcuts</span><em>View rundown</em></button>
@@ -72,9 +73,23 @@ function renderSettingsMenu() {
     <div class="settings-menu-section">Safety</div>
     <div class="settings-menu-section">Layer Styles</div>
     ${settingsToggleRow("keepStyleEditorOpen", "Keep Editor Open", "After style edits")}
+    <div class="settings-menu-section">Listeners</div>
+    ${settingsStatusRow("Panel Bridge", bridgeStatusLabel(), bridgeStatusClass())}
+    ${settingsStatusRow("Quick Controls", listener.detail, listener.statusClass)}
+    ${settingsActionRow("installNativeListener", listener.actionLabel, listener.actionDetail)}
     <div class="settings-menu-section">About</div>
     ${settingsActionRow("checkUpdate", "Check for Updates", tntUpdateStatusLabel())}
-    <div class="settings-menu-info">Timeline CEP v${escapeHtml(typeof TNT_VERSION === "string" ? TNT_VERSION : "?")}<br>Comp: ${escapeHtml(state.comp && state.comp.name || "None")}</div>
+    <div class="settings-menu-info">Timeline CEP v${escapeHtml(typeof TNT_VERSION === "string" ? TNT_VERSION : "?")}<br>Platform: ${escapeHtml(platformLabel())}<br>Comp: ${escapeHtml(state.comp && state.comp.name || "None")}</div>
+  `;
+}
+
+function settingsStatusRow(label, detail, statusClass) {
+  return `
+    <div class="settings-menu-row settings-menu-status">
+      <span>${escapeHtml(label)}</span>
+      <em>${escapeHtml(detail)}</em>
+      <i class="${escapeHtml(statusClass || "unknown")}"></i>
+    </div>
   `;
 }
 
@@ -97,6 +112,163 @@ function settingsToggleRow(key, label, detail) {
   `;
 }
 
+function bridgeStatusLabel() {
+  const status = window.__TNT_BRIDGE_STATUS__ || (typeof tntBridgeStatus !== "undefined" ? tntBridgeStatus : {}) || {};
+  if (status.state === "ok") return status.message || "Active";
+  if (status.state === "error") return status.message || "Unavailable";
+  return "Starting";
+}
+
+function bridgeStatusClass() {
+  const status = window.__TNT_BRIDGE_STATUS__ || (typeof tntBridgeStatus !== "undefined" ? tntBridgeStatus : {}) || {};
+  if (status.state === "ok") return "ok";
+  if (status.state === "error") return "bad";
+  return "warn";
+}
+
+function settingsNodeRequire(moduleName) {
+  try {
+    if (typeof require === "function") return require(moduleName);
+  } catch (_) {}
+  try {
+    if (window.cep_node && typeof window.cep_node.require === "function") {
+      return window.cep_node.require(moduleName);
+    }
+  } catch (_) {}
+  return null;
+}
+
+function nativeListenerExtensionRoot() {
+  try {
+    if (typeof SystemPath !== "undefined" && cs && typeof cs.getSystemPath === "function") {
+      const value = cs.getSystemPath(SystemPath.EXTENSION);
+      if (value) return value;
+    }
+  } catch (_) {}
+  try {
+    let pathname = decodeURIComponent(window.location.pathname || "");
+    if (isMacPlatform() && pathname.charAt(0) === "/") return pathname.replace(/\/[^\/]*$/, "");
+    pathname = pathname.replace(/^\/([A-Za-z]:\/)/, "$1").replace(/\//g, "\\");
+    return pathname.replace(/\\[^\\]*$/, "");
+  } catch (_) {
+    return "";
+  }
+}
+
+function nativeListenerStatus() {
+  const fs = settingsNodeRequire("fs");
+  const path = settingsNodeRequire("path");
+  const childProcess = settingsNodeRequire("child_process");
+  const root = nativeListenerExtensionRoot();
+  const mac = isMacPlatform();
+  if (!fs || !path || !childProcess || !root) {
+    return {
+      detail: "CEP Node unavailable",
+      statusClass: "bad",
+      actionLabel: "Install Listener",
+      actionDetail: "Unavailable here"
+    };
+  }
+
+  const artifact = mac
+    ? path.join(root, "native", "AE FX Quick Controls.app", "Contents", "MacOS", "AEFXQuickControls")
+    : path.join(root, "native-helper-win", "bin", "Release", "net8.0-windows", "AEFXQuickControls.exe");
+  const installed = fs.existsSync(artifact);
+  const active = nativeListenerProcessActive(childProcess, mac);
+
+  return {
+    detail: active ? "Installed and active" : (installed ? "Installed, not running" : "Not installed"),
+    statusClass: active ? "ok" : (installed ? "warn" : "bad"),
+    actionLabel: active ? "Open Listener" : (installed ? "Start Listener" : "Install Listener"),
+    actionDetail: active ? "Already active" : (mac ? "macOS helper" : "Windows helper")
+  };
+}
+
+function nativeListenerProcessActive(childProcess, mac) {
+  try {
+    if (mac) {
+      childProcess.execFileSync("/usr/bin/pgrep", ["-x", "AEFXQuickControls"], { stdio: "ignore" });
+      return true;
+    }
+    const output = childProcess.execFileSync(
+      "tasklist.exe",
+      ["/FI", "IMAGENAME eq AEFXQuickControls.exe", "/FO", "CSV", "/NH"],
+      { encoding: "utf8", windowsHide: true }
+    );
+    return /AEFXQuickControls\.exe/i.test(output);
+  } catch (_) {
+    return false;
+  }
+}
+
+function installNativeListener() {
+  const fs = settingsNodeRequire("fs");
+  const path = settingsNodeRequire("path");
+  const childProcess = settingsNodeRequire("child_process");
+  const root = nativeListenerExtensionRoot();
+  if (!fs || !path || !childProcess || !root) {
+    statusEl.textContent = "Native listener install is unavailable in this CEP runtime.";
+    renderSettingsMenu();
+    return;
+  }
+
+  const mac = isMacPlatform();
+  const message = mac
+    ? "Install or start the macOS Quick Controls listener?"
+    : "Install or start the Windows Quick Controls listener?";
+  if (!window.confirm(message)) return;
+
+  statusEl.textContent = mac ? "Starting macOS listener..." : "Starting Windows listener...";
+  if (mac) installMacNativeListener(childProcess, root);
+  else installWindowsNativeListener(fs, path, childProcess, root);
+}
+
+function installMacNativeListener(childProcess, root) {
+  const script = `${root}/scripts/launch-native-helper.sh`;
+  childProcess.execFile("/bin/bash", [script], { cwd: root }, error => {
+    statusEl.textContent = error ? `Listener failed: ${error.message}` : "Quick Controls listener is starting.";
+    if (settingsMenuEl && settingsMenuEl.classList.contains("open")) renderSettingsMenu();
+  });
+}
+
+function installWindowsNativeListener(fs, path, childProcess, root) {
+  const helperDir = path.join(root, "native-helper-win");
+  const exe = path.join(helperDir, "bin", "Release", "net8.0-windows", "AEFXQuickControls.exe");
+  const launch = () => {
+    try {
+      const child = childProcess.spawn(exe, [], {
+        cwd: helperDir,
+        detached: true,
+        stdio: "ignore",
+        windowsHide: true,
+        env: Object.assign({}, (typeof process !== "undefined" && process.env) || {}, { TNT_EXTENSION_ROOT: root })
+      });
+      child.unref();
+      statusEl.textContent = "Quick Controls listener is starting.";
+    } catch (e) {
+      statusEl.textContent = `Listener failed: ${e.message || e}`;
+    }
+    if (settingsMenuEl && settingsMenuEl.classList.contains("open")) {
+      window.setTimeout(renderSettingsMenu, 600);
+    }
+  };
+
+  if (fs.existsSync(exe)) {
+    launch();
+    return;
+  }
+
+  statusEl.textContent = "Building Windows listener...";
+  childProcess.execFile("dotnet", ["build", "-c", "Release"], { cwd: helperDir, windowsHide: true }, error => {
+    if (error) {
+      statusEl.textContent = `Listener build failed: ${error.message}`;
+      if (settingsMenuEl && settingsMenuEl.classList.contains("open")) renderSettingsMenu();
+      return;
+    }
+    launch();
+  });
+}
+
 async function handleSettingsMenuClick(event) {
   const toggle = event.target.closest && event.target.closest("[data-toggle]");
   if (toggle) {
@@ -117,6 +289,8 @@ async function handleSettingsMenuClick(event) {
     statusEl.textContent = "Refreshing...";
     await refreshLayers({ forceRender: true });
     statusEl.textContent = "Refreshed.";
+  } else if (action.dataset.action === "installNativeListener") {
+    installNativeListener();
   }
 }
 

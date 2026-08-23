@@ -929,3 +929,192 @@ body.quick-panel-mode .timing-order-layout {
 .quick-panel-refresh:hover .tnt-action-icon {
   color: rgba(240, 176, 137, .95);
 }
+
+
+/* ==========================================================================
+   v127: Windows native-helper corrections.
+
+   Scope: `.native-win` is set only by native-helper-win (via
+   window.__TNT_NATIVE_PLATFORM__). macOS never matches any rule in this block,
+   so the WKWebView appearance is untouched.
+
+   Why it is needed: the two helpers host this page in different engines.
+   WebKit, in a transparent NSWindow, samples the desktop behind the window, so
+   `backdrop-filter` genuinely blurs the After Effects timeline underneath.
+   Chromium (WebView2) samples page content only. With nothing behind, the
+   filtered layer resolves to flat black - which is the black rectangle framing
+   the ANCHOR/ALIGN cards, produced by the v126 rule's
+   `backdrop-filter` + `translateZ(0)` + `isolation: isolate` on .anchor-dialog.
+   Clearing the filter alone is not enough: the isolated composited layer is
+   what paints, so the transform and isolation have to go with it.
+
+   Real blur still happens on Windows, just one layer down - the helper asks DWM
+   to blur behind the whole window (see EnableBlurBehind in Program.cs). The page
+   therefore stops trying to fake it and simply paints an opaque-enough surface.
+   ========================================================================== */
+
+body.quick-panel-mode.native-win .quick-panel-shell,
+body.quick-panel-mode.native-win .quick-layer-menu-dialog,
+body.quick-panel-mode.native-win .layer-style-dialog,
+body.quick-panel-mode.native-win .timeline-command-dialog,
+body.quick-panel-mode.native-win .duration-dialog,
+body.quick-panel-mode.native-win .expression-dialog,
+body.quick-panel-mode.native-win .anchor-dialog,
+body.quick-panel-mode.native-win .composition-dialog,
+body.quick-panel-mode.native-win .layer-selection-dialog,
+body.quick-panel-mode.native-win .ease-dialog,
+body.quick-panel-mode.native-win .mass-edit-dialog,
+body.quick-panel-mode.native-win .text-animation-dialog,
+body.quick-panel-mode.native-win .timing-order-layout,
+body.quick-panel-mode.native-win .layer-menu.open {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  transform: none !important;
+  isolation: auto !important;
+}
+
+/* Opaque enough to read against a bright comp. The macOS values lean on the
+   blur for legibility; without an in-page blur these have to carry it alone. */
+body.quick-panel-mode.native-win .quick-panel-shell {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .012) 38%, rgba(255, 255, 255, .035)),
+    radial-gradient(ellipse 70% 54% at 18% 0%, rgba(255, 255, 255, .07), transparent 68%),
+    radial-gradient(ellipse 48% 38% at 86% 12%, rgba(213, 111, 58, .1), transparent 72%),
+    rgba(22, 23, 24, .93) !important;
+}
+
+body.quick-panel-mode.native-win .quick-layer-menu-dialog,
+body.quick-panel-mode.native-win .layer-style-dialog,
+body.quick-panel-mode.native-win .timeline-command-dialog,
+body.quick-panel-mode.native-win .duration-dialog,
+body.quick-panel-mode.native-win .expression-dialog,
+body.quick-panel-mode.native-win .composition-dialog,
+body.quick-panel-mode.native-win .layer-selection-dialog,
+body.quick-panel-mode.native-win .ease-dialog,
+body.quick-panel-mode.native-win .mass-edit-dialog,
+body.quick-panel-mode.native-win .text-animation-dialog,
+body.quick-panel-mode.native-win .layer-menu.open {
+  background-color: rgba(20, 20, 22, .94) !important;
+}
+
+/* The anchor and timing-order wrappers are bare frames on purpose (v97) - the
+   ANCHOR and ALIGN cards carry their own surfaces and the wrapper must not paint
+   at all. This has to come AFTER the opaque block above, not before it: the
+   anchor wrapper's element is `.duration-dialog.anchor-dialog`, so it matches
+   that list too, at identical specificity and with !important on both sides -
+   whichever rule is written last wins. Written first, it lost, and the wrapper
+   came back as a square opaque rectangle framing the two rounded cards. */
+body.quick-panel-mode.native-win .anchor-dialog,
+body.quick-panel-mode.native-win .timing-order-layout {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Every other blurred surface in the page has the same black-slab problem in
+   Chromium. None of them can blur usefully here, so none of them should try. */
+body.quick-panel-mode.native-win *,
+body.quick-panel-mode.native-win *::before,
+body.quick-panel-mode.native-win *::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+
+/* v128: Windows scrollbars. Chromium 121+ ignores every ::-webkit-scrollbar-*
+   rule on an element that also sets `scrollbar-width` or `scrollbar-color` - the
+   standard properties win outright. .quick-panel-grid sets `scrollbar-width:
+   thin`, so on WebView2 all of the ::-webkit-scrollbar styling above is dropped
+   and the raw native scrollbar shows through, pale and chunky against the dark
+   panel. WebKit still honours the ::-webkit rules, so macOS is unaffected either
+   way and this block stays scoped to .native-win regardless.
+
+   `scrollbar-color` is inherited, so setting it once on the body covers the grid,
+   the search results, the layer menu, and every subpanel list. `color-scheme:
+   dark` keeps any remaining native widget (select drop-downs, spinners) from
+   rendering in the light palette. */
+body.quick-panel-mode.native-win {
+  color-scheme: dark;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(225, 225, 230, .26) transparent;
+}
+
+
+/* v129: the bare-wrapper layouts float their own cards directly over the
+   timeline, with no shell behind them. Their surfaces are tuned for macOS, where
+   backdrop-filter blurs whatever is underneath - at rgba(17,18,18,.56) the blur
+   is doing most of the work of making them readable. With no blur available here
+   that alpha just shows the comp through the card. Raise it so the cards read as
+   surfaces on their own, matching the opacity used for the dialogs above. */
+body.quick-panel-mode.native-win .anchor-section,
+body.quick-panel-mode.native-win .timing-order-section {
+  background-color: rgba(20, 20, 22, .95) !important;
+}
+
+
+/* v130: room for drop shadows on every panel.
+
+   Every quick-panel surface carries an outer drop shadow. On macOS those land on
+   a blurred backdrop and read as depth. On Windows the native window is sized to
+   the measured content, so a shadow reaching past the window edge is clipped
+   square at full strength - a dark rectangle around the panel instead of depth.
+   The anchor layout showed it worst, because its two cards float on transparency
+   with no shell to contain the shadow, but the dialogs had it too: they ask for
+   `0 18px 44px` (62px of reach) inside an 8px margin.
+
+   The fix is room. `quickPanelShadowGutter()` in
+   src/js/100-panels-shortcuts-bootstrap.js adds 40px of transparent margin to the
+   size the page reports, so the native window grows, and the rules below inset
+   each panel by the same 40px so it keeps its intended size. The shadow then
+   reaches zero well inside the window.
+
+   Two invariants, or the hard edge comes straight back:
+     - the gutter constant in the JS must equal the inset here
+     - every shadow's reach (offset + blur) must stay under that gutter, with a
+       little headroom for the blur's tail:  8 + 24 = 32, inside 40
+
+   The gutter is transparent and carries no hit shape, so clicks there fall
+   through to After Effects. */
+
+body.quick-panel-mode.native-win .quick-panel-shell {
+  inset: 40px !important;
+}
+
+body.quick-panel-mode.native-win .modal-backdrop,
+body.quick-panel-mode.native-win .timeline-command-dialog-backdrop,
+body.quick-panel-mode.native-win .layer-style-dialog-backdrop,
+body.quick-panel-mode.native-win .layer-selection-backdrop,
+body.quick-panel-mode.native-win .ease-dialog-backdrop,
+body.quick-panel-mode.native-win .mass-edit-backdrop,
+body.quick-panel-mode.native-win .text-animation-backdrop,
+body.quick-panel-mode.native-win .timing-order-backdrop,
+body.quick-panel-mode.native-win .quick-layer-menu-backdrop {
+  padding: 40px !important;
+}
+
+/* One shadow for every surface, sized to fit the gutter. This deliberately
+   replaces the heavier `0 18px 44px` the dialogs use elsewhere - that reaches
+   62px and cannot fit. */
+body.quick-panel-mode.native-win .quick-panel-shell,
+body.quick-panel-mode.native-win .anchor-section,
+body.quick-panel-mode.native-win .timing-order-section,
+body.quick-panel-mode.native-win .quick-layer-menu-dialog,
+body.quick-panel-mode.native-win .layer-style-dialog,
+body.quick-panel-mode.native-win .timeline-command-dialog,
+body.quick-panel-mode.native-win .duration-dialog,
+body.quick-panel-mode.native-win .expression-dialog,
+body.quick-panel-mode.native-win .composition-dialog,
+body.quick-panel-mode.native-win .layer-selection-dialog,
+body.quick-panel-mode.native-win .ease-dialog,
+body.quick-panel-mode.native-win .mass-edit-dialog,
+body.quick-panel-mode.native-win .text-animation-dialog,
+body.quick-panel-mode.native-win .layer-menu.open {
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, .45),
+    inset 0 1px 0 rgba(255, 255, 255, .09) !important;
+}
+
+/* The bare wrappers still paint nothing - their child cards carry the shadow. */
+body.quick-panel-mode.native-win .anchor-dialog,
+body.quick-panel-mode.native-win .timing-order-layout {
+  box-shadow: none !important;
+}
