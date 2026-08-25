@@ -1831,21 +1831,33 @@ function tntRebuildUserShortcutIndex() {
   });
 }
 
-// Display form ("Ctrl+Shift+E") from the normalised form ("ctrl+shift+e").
+// Display form from the normalised form ("ctrl+shift+e" -> "Control+Shift+E").
+//
+// Named per platform: meta is Command on macOS but the Windows key on Windows,
+// and alt is Option on macOS. Modifiers are also ordered by platform
+// convention - Control, Option, Shift, Command on macOS - so a binding reads the
+// way the OS writes it. The stored form never changes, only the label.
+const TNT_MODIFIER_LABELS_MAC = { ctrl: "Control", alt: "Option", shift: "Shift", meta: "Cmd" };
+const TNT_MODIFIER_LABELS_WIN = { ctrl: "Ctrl", meta: "Win", alt: "Alt", shift: "Shift" };
+const TNT_MODIFIER_ORDER_MAC = ["ctrl", "alt", "shift", "meta"];
+const TNT_MODIFIER_ORDER_WIN = ["ctrl", "meta", "alt", "shift"];
+
 function tntShortcutLabel(key) {
-  return String(key || "")
-    .split("+")
-    .map(part => {
-      if (part === "ctrl") return "Ctrl";
-      if (part === "shift") return "Shift";
-      if (part === "alt") return "Alt";
-      if (part === "meta") return "Cmd";
-      if (part === "space") return "Space";
-      if (part === "escape") return "Esc";
-      if (part.length === 1) return part.toUpperCase();
-      return part.charAt(0).toUpperCase() + part.slice(1);
-    })
-    .join("+");
+  const parts = String(key || "").split("+").filter(Boolean);
+  if (!parts.length) return "";
+  const mac = typeof isMacPlatform === "function" ? isMacPlatform() : false;
+  const names = mac ? TNT_MODIFIER_LABELS_MAC : TNT_MODIFIER_LABELS_WIN;
+  const order = mac ? TNT_MODIFIER_ORDER_MAC : TNT_MODIFIER_ORDER_WIN;
+
+  const mods = order.filter(mod => parts.indexOf(mod) >= 0).map(mod => names[mod]);
+  const base = parts.filter(part => !names[part]).map(part => {
+    if (part === "space") return "Space";
+    if (part === "escape") return "Esc";
+    if (part === "backquote") return "`";
+    if (part.length === 1) return part.toUpperCase();
+    return part.charAt(0).toUpperCase() + part.slice(1);
+  });
+  return mods.concat(base).join("+");
 }
 
 function tntShortcutForEntry(entry) {
