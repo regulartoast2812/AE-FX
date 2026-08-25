@@ -13026,14 +13026,52 @@ function tntConflictForKey(key, exceptName) {
   return "";
 }
 
+// Capture reads keys from a focused off-screen input rather than from a window
+// listener.
+//
+// In After Effects a CEP panel only receives the keys it declared through
+// registerKeyEventsInterest - a fixed list of 14 letters and a few specials here
+// - so pressing anything else never reached the handler and the cell sat on
+// "Press key..." forever. Text inputs receive keys natively regardless of that
+// list, which is why the search box accepts any character. Focusing one for the
+// duration of the capture sidesteps the whole problem, on both platforms.
+function tntShortcutCaptureInput() {
+  let input = document.getElementById("tntShortcutCaptureInput");
+  if (input) return input;
+  input = document.createElement("input");
+  input.id = "tntShortcutCaptureInput";
+  input.type = "text";
+  input.setAttribute("aria-hidden", "true");
+  input.tabIndex = -1;
+  // Off-screen rather than display:none, which cannot take focus.
+  input.style.cssText = "position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;";
+  input.addEventListener("keydown", tntShortcutCaptureKeydown);
+  // Losing focus ends the capture, so a stray click can never strand the cell.
+  input.addEventListener("blur", () => {
+    if (tntShortcutCaptureName) {
+      if (statusEl) statusEl.textContent = "Shortcut unchanged.";
+      tntEndShortcutCapture();
+    }
+  });
+  document.body.appendChild(input);
+  return input;
+}
+
 function tntBeginShortcutCapture(name) {
   tntShortcutCaptureName = String(name || "");
   renderAssistantFunctions();
   if (statusEl) statusEl.textContent = `Press a key for "${tntShortcutCaptureName}" - Esc to cancel, Delete to clear`;
+  const input = tntShortcutCaptureInput();
+  input.value = "";
+  setTimeout(() => { try { input.focus(); } catch (_) {} }, 0);
 }
 
 function tntEndShortcutCapture() {
   tntShortcutCaptureName = "";
+  const input = document.getElementById("tntShortcutCaptureInput");
+  if (input && document.activeElement === input) {
+    try { input.blur(); } catch (_) {}
+  }
   renderAssistantFunctions();
 }
 
