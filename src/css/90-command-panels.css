@@ -2429,3 +2429,163 @@ body:not(.quick-panel-mode) #assistantHub {
   border-color: rgba(233, 147, 96, .5);
   background: rgba(213, 111, 58, .16);
 }
+
+/* Icon cell in the catalogue is a control, not decoration. */
+.assistant-function-iconcell {
+  grid-area: icon;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.assistant-function-iconcell:hover {
+  border-color: rgba(233, 147, 96, .45);
+  background: rgba(213, 111, 58, .14);
+}
+
+.assistant-function-iconcell.custom {
+  border-color: rgba(213, 111, 58, .3);
+  background: rgba(213, 111, 58, .1);
+}
+
+/* Icon picker */
+.tnt-icon-picker-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, .45);
+}
+
+.tnt-icon-picker-backdrop.open { display: flex; }
+
+.tnt-icon-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(620px, 100%);
+  max-height: min(560px, 100%);
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .015)),
+    rgba(20, 20, 22, .97);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .5);
+}
+
+.tnt-icon-picker-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e8e8ec;
+  font-size: 12.5px;
+}
+
+.tnt-icon-picker-for {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(228, 228, 234, .5);
+  font-size: 11px;
+}
+
+.tnt-icon-picker-head button {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .05);
+  color: rgba(238, 238, 244, .85);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.tnt-icon-picker-head button[data-icon-reset] { margin-left: auto; }
+.tnt-icon-picker-head button:hover {
+  border-color: rgba(233, 147, 96, .5);
+  background: rgba(213, 111, 58, .16);
+}
+
+.tnt-icon-picker-search {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 10px;
+  outline: 0;
+  background: rgba(8, 9, 10, .5);
+  color: #ededee;
+  font: inherit;
+  font-size: 13px;
+}
+
+.tnt-icon-picker-search:focus {
+  border-color: rgba(225, 128, 73, .62);
+  box-shadow: 0 0 0 2px rgba(213, 111, 58, .13);
+}
+
+.tnt-icon-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 6px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.tnt-icon-choice {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 5px;
+  padding: 9px 4px 7px;
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .03);
+  color: rgba(226, 227, 232, .75);
+  font: inherit;
+  font-size: 8.5px;
+  cursor: pointer;
+}
+
+.tnt-icon-choice span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(228, 228, 234, .45);
+}
+
+.tnt-icon-choice:hover,
+.tnt-icon-choice.active {
+  border-color: rgba(233, 147, 96, .5);
+  background: rgba(213, 111, 58, .14);
+  color: rgba(240, 176, 137, .95);
+}
+
+.tnt-icon-choice-glyph {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tnt-icon-picker-empty {
+  grid-column: 1 / -1;
+  padding: 24px;
+  color: rgba(228, 228, 234, .45);
+  font-size: 12px;
+  text-align: center;
+}

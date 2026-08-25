@@ -1776,6 +1776,30 @@ const assistantFunctionCountEl = document.getElementById("assistantFunctionCount
 // Stored against the command name rather than the built-in key, so any catalogue
 // entry can be bound - not just the 62 with a hardcoded SHORTCUT_ACTIONS entry.
 // Looked up before SHORTCUT_ACTIONS, so a user binding wins over a built-in.
+const TNT_USER_ICONS_KEY = "tntUserIcons.v1";
+let tntUserIcons = {};
+
+function tntLoadUserIcons() {
+  try {
+    const raw = window.localStorage.getItem(TNT_USER_ICONS_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    tntUserIcons = parsed && typeof parsed === "object" ? parsed : {};
+  } catch (_) {
+    tntUserIcons = {};
+  }
+}
+
+function tntSaveUserIcons() {
+  try {
+    window.localStorage.setItem(TNT_USER_ICONS_KEY, JSON.stringify(tntUserIcons));
+  } catch (_) {}
+}
+
+function tntIconNameForEntry(entry) {
+  const name = String((entry && entry.name) || "");
+  return (name && tntUserIcons[name]) || "";
+}
+
 const TNT_USER_SHORTCUTS_KEY = "tntUserShortcuts.v1";
 let tntUserShortcuts = {};
 let tntUserShortcutIndex = {};
@@ -1896,20 +1920,23 @@ function tntShortcutCaptureKeydown(event) {
 }
 
 if (assistantFunctionListEl) {
-  assistantFunctionListEl.addEventListener("dblclick", event => {
-    const cell = event.target.closest("[data-shortcut-for]");
-    if (!cell) return;
-    event.preventDefault();
-    event.stopPropagation();
-    tntBeginShortcutCapture(cell.dataset.shortcutFor || "");
-  });
-  // Clicking a row runs the command, so swallow clicks that land on the key cell.
+  // Single click on either editable cell. The capture-phase row runner bails for
+  // these, so the click reaches here instead of running the command.
   assistantFunctionListEl.addEventListener("click", event => {
-    if (event.target.closest("[data-shortcut-for]")) {
+    const keyCell = event.target.closest("[data-shortcut-for]");
+    if (keyCell) {
       event.preventDefault();
       event.stopPropagation();
+      tntBeginShortcutCapture(keyCell.dataset.shortcutFor || "");
+      return;
     }
-  }, true);
+    const iconCell = event.target.closest("[data-icon-for]");
+    if (iconCell) {
+      event.preventDefault();
+      event.stopPropagation();
+      tntOpenIconPicker(iconCell.dataset.iconFor || "");
+    }
+  });
 }
 
 // On window, not document: capture runs window -> document, and handleShortcut is
@@ -1918,6 +1945,7 @@ if (assistantFunctionListEl) {
 // them, so cancel and clear never fired.
 window.addEventListener("keydown", tntShortcutCaptureKeydown, true);
 tntLoadUserShortcuts();
+tntLoadUserIcons();
 
 // Progress fill for a running command.
 //
@@ -2139,11 +2167,11 @@ function renderAssistantFunctions() {
     const custom = Object.prototype.hasOwnProperty.call(tntUserShortcuts, String(entry.name || ""));
     return `
       <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}${tntRunClassFor(entry)}" data-assistant-function-index="${index}" data-fx-source="${tntSourceGroup(entry)}"${tntRunStyleFor(entry)}>
-        ${tntActionIconMarkup(entry)}
+        <span class="assistant-function-iconcell${tntIconNameForEntry(entry) ? " custom" : ""}" data-icon-for="${escapeHtml(String(entry.name || ""))}" title="Click to change the icon">${tntActionIconMarkup(entry)}</span>
         <strong>${escapeHtml(entry.name || entry.matchName || "Function")}</strong>
         <span class="assistant-function-tags tnt-tags">${tntTagChips(entry, 2)}</span>
         <em>${escapeHtml(assistantFunctionDetail(entry))}</em>
-        <kbd class="assistant-function-key${shortcut ? "" : " empty"}${custom ? " custom" : ""}${capturing ? " listening" : ""}" data-shortcut-for="${escapeHtml(String(entry.name || ""))}" title="Double-click to set a shortcut">${capturing ? "Press key&hellip;" : (shortcut ? escapeHtml(shortcut) : "&mdash;")}</kbd>
+        <kbd class="assistant-function-key${shortcut ? "" : " empty"}${custom ? " custom" : ""}${capturing ? " listening" : ""}" data-shortcut-for="${escapeHtml(String(entry.name || ""))}" title="Click to set a shortcut">${capturing ? "Press key&hellip;" : (shortcut ? escapeHtml(shortcut) : "&mdash;")}</kbd>
       </button>
     `;
   }).join("");
@@ -3020,6 +3048,10 @@ async function submitAssistantChat() {
 function handleAssistantFunctionCardPointer(event, run = false) {
   const card = event.target.closest && event.target.closest("[data-assistant-function-index]");
   if (!card) return false;
+  // The shortcut and icon cells are editable controls sitting inside the row.
+  // This handler runs at capture phase and stops immediate propagation, so
+  // without bailing here a click on either would run the command instead.
+  if (event.target.closest && event.target.closest("[data-shortcut-for], [data-icon-for]")) return false;
   event.preventDefault();
   event.stopPropagation();
   if (event.stopImmediatePropagation) event.stopImmediatePropagation();

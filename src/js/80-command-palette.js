@@ -239,6 +239,11 @@ function filteredFxEffects() {
 // their own icon override the action icon, since "what it acts on" is the more
 // recognisable signal when scanning a list.
 function tntActionIconMarkup(entry) {
+  // A user-assigned icon wins over anything derived from the tags.
+  try {
+    const custom = typeof tntIconNameForEntry === "function" ? tntIconNameForEntry(entry) : "";
+    if (custom) return tntIconSvg(custom, "assistant-function-icon");
+  } catch (_) {}
   let role = "action.Apply";
   try {
     const tags = safeFxConsoleEntryTags(entry) || [];

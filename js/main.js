@@ -1619,6 +1619,116 @@ if (document.readyState === "loading") {
 } else {
   tntPaintDeclaredIcons();
 }
+
+
+// ---- Icon picker ------------------------------------------------------------
+// Searchable across the whole Lucide set. Results are capped because rendering
+// 2,035 inline SVGs at once is slow enough to feel broken; searching narrows it
+// long before the cap matters.
+
+const TNT_ICON_PICKER_LIMIT = 240;
+let tntIconPickerTarget = "";
+let tntIconPickerEl = null;
+
+function tntEnsureIconPicker() {
+  if (tntIconPickerEl) return tntIconPickerEl;
+  const el = document.createElement("div");
+  el.className = "tnt-icon-picker-backdrop";
+  el.innerHTML = `
+    <div class="tnt-icon-picker" role="dialog" aria-label="Choose an icon">
+      <div class="tnt-icon-picker-head">
+        <strong>Choose an icon</strong>
+        <span class="tnt-icon-picker-for"></span>
+        <button type="button" data-icon-reset title="Use the default icon for this command">Reset</button>
+        <button type="button" data-icon-close aria-label="Close">Close</button>
+      </div>
+      <input type="text" class="tnt-icon-picker-search" placeholder="Search 2,035 icons" spellcheck="false" autocomplete="off">
+      <div class="tnt-icon-picker-grid"></div>
+    </div>
+  `;
+  document.body.appendChild(el);
+
+  const search = el.querySelector(".tnt-icon-picker-search");
+  search.addEventListener("input", () => tntRenderIconPickerGrid(search.value));
+  search.addEventListener("keydown", event => {
+    // Escape must close the picker, not leak to the panel's shortcut handlers.
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      tntCloseIconPicker();
+    }
+  });
+
+  el.addEventListener("click", event => {
+    if (event.target === el || event.target.closest("[data-icon-close]")) {
+      tntCloseIconPicker();
+      return;
+    }
+    if (event.target.closest("[data-icon-reset]")) {
+      tntAssignIcon(tntIconPickerTarget, "");
+      return;
+    }
+    const choice = event.target.closest("[data-icon-name]");
+    if (choice) tntAssignIcon(tntIconPickerTarget, choice.dataset.iconName);
+  });
+
+  tntIconPickerEl = el;
+  return el;
+}
+
+function tntRenderIconPickerGrid(query) {
+  const el = tntEnsureIconPicker();
+  const grid = el.querySelector(".tnt-icon-picker-grid");
+  const term = String(query || "").toLowerCase().trim();
+  const all = tntIconCatalogue();
+  const matches = term ? all.filter(name => name.indexOf(term) >= 0) : all;
+  const shown = matches.slice(0, TNT_ICON_PICKER_LIMIT);
+  const current = (typeof tntUserIcons === "object" && tntIconPickerTarget)
+    ? tntUserIcons[tntIconPickerTarget] || ""
+    : "";
+
+  grid.innerHTML = shown.map(name => `
+    <button type="button" class="tnt-icon-choice${name === current ? " active" : ""}" data-icon-name="${name}" title="${name}">
+      ${tntIconSvg(name, "tnt-icon-choice-glyph")}
+      <span>${name}</span>
+    </button>
+  `).join("") || `<div class="tnt-icon-picker-empty">No icon matches "${escapeHtml(term)}"</div>`;
+
+  const count = el.querySelector(".tnt-icon-picker-for");
+  const more = matches.length > shown.length ? ` · showing ${shown.length}` : "";
+  count.textContent = `${tntIconPickerTarget} — ${matches.length} match${matches.length === 1 ? "" : "es"}${more}`;
+}
+
+function tntOpenIconPicker(commandName) {
+  if (!commandName) return;
+  tntIconPickerTarget = commandName;
+  const el = tntEnsureIconPicker();
+  el.classList.add("open");
+  const search = el.querySelector(".tnt-icon-picker-search");
+  search.value = "";
+  tntRenderIconPickerGrid("");
+  setTimeout(() => search.focus(), 0);
+}
+
+function tntCloseIconPicker() {
+  if (tntIconPickerEl) tntIconPickerEl.classList.remove("open");
+  tntIconPickerTarget = "";
+}
+
+function tntAssignIcon(commandName, iconName) {
+  if (!commandName) return;
+  if (iconName) tntUserIcons[commandName] = iconName;
+  else delete tntUserIcons[commandName];
+  tntSaveUserIcons();
+  tntCloseIconPicker();
+  try { renderAssistantFunctions(); } catch (_) {}
+  try { renderQuickPanelSearchResults(); } catch (_) {}
+  if (typeof statusEl !== "undefined" && statusEl) {
+    statusEl.textContent = iconName
+      ? `${commandName} icon set to "${iconName}".`
+      : `${commandName} icon reset to default.`;
+  }
+}
 function ensureLayerStyleDialog() {
   if (layerStyleDialogEl) return layerStyleDialogEl;
   layerStyleDialogEl = document.createElement("div");
@@ -9294,6 +9404,11 @@ function filteredFxEffects() {
 // their own icon override the action icon, since "what it acts on" is the more
 // recognisable signal when scanning a list.
 function tntActionIconMarkup(entry) {
+  // A user-assigned icon wins over anything derived from the tags.
+  try {
+    const custom = typeof tntIconNameForEntry === "function" ? tntIconNameForEntry(entry) : "";
+    if (custom) return tntIconSvg(custom, "assistant-function-icon");
+  } catch (_) {}
   let role = "action.Apply";
   try {
     const tags = safeFxConsoleEntryTags(entry) || [];
@@ -12812,6 +12927,30 @@ const assistantFunctionCountEl = document.getElementById("assistantFunctionCount
 // Stored against the command name rather than the built-in key, so any catalogue
 // entry can be bound - not just the 62 with a hardcoded SHORTCUT_ACTIONS entry.
 // Looked up before SHORTCUT_ACTIONS, so a user binding wins over a built-in.
+const TNT_USER_ICONS_KEY = "tntUserIcons.v1";
+let tntUserIcons = {};
+
+function tntLoadUserIcons() {
+  try {
+    const raw = window.localStorage.getItem(TNT_USER_ICONS_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    tntUserIcons = parsed && typeof parsed === "object" ? parsed : {};
+  } catch (_) {
+    tntUserIcons = {};
+  }
+}
+
+function tntSaveUserIcons() {
+  try {
+    window.localStorage.setItem(TNT_USER_ICONS_KEY, JSON.stringify(tntUserIcons));
+  } catch (_) {}
+}
+
+function tntIconNameForEntry(entry) {
+  const name = String((entry && entry.name) || "");
+  return (name && tntUserIcons[name]) || "";
+}
+
 const TNT_USER_SHORTCUTS_KEY = "tntUserShortcuts.v1";
 let tntUserShortcuts = {};
 let tntUserShortcutIndex = {};
@@ -12932,20 +13071,23 @@ function tntShortcutCaptureKeydown(event) {
 }
 
 if (assistantFunctionListEl) {
-  assistantFunctionListEl.addEventListener("dblclick", event => {
-    const cell = event.target.closest("[data-shortcut-for]");
-    if (!cell) return;
-    event.preventDefault();
-    event.stopPropagation();
-    tntBeginShortcutCapture(cell.dataset.shortcutFor || "");
-  });
-  // Clicking a row runs the command, so swallow clicks that land on the key cell.
+  // Single click on either editable cell. The capture-phase row runner bails for
+  // these, so the click reaches here instead of running the command.
   assistantFunctionListEl.addEventListener("click", event => {
-    if (event.target.closest("[data-shortcut-for]")) {
+    const keyCell = event.target.closest("[data-shortcut-for]");
+    if (keyCell) {
       event.preventDefault();
       event.stopPropagation();
+      tntBeginShortcutCapture(keyCell.dataset.shortcutFor || "");
+      return;
     }
-  }, true);
+    const iconCell = event.target.closest("[data-icon-for]");
+    if (iconCell) {
+      event.preventDefault();
+      event.stopPropagation();
+      tntOpenIconPicker(iconCell.dataset.iconFor || "");
+    }
+  });
 }
 
 // On window, not document: capture runs window -> document, and handleShortcut is
@@ -12954,6 +13096,7 @@ if (assistantFunctionListEl) {
 // them, so cancel and clear never fired.
 window.addEventListener("keydown", tntShortcutCaptureKeydown, true);
 tntLoadUserShortcuts();
+tntLoadUserIcons();
 
 // Progress fill for a running command.
 //
@@ -13175,11 +13318,11 @@ function renderAssistantFunctions() {
     const custom = Object.prototype.hasOwnProperty.call(tntUserShortcuts, String(entry.name || ""));
     return `
       <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}${tntRunClassFor(entry)}" data-assistant-function-index="${index}" data-fx-source="${tntSourceGroup(entry)}"${tntRunStyleFor(entry)}>
-        ${tntActionIconMarkup(entry)}
+        <span class="assistant-function-iconcell${tntIconNameForEntry(entry) ? " custom" : ""}" data-icon-for="${escapeHtml(String(entry.name || ""))}" title="Click to change the icon">${tntActionIconMarkup(entry)}</span>
         <strong>${escapeHtml(entry.name || entry.matchName || "Function")}</strong>
         <span class="assistant-function-tags tnt-tags">${tntTagChips(entry, 2)}</span>
         <em>${escapeHtml(assistantFunctionDetail(entry))}</em>
-        <kbd class="assistant-function-key${shortcut ? "" : " empty"}${custom ? " custom" : ""}${capturing ? " listening" : ""}" data-shortcut-for="${escapeHtml(String(entry.name || ""))}" title="Double-click to set a shortcut">${capturing ? "Press key&hellip;" : (shortcut ? escapeHtml(shortcut) : "&mdash;")}</kbd>
+        <kbd class="assistant-function-key${shortcut ? "" : " empty"}${custom ? " custom" : ""}${capturing ? " listening" : ""}" data-shortcut-for="${escapeHtml(String(entry.name || ""))}" title="Click to set a shortcut">${capturing ? "Press key&hellip;" : (shortcut ? escapeHtml(shortcut) : "&mdash;")}</kbd>
       </button>
     `;
   }).join("");
@@ -14056,6 +14199,10 @@ async function submitAssistantChat() {
 function handleAssistantFunctionCardPointer(event, run = false) {
   const card = event.target.closest && event.target.closest("[data-assistant-function-index]");
   if (!card) return false;
+  // The shortcut and icon cells are editable controls sitting inside the row.
+  // This handler runs at capture phase and stops immediate propagation, so
+  // without bailing here a click on either would run the command instead.
+  if (event.target.closest && event.target.closest("[data-shortcut-for], [data-icon-for]")) return false;
   event.preventDefault();
   event.stopPropagation();
   if (event.stopImmediatePropagation) event.stopImmediatePropagation();
