@@ -611,7 +611,6 @@ main { padding-bottom: 24px; }
   font-size: 8px;
 }
 
-
 /* custom duration modal */
 .modal-backdrop {
   display: none;
@@ -1559,7 +1558,6 @@ body.marker-dragging-out, body.marker-dragging-out * {
   top: -18px !important;
   z-index: 1 !important;
 }
-
 
 /* v25 layer filter column + middle-drag/menu refinements
    Permanent gutter rule: filter column + time/track column stay frozen above clips/rulers. */
@@ -3997,7 +3995,6 @@ body.show-frame-checkers .track:nth-child(even)::before {
   box-shadow: 0 0 0 1px rgba(0,0,0,.35), 0 0 4px rgba(255,255,255,.26);
 }
 
-
 /* Keyframe focus mode: one layer row with expandable animated property lanes. */
 body.keyframe-mode .track {
   height: 30px;
@@ -6007,7 +6004,6 @@ body.keyframe-mode .horizontal-scrollbar {
 body.keyframe-mode.show-frame-checkers .track::before {
   left: 102px !important;
 }
-
 /* Wider frozen layer/property column. Keep this at EOF so older gutter locks
    do not pull PR/keyframe property labels back to the old 72px column. */
 #timeDisplay {
@@ -7517,7 +7513,6 @@ header .comp-select {
 #keyframeModeBtn {
   grid-column: 5 !important;
 }
-
 
 /* v78: gradient Apple glyph and explicit OS-equivalent shortcut tooltip target. */
 .platform-badge.mac {
@@ -9128,7 +9123,6 @@ header {
   height: 12px !important;
   border-radius: 50% !important;
 }
-
 
 /* v92: layer style editor revamp. No black header/footer bars; one soft glass tool surface. */
 .layer-style-dialog-backdrop {
@@ -10950,7 +10944,6 @@ body.keyframe-mode .track-label {
   text-align: center !important;
   padding: 0 10px !important;
 }
-
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {
   display: grid !important;
@@ -12957,7 +12950,6 @@ body.keyframe-mode .property-label-text,
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button i {
   display: none !important;
 }
-
 /* v122: Ease Editor follows the current layer-style glass system. */
 .ease-dialog-backdrop {
   background: transparent !important;
@@ -14397,7 +14389,6 @@ body .ease-dialog-title {
   line-height: 1 !important;
 }
 
-
 .mass-edit-backdrop {
   display: none;
   position: fixed;
@@ -14657,7 +14648,6 @@ body .ease-dialog-title {
     grid-template-columns: 1fr;
   }
 }
-
 .text-animation-backdrop {
   display: none;
   position: fixed;
@@ -14965,7 +14955,6 @@ body .ease-dialog-title {
     grid-template-columns: 1fr;
   }
 }
-
 .timing-order-backdrop {
   display: none;
   position: fixed;
@@ -15407,7 +15396,6 @@ body .ease-dialog-title {
     grid-template-columns: 66px repeat(2, minmax(0, 1fr));
   }
 }
-
 /* Keep the layer selector aligned with the final subpanel system overrides. */
 body .layer-selection-backdrop {
   background: transparent !important;
@@ -17839,7 +17827,6 @@ body:not(.quick-panel-mode) #assistantHub {
   border-color: rgba(233, 147, 96, .5);
   background: rgba(213, 111, 58, .16);
 }
-
 .quick-panel-shell {
   display: none;
 }
@@ -18960,4 +18947,3 @@ body.quick-panel-mode.native-win .anchor-dialog,
 body.quick-panel-mode.native-win .timing-order-layout {
   box-shadow: none !important;
 }
-

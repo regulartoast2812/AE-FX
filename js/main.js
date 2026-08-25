@@ -1512,7 +1512,113 @@ async function promptAddMarker() {
   else if (response.action === "protected") await runTntV3Command({ name: "Create Protected Marker", tntFunction: "createProtectedMarker", args: [0, label, true] });
   else await runTntV3Command({ name: "Add Marker", tntFunction: "addMarker", args: [label] });
 }
+// Icon registry.
+//
+// icons/lucide.js is loaded by a plain <script> tag before this bundle, so the
+// whole 2,035-icon set is available synchronously on window.TNT_LUCIDE. That
+// matters because every renderer builds its markup as a string - an async icon
+// lookup would force all of them to become async. A script tag also works
+// identically in the CEP panel and in both native overlays (WKWebView and
+// WebView2), where a fetch() from file:// would not.
+//
+// Icons are referenced by semantic role rather than by Lucide name, so swapping
+// the glyph for a role is a one-line change here and nothing else moves.
 
+const TNT_ICON_FALLBACK = "circle";
+
+// Role -> Lucide name.
+const TNT_ICON_ROLES = {
+  // Panel chrome
+  "ui.settings": "settings",
+  "ui.refresh": "refresh-cw",
+  "ui.search": "search",
+  "ui.close": "x",
+
+  // Action verbs, matching TNT_ACTION_TITLES
+  "action.Open": "panel-right-open",
+  "action.Set": "sliders-horizontal",
+  "action.Apply": "sparkles",
+  "action.Add": "circle-plus",
+  "action.Delete": "trash-2",
+  "action.Show": "eye",
+  "action.Go To": "circle-chevron-right",
+  "action.Space": "align-horizontal-space-around",
+  "action.Play": "play",
+
+  // Targets that earn their own glyph, overriding the action icon
+  "target.Marker": "flag",
+  "target.Text": "type",
+  "target.Shape": "shapes",
+  "target.Mask": "scan",
+  "target.Effect": "wand-sparkles",
+
+  // Quick Controls subpanels
+  "panel.anchor": "crosshair",
+  "panel.composition": "film",
+  "panel.rename-comp": "pencil",
+  "panel.ease": "spline",
+  "panel.mask": "scan",
+  "panel.effects": "wand-sparkles",
+  "panel.shapes": "shapes",
+  "panel.styles": "layers",
+  "panel.layer-menu": "list",
+  "panel.mass-edit": "list-checks",
+  "panel.text-animation": "type",
+  "panel.timing-order": "align-start-vertical",
+  "panel.filter": "filter"
+};
+
+function tntIconLibraryReady() {
+  return !!(window.TNT_LUCIDE && typeof window.TNT_LUCIDE === "object");
+}
+
+// Inner markup for a Lucide icon name. Unknown names fall back rather than
+// rendering an empty box, so a typo is visible but never breaks a layout.
+function tntIconMarkupByName(name) {
+  if (!tntIconLibraryReady()) return "";
+  const icons = window.TNT_LUCIDE;
+  return icons[name] || icons[TNT_ICON_FALLBACK] || "";
+}
+
+function tntIconNameForRole(role) {
+  return TNT_ICON_ROLES[role] || "";
+}
+
+// Full <svg> for a role, e.g. tntIconSvg("panel.ease", "quick-panel-icon").
+// Falls back to a role's raw Lucide name if the role is unknown, so callers can
+// pass either - which is what a user-assigned custom icon will do.
+function tntIconSvg(roleOrName, className) {
+  const name = tntIconNameForRole(roleOrName) || roleOrName;
+  const inner = tntIconMarkupByName(name);
+  if (!inner) return "";
+  const cls = className ? ` class="${className}"` : "";
+  return `<svg${cls} viewBox="0 0 24 24" aria-hidden="true" focusable="false">${inner}</svg>`;
+}
+
+// Names available for a future icon picker.
+function tntIconCatalogue() {
+  return tntIconLibraryReady() ? Object.keys(window.TNT_LUCIDE).sort() : [];
+}
+
+
+// Paints every element carrying data-icon. Static markup declares the role and
+// this fills it, so index.html holds no path data at all.
+function tntPaintDeclaredIcons(root) {
+  const scope = root || document;
+  scope.querySelectorAll("[data-icon]").forEach(el => {
+    const role = el.getAttribute("data-icon");
+    if (!role || el.querySelector("svg")) return;
+    const cls = el.classList.contains("quick-panel-grid-button") ? "quick-panel-icon" : "";
+    const markup = tntIconSvg(role, cls || (el.closest(".quick-panel-grid") ? "quick-panel-icon" : "tnt-action-icon"));
+    if (markup) el.insertAdjacentHTML("afterbegin", markup);
+  });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => tntPaintDeclaredIcons());
+} else {
+  tntPaintDeclaredIcons();
+}
 function ensureLayerStyleDialog() {
   if (layerStyleDialogEl) return layerStyleDialogEl;
   layerStyleDialogEl = document.createElement("div");
@@ -3322,7 +3428,6 @@ async function setLayerStyleProp(input, value) {
   await callTntV3Command("seSetProp", [input.dataset.gmn, input.dataset.pmn, value], { status: false, localFirst: true });
   if (!LAYER_STYLE_PANEL_KEEP_OPEN && !panelSettings.keepStyleEditorOpen) closeLayerStyleDialog();
 }
-
 function ensureSettingsMenu() {
   if (settingsMenuEl) return settingsMenuEl;
   settingsMenuEl = document.createElement("div");
@@ -3804,7 +3909,6 @@ function allRelationshipLayerSets(layers = state.layers || []) {
   });
   return { parented, parentSources, matteChildren, matteSources };
 }
-
 // Native bridge server.
 //
 // Runs only in the real CEP panel (inside After Effects), never in quick.html.
@@ -4002,7 +4106,6 @@ function bridgeSetStatus(state, message) {
 }
 
 const tntBridgeServer = startNativeBridgeServer();
-
 // Version and update check.
 //
 // TNT_VERSION is stamped into the bundle by scripts/build.sh from
@@ -4198,7 +4301,6 @@ if (settingsMenuEl) {
     try { renderSettingsMenu(); } catch (_) {}
   });
 }
-
 const FILTER_LABELS = {
   comp: "comps",
   text: "text",
@@ -4606,7 +4708,6 @@ async function applyLayerSelectionQuickFilter(filter) {
   renderLayerSelectionPanel();
   await queueLayerSelectionHostUpdate(next);
 }
-
 function packLayers(layers) {
   // Compact, stack-aware interval packing.
   // Goal:
@@ -5891,7 +5992,6 @@ function renderLayerRelationships(layers) {
     if (showParentLinks && parentIndex && visible[parentIndex]) renderRelationshipLine("parent", layerIndex, parentIndex);
   });
 }
-
 function render() {
   if (timelineMode === "keyframe") {
     renderKeyframeMode();
@@ -7100,7 +7200,6 @@ function escapeHtml(value) {
 function isLayerMenuOpen() {
   return !!(layerMenuEl && layerMenuEl.classList.contains("open"));
 }
-
 async function refreshLayers(options = {}) {
   if (QUICK_PANEL_MODE) {
     await refreshQuickPanelState();
@@ -8022,7 +8121,6 @@ function showMarkerContextMenu(event, marker, options = {}) {
 function bindMarkerContextMenu(el, marker, options = {}) {
   el.addEventListener("contextmenu", e => showMarkerContextMenu(e, marker, options));
 }
-
 function timeFromPointerEvent(event, options = {}) {
   if (!state.comp) return 0;
 
@@ -8955,7 +9053,6 @@ async function drainUndoRequests() {
   panelPointerInside = true;
   focusPanel(2);
 }
-
 function ensureFxConsole() {
   if (fxConsoleEl) return fxConsoleEl;
   fxConsoleEl = document.createElement("div");
@@ -9192,40 +9289,23 @@ function filteredFxEffects() {
 // Three visual groups for the left-edge stripe. Assistant-saved scripts share the
 // custom stripe deliberately: the distinction that matters at a glance is "not
 // built into After Effects", not who authored it.
-// One icon per action verb, reused across every entry. Drawing per-command icons
-// is not viable at ~640 entries, and the action is the axis that says what a
-// command does - the source stripe already carries where it came from.
-const TNT_ACTION_ICONS = {
-  "Open":   '<rect x="2.5" y="4" width="10" height="12" rx="1.6"/><path d="M12.5 10h5M15.2 7.4L17.7 10l-2.5 2.6"/>',
-  "Set":    '<path d="M3 6h14M3 10h14M3 14h14"/><circle cx="7" cy="6" r="1.8"/><circle cx="13" cy="10" r="1.8"/><circle cx="9" cy="14" r="1.8"/>',
-  "Apply":  '<path d="M8 2.6l1.5 4L13.4 8 9.5 9.5 8 13.4 6.5 9.5 2.6 8l3.9-1.5z"/><path d="M14.8 12.4l.8 2.1 2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8z"/>',
-  "Add":    '<circle cx="10" cy="10" r="7"/><path d="M10 6.6v6.8M6.6 10h6.8"/>',
-  "Delete": '<path d="M3.5 5.5h13M8 5.5V3.8h4v1.7"/><path d="M5.4 5.5l.8 10.2a1 1 0 0 0 1 .9h5.6a1 1 0 0 0 1-.9l.8-10.2"/>',
-  "Show":   '<path d="M1.6 10S4.6 4.6 10 4.6 18.4 10 18.4 10 15.4 15.4 10 15.4 1.6 10 1.6 10z"/><circle cx="10" cy="10" r="2.4"/>',
-  "Go To":  '<circle cx="10" cy="10" r="7"/><path d="M8.6 6.9L11.8 10l-3.2 3.1"/>',
-  "Space":  '<path d="M3 3.2v13.6M17 3.2v13.6"/><rect x="6.6" y="7.4" width="6.8" height="5.2" rx="1.2"/>',
-  "Play":   '<path d="M6.6 4.4l8.4 5.6-8.4 5.6z"/>'
-};
-
-// Target glyphs that override the action icon. Markers earn one because they are
-// a large, visually distinct slice of the catalogue; add more here as needed.
-const TNT_TARGET_ICONS = {
-  "Marker": '<path d="M5 2.4v15.2"/><path d="M5 3.6h9.9l-2.3 3.2 2.3 3.2H5z"/>'
-};
-
+// Icons come from the Lucide registry in 05-icons.js, keyed by role - so the
+// glyph for an action or target is changed there, not here. Targets that have
+// their own icon override the action icon, since "what it acts on" is the more
+// recognisable signal when scanning a list.
 function tntActionIconMarkup(entry) {
-  let paths = TNT_ACTION_ICONS["Apply"];
+  let role = "action.Apply";
   try {
     const tags = safeFxConsoleEntryTags(entry) || [];
-    const target = tags.filter(tag => tag.kind === "target" && TNT_TARGET_ICONS[tag.label])[0];
+    const target = tags.filter(t => t.kind === "target" && tntIconNameForRole(`target.${t.label}`))[0];
     if (target) {
-      paths = TNT_TARGET_ICONS[target.label];
+      role = `target.${target.label}`;
     } else {
-      const action = tags.filter(tag => tag.kind === "action")[0];
-      if (action && TNT_ACTION_ICONS[action.label]) paths = TNT_ACTION_ICONS[action.label];
+      const action = tags.filter(t => t.kind === "action")[0];
+      if (action && tntIconNameForRole(`action.${action.label}`)) role = `action.${action.label}`;
     }
   } catch (_) {}
-  return `<svg class="assistant-function-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">${paths}</svg>`;
+  return tntIconSvg(role, "assistant-function-icon");
 }
 
 function tntSourceGroup(entry) {
@@ -9501,7 +9581,6 @@ async function executeFxConsoleEntry(effect) {
   await refreshLayers({ forceRender: true });
   return true;
 }
-
 function ensureEaseDialog() {
   if (easeDialogEl) return easeDialogEl;
   easeDialogEl = document.createElement("div");
@@ -10014,7 +10093,6 @@ async function applyEaseToSelected(options = {}) {
   if ((options.close || options.refresh) && !keepDialogOpen) focusPanel(2);
 }
 
-
 let massEditDialogEl = null;
 let massEditSourceIndex = 0;
 
@@ -10221,7 +10299,6 @@ function hideMassEditPanel() {
   massEditDialogEl.classList.remove("show");
   massEditDialogEl.setAttribute("aria-hidden", "true");
 }
-
 let textAnimationBackdropEl = null;
 let textAnimationState = {
   style: "master",
@@ -10474,7 +10551,6 @@ async function applyTextAnimationPreset(name) {
   await runTntV3Command({ name: "Text Animation Preset", tntFunction: preset[0], args: preset[1] });
   renderTextAnimationPanel();
 }
-
 let timingOrderBackdropEl = null;
 let timingOrderDirection = "asc";
 let timingOrderUnit = "frames";
@@ -10958,7 +11034,6 @@ function hideTimingOrderPanel() {
   timingOrderBackdropEl.classList.remove("show");
   timingOrderBackdropEl.setAttribute("aria-hidden", "true");
 }
-
 function currentFrameRate() {
   return Math.max(1, Math.round(Number(state.comp && state.comp.frameRate || 30)));
 }
@@ -14372,4 +14447,3 @@ if (QUICK_PANEL_MODE) {
     startNativeSelectionMonitor();
   });
 }
-
