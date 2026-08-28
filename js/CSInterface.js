@@ -64,6 +64,30 @@
     return '';
   };
 
+  // CSXS event bus. 100-panels-shortcuts-bootstrap.js subscribes to
+  // com.tnt.timeline.nativeSelection; without these the call throws and aborts
+  // the rest of that module - the panel half-initialises with no error shown.
+  window.CSInterface.prototype.addEventListener = function (type, listener, obj) {
+    if (window.__adobe_cep__ && window.__adobe_cep__.addEventListener) {
+      return window.__adobe_cep__.addEventListener(type, listener, obj);
+    }
+    return null;
+  };
+
+  window.CSInterface.prototype.removeEventListener = function (type, listener, obj) {
+    if (window.__adobe_cep__ && window.__adobe_cep__.removeEventListener) {
+      return window.__adobe_cep__.removeEventListener(type, listener, obj);
+    }
+    return null;
+  };
+
+  window.CSInterface.prototype.dispatchEvent = function (event) {
+    if (window.__adobe_cep__ && window.__adobe_cep__.dispatchEvent) {
+      return window.__adobe_cep__.dispatchEvent(event);
+    }
+    return null;
+  };
+
   window.CSInterface.prototype.registerKeyEventsInterest = function (keyEventsInterest) {
     if (window.__adobe_cep__ && window.__adobe_cep__.registerKeyEventsInterest) {
       return window.__adobe_cep__.registerKeyEventsInterest(keyEventsInterest);

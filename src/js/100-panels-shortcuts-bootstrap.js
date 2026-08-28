@@ -2587,6 +2587,7 @@ function setAssistantTab(name) {
     panel.classList.toggle("active", panel.dataset.assistantPanel === selected);
   });
   if (selected === "functions") renderAssistantFunctions();
+  if (selected === "tnk" && typeof tnkRender === "function") tnkRender();
 }
 
 function assistantStorageAvailable() {

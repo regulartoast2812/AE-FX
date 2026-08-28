@@ -22,6 +22,7 @@ js_sources=(
   src/js/96-text-animation-panel.js
   src/js/97-timing-order-panel.js
   src/js/100-panels-shortcuts-bootstrap.js
+  src/js/110-tnk-panel.js
 )
 
 css_sources=(

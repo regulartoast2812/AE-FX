@@ -281,6 +281,7 @@
       <div class="assistant-tabs" role="tablist" aria-label="Assistant workspace">
         <button id="assistantFunctionsTab" class="assistant-tab active" type="button" role="tab" aria-selected="true" data-assistant-tab="functions">Functions</button>
         <button id="assistantChatTab" class="assistant-tab" type="button" role="tab" aria-selected="false" data-assistant-tab="chat">Assistant</button>
+        <button id="assistantTnkTab" class="assistant-tab" type="button" role="tab" aria-selected="false" data-assistant-tab="tnk" title="TNK-style layout: global parameters feed every tool">TNK</button>
         <div class="assistant-tab-actions">
           <button id="assistantRefreshFunctions" class="tnt-action-btn" type="button" title="Refresh functions" aria-label="Refresh functions" data-icon="ui.refresh"></button>
           <button id="settingsBtn" class="settings-btn tnt-action-btn" type="button" title="Settings" aria-label="Settings" data-icon="ui.settings"></button>
@@ -310,6 +311,31 @@
           </div>
         </div>
         <div id="assistantFunctionList" class="assistant-function-list"></div>
+      </div>
+      <div id="assistantTnkPanel" class="assistant-panel" role="tabpanel" aria-labelledby="assistantTnkTab" data-assistant-panel="tnk">
+        <div class="tnk-global-bar">
+          <div class="tnk-param"><label for="tnkParamIn">In</label><input id="tnkParamIn" data-tnk-param="inTime" type="number" step="0.05" min="0" value="1"></div>
+          <div class="tnk-param"><label for="tnkParamOut">Out</label><input id="tnkParamOut" data-tnk-param="outTime" type="number" step="0.05" min="0" value="1"></div>
+          <div class="tnk-divider"></div>
+          <div class="tnk-param"><label for="tnkParamEaseIn">EI</label><input id="tnkParamEaseIn" data-tnk-param="easeIn" type="number" step="5" min="0" max="100" value="75"></div>
+          <div class="tnk-param"><label for="tnkParamEaseOut">EO</label><input id="tnkParamEaseOut" data-tnk-param="easeOut" type="number" step="5" min="0" max="100" value="75"></div>
+          <div class="tnk-divider"></div>
+          <div class="tnk-param"><label for="tnkParamPixels">Px</label><input id="tnkParamPixels" data-tnk-param="pixels" type="number" step="10" value="100"></div>
+          <div class="tnk-divider"></div>
+          <div class="tnk-param"><label for="tnkParamFreq">Hz</label><input id="tnkParamFreq" data-tnk-param="freq" type="number" step="1" min="0" value="2"></div>
+          <div class="tnk-param"><label for="tnkParamAmp">Amp</label><input id="tnkParamAmp" data-tnk-param="amp" type="number" step="5" value="20"></div>
+          <div class="tnk-divider"></div>
+          <div class="tnk-param"><label for="tnkParamTextIn">TI</label><input id="tnkParamTextIn" data-tnk-param="textIn" type="number" step="0.05" min="0" value="0.35"></div>
+          <div class="tnk-param"><label for="tnkParamTextOut">TO</label><input id="tnkParamTextOut" data-tnk-param="textOut" type="number" step="0.05" min="0" value="0.35"></div>
+          <div class="tnk-bar-actions">
+            <button type="button" class="tnk-bar-btn" id="tnkResetParams" data-icon="ui.refresh" title="Reset every parameter to its default"></button>
+          </div>
+        </div>
+        <div class="tnk-search-row">
+          <input id="tnkFilter" type="text" spellcheck="false" autocomplete="off" placeholder="Filter tools">
+          <span id="tnkCount" class="tnk-count"></span>
+        </div>
+        <div id="tnkToolRows" class="tnk-tool-rows"></div>
       </div>
       <div id="assistantChatPanel" class="assistant-panel" role="tabpanel" aria-labelledby="assistantChatTab" data-assistant-panel="chat">
         <div class="assistant-agent-shell">
