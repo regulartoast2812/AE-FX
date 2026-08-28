@@ -88,14 +88,11 @@
   color: rgba(255,255,255,.58) !important;
 }
 
-/* v81: stop AE sync completely while the CEP panel is inactive. */
-body.panel-sync-paused header,
-body.panel-sync-paused main,
-body.panel-sync-paused .horizontal-scrollbar {
-  filter: blur(1.6px);
-  opacity: .48;
-  transition: filter .04s linear, opacity .04s linear;
-}
+/* v81 removed: the panel used to blur and dim itself whenever it lost focus -
+   clicking any other After Effects panel greyed it out. Sync still pauses while
+   inactive, which was the point; that runs off panelSyncPaused in JS and is
+   unaffected. body.panel-sync-paused is still toggled, so a subtler indicator
+   can hang off it later without rewiring anything. */
 
 /* v82: disabled layers stay muted, but still get a softer selected lift. */
 .clip.disabled-layer {
