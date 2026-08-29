@@ -19,7 +19,7 @@
 .tnk-dialog {
   display: flex;
   flex-direction: column;
-  width: min(720px, calc(100vw - 24px));
+  width: min(760px, calc(100vw - 24px));
   max-height: calc(100vh - 60px);
   overflow: hidden;
   border: 1px solid rgba(255,255,255,.115);
@@ -76,7 +76,7 @@
   align-items: center;
   flex: 0 0 auto;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
   padding: 9px 12px;
   border-bottom: 1px solid rgba(255, 255, 255, .07);
   background:
@@ -98,7 +98,7 @@
 }
 
 .tnk-param input {
-  width: 52px;
+  width: 44px;
   height: 24px;
   padding: 0 6px;
   border: 1px solid rgba(255, 255, 255, .14);
@@ -161,16 +161,46 @@
   font-size: 12.5px;
 }
 
-/* Dense wrapping rows, the way TNK laid its tools out. */
+/* Grouped, the way TNK laid its tools out - a labelled box per task, dense
+   wrapping buttons inside. The grouping is the navigation; there is no long
+   list to scan. */
 .tnk-tool-rows {
   display: flex;
   flex: 1 1 auto;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  gap: 5px;
+  flex-direction: column;
+  gap: 10px;
   min-height: 0;
   overflow-y: auto;
-  padding: 10px 12px 12px;
+  padding: 12px;
+}
+
+.tnk-group {
+  position: relative;
+  padding: 14px 10px 10px;
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .018);
+}
+
+/* Sits on the border, the way TNK's group captions do. */
+.tnk-group h4 {
+  position: absolute;
+  top: -7px;
+  left: 10px;
+  margin: 0;
+  padding: 0 6px;
+  background: #1e1f20;
+  color: rgba(228, 228, 234, .52);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.tnk-group-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 
 .tnk-tool {
