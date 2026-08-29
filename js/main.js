@@ -12586,6 +12586,7 @@ function closeNativeQuickPanelSurfaces() {
   if (massEditDialogEl && massEditDialogEl.classList.contains("show")) hideMassEditPanel();
   if (textAnimationBackdropEl && textAnimationBackdropEl.classList.contains("show")) hideTextAnimationPanel();
   if (timingOrderBackdropEl && timingOrderBackdropEl.classList.contains("show")) hideTimingOrderPanel();
+  if (typeof tnkBackdropEl !== "undefined" && tnkBackdropEl && tnkBackdropEl.classList.contains("show")) hideTnkPanel();
   if (layerSelectionModalEl && layerSelectionModalEl.classList.contains("show")) hideLayerSelectionPanel();
   if (compositionModalEl && compositionModalEl.classList.contains("show")) hideCompositionPanel();
   if (anchorModalEl && anchorModalEl.classList.contains("show")) hideAnchorDialog();
