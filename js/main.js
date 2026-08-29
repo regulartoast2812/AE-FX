@@ -14698,42 +14698,75 @@ const TNK_PARAM_FIELDS = [
 ];
 // TNK was never a catalogue. It held the handful of general commands you reach
 // for constantly, grouped by task, and left everything deeper to the panels
-// built for it - Ease, Mask, Mass Edit. Listing all 400 commands here made it a
-// second Functions tab and destroyed the point. This is the curated set, in
-// TNK's own grouping. Panel launchers are deliberately absent: opening a panel
-// from inside a panel is not a tool.
+// built for it - Ease, Mask, Mass Edit.
+//
+// Buttons are icon-only, the way TNK's were: at this size a row of glyphs is
+// read by shape and position, not by reading words, and that is the whole
+// speed argument for the panel. Which means every tool needs its OWN icon -
+// the shared action/target glyphs used in the Functions list would render half
+// this panel as the same sparkle. So each entry names its own Lucide icon here,
+// and the name survives as the hover tooltip.
 const TNK_GROUPS = [
   { title: "Motion", commands: [
-    "Scale In", "Scale Out", "Scale In+Out",
-    "Opacity In", "Opacity Out", "Opacity In+Out",
-    "Anticipation Tool"
+    ["Scale In", "maximize-2"],
+    ["Scale Out", "minimize-2"],
+    ["Scale In+Out", "scaling"],
+    ["Opacity In", "eye"],
+    ["Opacity Out", "eye-off"],
+    ["Opacity In+Out", "glasses"],
+    ["Anticipation Tool", "undo-2"]
   ] },
   { title: "Keys", commands: [
-    "Ease In / Out", "Linear Keyframes", "Align Keys to Playhead",
-    "Clone Keyframes", "Clone Keyframes Flipped", "Reverse Keyframes",
-    "Wiggle Expression", "Overshoot Expression", "Clear Expressions"
+    ["Ease In / Out", "spline"],
+    ["Linear Keyframes", "trending-up"],
+    ["Align Keys to Playhead", "align-center-vertical"],
+    ["Clone Keyframes", "copy"],
+    ["Clone Keyframes Flipped", "flip-horizontal-2"],
+    ["Reverse Keyframes", "arrow-left-right"],
+    ["Wiggle Expression", "activity"],
+    ["Overshoot Expression", "waves"],
+    ["Clear Expressions", "eraser"]
   ] },
   { title: "Layers", commands: [
-    "Duplicate Selected Layers", "Split Selected Layers", "Precompose Selected",
-    "Create Null", "Parent to Null", "Stagger Layers...",
-    "Hide Selected", "Lock Selected", "Solo Focus Toggle"
+    ["Duplicate Selected Layers", "copy-plus"],
+    ["Split Selected Layers", "split"],
+    ["Precompose Selected", "package"],
+    ["Create Null", "square-dashed"],
+    ["Parent to Null", "link"],
+    ["Stagger Layers...", "align-start-vertical"],
+    ["Hide Selected", "ghost"],
+    ["Lock Selected", "lock"],
+    ["Solo Focus Toggle", "focus"]
   ] },
   { title: "Timing", commands: [
-    "Trim In to Playhead", "Trim Out to Playhead", "Trim to Keyframes",
-    "Snap Layers to Playhead In Point", "Snap Layers to Playhead Out Point",
-    "Auto Trim Comp"
+    ["Trim In to Playhead", "arrow-right-to-line"],
+    ["Trim Out to Playhead", "arrow-left-to-line"],
+    ["Trim to Keyframes", "scissors"],
+    ["Snap Layers to Playhead In Point", "chevrons-left"],
+    ["Snap Layers to Playhead Out Point", "chevrons-right"],
+    ["Auto Trim Comp", "crop"]
   ] },
   { title: "Effects", commands: [
-    "Apply Glow", "Apply Light Sweep", "Apply VHS", "Apply Blur In+Out",
-    "Apply Grain", "Apply Dim + Desat", "Toggle Effects", "Delete All Effects"
+    ["Apply Glow", "sparkles"],
+    ["Apply Light Sweep", "flashlight"],
+    ["Apply VHS", "tv"],
+    ["Apply Blur In+Out", "droplets"],
+    ["Apply Grain", "grip"],
+    ["Apply Dim + Desat", "sun-dim"],
+    ["Toggle Effects", "toggle-left"],
+    ["Delete All Effects", "trash-2"]
   ] },
   { title: "Text", commands: [
-    "Set Text Content...", "Find / Replace Text...",
-    "Text: Remove In Animator + Marker", "Text: Remove Out Animator + Marker"
+    ["Set Text Content...", "type"],
+    ["Find / Replace Text...", "replace"],
+    ["Text: Remove In Animator + Marker", "list-x"],
+    ["Text: Remove Out Animator + Marker", "text-select"]
   ] },
   { title: "Markers", commands: [
-    "Markers: Set In Marker", "Markers: Set Out Marker",
-    "Markers: Add Marker...", "Markers: Remove In/Out Markers"
+    ["Markers: Set In Marker", "flag"],
+    ["Markers: Set Out Marker", "flag-triangle-right"],
+    ["Markers: Add Marker...", "bookmark-plus"],
+    ["Markers: Remove In/Out Markers", "flag-off"]
   ] }
 ];
 
@@ -14812,14 +14845,17 @@ function tnkResolvedGroups() {
   const flat = [];
   const groups = TNK_GROUPS.map(group => {
     const entries = group.commands
-      .map(name => index.get(name))
+      .map(([name, icon]) => {
+        const entry = index.get(name);
+        return entry ? { entry, icon } : null;
+      })
       .filter(Boolean)
-      .filter(entry => {
+      .filter(item => {
         if (!terms.length) return true;
-        const haystack = `${entry.name || ""} ${entry.category || ""}`.toLowerCase();
+        const haystack = `${item.entry.name || ""} ${item.entry.category || ""}`.toLowerCase();
         return terms.every(term => haystack.indexOf(term) >= 0);
       })
-      .map(entry => ({ entry, index: flat.push(entry) - 1 }));
+      .map(item => Object.assign(item, { index: flat.push(item.entry) - 1 }));
     return { title: group.title, entries };
   }).filter(group => group.entries.length);
   return { groups, flat };
@@ -14899,17 +14935,18 @@ function ensureTnkPanel() {
   return tnkBackdropEl;
 }
 
-function tnkToolMarkup(entry, index) {
+function tnkToolMarkup(entry, icon, index) {
   const name = String(entry.name || entry.matchName || "Tool");
   const driven = Array.isArray(entry.args) && entry.args.some(arg =>
     arg && typeof arg === "object" && !Array.isArray(arg) &&
     Object.keys(arg).some(key => key in tnkParams));
   const shortcut = typeof tntShortcutForEntry === "function" ? tntShortcutForEntry(entry) : "";
-  const tip = [name, driven ? "uses the bar parameters" : "", shortcut].filter(Boolean).join(" \u00b7 ");
+  // The name lives only in the tooltip now, so it has to carry everything the
+  // label used to: what it is, its key, and whether the bar drives it.
+  const tip = [name, shortcut, driven ? "uses the bar parameters" : ""].filter(Boolean).join(" \u00b7 ");
   return `
-    <button type="button" class="tnk-tool${driven ? " driven" : ""}" data-tnk-index="${index}" data-fx-source="${tntSourceGroup(entry)}" title="${escapeHtml(tip)}">
-      ${tntActionIconMarkup(entry)}
-      <span>${escapeHtml(name)}</span>
+    <button type="button" class="tnk-tool${driven ? " driven" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(name)}" title="${escapeHtml(tip)}">
+      ${tntIconSvg(icon, "tnk-tool-icon") || ""}
     </button>
   `;
 }
@@ -14923,7 +14960,7 @@ function tnkRender() {
     <section class="tnk-group">
       <h4>${escapeHtml(group.title)}</h4>
       <div class="tnk-group-tools">
-        ${group.entries.map(item => tnkToolMarkup(item.entry, item.index)).join("")}
+        ${group.entries.map(item => tnkToolMarkup(item.entry, item.icon, item.index)).join("")}
       </div>
     </section>
   `).join("") || `<div class="tnk-empty">No tool matches that filter</div>`;
