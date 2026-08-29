@@ -630,6 +630,10 @@ function criticalShortcutBaseKey(event) {
 }
 
 function handleCriticalPanelShortcut(event) {
+  // TNK binds its own keys over these while it is open - "c" is Clone there,
+  // Composition Tools here. Its listener cannot win on ordering (this handler is
+  // registered on window first), so it is deferred to explicitly.
+  if (typeof tnkOwnsKeyboard === "function" && tnkOwnsKeyboard()) return;
   // While a shortcut cell is listening, capture owns the keyboard. These handlers
   // are registered on window earlier in the bundle, so without this they consume
   // Escape and Delete before the capture listener ever sees them.
@@ -660,6 +664,10 @@ function handleCriticalPanelShortcut(event) {
 }
 
 function handleShortcut(event) {
+  // TNK binds its own keys over these while it is open - "c" is Clone there,
+  // Composition Tools here. Its listener cannot win on ordering (this handler is
+  // registered on window first), so it is deferred to explicitly.
+  if (typeof tnkOwnsKeyboard === "function" && tnkOwnsKeyboard()) return;
   // While a shortcut cell is listening, capture owns the keyboard. These handlers
   // are registered on window earlier in the bundle, so without this they consume
   // Escape and Delete before the capture listener ever sees them.

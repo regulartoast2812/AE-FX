@@ -15413,6 +15413,7 @@ body .ease-dialog-title {
 
 .tnk-dialog {
   display: flex;
+  outline: none;
   flex-direction: column;
   width: min(880px, calc(100vw - 24px));
   max-height: calc(100vh - 60px);
@@ -15626,6 +15627,25 @@ body .ease-dialog-title {
 }
 
 /* Lucide ships bare paths; without these they render as filled blobs. */
+/* A key badge tucked into the corner, so a bound tool is identifiable without
+   hovering. Unkeyed tools stay a clean square. */
+.tnk-tool { position: relative; }
+
+.tnk-key {
+  position: absolute;
+  right: 1px;
+  bottom: 0;
+  color: rgba(233, 147, 96, .85);
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  pointer-events: none;
+}
+
+.tnk-tool.keyed .tnk-tool-icon { transform: translate(-2px, -2px); }
+
 .tnk-tool-icon {
   width: 16px;
   height: 16px;

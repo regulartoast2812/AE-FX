@@ -34,75 +34,96 @@ const TNK_PARAM_FIELDS = [
 // for constantly, grouped by task, and left everything deeper to the panels
 // built for it - Ease, Mask, Mass Edit.
 //
+// Keys and grouping are lifted from TNK v3 itself (Ref/TNK_v3/index.html,
+// _HK_ACTIONS), not invented. TNK compacts pairs onto one key with shift as the
+// variant - clone/flip, hide/show, toggle-fx/copy-fx - so the buttons compact
+// the same way rather than spending two squares on one idea.
+//
+// `key` is the bare key while TNK is open. `shift` and `alt` name the command
+// run with that modifier held. Anything with no key is ours, not TNK's, and
+// stays unbound until it earns one.
+//
 // Buttons are icon-only, the way TNK's were: at this size a row of glyphs is
-// read by shape and position, not by reading words, and that is the whole
-// speed argument for the panel. Which means every tool needs its OWN icon -
-// the shared action/target glyphs used in the Functions list would render half
-// this panel as the same sparkle. So each entry names its own Lucide icon here,
-// and the name survives as the hover tooltip.
+// read by shape and position, not by reading words. That means every entry
+// needs its OWN icon - the shared action/target glyphs from the Functions list
+// would render half this panel as the same sparkle.
 const TNK_GROUPS = [
-  { title: "Motion", commands: [
-    ["Scale In", "maximize-2"],
-    ["Scale Out", "minimize-2"],
-    ["Scale In+Out", "scaling"],
-    ["Opacity In", "eye"],
-    ["Opacity Out", "eye-off"],
-    ["Opacity In+Out", "glasses"],
-    ["Anticipation Tool", "undo-2"]
-  ] },
   { title: "Keys", commands: [
-    ["Ease In / Out", "spline"],
-    ["Linear Keyframes", "trending-up"],
-    ["Align Keys to Playhead", "align-center-vertical"],
-    ["Clone Keyframes", "copy"],
-    ["Clone Keyframes Flipped", "flip-horizontal-2"],
-    ["Reverse Keyframes", "arrow-left-right"],
-    ["Wiggle Expression", "activity"],
-    ["Overshoot Expression", "waves"],
-    ["Clear Expressions", "eraser"]
+    { label: "Ease In / Out", icon: "spline", key: "e", command: "Ease In / Out" },
+    { label: "Linear", icon: "trending-up", key: "l", command: "Linear Keyframes" },
+    { label: "Overshoot", icon: "waves", key: "o", command: "Overshoot Expression" },
+    { label: "Wiggle", icon: "activity", key: "w", command: "Wiggle Expression" },
+    { label: "Reverse", icon: "arrow-left-right", key: "r", command: "Reverse Keyframes" },
+    { label: "Clone", icon: "copy", key: "c", command: "Clone Keyframes",
+      shift: "Clone Keyframes Flipped" },
+    { label: "Delete Keys", icon: "eraser", key: "z", command: "Delete All Keyframes" },
+    { label: "Align to Playhead", icon: "align-center-vertical", command: "Align Keys to Playhead" },
+    { label: "Clear Expressions", icon: "square-slash", command: "Clear Expressions" }
   ] },
   { title: "Layers", commands: [
-    ["Duplicate Selected Layers", "copy-plus"],
-    ["Split Selected Layers", "split"],
-    ["Precompose Selected", "package"],
-    ["Create Null", "square-dashed"],
-    ["Parent to Null", "link"],
-    ["Stagger Layers...", "align-start-vertical"],
-    ["Hide Selected", "ghost"],
-    ["Lock Selected", "lock"],
-    ["Solo Focus Toggle", "focus"]
-  ] },
-  { title: "Timing", commands: [
-    ["Trim In to Playhead", "arrow-right-to-line"],
-    ["Trim Out to Playhead", "arrow-left-to-line"],
-    ["Trim to Keyframes", "scissors"],
-    ["Snap Layers to Playhead In Point", "chevrons-left"],
-    ["Snap Layers to Playhead Out Point", "chevrons-right"],
-    ["Auto Trim Comp", "crop"]
+    { label: "Stagger", icon: "align-start-vertical", key: "s", command: "Stagger Layers..." },
+    { label: "Pull to Playhead", icon: "chevrons-left", key: "p",
+      command: "Pull Layer Group to Playhead In Point",
+      shift: "Pull Layer Group to Playhead Out Point" },
+    { label: "Focus", icon: "focus", key: "f", command: "Solo Focus Toggle" },
+    { label: "Hide", icon: "ghost", key: "h", command: "Hide Selected",
+      shift: "Show All Layers" },
+    { label: "Precompose", icon: "package", key: "`", command: "Precompose Selected" },
+    { label: "Lock", icon: "lock", command: "Lock Selected" },
+    { label: "Duplicate", icon: "copy-plus", command: "Duplicate Selected Layers" },
+    { label: "Split", icon: "split", command: "Split Selected Layers" },
+    { label: "Null", icon: "square-dashed", command: "Create Null", shift: "Parent to Null" }
   ] },
   { title: "Effects", commands: [
-    ["Apply Glow", "sparkles"],
-    ["Apply Light Sweep", "flashlight"],
-    ["Apply VHS", "tv"],
-    ["Apply Blur In+Out", "droplets"],
-    ["Apply Grain", "grip"],
-    ["Apply Dim + Desat", "sun-dim"],
-    ["Toggle Effects", "toggle-left"],
-    ["Delete All Effects", "trash-2"]
+    { label: "Toggle Effects", icon: "toggle-left", key: "x", command: "Toggle Effects",
+      shift: "Copy Effects" },
+    { label: "Glow", icon: "sparkles", command: "Apply Glow" },
+    { label: "Light Sweep", icon: "flashlight", command: "Apply Light Sweep" },
+    { label: "VHS", icon: "tv", command: "Apply VHS" },
+    { label: "Blur", icon: "droplets", command: "Apply Blur In+Out",
+      alt: "Apply Blur Out" },
+    { label: "Grain", icon: "grip", command: "Apply Grain" },
+    { label: "Dim + Desat", icon: "sun-dim", command: "Apply Dim + Desat" },
+    { label: "Delete Effects", icon: "trash-2", command: "Delete All Effects" }
+  ] },
+  { title: "Motion", commands: [
+    { label: "Scale", icon: "scaling", command: "Scale In+Out",
+      shift: "Scale In", alt: "Scale Out" },
+    { label: "Opacity", icon: "eye", command: "Opacity In+Out",
+      shift: "Opacity In", alt: "Opacity Out" },
+    { label: "Anticipation", icon: "undo-2", command: "Anticipation Tool" }
+  ] },
+  { title: "Timing", commands: [
+    { label: "Trim to Playhead", icon: "arrow-right-to-line", command: "Trim In to Playhead",
+      shift: "Trim Out to Playhead" },
+    { label: "Trim to Keyframes", icon: "scissors", command: "Trim to Keyframes" },
+    { label: "Snap to Playhead", icon: "chevrons-right", command: "Snap Layers to Playhead In Point",
+      shift: "Snap Layers to Playhead Out Point" },
+    { label: "Auto Trim Comp", icon: "crop", command: "Auto Trim Comp" }
   ] },
   { title: "Text", commands: [
-    ["Set Text Content...", "type"],
-    ["Find / Replace Text...", "replace"],
-    ["Text: Remove In Animator + Marker", "list-x"],
-    ["Text: Remove Out Animator + Marker", "text-select"]
+    { label: "Set Text", icon: "type", command: "Set Text Content..." },
+    { label: "Find / Replace", icon: "replace", command: "Find / Replace Text..." },
+    { label: "Remove Animator", icon: "list-x", command: "Text: Remove In Animator + Marker",
+      shift: "Text: Remove Out Animator + Marker" }
   ] },
   { title: "Markers", commands: [
-    ["Markers: Set In Marker", "flag"],
-    ["Markers: Set Out Marker", "flag-triangle-right"],
-    ["Markers: Add Marker...", "bookmark-plus"],
-    ["Markers: Remove In/Out Markers", "flag-off"]
+    { label: "Add Marker", icon: "bookmark-plus", key: "m", command: "Markers: Add Marker..." },
+    { label: "In Marker", icon: "flag", command: "Markers: Set In Marker",
+      shift: "Markers: Set Out Marker" },
+    { label: "Remove Markers", icon: "flag-off", command: "Markers: Remove In/Out Markers" }
   ] }
 ];
+
+// key -> the group entry it runs. Built once from the table above so the key
+// list and the buttons can never disagree.
+const TNK_KEYMAP = (() => {
+  const map = {};
+  TNK_GROUPS.forEach(group => group.commands.forEach(item => {
+    if (item.key) map[item.key] = item;
+  }));
+  return map;
+})();
 
 const TNK_PARAMS_KEY = "tnkParams.v1";
 
@@ -172,6 +193,14 @@ function tnkEntryIndex() {
 
 // The flat, ordered list behind the grouped view. Indices into it are what the
 // buttons carry, so running a tool never depends on how the groups are drawn.
+// Which command a button runs, given the modifiers held. TNK's own convention:
+// shift is the variant, and a button with no variant ignores it.
+function tnkCommandFor(item, modifiers) {
+  if (modifiers && modifiers.altKey && item.alt) return item.alt;
+  if (modifiers && modifiers.shiftKey && item.shift) return item.shift;
+  return item.command;
+}
+
 function tnkResolvedGroups() {
   const index = tnkEntryIndex();
   const query = String(tnkFilterInput() ? tnkFilterInput().value : "").toLowerCase().trim();
@@ -179,20 +208,16 @@ function tnkResolvedGroups() {
   const flat = [];
   const groups = TNK_GROUPS.map(group => {
     const entries = group.commands
-      .map(([name, icon]) => {
-        const entry = index.get(name);
-        return entry ? { entry, icon } : null;
-      })
-      .filter(Boolean)
+      .filter(item => index.has(item.command))
       .filter(item => {
         if (!terms.length) return true;
-        const haystack = `${item.entry.name || ""} ${item.entry.category || ""}`.toLowerCase();
+        const haystack = `${item.label} ${item.command} ${item.key || ""}`.toLowerCase();
         return terms.every(term => haystack.indexOf(term) >= 0);
       })
-      .map(item => Object.assign(item, { index: flat.push(item.entry) - 1 }));
+      .map(item => Object.assign({ item }, { index: flat.push(item) - 1 }));
     return { title: group.title, entries };
   }).filter(group => group.entries.length);
-  return { groups, flat };
+  return { groups, flat, index };
 }
 
 function tnkParamBarMarkup() {
@@ -214,7 +239,7 @@ function ensureTnkPanel() {
   tnkBackdropEl.className = "tnk-backdrop";
   tnkBackdropEl.setAttribute("aria-hidden", "true");
   tnkBackdropEl.innerHTML = `
-    <section class="tnk-dialog" role="dialog" aria-modal="true" aria-label="TNK tools">
+    <section class="tnk-dialog" role="dialog" aria-modal="true" aria-label="TNK tools" tabindex="-1">
       <header class="tnk-head">
         <div class="tnk-title"><b>TNK</b><span>Tools</span><em class="tnk-count"></em></div>
         <button type="button" class="tnk-bar-btn" data-tnk-reset data-icon="ui.refresh" data-tooltip="Reset Parameters\nReturn every value in the bar to its default."></button>
@@ -255,7 +280,7 @@ function ensureTnkPanel() {
     const tool = event.target.closest("[data-tnk-index]");
     if (tool) {
       event.preventDefault();
-      tnkRunEntry(Number(tool.dataset.tnkIndex || 0));
+      tnkRunEntry(Number(tool.dataset.tnkIndex || 0), event, tool);
     }
   });
 
@@ -270,35 +295,44 @@ function ensureTnkPanel() {
   return tnkBackdropEl;
 }
 
-function tnkToolMarkup(entry, icon, index) {
-  const name = String(entry.name || entry.matchName || "Tool");
-  const driven = Array.isArray(entry.args) && entry.args.some(arg =>
+function tnkKeyBadge(key) {
+  if (!key) return "";
+  return `<kbd class="tnk-key">${escapeHtml(key === "`" ? "\u0060" : key.toUpperCase())}</kbd>`;
+}
+
+function tnkToolMarkup(item, index, entryIndex) {
+  const entry = entryIndex.get(item.command);
+  const driven = entry && Array.isArray(entry.args) && entry.args.some(arg =>
     arg && typeof arg === "object" && !Array.isArray(arg) &&
     Object.keys(arg).some(key => key in tnkParams));
-  const shortcut = typeof tntShortcutForEntry === "function" ? tntShortcutForEntry(entry) : "";
   // data-tooltip, not title. The native title attribute waits on the OS hover
   // delay - over a second - which is unusable on a panel whose only label is
   // the tooltip. The panel's own tooltip renders on mouseenter with no delay.
-  // Line one is the name, line two the detail, matching every other panel.
-  const detail = [shortcut, driven ? "Uses the bar parameters" : ""].filter(Boolean).join(" \u00b7 ");
-  const tip = detail ? `${name}\n${detail}` : name;
+  const lines = [item.label];
+  const detail = [];
+  if (item.key) detail.push(`Key: ${item.key.toUpperCase()}`);
+  if (item.shift && entryIndex.has(item.shift)) detail.push(`Shift: ${item.shift}`);
+  if (item.alt && entryIndex.has(item.alt)) detail.push(`Alt: ${item.alt}`);
+  if (driven) detail.push("Uses the bar parameters");
+  if (detail.length) lines.push(detail.join(" \u00b7 "));
   return `
-    <button type="button" class="tnk-tool${driven ? " driven" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(name)}" data-tooltip="${escapeHtml(tip)}">
-      ${tntIconSvg(icon, "tnk-tool-icon") || ""}
+    <button type="button" class="tnk-tool${driven ? " driven" : ""}${item.key ? " keyed" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}">
+      ${tntIconSvg(item.icon, "tnk-tool-icon") || ""}
+      ${tnkKeyBadge(item.key)}
     </button>
   `;
 }
 
 function tnkRender() {
   if (!tnkToolRows()) return;
-  const { groups, flat } = tnkResolvedGroups();
+  const { groups, flat, index } = tnkResolvedGroups();
   if (tnkCountLabel()) tnkCountLabel().textContent = `${flat.length} tools`;
 
   tnkToolRows().innerHTML = groups.map(group => `
     <section class="tnk-group">
       <h4>${escapeHtml(group.title)}</h4>
       <div class="tnk-group-tools">
-        ${group.entries.map(item => tnkToolMarkup(item.entry, item.icon, item.index)).join("")}
+        ${group.entries.map(row => tnkToolMarkup(row.item, row.index, index)).join("")}
       </div>
     </section>
   `).join("") || `<div class="tnk-empty">No tool matches that filter</div>`;
@@ -307,13 +341,49 @@ function tnkRender() {
   tnkToolRows().querySelectorAll("[data-tooltip]").forEach(bindPanelTooltip);
 }
 
-async function tnkRunEntry(index) {
-  const entry = tnkResolvedGroups().flat[index];
+async function tnkRunEntry(index, modifiers, button) {
+  const { flat, index: entryIndex } = tnkResolvedGroups();
+  const item = flat[index];
+  if (!item) return;
+  const entry = entryIndex.get(tnkCommandFor(item, modifiers));
   if (!entry) return;
   // Clone so the bar never mutates the shared registry entry.
   const withParams = Object.assign({}, entry, { args: tnkApplyParamsToArgs(entry.args) });
-  const row = tnkToolRows().querySelector(`[data-tnk-index="${index}"]`);
+  const row = button || tnkToolRows().querySelector(`[data-tnk-index="${index}"]`);
   await tntRunWithProgress(row, entry.name, () => executeFxConsoleEntry(withParams));
+}
+
+// TNK's own keys, live while the panel is open. Skipped while a field has focus
+// so typing in the filter or a parameter is never swallowed.
+function tnkHandleKey(event) {
+  if (event.metaKey || event.ctrlKey) return false;
+  const target = event.target;
+  if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return false;
+  const item = TNK_KEYMAP[String(event.key || "").toLowerCase()];
+  if (!item) return false;
+  const { flat } = tnkResolvedGroups();
+  const index = flat.indexOf(item);
+  if (index < 0) return false;
+  event.preventDefault();
+  event.stopPropagation();
+  tnkRunEntry(index, event);
+  return true;
+}
+
+// While TNK is open it owns the keyboard: its keys collide with the panel's own
+// by design ("c" is Clone here and Composition Tools there), and TNK wins.
+//
+// This cannot be done with a capturing window listener. handleShortcut is bound
+// on window earlier in the bundle, so it runs first and consumes the event
+// before any listener added here. handleShortcut checks this guard instead -
+// the same shape as the tntShortcutCaptureName guard already beside it.
+function tnkOwnsKeyboard() {
+  return !!(tnkBackdropEl && tnkBackdropEl.classList.contains("show"));
+}
+
+function tnkCaptureKeydown(event) {
+  if (!tnkOwnsKeyboard()) return;
+  tnkHandleKey(event);
 }
 
 function showTnkPanel() {
@@ -327,12 +397,17 @@ function showTnkPanel() {
   tnkRender();
   panel.classList.add("show");
   panel.setAttribute("aria-hidden", "false");
-  const filter = tnkFilterInput();
-  if (filter) requestAnimationFrame(() => filter.focus());
+  window.addEventListener("keydown", tnkCaptureKeydown, true);
+  // Focus the dialog, not the filter. TNK is key-driven first and searched
+  // second; parking the caret in a text field would make every key below dead,
+  // since tnkHandleKey deliberately ignores keystrokes aimed at an input.
+  const dialog = panel.querySelector(".tnk-dialog");
+  if (dialog) requestAnimationFrame(() => dialog.focus());
 }
 
 function hideTnkPanel() {
   if (!tnkBackdropEl) return;
+  window.removeEventListener("keydown", tnkCaptureKeydown, true);
   tnkBackdropEl.classList.remove("show");
   tnkBackdropEl.setAttribute("aria-hidden", "true");
 }

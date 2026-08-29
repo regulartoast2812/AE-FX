@@ -13,10 +13,12 @@ private let quickControlsHotKeySignature = OSType(
 private weak var activeAppDelegate: AppDelegate?
 
 // Read on every keystroke by the bare-key tap, so it stays a plain lookup.
+//
+// Deliberately excludes this helper. C opens TNK from After Effects, but inside
+// TNK it is TNK's own Clone key - so once the overlay is frontmost the tap has
+// to stop claiming C and let the page have it.
 private func isAfterEffectsFrontmost() -> Bool {
-    let frontmost = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? ""
-    return frontmost == afterEffectsBundleIdentifier ||
-        frontmost == (Bundle.main.bundleIdentifier ?? "\u{0}")
+    return NSWorkspace.shared.frontmostApplication?.bundleIdentifier == afterEffectsBundleIdentifier
 }
 
 private func quickPanelControlName(forHotKeyId id: UInt32) -> String? {
