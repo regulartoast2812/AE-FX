@@ -85,6 +85,19 @@ Consequences to respect:
 
 - **Tab to cycle between subpanels** while one is open. Not built yet.
 
+### On hold
+
+- **Plain `C` opens TNK** - built and shipped, but inert until the helper is
+  granted Accessibility. `CGEvent.tapCreate` returns nil without it, silently.
+  The grant is bound to the code signature, so **every rebuild of the helper
+  drops it** and it has to be re-granted (remove and re-add the app in System
+  Settings > Privacy & Security > Accessibility; a stale entry matches the old
+  signature and will not take). The same grant covers control-right-click.
+  `Ctrl+D` needs none of this - Carbon hotkeys are not gated.
+  Permanent fix, if it becomes tiresome: sign with a stable identity instead of
+  the ad-hoc signature `scripts/build-native-helper.sh` uses now.
+  Check state after any rebuild: `cat ~/.ae-fx-quick-controls/helper.log`
+
 
 - Panel-owned shortcuts must be consumed inside the CEP panel.
 - Prevent shortcuts like `S`, `F`, `Space`, `Cmd/Ctrl+Z`, and `Cmd/Ctrl+S` from leaking focus to native AE panels.

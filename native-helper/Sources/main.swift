@@ -1,5 +1,24 @@
 import Cocoa
 import Carbon
+import ApplicationServices
+
+// Written to ~/.ae-fx-quick-controls/helper.log. The app has no window and no
+// console, so a failed hotkey otherwise leaves nothing to read.
+func tntLog(_ message: String) {
+    let directory = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent(".ae-fx-quick-controls")
+    try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    let file = directory.appendingPathComponent("helper.log")
+    let line = "\(Date()) \(message)\n"
+    guard let data = line.data(using: .utf8) else { return }
+    if let handle = try? FileHandle(forWritingTo: file) {
+        handle.seekToEndOfFile()
+        handle.write(data)
+        try? handle.close()
+    } else {
+        try? data.write(to: file)
+    }
+}
 import Network
 import WebKit
 
@@ -697,8 +716,14 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             callback: callback,
             userInfo: nil
         ) else {
+            // Silent failure here is indistinguishable from "the key does
+            // nothing", so say so. Rebuilding re-signs the app, and macOS ties
+            // an Accessibility grant to the signature - so every rebuild drops
+            // the permission and this is the expected failure after one.
+            tntLog("bare-key tap NOT created. Accessibility trusted: \(AXIsProcessTrusted()). Grant it in System Settings > Privacy & Security > Accessibility.")
             return
         }
+        tntLog("bare-key tap created. C will open TNK while After Effects is frontmost.")
         bareKeyEventTap = tap
         bareKeyRunLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
         if let bareKeyRunLoopSource {
