@@ -14883,7 +14883,7 @@ function ensureTnkPanel() {
     <section class="tnk-dialog" role="dialog" aria-modal="true" aria-label="TNK tools">
       <header class="tnk-head">
         <div class="tnk-title"><b>TNK</b><span>Tools</span><em class="tnk-count"></em></div>
-        <button type="button" class="tnk-bar-btn" data-tnk-reset data-icon="ui.refresh" title="Reset every parameter to its default"></button>
+        <button type="button" class="tnk-bar-btn" data-tnk-reset data-icon="ui.refresh" data-tooltip="Reset Parameters\nReturn every value in the bar to its default."></button>
       </header>
       <div class="tnk-global-bar">${tnkParamBarMarkup()}</div>
       <div class="tnk-search-row">
@@ -14894,6 +14894,7 @@ function ensureTnkPanel() {
   `;
   document.body.appendChild(tnkBackdropEl);
   if (typeof tntPaintDeclaredIcons === "function") tntPaintDeclaredIcons(tnkBackdropEl);
+  tnkBackdropEl.querySelectorAll("[data-tooltip]").forEach(bindPanelTooltip);
 
   tnkBackdropEl.addEventListener("input", event => {
     const input = event.target.closest("[data-tnk-param]");
@@ -14941,11 +14942,14 @@ function tnkToolMarkup(entry, icon, index) {
     arg && typeof arg === "object" && !Array.isArray(arg) &&
     Object.keys(arg).some(key => key in tnkParams));
   const shortcut = typeof tntShortcutForEntry === "function" ? tntShortcutForEntry(entry) : "";
-  // The name lives only in the tooltip now, so it has to carry everything the
-  // label used to: what it is, its key, and whether the bar drives it.
-  const tip = [name, shortcut, driven ? "uses the bar parameters" : ""].filter(Boolean).join(" \u00b7 ");
+  // data-tooltip, not title. The native title attribute waits on the OS hover
+  // delay - over a second - which is unusable on a panel whose only label is
+  // the tooltip. The panel's own tooltip renders on mouseenter with no delay.
+  // Line one is the name, line two the detail, matching every other panel.
+  const detail = [shortcut, driven ? "Uses the bar parameters" : ""].filter(Boolean).join(" \u00b7 ");
+  const tip = detail ? `${name}\n${detail}` : name;
   return `
-    <button type="button" class="tnk-tool${driven ? " driven" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(name)}" title="${escapeHtml(tip)}">
+    <button type="button" class="tnk-tool${driven ? " driven" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(name)}" data-tooltip="${escapeHtml(tip)}">
       ${tntIconSvg(icon, "tnk-tool-icon") || ""}
     </button>
   `;
@@ -14964,6 +14968,9 @@ function tnkRender() {
       </div>
     </section>
   `).join("") || `<div class="tnk-empty">No tool matches that filter</div>`;
+
+  // Rendering replaces the buttons wholesale, so binding has to follow it.
+  tnkToolRows().querySelectorAll("[data-tooltip]").forEach(bindPanelTooltip);
 }
 
 async function tnkRunEntry(index) {
