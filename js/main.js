@@ -12533,8 +12533,13 @@ function quickPanelNaturalHeight(surface) {
 // its intended size and the gutter is pure transparent margin.
 const QUICK_PANEL_SHADOW_GUTTER = 40;
 
+// Both platforms. This started as a Windows-only fix, but the cause is not
+// platform-specific: the page reports its size, the helper makes a window that
+// size, and a box-shadow drawn right up to the window edge is cut off there -
+// a soft fade becomes a hard rectangle. macOS was sized flush the same way and
+// had the same hard edge.
 function quickPanelShadowGutter() {
-  return window.__TNT_NATIVE_PLATFORM__ === "win" ? QUICK_PANEL_SHADOW_GUTTER : 0;
+  return QUICK_PANEL_SHADOW_GUTTER;
 }
 
 function resizeNativeQuickPanel() {

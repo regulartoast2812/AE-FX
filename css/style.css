@@ -19323,46 +19323,48 @@ body.quick-panel-mode.native-win .timing-order-section {
    The gutter is transparent and carries no hit shape, so clicks there fall
    through to After Effects. */
 
-body.quick-panel-mode.native-win .quick-panel-shell {
+body.quick-panel-mode .quick-panel-shell {
   inset: 40px !important;
 }
 
-body.quick-panel-mode.native-win .modal-backdrop,
-body.quick-panel-mode.native-win .timeline-command-dialog-backdrop,
-body.quick-panel-mode.native-win .layer-style-dialog-backdrop,
-body.quick-panel-mode.native-win .layer-selection-backdrop,
-body.quick-panel-mode.native-win .ease-dialog-backdrop,
-body.quick-panel-mode.native-win .mass-edit-backdrop,
-body.quick-panel-mode.native-win .text-animation-backdrop,
-body.quick-panel-mode.native-win .timing-order-backdrop,
-body.quick-panel-mode.native-win .quick-layer-menu-backdrop {
+body.quick-panel-mode .modal-backdrop,
+body.quick-panel-mode .timeline-command-dialog-backdrop,
+body.quick-panel-mode .layer-style-dialog-backdrop,
+body.quick-panel-mode .layer-selection-backdrop,
+body.quick-panel-mode .ease-dialog-backdrop,
+body.quick-panel-mode .mass-edit-backdrop,
+body.quick-panel-mode .text-animation-backdrop,
+body.quick-panel-mode .timing-order-backdrop,
+body.quick-panel-mode .tnk-backdrop,
+body.quick-panel-mode .quick-layer-menu-backdrop {
   padding: 40px !important;
 }
 
 /* One shadow for every surface, sized to fit the gutter. This deliberately
    replaces the heavier `0 18px 44px` the dialogs use elsewhere - that reaches
    62px and cannot fit. */
-body.quick-panel-mode.native-win .quick-panel-shell,
-body.quick-panel-mode.native-win .anchor-section,
-body.quick-panel-mode.native-win .timing-order-section,
-body.quick-panel-mode.native-win .quick-layer-menu-dialog,
-body.quick-panel-mode.native-win .layer-style-dialog,
-body.quick-panel-mode.native-win .timeline-command-dialog,
-body.quick-panel-mode.native-win .duration-dialog,
-body.quick-panel-mode.native-win .expression-dialog,
-body.quick-panel-mode.native-win .composition-dialog,
-body.quick-panel-mode.native-win .layer-selection-dialog,
-body.quick-panel-mode.native-win .ease-dialog,
-body.quick-panel-mode.native-win .mass-edit-dialog,
-body.quick-panel-mode.native-win .text-animation-dialog,
-body.quick-panel-mode.native-win .layer-menu.open {
+body.quick-panel-mode .quick-panel-shell,
+body.quick-panel-mode .anchor-section,
+body.quick-panel-mode .timing-order-section,
+body.quick-panel-mode .quick-layer-menu-dialog,
+body.quick-panel-mode .layer-style-dialog,
+body.quick-panel-mode .timeline-command-dialog,
+body.quick-panel-mode .duration-dialog,
+body.quick-panel-mode .expression-dialog,
+body.quick-panel-mode .composition-dialog,
+body.quick-panel-mode .layer-selection-dialog,
+body.quick-panel-mode .ease-dialog,
+body.quick-panel-mode .mass-edit-dialog,
+body.quick-panel-mode .text-animation-dialog,
+body.quick-panel-mode .tnk-dialog,
+body.quick-panel-mode .layer-menu.open {
   box-shadow:
     0 8px 24px rgba(0, 0, 0, .45),
     inset 0 1px 0 rgba(255, 255, 255, .09) !important;
 }
 
 /* The bare wrappers still paint nothing - their child cards carry the shadow. */
-body.quick-panel-mode.native-win .anchor-dialog,
-body.quick-panel-mode.native-win .timing-order-layout {
+body.quick-panel-mode .anchor-dialog,
+body.quick-panel-mode .timing-order-layout {
   box-shadow: none !important;
 }
