@@ -3495,7 +3495,15 @@ if (QUICK_PANEL_MODE) {
   // Full timeline refresh still only happens when the host fingerprint changes.
   refreshLayers({ forceRender: true, skipSettledRefresh: true }).then(() => {
     startSyncLoop();
-    startBackgroundEditWatch();
     startNativeSelectionMonitor();
+    // The 250ms edit watch is a fallback, not the normal path. Every tick is a
+    // CEP evalScript into After Effects, and AE flashes its busy cursor for each
+    // one - four times a second, forever, whether or not anything changed. When
+    // the native selection monitor is live it pushes comp, layer-count, and
+    // selection changes from the host instead, so the poll buys nothing. Only
+    // start it if that monitor never reports in.
+    setTimeout(() => {
+      if (!nativeSelectionMonitorActive) startBackgroundEditWatch();
+    }, 3000);
   });
 }

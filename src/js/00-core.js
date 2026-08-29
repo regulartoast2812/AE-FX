@@ -773,6 +773,9 @@ function handleNativeSelectionSync(event) {
     return;
   }
 
+  // Host push is live, so the polling fallback has nothing left to do.
+  if (typeof stopBackgroundEditWatch === "function") stopBackgroundEditWatch();
+
   if (panelBlurPauseTimer) {
     clearTimeout(panelBlurPauseTimer);
     panelBlurPauseTimer = null;
