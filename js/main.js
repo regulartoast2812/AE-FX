@@ -231,6 +231,7 @@ const FX_CONSOLE_COMMANDS = [
   { type: "command", name: "Effects Control", category: "Effects", does: "Open", targets: ["Effect"], shortcut: "", action: () => openSubpanelByKey("effects") },
   { type: "command", name: "Shape Control", category: "Shapes", does: "Open", targets: ["Shape"], shortcut: "", action: () => openSubpanelByKey("shapes") },
   { type: "command", name: "Layer Menu", category: "Layers", does: "Open", targets: ["Layer"], shortcut: "", action: () => openSubpanelByKey("layer-menu") },
+  { type: "command", name: "TNK Tools", category: "Panels", does: "Open", targets: ["Animation"], shortcut: "", action: () => openSubpanelByKey("tnk") },
   { type: "command", name: "Focus Selected Layers", category: "View", does: "Show", targets: ["Layer"], shortcut: "Shift+F", action: toggleKeyframeFocusMode },
   { type: "command", name: "Layer Styles...", category: "Layer Styles", does: "Open", targets: ["Style"], shortcut: "S", action: () => openSubpanelByKey("styles") },
   { type: "command", name: "Rename Composition...", category: "Composition", does: "Set", targets: ["Comp"], shortcut: "", action: promptRenameComp },
@@ -425,6 +426,7 @@ const TNT_V3_COMMANDS = [
   { name: "Effects Control", category: "Effects", does: "Open", targets: ["Effect"], action: () => openSubpanelByKey("effects") },
   { name: "Shape Control", category: "Shapes", does: "Open", targets: ["Shape"], action: () => openSubpanelByKey("shapes") },
   { name: "Layer Menu", category: "Layers", does: "Open", targets: ["Layer"], action: () => openSubpanelByKey("layer-menu") },
+  { name: "TNK Tools", category: "Panels", does: "Open", targets: ["Animation"], action: () => openSubpanelByKey("tnk") },
   { name: "Layer Styles...", category: "Layer Styles", does: "Open", targets: ["Style"], action: () => openSubpanelByKey("styles") },
   { name: "Auto Trim Comp", category: "Composition", tntFunction: "autoTrimComp", args: [false] },
   { name: "Crop Comp", category: "Composition", tntFunction: "cropComp", args: [false, 0] },
@@ -639,7 +641,8 @@ function setupFilterTooltips() {
     "mass-edit": "Mass Edit\nCopy effects, keys, values, and link matching properties across selected layers",
     "text-animation": "Text Animation\nBuild text animators and manage selected text layers",
     "timing-order": "Timing and Layer Order\nStagger, sequence, and reorder selected layers",
-    filter: "Filter\nShortcut: Shift+X"
+    filter: "Filter\nShortcut: Shift+X",
+    tnk: "TNK Tools\nShortcut: Ctrl+D\nGlobal parameter bar feeding every tool"
   };
   filterColumnEl.querySelectorAll(".filter-btn").forEach(btn => {
     const tooltip = btn.id === "settingsBtn"
@@ -12123,7 +12126,8 @@ async function openQuickPanelControl(name) {
     "mass-edit": showMassEditPanel,
     "text-animation": showTextAnimationPanel,
     "timing-order": showTimingOrderPanel,
-    filter: showLayerSelectionPanel
+    filter: showLayerSelectionPanel,
+    tnk: showTnkPanel
   };
   const action = actions[name];
   if (!action) return;

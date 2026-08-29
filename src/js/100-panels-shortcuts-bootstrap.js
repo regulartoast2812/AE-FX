@@ -971,7 +971,8 @@ async function openQuickPanelControl(name) {
     "mass-edit": showMassEditPanel,
     "text-animation": showTextAnimationPanel,
     "timing-order": showTimingOrderPanel,
-    filter: showLayerSelectionPanel
+    filter: showLayerSelectionPanel,
+    tnk: showTnkPanel
   };
   const action = actions[name];
   if (!action) return;
