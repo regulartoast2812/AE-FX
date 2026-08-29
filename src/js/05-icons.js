@@ -51,7 +51,8 @@ const TNT_ICON_ROLES = {
   "panel.mass-edit": "list-checks",
   "panel.text-animation": "type",
   "panel.timing-order": "align-start-vertical",
-  "panel.filter": "filter"
+  "panel.filter": "filter",
+  "panel.tnk": "sliders-vertical"
 };
 
 function tntIconLibraryReady() {

@@ -141,7 +141,8 @@ function openSubpanelByKey(key) {
     "mass-edit": showMassEditPanel,
     "text-animation": showTextAnimationPanel,
     "timing-order": showTimingOrderPanel,
-    filter: showLayerSelectionPanel
+    filter: showLayerSelectionPanel,
+    tnk: showTnkPanel
   };
   const action = panelActions[key];
   if (action) action();
@@ -1231,7 +1232,8 @@ const QUICK_PANEL_CONTROL_SHORTCUTS = {
   "ctrl+m": "mass-edit",
   "ctrl+t": "text-animation",
   "ctrl+o": "timing-order",
-  "ctrl+x": "filter"
+  "ctrl+x": "filter",
+  "ctrl+d": "tnk"
 };
 
 const quickPanelShellEl = document.getElementById("quickPanelShell");
@@ -1259,6 +1261,7 @@ function activeQuickPanelSurface() {
     ".mass-edit-backdrop.show .mass-edit-dialog",
     ".text-animation-backdrop.show .text-animation-dialog",
     ".timing-order-backdrop.show .timing-order-layout",
+    ".tnk-backdrop.show .tnk-dialog",
     ".modal-backdrop.show > .expression-dialog",
     ".modal-backdrop.show > .anchor-dialog",
     ".modal-backdrop.show > .duration-dialog",
@@ -1616,6 +1619,7 @@ window.__tntQuickPanelHitRects = function () {
     ".ease-dialog",
     ".mass-edit-dialog",
     ".text-animation-dialog",
+    ".tnk-dialog",
     ".layer-menu.open"
   ];
   const rects = [];
@@ -2587,7 +2591,6 @@ function setAssistantTab(name) {
     panel.classList.toggle("active", panel.dataset.assistantPanel === selected);
   });
   if (selected === "functions") renderAssistantFunctions();
-  if (selected === "tnk" && typeof tnkRender === "function") tnkRender();
 }
 
 function assistantStorageAvailable() {

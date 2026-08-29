@@ -64,6 +64,28 @@ This guide keeps future work compact and consistent for the `AE FX` CEP project.
 
 ## Shortcut Rules
 
+### Why the tool is split into subpanels
+
+TNK v3 used far more keys than one hand can reach. The panels exist so every
+trigger key can sit on the **left side of the keyboard** - reachable without
+moving the hand off the mouse. Putting every function in one panel would make
+that impossible, because the keys would have to spread across the whole board.
+
+Consequences to respect:
+
+- Shortcuts are **bound to the subpanel**, not global. The same key may mean
+  different things in Ease and in Mask. That is the point, not a collision.
+- Prefer left-hand keys (Q W E R A S D F Z X C V, 1-5) when adding a binding.
+- `Ctrl+Space` is the general entry point for novice or occasional use. It is
+  not the fast path; the subpanel keys are.
+- Every subpanel should support its own further key controls once open. A
+  subpanel that traps the keyboard and offers nothing is the worst case.
+
+### Planned
+
+- **Tab to cycle between subpanels** while one is open. Not built yet.
+
+
 - Panel-owned shortcuts must be consumed inside the CEP panel.
 - Prevent shortcuts like `S`, `F`, `Space`, `Cmd/Ctrl+Z`, and `Cmd/Ctrl+S` from leaking focus to native AE panels.
 - When adding a shortcut, update the visible command/menu hint if one exists.

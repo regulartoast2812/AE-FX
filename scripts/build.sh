@@ -38,6 +38,7 @@ css_sources=(
   src/css/85-mass-edit-panel.css
   src/css/86-text-animation-panel.css
   src/css/87-timing-order-panel.css
+  src/css/88-tnk-panel.css
   src/css/90-command-panels.css
   src/css/95-quick-panel.css
 )
