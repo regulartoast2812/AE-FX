@@ -426,7 +426,6 @@ const TNT_V3_COMMANDS = [
   { name: "Effects Control", category: "Effects", does: "Open", targets: ["Effect"], action: () => openSubpanelByKey("effects") },
   { name: "Shape Control", category: "Shapes", does: "Open", targets: ["Shape"], action: () => openSubpanelByKey("shapes") },
   { name: "Layer Menu", category: "Layers", does: "Open", targets: ["Layer"], action: () => openSubpanelByKey("layer-menu") },
-  { name: "TNK Tools", category: "Panels", does: "Open", targets: ["Animation"], action: () => openSubpanelByKey("tnk") },
   { name: "Layer Styles...", category: "Layer Styles", does: "Open", targets: ["Style"], action: () => openSubpanelByKey("styles") },
   { name: "Auto Trim Comp", category: "Composition", tntFunction: "autoTrimComp", args: [false] },
   { name: "Crop Comp", category: "Composition", tntFunction: "cropComp", args: [false, 0] },
