@@ -12,6 +12,13 @@ private let quickControlsHotKeySignature = OSType(
 )
 private weak var activeAppDelegate: AppDelegate?
 
+// Read on every keystroke by the bare-key tap, so it stays a plain lookup.
+private func isAfterEffectsFrontmost() -> Bool {
+    let frontmost = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? ""
+    return frontmost == afterEffectsBundleIdentifier ||
+        frontmost == (Bundle.main.bundleIdentifier ?? "\u{0}")
+}
+
 private func quickPanelControlName(forHotKeyId id: UInt32) -> String? {
     switch id {
     case 10: return "anchor"
@@ -293,6 +300,8 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
     private var hotKeyEventHandler: EventHandlerRef?
     private var hotKeyRefs: [EventHotKeyRef] = []
     private var rightClickEventTap: CFMachPort?
+    private var bareKeyEventTap: CFMachPort?
+    private var bareKeyRunLoopSource: CFRunLoopSource?
     private var rightClickRunLoopSource: CFRunLoopSource?
     private var workspaceObservers: [NSObjectProtocol] = []
     private var visibilityTimer: Timer?
@@ -396,6 +405,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         // Accessibility grant, so it stays off unless Carbon registration failed.
         let carbonHotKeysReady = registerGlobalHotKeys()
         startControlRightClickMonitor()
+        startBareKeyMonitor()
         if !carbonHotKeysReady {
             startGlobalShortcutFallbackMonitor()
         }
@@ -438,6 +448,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         if let escapeMonitor {
             NSEvent.removeMonitor(escapeMonitor)
         }
+        stopBareKeyMonitor()
         if let globalShortcutMonitor {
             NSEvent.removeMonitor(globalShortcutMonitor)
         }
@@ -641,6 +652,68 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             CFRunLoopAddSource(CFRunLoopGetMain(), rightClickRunLoopSource, .commonModes)
         }
         CGEvent.tapEnable(tap: tap, enable: true)
+    }
+
+    // Plain C opens TNK - the binding TNK v3 always used inside After Effects.
+    //
+    // This cannot go through RegisterEventHotKey like the Ctrl+letter shortcuts:
+    // that claims the key for the whole session and would eat the letter "c" in
+    // every application, so you could not type it anywhere. A session event tap
+    // sees the key first and decides per keystroke, so C is swallowed only while
+    // After Effects (or this overlay) is frontmost and passes straight through
+    // everywhere else.
+    //
+    // Requires Accessibility permission, the same grant the control-right-click
+    // tap already needs. Without it tapCreate returns nil and plain C simply
+    // does nothing - the Ctrl+D path still works.
+    private func startBareKeyMonitor() {
+        guard bareKeyEventTap == nil else { return }
+        let mask = CGEventMask(1 << CGEventType.keyDown.rawValue)
+        let callback: CGEventTapCallBack = { _, type, event, _ in
+            let passThrough = Unmanaged.passUnretained(event)
+            guard type == .keyDown else { return passThrough }
+            guard event.getIntegerValueField(.keyboardEventKeycode) == Int64(kVK_ANSI_C) else {
+                return passThrough
+            }
+            // Any real modifier means this is some other shortcut - Cmd+C above
+            // all, which must never be swallowed. Caps lock and the numeric-pad
+            // flag are not modifiers for this purpose.
+            let flags = event.flags
+            let disqualifying: CGEventFlags = [.maskCommand, .maskControl, .maskAlternate, .maskShift, .maskSecondaryFn]
+            guard flags.intersection(disqualifying).isEmpty else { return passThrough }
+            guard isAfterEffectsFrontmost() else { return passThrough }
+            DispatchQueue.main.async {
+                activeAppDelegate?.openPanelControlFromHotKey("tnk")
+            }
+            return nil
+        }
+        guard let tap = CGEvent.tapCreate(
+            tap: .cgSessionEventTap,
+            place: .headInsertEventTap,
+            options: .defaultTap,
+            eventsOfInterest: mask,
+            callback: callback,
+            userInfo: nil
+        ) else {
+            return
+        }
+        bareKeyEventTap = tap
+        bareKeyRunLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
+        if let bareKeyRunLoopSource {
+            CFRunLoopAddSource(CFRunLoopGetMain(), bareKeyRunLoopSource, .commonModes)
+        }
+        CGEvent.tapEnable(tap: tap, enable: true)
+    }
+
+    private func stopBareKeyMonitor() {
+        if let bareKeyRunLoopSource {
+            CFRunLoopRemoveSource(CFRunLoopGetMain(), bareKeyRunLoopSource, .commonModes)
+            self.bareKeyRunLoopSource = nil
+        }
+        if let bareKeyEventTap {
+            CFMachPortInvalidate(bareKeyEventTap)
+            self.bareKeyEventTap = nil
+        }
     }
 
     private func stopControlRightClickMonitor() {
