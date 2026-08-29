@@ -23,6 +23,7 @@ private func quickPanelControlName(forHotKeyId id: UInt32) -> String? {
     case 16: return "text-animation"
     case 17: return "timing-order"
     case 18: return "filter"
+    case 19: return "tnk"
     default: return nil
     }
 }
@@ -700,7 +701,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             (kVK_Space, 1), (kVK_ANSI_K, 2),
             (kVK_ANSI_A, 10), (kVK_ANSI_C, 11), (kVK_ANSI_E, 12), (kVK_ANSI_F, 13),
             (kVK_ANSI_S, 14), (kVK_ANSI_M, 15), (kVK_ANSI_T, 16), (kVK_ANSI_O, 17),
-            (kVK_ANSI_X, 18)
+            (kVK_ANSI_X, 18), (kVK_ANSI_D, 19)
         ]
         requested.forEach { entry in
             registerHotKey(keyCode: UInt32(entry.keyCode), modifiers: UInt32(controlKey), id: entry.id)

@@ -57,6 +57,7 @@ outside AE here. Options, none implemented:
 | `Ctrl+C` | composition | | `Ctrl+T` | text-animation |
 | `Ctrl+E` | ease | | `Ctrl+O` | timing-order |
 | `Ctrl+F` | mask | | `Ctrl+X` | filter |
+| `Ctrl+D` | TNK | | | |
 | `Ctrl+S` | styles | | `Esc` | hide overlay |
 
 The hotkeys only fire while After Effects (or the overlay itself) is the

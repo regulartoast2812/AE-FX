@@ -471,6 +471,7 @@ internal sealed class OverlayWindow : Window
         ['T'] = "text-animation",
         ['O'] = "timing-order",
         ['X'] = "filter",
+        ['D'] = "tnk",
     };
 
     private const uint VkSpace = 0x20;
