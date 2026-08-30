@@ -103,26 +103,27 @@
           <div class="anchor-section-title">Align</div>
           <label class="anchor-align-target">
             <span>Align Layers to:</span>
-            <select aria-label="Align layers to" disabled>
-              <option>Selection</option>
+            <select id="anchorAlignTarget" aria-label="Align layers to">
+              <option value="selection">Selection</option>
+              <option value="comp">Composition</option>
             </select>
           </label>
           <div id="anchorAlignGrid" class="anchor-align-grid" role="group" aria-label="Align selected layers">
-            <button type="button" class="anchor-align-btn align-left" data-align="left" title="Align left"></button>
-            <button type="button" class="anchor-align-btn align-hcenter" data-align="hcenter" title="Align horizontal center"></button>
-            <button type="button" class="anchor-align-btn align-right" data-align="right" title="Align right"></button>
-            <button type="button" class="anchor-align-btn align-top" data-align="top" title="Align top"></button>
-            <button type="button" class="anchor-align-btn align-vcenter" data-align="vcenter" title="Align vertical center"></button>
-            <button type="button" class="anchor-align-btn align-bottom" data-align="bottom" title="Align bottom"></button>
+            <button type="button" class="anchor-align-btn align-left" data-align="left" data-icon="align-start-vertical" title="Align left"></button>
+            <button type="button" class="anchor-align-btn align-hcenter" data-align="hcenter" data-icon="align-center-vertical" title="Align horizontal center"></button>
+            <button type="button" class="anchor-align-btn align-right" data-align="right" data-icon="align-end-vertical" title="Align right"></button>
+            <button type="button" class="anchor-align-btn align-top" data-align="top" data-icon="align-start-horizontal" title="Align top"></button>
+            <button type="button" class="anchor-align-btn align-vcenter" data-align="vcenter" data-icon="align-center-horizontal" title="Align vertical center"></button>
+            <button type="button" class="anchor-align-btn align-bottom" data-align="bottom" data-icon="align-end-horizontal" title="Align bottom"></button>
           </div>
           <div class="anchor-section-title anchor-distribute-title">Distribute Layers</div>
           <div id="anchorDistributeGrid" class="anchor-align-grid anchor-distribute-grid" role="group" aria-label="Distribute selected layers">
-            <button type="button" class="anchor-align-btn dist-top" data-align="dist-top" title="Distribute top edges"></button>
-            <button type="button" class="anchor-align-btn dist-vcenter" data-align="dist-vcenter" title="Distribute vertical centers"></button>
-            <button type="button" class="anchor-align-btn dist-bottom" data-align="dist-bottom" title="Distribute bottom edges"></button>
-            <button type="button" class="anchor-align-btn dist-left" data-align="dist-left" title="Distribute left edges"></button>
-            <button type="button" class="anchor-align-btn dist-hcenter" data-align="dist-hcenter" title="Distribute horizontal centers"></button>
-            <button type="button" class="anchor-align-btn dist-right" data-align="dist-right" title="Distribute right edges"></button>
+            <button type="button" class="anchor-align-btn dist-top" data-align="dist-top" data-icon="align-vertical-distribute-start" title="Distribute top edges"></button>
+            <button type="button" class="anchor-align-btn dist-vcenter" data-align="dist-vcenter" data-icon="align-vertical-distribute-center" title="Distribute vertical centers"></button>
+            <button type="button" class="anchor-align-btn dist-bottom" data-align="dist-bottom" data-icon="align-vertical-distribute-end" title="Distribute bottom edges"></button>
+            <button type="button" class="anchor-align-btn dist-left" data-align="dist-left" data-icon="align-horizontal-distribute-start" title="Distribute left edges"></button>
+            <button type="button" class="anchor-align-btn dist-hcenter" data-align="dist-hcenter" data-icon="align-horizontal-distribute-center" title="Distribute horizontal centers"></button>
+            <button type="button" class="anchor-align-btn dist-right" data-align="dist-right" data-icon="align-horizontal-distribute-end" title="Distribute right edges"></button>
           </div>
         </div>
       </div>

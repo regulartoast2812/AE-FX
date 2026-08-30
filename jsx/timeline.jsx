@@ -1522,7 +1522,7 @@ function TNT_centerSelectedAnchorPoint() {
   }
 }
 
-function TNT_alignSelectedLayersToComp(mode, useMasks) {
+function TNT_alignSelectedLayersToComp(mode, useMasks, target) {
   try {
     var comp = TNT_activeComp();
     if (!comp) return TNT_jsonStringify({ ok: false, error: "No active composition." });
@@ -1567,25 +1567,54 @@ function TNT_alignSelectedLayersToComp(mode, useMasks) {
       app.endUndoGroup();
       return TNT_jsonStringify({ ok: true, changedCount: changed });
     }
+    // "selection" aligns to the union bounding box of what is selected;
+    // "comp" aligns to the composition frame. The panel's dropdown said
+    // Selection while this function only ever did comp - so every button moved
+    // layers to the comp edges and looked broken rather than wrong.
+    var toSelection = String(target || "selection") === "selection";
+    var edgeLeft = 0, edgeTop = 0, edgeRight = comp.width, edgeBottom = comp.height;
+    if (toSelection) {
+      if (layers.length < 2) {
+        app.endUndoGroup();
+        return TNT_jsonStringify({ ok: false, error: "Select at least two layers to align to the selection." });
+      }
+      var bounds = null;
+      for (var bi = 0; bi < layers.length; bi++) {
+        var lb = TNT_layerCompBBox(layers[bi], !!useMasks);
+        if (!bounds) {
+          bounds = { left: lb.left, top: lb.top, right: lb.right, bottom: lb.bottom };
+        } else {
+          if (lb.left < bounds.left) bounds.left = lb.left;
+          if (lb.top < bounds.top) bounds.top = lb.top;
+          if (lb.right > bounds.right) bounds.right = lb.right;
+          if (lb.bottom > bounds.bottom) bounds.bottom = lb.bottom;
+        }
+      }
+      edgeLeft = bounds.left;
+      edgeTop = bounds.top;
+      edgeRight = bounds.right;
+      edgeBottom = bounds.bottom;
+    }
+
     for (var i = 0; i < layers.length; i++) {
       try {
         bbox = TNT_layerCompBBox(layers[i], !!useMasks);
         dx = 0;
         dy = 0;
         if (mode === "left") {
-          dx = -bbox.left;
+          dx = edgeLeft - bbox.left;
         } else if (mode === "hcenter") {
-          targetX = comp.width / 2;
+          targetX = (edgeLeft + edgeRight) / 2;
           dx = targetX - ((bbox.left + bbox.right) / 2);
         } else if (mode === "right") {
-          dx = comp.width - bbox.right;
+          dx = edgeRight - bbox.right;
         } else if (mode === "top") {
-          dy = -bbox.top;
+          dy = edgeTop - bbox.top;
         } else if (mode === "vcenter") {
-          targetY = comp.height / 2;
+          targetY = (edgeTop + edgeBottom) / 2;
           dy = targetY - ((bbox.top + bbox.bottom) / 2);
         } else if (mode === "bottom") {
-          dy = comp.height - bbox.bottom;
+          dy = edgeBottom - bbox.bottom;
         } else {
           continue;
         }

@@ -9925,116 +9925,38 @@ header {
   border-top: 1px solid rgba(255,255,255,.075);
 }
 
+/* A grid, so the glyph is centred by layout rather than by offsets. The old
+   rule set color:transparent to hide the button's text - with a real SVG that
+   would also hide stroke:currentColor and paint nothing at all. */
 .anchor-align-btn {
-  position: relative;
-  width: 24px !important;
-  height: 24px !important;
-  color: transparent !important;
-  overflow: hidden;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 26px !important;
+  height: 26px !important;
+  padding: 0;
+  color: rgba(235, 235, 245, .5);
+  font-size: 0;
 }
 
-.anchor-align-btn::before,
-.anchor-align-btn::after {
-  content: "";
-  position: absolute;
-  background: rgba(235,235,245,.50);
-  border-radius: 1px;
+.anchor-align-btn:hover {
+  color: rgba(245, 245, 247, .88);
 }
 
-.anchor-align-btn:hover::before,
-.anchor-align-btn:hover::after {
-  background: rgba(245,245,247,.82);
+/* Icons come from the Lucide registry, painted by data-icon. They were
+   hand-drawn with ::before/::after and hardcoded offsets (left:5px, left:11px,
+   top:7px...), which is why no two lined up: each glyph was positioned by eye
+   rather than sharing a grid. */
+.anchor-align-btn svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.anchor-align-btn.align-left::before,
-.anchor-align-btn.align-hcenter::before,
-.anchor-align-btn.align-right::before {
-  top: 5px;
-  bottom: 5px;
-  width: 2px;
-}
-
-.anchor-align-btn.align-left::before { left: 5px; }
-.anchor-align-btn.align-hcenter::before { left: 11px; }
-.anchor-align-btn.align-right::before { right: 5px; }
-
-.anchor-align-btn.align-left::after,
-.anchor-align-btn.align-hcenter::after,
-.anchor-align-btn.align-right::after {
-  width: 11px;
-  height: 3px;
-  top: 7px;
-  box-shadow: 0 7px 0 rgba(235,235,245,.50);
-}
-
-.anchor-align-btn.align-left::after { left: 8px; }
-.anchor-align-btn.align-hcenter::after { left: 6px; }
-.anchor-align-btn.align-right::after { right: 8px; }
-
-.anchor-align-btn.align-left:hover::after,
-.anchor-align-btn.align-hcenter:hover::after,
-.anchor-align-btn.align-right:hover::after {
-  box-shadow: 0 7px 0 rgba(245,245,247,.82);
-}
-
-.anchor-align-btn.align-top::before,
-.anchor-align-btn.align-vcenter::before,
-.anchor-align-btn.align-bottom::before {
-  left: 5px;
-  right: 5px;
-  height: 2px;
-}
-
-.anchor-align-btn.align-top::before { top: 5px; }
-.anchor-align-btn.align-vcenter::before { top: 11px; }
-.anchor-align-btn.align-bottom::before { bottom: 5px; }
-
-.anchor-align-btn.align-top::after,
-.anchor-align-btn.align-vcenter::after,
-.anchor-align-btn.align-bottom::after {
-  width: 3px;
-  height: 11px;
-  left: 7px;
-  top: 8px;
-  box-shadow: 7px 0 0 rgba(235,235,245,.50);
-}
-
-.anchor-align-btn.align-vcenter::after { top: 6px; }
-.anchor-align-btn.align-bottom::after { top: 5px; }
-
-.anchor-align-btn.align-top:hover::after,
-.anchor-align-btn.align-vcenter:hover::after,
-.anchor-align-btn.align-bottom:hover::after {
-  box-shadow: 7px 0 0 rgba(245,245,247,.82);
-}
-
-.anchor-align-btn[class*="dist-"]::before {
-  background: transparent;
-}
-
-.anchor-align-btn.dist-top::after,
-.anchor-align-btn.dist-vcenter::after,
-.anchor-align-btn.dist-bottom::after {
-  left: 5px;
-  width: 14px;
-  height: 2px;
-  top: 6px;
-  box-shadow: 0 5px 0 rgba(235,235,245,.50), 0 10px 0 rgba(235,235,245,.50);
-}
-
-.anchor-align-btn.dist-left::after,
-.anchor-align-btn.dist-hcenter::after,
-.anchor-align-btn.dist-right::after {
-  top: 5px;
-  width: 2px;
-  height: 14px;
-  left: 6px;
-  box-shadow: 5px 0 0 rgba(235,235,245,.50), 10px 0 0 rgba(235,235,245,.50);
-}
-
-.anchor-align-btn[class*="dist-"]:hover::after {
-  box-shadow: inherit;
-}
 
 /* v98: denser layer styles panel with full-name add buttons. */
 .layer-style-dialog {
