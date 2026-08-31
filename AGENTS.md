@@ -149,13 +149,30 @@ to go through a file: the loopback bridge runs helper-to-panel only, and
 ignored past ten seconds, so a scope left by a crash cannot hijack the next
 plain summon.
 
-**Still open:** with After Effects focused and the overlay shut, a group
-shortcut does nothing - the key never reaches the panel. The helpers register
-a hotkey table compiled into them (`registerGlobalHotKeys` in native-helper,
-`ControlHotkeys` in native-helper-win) and have never seen the user's
-bindings. Closing it means publishing those bindings to the helper and
-registering them at runtime. That would fix every custom shortcut, not just
-groups: today none of them can summon the overlay.
+### Custom shortcuts are registered globally
+
+The panel publishes its bindings to `~/.ae-fx-quick-controls/shortcuts.json`
+(`TNT_writeQuickPanelShortcuts`, called whenever the index is rebuilt) and the
+macOS helper registers them as Carbon hot keys at runtime, ids from 100 up. It
+re-reads on a 2s mtime check, so binding a key takes effect without a restart.
+Firing one summons the overlay and calls `__tntQuickPanelRunBinding`, which
+scopes if the entry is a group parent and runs it otherwise.
+
+The file exists because the helper cannot read the bindings itself: the bridge
+runs helper-to-panel and evaluates ExtendScript in After Effects, so the
+panel's localStorage is out of its reach.
+
+Two rules the parser enforces:
+
+- **Modified combinations only.** A bare key would be claimed session-wide by
+  RegisterEventHotKey and made untypeable in every application.
+- Unparseable combinations are skipped and logged, not guessed at.
+
+Like the rest of the hot keys, these fire only while After Effects or the
+overlay is frontmost.
+
+**Not done on Windows.** `native-helper-win` still uses its compiled
+`ControlHotkeys` table.
 
 ### On hold
 

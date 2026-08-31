@@ -64,6 +64,67 @@ private func takePendingQuickPanelScope() -> String? {
     return group
 }
 
+// macOS virtual keycodes, mirroring TNT_KEY_CODES in src/js/00-core.js. The two
+// tables have to agree: the panel writes "ctrl+shift+w" and this turns it back
+// into a keycode plus modifier mask.
+private let tntVirtualKeyCodes: [String: Int] = [
+    "a": 0, "b": 11, "c": 8, "d": 2, "e": 14, "f": 3, "g": 5, "h": 4, "i": 34,
+    "j": 38, "k": 40, "l": 37, "m": 46, "n": 45, "o": 31, "p": 35, "q": 12,
+    "r": 15, "s": 1, "t": 17, "u": 32, "v": 9, "w": 13, "x": 7, "y": 16, "z": 6,
+    "1": 18, "2": 19, "3": 20, "4": 21, "5": 23, "6": 22, "7": 26, "8": 28,
+    "9": 25, "0": 29,
+    "space": 49, "tab": 48, "enter": 36, "escape": 53, "backspace": 51,
+    "delete": 117, "period": 47, ".": 47, "`": 50, "backquote": 50,
+    "-": 27, "=": 24, "[": 33, "]": 30, ";": 41, "'": 39, ",": 43, "/": 44,
+    "\\": 42,
+    "arrowup": 126, "arrowdown": 125, "arrowleft": 123, "arrowright": 124
+]
+
+struct TntUserBinding {
+    let combo: String
+    let name: String
+    let keyCode: UInt32
+    let modifiers: UInt32
+}
+
+// Parses "ctrl+shift+w" into a Carbon keycode and modifier mask.
+private func parseTntBinding(combo: String, name: String) -> TntUserBinding? {
+    var parts = combo.lowercased().split(separator: "+").map { String($0).trimmingCharacters(in: .whitespaces) }
+    guard let base = parts.popLast(), let code = tntVirtualKeyCodes[base] else { return nil }
+    var modifiers: UInt32 = 0
+    if parts.contains("ctrl") { modifiers |= UInt32(controlKey) }
+    if parts.contains("alt") || parts.contains("option") { modifiers |= UInt32(optionKey) }
+    if parts.contains("shift") { modifiers |= UInt32(shiftKey) }
+    if parts.contains("cmd") || parts.contains("meta") || parts.contains("command") { modifiers |= UInt32(cmdKey) }
+    // A bare key would be claimed session-wide and make that character
+    // untypeable everywhere. Only modified combinations are registered.
+    guard modifiers != 0 else { return nil }
+    return TntUserBinding(combo: combo, name: name, keyCode: UInt32(code), modifiers: modifiers)
+}
+
+private func readTntUserBindings() -> [TntUserBinding] {
+    let url = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent(".ae-fx-quick-controls")
+        .appendingPathComponent("shortcuts.json")
+    guard
+        let data = try? Data(contentsOf: url),
+        let rows = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]]
+    else {
+        return []
+    }
+    return rows.compactMap { row in
+        guard let combo = row["key"] as? String, let name = row["name"] as? String, !name.isEmpty else { return nil }
+        return parseTntBinding(combo: combo, name: name)
+    }
+}
+
+private func tntUserBindingsFileDate() -> Date? {
+    let url = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent(".ae-fx-quick-controls")
+        .appendingPathComponent("shortcuts.json")
+    return (try? FileManager.default.attributesOfItem(atPath: url.path))?[.modificationDate] as? Date
+}
+
 private func quickPanelControlName(forHotKeyId id: UInt32) -> String? {
     switch id {
     case 10: return "anchor"
@@ -346,6 +407,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
     private var hotKeyRefs: [EventHotKeyRef] = []
     private var rightClickEventTap: CFMachPort?
     private var bareKeyEventTap: CFMachPort?
+    private var userHotKeyRefs: [EventHotKeyRef] = []
+    private var userHotKeyNames: [UInt32: String] = [:]
+    private var userBindingsWatchTimer: Timer?
+    private var userBindingsSeenAt: Date?
     private var bareKeyRunLoopSource: CFRunLoopSource?
     private var rightClickRunLoopSource: CFRunLoopSource?
     private var workspaceObservers: [NSObjectProtocol] = []
@@ -451,6 +516,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         let carbonHotKeysReady = registerGlobalHotKeys()
         startControlRightClickMonitor()
         startBareKeyMonitor()
+        startUserBindingsWatch()
         if !carbonHotKeysReady {
             startGlobalShortcutFallbackMonitor()
         }
@@ -522,6 +588,75 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         }
         pendingRevealWorkItem = work
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
+    }
+
+
+    // The panel publishes its bindings to shortcuts.json because this process
+    // cannot read them: the bridge runs helper-to-panel and evaluates
+    // ExtendScript in After Effects, so the panel's localStorage is out of
+    // reach. Registered here at runtime rather than from a compiled table -
+    // which is why a custom shortcut previously worked only while the panel or
+    // overlay had focus, i.e. almost never.
+    func reloadUserBindings() {
+        userHotKeyRefs.forEach { UnregisterEventHotKey($0) }
+        userHotKeyRefs.removeAll()
+        userHotKeyNames.removeAll()
+        var nextId: UInt32 = 100
+        readTntUserBindings().forEach { binding in
+            let hotKeyId = EventHotKeyID(signature: quickControlsHotKeySignature, id: nextId)
+            var ref: EventHotKeyRef?
+            let status = RegisterEventHotKey(
+                binding.keyCode,
+                binding.modifiers,
+                hotKeyId,
+                GetApplicationEventTarget(),
+                0,
+                &ref
+            )
+            if status == noErr, let ref {
+                userHotKeyRefs.append(ref)
+                userHotKeyNames[nextId] = binding.name
+                nextId += 1
+            } else {
+                tntLog("could not register \(binding.combo) for \(binding.name): status \(status)")
+            }
+        }
+        tntLog("registered \(userHotKeyNames.count) user binding(s)")
+    }
+
+    private func startUserBindingsWatch() {
+        userBindingsSeenAt = tntUserBindingsFileDate()
+        reloadUserBindings()
+        userBindingsWatchTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
+            guard let self else { return }
+            let stamp = tntUserBindingsFileDate()
+            if stamp != self.userBindingsSeenAt {
+                self.userBindingsSeenAt = stamp
+                self.reloadUserBindings()
+            }
+        }
+    }
+
+    func runUserBindingFromHotKey(_ id: UInt32) {
+        guard let name = userHotKeyNames[id] else { return }
+        guard afterEffectsApplication() != nil else { return }
+        let helperBundleIdentifier = Bundle.main.bundleIdentifier ?? ""
+        let frontmostBundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? ""
+        guard
+            frontmostBundleIdentifier == afterEffectsBundleIdentifier ||
+            frontmostBundleIdentifier == helperBundleIdentifier
+        else {
+            return
+        }
+        showPanel()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in
+            self?.webView?.evaluateJavaScript("""
+            (async function () {
+                window.focus();
+                if (window.__tntQuickPanelRunBinding) await window.__tntQuickPanelRunBinding(\(javaScriptLiteral(name)));
+            }());
+            """)
+        }
     }
 
     private func showPanel(openControl controlName: String? = nil) {
@@ -809,7 +944,11 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
                     return OSStatus(eventNotHandledErr)
                 }
                 DispatchQueue.main.async {
-                    if let controlName = quickPanelControlName(forHotKeyId: hotKeyId.id) {
+                    // Ids from 100 up are the user's own bindings, published by
+                    // the panel and registered at runtime.
+                    if hotKeyId.id >= 100 {
+                        activeAppDelegate?.runUserBindingFromHotKey(hotKeyId.id)
+                    } else if let controlName = quickPanelControlName(forHotKeyId: hotKeyId.id) {
                         activeAppDelegate?.openPanelControlFromHotKey(controlName)
                     } else {
                         activeAppDelegate?.togglePanelFromHotKey()
