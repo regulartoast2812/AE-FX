@@ -10686,16 +10686,27 @@ body.keyframe-mode .track-label {
 .anchor-dialog:has(.timing-order-backdrop.embedded) {
   width: min(1280px, calc(100vw - 40px)) !important;
   max-width: none !important;
+  /* Opaque. The dialog's own background is translucent with a blur, which was
+     fine for a small floating box over the timeline and reads as unfinished at
+     1280px - the Functions list showed straight through the timing columns. */
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .012) 40%, rgba(0, 0, 0, .12)),
+    #1c1d1f !important;
 }
 
 .anchor-panel:has(.timing-order-backdrop.embedded) {
   display: flex !important;
   flex-wrap: nowrap;
-  align-items: stretch;
-  gap: 14px;
-  max-height: min(70vh, 640px);
-  overflow-y: auto;
-  padding-right: 4px;
+  align-items: flex-start;
+  /* Three earlier .anchor-panel rules set gap with !important - 10, 10 and 12 -
+     so the outer spacing came out 12 while the nested cards used 16 and the row
+     read as unevenly spaced. */
+  gap: 16px !important;
+  /* No height cap. The tallest column - Layer Order, nine buttons - decides
+     the panel height, and capping it let the columns paint past the dialog's
+     own background onto the list behind. The overlay sizes itself to the
+     content anyway. */
+  align-content: flex-start;
 }
 
 .anchor-panel:has(.timing-order-backdrop.embedded) > .anchor-section {
@@ -10715,21 +10726,64 @@ body.keyframe-mode .track-label {
 .timing-order-backdrop.embedded .timing-order-layout {
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   width: 100% !important;
-  gap: 10px;
+  /* The same 16px the outer row uses, so the gap between Align and Stagger
+     matches the gap between Stagger and Layer Order. A nested container with
+     its own spacing is what made them uneven. */
+  gap: 16px;
+  margin: 0 !important;
+  align-items: start;
 }
 
 .timing-order-backdrop.embedded .timing-order-card {
   min-width: 0 !important;
 }
 
-/* Inside the panel the cards are sections, not floating dialogs. Their own
-   background is translucent and leans on a backdrop-filter, which reads as
-   the Functions list showing through once they sit inside another surface. */
+/* The migrated cards adopt the anchor/align look: a bare column under a small
+   uppercase label, with no shell of its own. Five sections in one row cannot
+   speak two visual languages - the card chrome was for a floating dialog, and
+   inside another panel it reads as a panel within a panel. */
 .anchor-panel .timing-order-card {
-  background: rgba(30, 31, 33, .97) !important;
-  box-shadow: inset 0 1px rgba(255, 255, 255, .045) !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+}
+
+.timing-order-backdrop.embedded .timing-order-head {
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  margin-bottom: 10px;
+}
+
+/* Same 10px uppercase label the anchor and align sections use. */
+.timing-order-backdrop.embedded .timing-order-title {
+  gap: 6px;
+  font-family: inherit !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: rgba(235, 235, 245, .42);
+}
+
+/* The lettered badge belongs to the floating card, not to a section label. */
+.timing-order-backdrop.embedded .timing-order-title b {
+  display: none !important;
+}
+
+.timing-order-backdrop.embedded .timing-order-title em {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.timing-order-backdrop.embedded .timing-order-body {
+  padding: 0 !important;
 }
 
 /* The timing cards were laid out for a 1120px sheet, so their inner rows are
