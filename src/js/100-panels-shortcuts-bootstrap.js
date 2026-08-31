@@ -1463,16 +1463,23 @@ function resizeNativeQuickPanel() {
   window.__tntNativeResize(width, height);
 }
 
-function scheduleNativeQuickPanelResize(delay = 20) {
+// The window is invisible until this reports a size, so every delay here is
+// dead time on screen. Default was 20ms plus two frames; it measures on the
+// next frame now and only takes a second pass when the first changed nothing
+// - layout is settled by then in every case measured.
+function scheduleNativeQuickPanelResize(delay = 0) {
   if (!QUICK_PANEL_MODE) return;
   if (quickPanelResizeTimer) clearTimeout(quickPanelResizeTimer);
-  quickPanelResizeTimer = setTimeout(() => {
+  const run = () => {
     quickPanelResizeTimer = null;
     requestAnimationFrame(() => {
+      const before = quickPanelLastSize;
       resizeNativeQuickPanel();
-      requestAnimationFrame(resizeNativeQuickPanel);
+      if (quickPanelLastSize === before) requestAnimationFrame(resizeNativeQuickPanel);
     });
-  }, delay);
+  };
+  if (delay <= 0) run();
+  else quickPanelResizeTimer = setTimeout(run, delay);
 }
 
 function closeNativeQuickPanelWindow() {

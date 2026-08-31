@@ -309,7 +309,9 @@ private final class WindowBridge: NSObject, WKScriptMessageHandler {
         let frame = afterEffectsOverlayFrame(for: size) ?? NSRect(origin: panel.frame.origin, size: size)
         panel.setFrame(frame, display: true, animate: false)
         // Reveal once sizes settle, not on the first one.
-        activeAppDelegate?.scheduleReveal(after: 0.07)
+        // Was 70ms after every resize. One frame is enough to let the second
+        // resize the page schedules arrive and coalesce.
+        activeAppDelegate?.scheduleReveal(after: 0.016)
     }
 }
 
@@ -551,10 +553,15 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
 
         if deferReveal {
             // Safety net: reveal anyway if the page never reports a size.
-            scheduleReveal(after: 0.45)
+            // Safety net only - the page normally reports a size within a frame.
+            // Was 450ms, which is what a summon cost when anything hiccuped.
+            scheduleReveal(after: 0.18)
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) { [weak self] in
+        // Was 80ms. The page is already loaded and idle - it does not need time
+        // to become ready, and every millisecond here is spent with the window
+        // invisible, so it is the most expensive delay in the path.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.005) { [weak self] in
             let showScript: String
             if let controlName {
                 showScript = "if (window.__tntQuickPanelOpenControl) await window.__tntQuickPanelOpenControl(\(javaScriptLiteral(controlName)));"

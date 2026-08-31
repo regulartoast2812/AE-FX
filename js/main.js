@@ -233,9 +233,9 @@ const FX_CONSOLE_COMMANDS = [
   { type: "command", name: "Rename Composition...", category: "Composition", does: "Set", targets: ["Comp"], shortcut: "", action: promptRenameComp },
   { type: "command", name: "Set Composition Length", category: "Composition", does: "Set", targets: ["Comp"], shortcut: "", action: promptCompDuration },
   { type: "command", name: "Composition Tools", category: "Composition", does: "Open", targets: ["Comp"], shortcut: "C", action: () => openSubpanelByKey("composition") },
-  { type: "command", name: "Anchor Point Master", category: "Anchor", does: "Open", targets: ["Layer"], shortcut: "A", action: () => openSubpanelByKey("anchor") },
+  { type: "command", name: "Layout Panel", category: "Anchor", does: "Open", targets: ["Layer"], shortcut: "A", action: () => openSubpanelByKey("anchor") },
   { type: "command", name: "Center Anchor Point", category: "Anchor", does: "Set", targets: ["Layer"], shortcut: "Shift+A", action: centerSelectedAnchorPoints },
-  { type: "command", name: "Stagger & Layer Order", category: "Layers", does: "Open", targets: ["Layer"], shortcut: "", action: () => openSubpanelByKey("timing-order") },
+  { type: "command", name: "Stagger & Layer Order (Layout)", category: "Layers", does: "Open", targets: ["Layer"], shortcut: "", action: () => openSubpanelByKey("timing-order") },
   { type: "command", name: "Flip Layer Order", category: "Layers", does: "Set", targets: ["Layer"], shortcut: "", action: () => moveSelectedLayersInStack("reverse") },
   { type: "command", name: "Duplicate Selected Layers", category: "Edit", does: "Add", targets: ["Layer"], shortcut: "Ctrl+D", action: duplicateSelectedLayers },
   { type: "command", name: "Split Selected Layers", category: "Edit", does: "Set", targets: ["Layer"], shortcut: "3", action: splitSelectedLayersAtPlayhead },
@@ -646,7 +646,7 @@ function bindRailTooltipDelegation() {
 function setupFilterTooltips() {
   if (!filterColumnEl) return;
   const tooltipByPanel = {
-    anchor: "Anchor Point\nShortcut: A",
+    anchor: "Layout\nShortcut: A",
     composition: "Composition Tools\nShortcut: C",
     ease: "Ease Editor\nShortcut: E\nRequires selected keyframes",
     mask: "Mask Control\nShortcut: F",
@@ -655,7 +655,7 @@ function setupFilterTooltips() {
     styles: "Layer Styles\nShortcut: S",
     "mass-edit": "Mass Edit\nCopy effects, keys, values, and link matching properties across selected layers",
     "text-animation": "Text Animation\nBuild text animators and manage selected text layers",
-    "timing-order": "Timing and Layer Order\nStagger, sequence, and reorder selected layers",
+    "timing-order": "Layout\nAnchor, align, distribute, stagger, layer order and pull/snap",
     filter: "Filter\nShortcut: Shift+X",
     tnk: "TNK Tools\nShortcut: Ctrl+D\nGlobal parameter bar feeding every tool"
   };
@@ -12954,16 +12954,23 @@ function resizeNativeQuickPanel() {
   window.__tntNativeResize(width, height);
 }
 
-function scheduleNativeQuickPanelResize(delay = 20) {
+// The window is invisible until this reports a size, so every delay here is
+// dead time on screen. Default was 20ms plus two frames; it measures on the
+// next frame now and only takes a second pass when the first changed nothing
+// - layout is settled by then in every case measured.
+function scheduleNativeQuickPanelResize(delay = 0) {
   if (!QUICK_PANEL_MODE) return;
   if (quickPanelResizeTimer) clearTimeout(quickPanelResizeTimer);
-  quickPanelResizeTimer = setTimeout(() => {
+  const run = () => {
     quickPanelResizeTimer = null;
     requestAnimationFrame(() => {
+      const before = quickPanelLastSize;
       resizeNativeQuickPanel();
-      requestAnimationFrame(resizeNativeQuickPanel);
+      if (quickPanelLastSize === before) requestAnimationFrame(resizeNativeQuickPanel);
     });
-  }, delay);
+  };
+  if (delay <= 0) run();
+  else quickPanelResizeTimer = setTimeout(run, delay);
 }
 
 function closeNativeQuickPanelWindow() {
