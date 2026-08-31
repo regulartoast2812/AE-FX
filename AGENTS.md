@@ -108,6 +108,27 @@ Remaining, in the order they show:
 Ctrl+O is a right-hand key, which the ergonomics rule above says triggers
 should avoid. Folding O into A retires it.
 
+### Dialogs opened from inside a subpanel
+
+`showTntCommandDialog` closes whatever subpanel is showing before it opens.
+It has to: nothing else did, so two surfaces ended up shown at once, and in
+the overlay the window is sized to `activeQuickPanelSurface()` - which
+prefers this dialog. The window shrank to the dialog while the subpanel
+behind it still laid out at its own size, so the panel appeared stretched and
+torn and the dialog only surfaced once a click outside dismissed the
+subpanel and let the resize settle.
+
+Every `prompt*` helper routes through that one function, which is why the fix
+lives there rather than in each caller. Affected callers found:
+
+- TNK: Stagger Layers, Set Text Content, Find / Replace Text, Add Marker -
+  every TNK command whose name ends in "..."
+- Text Animation panel: its Set Text and Find / Replace buttons
+
+**Adding a subpanel that opens a prompt needs nothing extra** - but a
+subpanel that shows its own surface some other way must be added to
+`closeNativeQuickPanelSurfaces`, which is a hand-maintained list.
+
 ### On hold
 
 - **Plain `C` opens TNK** - built and shipped, but inert until the helper is

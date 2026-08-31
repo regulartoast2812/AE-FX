@@ -1240,8 +1240,24 @@ function showTntCommandDialog(config) {
 
   return new Promise(resolve => {
     activeTntDialogResolve = resolve;
+    // A subpanel that opens this dialog must get out of the way first.
+    //
+    // Nothing closed the caller, so two surfaces ended up shown at once. In the
+    // overlay that is not just clutter: the window is sized to
+    // activeQuickPanelSurface(), which prefers this dialog, so the window
+    // shrank to the dialog while the subpanel behind it still laid out at its
+    // own size - the panel appeared stretched and torn, and the dialog only
+    // became visible once a click outside dismissed the subpanel and let the
+    // resize settle.
+    //
+    // Every prompt* helper routes through here, so this covers TNK's four
+    // dialog commands and the Text Animation panel's two alike.
+    if (typeof closeNativeQuickPanelSurfaces === "function") closeNativeQuickPanelSurfaces();
+    if (typeof hideTnkPanel === "function") hideTnkPanel();
+    if (typeof hideTextAnimationPanel === "function") hideTextAnimationPanel();
     el.classList.add("show");
     el.setAttribute("aria-hidden", "false");
+    if (typeof scheduleNativeQuickPanelResize === "function") scheduleNativeQuickPanelResize(0);
     const first = fieldsEl.querySelector("input, textarea");
     setTimeout(() => {
       if (first) {
