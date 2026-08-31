@@ -11022,9 +11022,9 @@ function ensureTimingOrderPanel() {
         </header>
         <div class="timing-order-body">
           <div class="timing-execute-actions" role="group" aria-label="Choose stagger direction">
-            <button type="button" data-stagger-execute="asc" data-tooltip="Bottom Up\nUse the bottom selected layer as the first layer, then stagger upward."><strong>Bottom up</strong><span>Stagger upward</span></button>
-            <button type="button" data-stagger-execute="desc" data-tooltip="Top Down\nUse the top selected layer as the first layer, then stagger downward."><strong>Top down</strong><span>Stagger downward</span></button>
-            <button type="button" data-stagger-execute="random" data-tooltip="Random Stagger\nShuffle the selected layers once, then use the slider to set the offset."><strong>Random</strong><span>Shuffle timing</span></button>
+            <button type="button" data-stagger-execute="asc" data-icon="arrow-up-narrow-wide" data-tooltip="Bottom Up\nUse the bottom selected layer as the first layer, then stagger upward."><strong>Bottom up</strong><span>Stagger upward</span></button>
+            <button type="button" data-stagger-execute="desc" data-icon="arrow-down-wide-narrow" data-tooltip="Top Down\nUse the top selected layer as the first layer, then stagger downward."><strong>Top down</strong><span>Stagger downward</span></button>
+            <button type="button" data-stagger-execute="random" data-icon="shuffle" data-tooltip="Random Stagger\nShuffle the selected layers once, then use the slider to set the offset."><strong>Random</strong><span>Shuffle timing</span></button>
           </div>
           <div class="timing-order-field">
             <span>Offset / gap</span>
@@ -11061,19 +11061,19 @@ function ensureTimingOrderPanel() {
           <div class="timing-order-field">
             <span>Sort selected layers</span>
             <div class="timing-execute-actions order-sort-actions" role="group" aria-label="Sort selected layers">
-              <button type="button" data-order-sort="in" data-tooltip="By In Point\nSort selected layers by in point."><strong>In point</strong><span>Layer start</span></button>
-              <button type="button" data-order-sort="out" data-tooltip="By Out Point\nSort selected layers by out point."><strong>Out point</strong><span>Layer end</span></button>
-              <button type="button" data-order-sort="x" data-tooltip="By X Position\nSort selected layers by Position X at the current time."><strong>X position</strong><span>Left to right</span></button>
-              <button type="button" data-order-sort="y" data-tooltip="By Y Position\nSort selected layers by Position Y at the current time."><strong>Y position</strong><span>Top to bottom</span></button>
-              <button type="button" data-order-sort="firstKey" data-tooltip="Earliest Keyframe\nSort by each layer's earliest keyframe. Layers with no keys use their in point."><strong>First key</strong><span>Earliest key</span></button>
-              <button type="button" data-order-sort="lastKey" data-tooltip="Last Keyframe\nSort by each layer's latest keyframe. Layers with no keys use their in point."><strong>Last key</strong><span>Latest key</span></button>
-              <button type="button" data-order-sort="random" data-tooltip="Randomize\nShuffle selected layers and move the shuffled selection to the top of the stack."><strong>Random</strong><span>Shuffle stack</span></button>
+              <button type="button" data-order-sort="in" data-icon="chevrons-left" data-tooltip="By In Point\nSort selected layers by in point."><strong>In point</strong><span>Layer start</span></button>
+              <button type="button" data-order-sort="out" data-icon="chevrons-right" data-tooltip="By Out Point\nSort selected layers by out point."><strong>Out point</strong><span>Layer end</span></button>
+              <button type="button" data-order-sort="x" data-icon="move-horizontal" data-tooltip="By X Position\nSort selected layers by Position X at the current time."><strong>X position</strong><span>Left to right</span></button>
+              <button type="button" data-order-sort="y" data-icon="move-vertical" data-tooltip="By Y Position\nSort selected layers by Position Y at the current time."><strong>Y position</strong><span>Top to bottom</span></button>
+              <button type="button" data-order-sort="firstKey" data-icon="skip-back" data-tooltip="Earliest Keyframe\nSort by each layer's earliest keyframe. Layers with no keys use their in point."><strong>First key</strong><span>Earliest key</span></button>
+              <button type="button" data-order-sort="lastKey" data-icon="skip-forward" data-tooltip="Last Keyframe\nSort by each layer's latest keyframe. Layers with no keys use their in point."><strong>Last key</strong><span>Latest key</span></button>
+              <button type="button" data-order-sort="random" data-icon="shuffle" data-tooltip="Randomize\nShuffle selected layers and move the shuffled selection to the top of the stack."><strong>Random</strong><span>Shuffle stack</span></button>
             </div>
           </div>
           <div class="timing-execute-actions order-stack-actions" role="group" aria-label="Send selected layers">
-            <button type="button" data-order-stack="top" data-tooltip="Send to Top\nMove the selected layers to the top of the composition stack while preserving their order."><strong>Send to top</strong><span>Top of layer stack</span></button>
-            <button type="button" data-order-stack="reverse" data-tooltip="Flip Layer Order\nReverse the selected layers inside their current stack slots."><strong>Flip order</strong><span>Reverse selected stack</span></button>
-            <button type="button" data-order-stack="bottom" data-tooltip="Send to Bottom\nMove the selected layers to the bottom of the composition stack while preserving their order."><strong>Send to bottom</strong><span>Bottom of layer stack</span></button>
+            <button type="button" data-order-stack="top" data-icon="arrow-up-to-line" data-tooltip="Send to Top\nMove the selected layers to the top of the composition stack while preserving their order."><strong>Send to top</strong><span>Top of layer stack</span></button>
+            <button type="button" data-order-stack="reverse" data-icon="flip-vertical-2" data-tooltip="Flip Layer Order\nReverse the selected layers inside their current stack slots."><strong>Flip order</strong><span>Reverse selected stack</span></button>
+            <button type="button" data-order-stack="bottom" data-icon="arrow-down-to-line" data-tooltip="Send to Bottom\nMove the selected layers to the bottom of the composition stack while preserving their order."><strong>Send to bottom</strong><span>Bottom of layer stack</span></button>
           </div>
         </div>
         <div class="timing-order-error"></div>
@@ -11090,8 +11090,8 @@ function ensureTimingOrderPanel() {
               <span>Move the selected layer group together</span>
             </div>
             <div class="timing-execute-actions timing-two-actions" role="group" aria-label="Pull layer group">
-              <button type="button" data-pull-layer="in" data-tooltip="Pull Group In\nMove the whole selected layer group so the earliest in point lands at the playhead."><strong>In to playhead</strong><span>Keep spacing</span></button>
-              <button type="button" data-pull-layer="out" data-tooltip="Pull Group Out\nMove the whole selected layer group so the latest out point lands at the playhead."><strong>Out to playhead</strong><span>Keep spacing</span></button>
+              <button type="button" data-pull-layer="in" data-icon="arrow-right-to-line" data-tooltip="Pull Group In\nMove the whole selected layer group so the earliest in point lands at the playhead."><strong>In to playhead</strong><span>Keep spacing</span></button>
+              <button type="button" data-pull-layer="out" data-icon="arrow-left-to-line" data-tooltip="Pull Group Out\nMove the whole selected layer group so the latest out point lands at the playhead."><strong>Out to playhead</strong><span>Keep spacing</span></button>
             </div>
           </div>
           <div class="timing-compact-group timing-snap-group">
@@ -11123,6 +11123,7 @@ function ensureTimingOrderPanel() {
     </div>
   `;
   document.body.appendChild(timingOrderBackdropEl);
+  if (typeof tntPaintDeclaredIcons === "function") tntPaintDeclaredIcons(timingOrderBackdropEl);
   timingOrderBackdropEl.querySelectorAll("[data-tooltip]").forEach(control => {
     control.setAttribute("aria-label", control.dataset.tooltip.replace(/\n+/g, ". "));
     bindPanelTooltip(control);

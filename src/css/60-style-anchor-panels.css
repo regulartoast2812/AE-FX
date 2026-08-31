@@ -1932,3 +1932,83 @@ body.keyframe-mode .track-label {
   flex: 1 1 auto;
   min-width: 0;
 }
+
+/* Embedded, the timing controls are icon buttons - the same 26px square the
+   align grid uses. They were two lines of prose each ("Bottom up / Stagger
+   upward"), which is why three sections filled a 1280px panel and still had
+   room to spare. The words live in the tooltip, which is instant. */
+.timing-order-backdrop.embedded .timing-execute-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.timing-order-backdrop.embedded .timing-execute-actions > button {
+  display: grid;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+  min-height: 0;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: var(--tnt-radius-control, 7px);
+  background: rgba(0, 0, 0, .26);
+  color: rgba(235, 235, 245, .5);
+  font-size: 0;
+}
+
+.timing-order-backdrop.embedded .timing-execute-actions > button:hover:not(:disabled) {
+  border-color: rgba(217, 119, 66, .36);
+  background: rgba(217, 119, 66, .13);
+  color: #fff;
+}
+
+.timing-order-backdrop.embedded .timing-execute-actions > button.active {
+  border-color: rgba(217, 119, 66, .5);
+  background: rgba(217, 119, 66, .2);
+  color: #fff;
+}
+
+/* The label text is the tooltip's job now. */
+.timing-order-backdrop.embedded .timing-execute-actions > button strong,
+.timing-order-backdrop.embedded .timing-execute-actions > button span {
+  display: none;
+}
+
+.timing-order-backdrop.embedded .timing-execute-actions svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Field labels shrink to match the section labels above them. */
+.timing-order-backdrop.embedded .timing-order-field > span {
+  font-size: 9.5px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: rgba(235, 235, 245, .34);
+}
+
+.timing-order-backdrop.embedded .timing-order-field {
+  gap: 6px;
+}
+
+.timing-order-backdrop.embedded .timing-order-body {
+  gap: 12px;
+}
+
+/* Pull/Snap keeps words - In and Out on a matrix of rows are not iconifiable
+   without inventing a code the user has to learn - but loses the padding of a
+   dialog button. */
+.timing-order-backdrop.embedded .timing-snap-grid button,
+.timing-order-backdrop.embedded .timing-snap-pull-card button {
+  min-height: 0;
+  padding: 5px 8px;
+  font-size: 10.5px;
+}
