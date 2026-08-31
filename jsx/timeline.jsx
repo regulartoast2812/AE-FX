@@ -1398,16 +1398,36 @@ function TNT_centerLayerAnchorPoint(layer) {
   TNT_applyLayerAnchor(layer, [(bbox.left + bbox.right) / 2, (bbox.top + bbox.bottom) / 2]);
 }
 
+// Moving the anchor point must not move the layer. Position is measured from
+// the anchor, so shifting the anchor by d in LAYER space shifts the layer
+// unless Position is moved by the same d expressed in PARENT space - which
+// means scaling it AND rotating it, exactly as TNT_pointToParentSpace does.
+//
+// The rotation term was missing, so any rotated layer jumped when its anchor
+// was set: measured on a 45deg layer, centre -> top-left moved it 54px.
 function TNT_applyLayerAnchor(layer, nextAnchor) {
   var transform = layer.property("ADBE Transform Group");
   var anchorProp = transform ? transform.property("ADBE Anchor Point") : layer.property("Anchor Point");
   var scaleProp = transform ? transform.property("ADBE Scale") : layer.property("Scale");
   if (!anchorProp || !scaleProp) return;
 
+  var time = layer.containingComp.time;
   var oldAnchor = anchorProp.value;
   var scale = scaleProp.value;
-  var dx = (nextAnchor[0] - oldAnchor[0]) * (scale[0] / 100);
-  var dy = (nextAnchor[1] - oldAnchor[1]) * (scale[1] / 100);
+  var rotate = 0;
+  try {
+    var rotateProp = transform ? transform.property("ADBE Rotate Z") : null;
+    if (rotateProp) rotate = rotateProp.valueAtTime(time, false);
+  } catch (_) {}
+
+  var sx = (nextAnchor[0] - oldAnchor[0]) * (scale[0] / 100);
+  var sy = (nextAnchor[1] - oldAnchor[1]) * ((scale[1] == null ? 100 : scale[1]) / 100);
+  var radians = (rotate || 0) * Math.PI / 180;
+  var cos = Math.cos(radians);
+  var sin = Math.sin(radians);
+  var dx = (sx * cos) - (sy * sin);
+  var dy = (sx * sin) + (sy * cos);
+
   var anchorValue = oldAnchor.slice ? oldAnchor.slice(0) : [oldAnchor[0], oldAnchor[1]];
   anchorValue[0] = nextAnchor[0];
   anchorValue[1] = nextAnchor[1];
