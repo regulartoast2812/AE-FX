@@ -512,7 +512,15 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
     }
 
 
+    // Timing for the show path. The web layer boots in 62ms and an After
+    // Effects call round-trips in 20, so a slow summon is native, and without
+    // a number there is nothing to point at.
     private func showPanel(openControl controlName: String? = nil) {
+        let showStartedAt = Date()
+        defer {
+            let ms = Int(Date().timeIntervalSince(showStartedAt) * 1000)
+            if ms > 250 { tntLog("showPanel took \(ms)ms\(controlName.map { " for " + $0 } ?? "")") }
+        }
         guard let panel, let frame = afterEffectsOverlayFrame(for: quickControlsLauncherSize) else {
             panel?.orderOut(nil)
             return

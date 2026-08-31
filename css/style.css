@@ -10866,6 +10866,39 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
   padding: 5px 8px;
   font-size: 10.5px;
 }
+
+/* Layout panel surfaces.
+
+   In the overlay the dialog paints nothing, so each section is a surface in its
+   own right and has to carry its own fill and blur. It was inheriting a
+   rgba(0,0,0,.18) box built for a section sitting inside an opaque dialog -
+   almost transparent once there is nothing behind it, with the After Effects
+   timeline reading straight through.
+
+   Same treatment the other subpanels use: an opaque-enough ground plus a real
+   backdrop blur, which WebKit resolves against the desktop in a transparent
+   NSWindow. */
+.anchor-panel.layout-panel > .anchor-section,
+.anchor-timing-sections > .timing-order-card {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .014) 40%, rgba(0, 0, 0, .16)),
+    rgba(20, 21, 23, .93) !important;
+  border-color: rgba(255, 255, 255, .105) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .06),
+    0 8px 24px rgba(0, 0, 0, .45) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(116%) !important;
+  backdrop-filter: blur(22px) saturate(116%) !important;
+}
+
+/* The controls inside sit on that ground, so they need their own contrast
+   rather than the near-black they had against a dialog. */
+.anchor-timing-sections .timing-execute-actions > button,
+.anchor-panel.layout-panel .anchor-align-btn,
+.anchor-panel.layout-panel .anchor-cell {
+  background: rgba(255, 255, 255, .05) !important;
+  border-color: rgba(255, 255, 255, .14) !important;
+}
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {
   display: grid !important;
