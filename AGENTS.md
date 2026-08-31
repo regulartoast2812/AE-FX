@@ -187,9 +187,17 @@ var layers = getSelectedLayers(); if (!layers.length) return "No layers selected
 96 functions map that way - 84 need layers, 11 need keyframes, 1 needs a mask.
 **Re-run the script after adding host functions.**
 
-The Functions list has a Needs column, cross-checked against the live
-selection: an unmet row is dimmed, not hidden, and its tooltip says what is
-missing. With nothing selected 55 of 150 dim; with layers selected, 4.
+The cross-check runs on three surfaces, all dimming rather than hiding so
+nothing moves and everything stays findable:
+
+- **Functions list** - a Needs column plus a dimmed row. 55 of 150 dim with
+  nothing selected, 4 with layers selected.
+- **Quick panel search** - dimmed result, with the reason in its tooltip.
+- **TNK** - dimmed glyph, reason as the first bulleted line of its tooltip.
+  24 of 37 dim with nothing selected, 2 with layers selected.
+
+TNK matters most here: its buttons carry no label, so a dead one is
+indistinguishable from a live one until it fails.
 
 Deliberately narrow:
 

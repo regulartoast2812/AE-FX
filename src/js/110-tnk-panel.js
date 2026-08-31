@@ -350,12 +350,15 @@ function tnkToolMarkup(item, index, entryIndex) {
   // Headline, then one bulleted line per variation. The key goes in
   // data-tooltip-key so the tooltip can draw it as a chip rather than spell it
   // out mid-sentence.
+  // Cross-checked against the selection, like every other surface.
+  const unmet = typeof tntEntryUnmetRequirement === "function" ? tntEntryUnmetRequirement(entry) : "";
   const lines = [item.label];
+  if (unmet) lines.push(`- ${unmet}`);
   if (item.shift && entryIndex.has(item.shift)) lines.push(`- Shift: ${item.shift}`);
   if (item.alt && entryIndex.has(item.alt)) lines.push(`- Alt: ${item.alt}`);
   if (driven) lines.push("- Uses the bar parameters");
   return `
-    <button type="button" class="tnk-tool${driven ? " driven" : ""}${item.key ? " keyed" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}"${item.desc ? ` data-tooltip-desc="${escapeHtml(item.desc)}"` : ""}${item.key ? ` data-tooltip-key="${escapeHtml(item.key === "`" ? "\u0060" : item.key.toUpperCase())}"` : ""}>
+    <button type="button" class="tnk-tool${driven ? " driven" : ""}${item.key ? " keyed" : ""}${unmet ? " unmet" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}"${item.desc ? ` data-tooltip-desc="${escapeHtml(item.desc)}"` : ""}${item.key ? ` data-tooltip-key="${escapeHtml(item.key === "`" ? "\u0060" : item.key.toUpperCase())}"` : ""}>
       ${tntIconSvg(item.icon, "tnk-tool-icon") || ""}
       ${tnkKeyBadge(item.key)}
     </button>

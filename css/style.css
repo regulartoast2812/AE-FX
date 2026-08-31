@@ -15388,6 +15388,12 @@ body .ease-dialog-title {
   font-size: 12px;
   text-align: center;
 }
+
+/* Same cross-check as everywhere else: dim, not hidden, so the row of glyphs
+   keeps its shape and position - which is how this panel is read. */
+.tnk-tool.unmet {
+  opacity: .38;
+}
 /* Keep the layer selector aligned with the final subpanel system overrides. */
 body .layer-selection-backdrop {
   background: transparent !important;
@@ -19175,4 +19181,10 @@ body.quick-panel-mode .layer-menu.open {
 body.quick-panel-mode .anchor-dialog,
 body.quick-panel-mode .timing-order-layout {
   box-shadow: none !important;
+}
+
+/* A command the current selection cannot satisfy. Dimmed, never hidden: it
+   stays findable and its tooltip says what is missing. */
+.quick-panel-search-result.unmet {
+  opacity: .45;
 }

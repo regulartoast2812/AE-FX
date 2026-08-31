@@ -1120,3 +1120,9 @@ body.quick-panel-mode .anchor-dialog,
 body.quick-panel-mode .timing-order-layout {
   box-shadow: none !important;
 }
+
+/* A command the current selection cannot satisfy. Dimmed, never hidden: it
+   stays findable and its tooltip says what is missing. */
+.quick-panel-search-result.unmet {
+  opacity: .45;
+}

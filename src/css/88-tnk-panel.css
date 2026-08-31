@@ -298,3 +298,9 @@
   font-size: 12px;
   text-align: center;
 }
+
+/* Same cross-check as everywhere else: dim, not hidden, so the row of glyphs
+   keeps its shape and position - which is how this panel is read. */
+.tnk-tool.unmet {
+  opacity: .38;
+}

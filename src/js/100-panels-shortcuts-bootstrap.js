@@ -1551,8 +1551,11 @@ function renderQuickPanelSearchResults() {
   quickPanelSearchResultsEl.innerHTML = entries.map((entry, index) => {
     const shortcut = String(entry.shortcut || "").trim();
     const keyLabel = entry.children ? "Open" : (shortcut || "\u2014");
+    // Same cross-check as the Functions list. This is the surface the tool is
+    // actually used from, so dimming here is the point of having it at all.
+    const unmet = typeof tntEntryUnmetRequirement === "function" ? tntEntryUnmetRequirement(entry) : "";
     return `
-      <button type="button" class="quick-panel-search-result${index === quickPanelSearchSelectedIndex ? " active" : ""}${tntRunClassFor(entry)}" data-quick-search-index="${index}" data-fx-source="${tntSourceGroup(entry)}"${tntRunStyleFor(entry)}>
+      <button type="button" class="quick-panel-search-result${index === quickPanelSearchSelectedIndex ? " active" : ""}${unmet ? " unmet" : ""}${tntRunClassFor(entry)}" data-quick-search-index="${index}" data-fx-source="${tntSourceGroup(entry)}"${unmet ? ` data-tooltip="${escapeHtml(entry.name || "")}\n${escapeHtml(unmet)}"` : ""}${tntRunStyleFor(entry)}>
         ${tntActionIconMarkup(entry)}
         <span class="quick-panel-search-name">${escapeHtml(entry.name || entry.matchName || "Effect")}</span>
         <span class="tnt-tags">${tntTagChips(entry, 2)}</span>
