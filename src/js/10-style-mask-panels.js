@@ -234,7 +234,7 @@ async function refreshEffectsControlPanelContent(options = {}) {
   const totalEffects = layers.reduce((sum, layer) => sum + ((layer.effects || []).length), 0);
   const titleEl = el.querySelector(".layer-style-dialog-title");
   const subtitleEl = el.querySelector(".layer-style-dialog-subtitle");
-  if (titleEl) titleEl.innerHTML = `Effects <span class="mask-control-count">${totalEffects} effect${totalEffects === 1 ? "" : "s"}</span>`;
+  if (titleEl) titleEl.innerHTML = `Effects <span class="mask-control-count">${totalEffects} effect${totalEffects === 1 ? "" : "s"}</span><em class="tnt-selection-readout" data-tnt-selection></em>`;
   if (subtitleEl) subtitleEl.textContent = "";
   body.innerHTML = `
     <div class="effects-control-layout">
@@ -1226,7 +1226,8 @@ async function refreshLayerStylePanelContent(options = {}) {
     : `<div class="layer-style-header-add-row empty"><span>All styles added</span></div>`;
   const titleEl = el.querySelector(".layer-style-dialog-title");
   const subtitleEl = el.querySelector(".layer-style-dialog-subtitle");
-  if (titleEl) titleEl.innerHTML = `<b class="layer-style-shortcut-badge">S</b><span>Layer Styles</span><em class="layer-style-layer-count">${styleLayerCount || 0} layer${styleLayerCount === 1 ? "" : "s"}</em>`;
+  if (titleEl) titleEl.innerHTML = `<b class="layer-style-shortcut-badge">S</b><span>Layer Styles</span><em class="layer-style-layer-count">${styleLayerCount || 0} layer${styleLayerCount === 1 ? "" : "s"}</em><em class="tnt-selection-readout" data-tnt-selection></em>`;
+  if (typeof tntPaintSelectionReadouts === "function") tntPaintSelectionReadouts(el);
   if (subtitleEl) subtitleEl.textContent = "";
   body.innerHTML = `
     <div class="layer-style-layout">

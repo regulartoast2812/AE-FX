@@ -19,7 +19,7 @@ function ensureTextAnimationPanel() {
   textAnimationBackdropEl.innerHTML = `
     <div class="text-animation-dialog" role="dialog" aria-modal="true" aria-label="Text animation">
       <header class="text-animation-head">
-        <div class="text-animation-title"><b>TA</b><span>Text Animation</span><em class="text-animation-count">0 text</em></div>
+        <div class="text-animation-title"><b>TA</b><span>Text Animation</span><em class="text-animation-count">0 text</em><em class="tnt-selection-readout" data-tnt-selection></em></div>
         <button type="button" class="text-animation-close" aria-label="Close">x</button>
       </header>
       <div class="text-animation-body">
@@ -189,6 +189,7 @@ function renderTextAnimationPanel() {
 }
 
 function showTextAnimationPanel() {
+  if (typeof tntPaintSelectionReadouts === "function") setTimeout(() => tntPaintSelectionReadouts(document), 0);
   const el = ensureTextAnimationPanel();
   if (el.classList.contains("show")) {
     hideTextAnimationPanel();

@@ -2098,7 +2098,7 @@ async function refreshEffectsControlPanelContent(options = {}) {
   const totalEffects = layers.reduce((sum, layer) => sum + ((layer.effects || []).length), 0);
   const titleEl = el.querySelector(".layer-style-dialog-title");
   const subtitleEl = el.querySelector(".layer-style-dialog-subtitle");
-  if (titleEl) titleEl.innerHTML = `Effects <span class="mask-control-count">${totalEffects} effect${totalEffects === 1 ? "" : "s"}</span>`;
+  if (titleEl) titleEl.innerHTML = `Effects <span class="mask-control-count">${totalEffects} effect${totalEffects === 1 ? "" : "s"}</span><em class="tnt-selection-readout" data-tnt-selection></em>`;
   if (subtitleEl) subtitleEl.textContent = "";
   body.innerHTML = `
     <div class="effects-control-layout">
@@ -3090,7 +3090,8 @@ async function refreshLayerStylePanelContent(options = {}) {
     : `<div class="layer-style-header-add-row empty"><span>All styles added</span></div>`;
   const titleEl = el.querySelector(".layer-style-dialog-title");
   const subtitleEl = el.querySelector(".layer-style-dialog-subtitle");
-  if (titleEl) titleEl.innerHTML = `<b class="layer-style-shortcut-badge">S</b><span>Layer Styles</span><em class="layer-style-layer-count">${styleLayerCount || 0} layer${styleLayerCount === 1 ? "" : "s"}</em>`;
+  if (titleEl) titleEl.innerHTML = `<b class="layer-style-shortcut-badge">S</b><span>Layer Styles</span><em class="layer-style-layer-count">${styleLayerCount || 0} layer${styleLayerCount === 1 ? "" : "s"}</em><em class="tnt-selection-readout" data-tnt-selection></em>`;
+  if (typeof tntPaintSelectionReadouts === "function") tntPaintSelectionReadouts(el);
   if (subtitleEl) subtitleEl.textContent = "";
   body.innerHTML = `
     <div class="layer-style-layout">
@@ -9747,7 +9748,7 @@ function ensureEaseDialog() {
     <div class="ease-dialog">
       <div class="ease-dialog-head">
         <div class="ease-dialog-title-wrap">
-          <div class="ease-dialog-title"><b class="ease-shortcut-badge">E</b><span>Ease Editor</span><em class="ease-keyframe-count"></em></div>
+          <div class="ease-dialog-title"><b class="ease-shortcut-badge">E</b><span>Ease Editor</span><em class="ease-keyframe-count"></em><em class="tnt-selection-readout" data-tnt-selection></em></div>
         </div>
         <div class="ease-actions">
           <button type="button" class="ease-apply-saved">Apply Saved</button>
@@ -9882,6 +9883,7 @@ async function runEaseUtility(tool) {
 }
 
 async function showEaseDialog() {
+  if (typeof tntPaintSelectionReadouts === "function") setTimeout(() => tntPaintSelectionReadouts(document), 0);
   if (!state.comp) return;
   if (easeDialogEl && easeDialogEl.classList.contains("show")) {
     hideEaseDialog();
@@ -10278,7 +10280,7 @@ function ensureMassEditPanel() {
   massEditDialogEl.innerHTML = `
     <div class="mass-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="massEditTitle">
       <div class="mass-edit-head">
-        <div class="mass-edit-title"><b>ME</b><span id="massEditTitle">Mass Edit</span><em class="mass-edit-count"></em></div>
+        <div class="mass-edit-title"><b>ME</b><span id="massEditTitle">Mass Edit</span><em class="mass-edit-count"></em><em class="tnt-selection-readout" data-tnt-selection></em></div>
       </div>
       <div class="mass-edit-body">
         <section class="mass-edit-source">
@@ -10441,6 +10443,7 @@ async function runMassEditAction(action) {
 }
 
 function showMassEditPanel() {
+  if (typeof tntPaintSelectionReadouts === "function") setTimeout(() => tntPaintSelectionReadouts(document), 0);
   const el = ensureMassEditPanel();
   if (el.classList.contains("show")) {
     hideMassEditPanel();
@@ -10477,7 +10480,7 @@ function ensureTextAnimationPanel() {
   textAnimationBackdropEl.innerHTML = `
     <div class="text-animation-dialog" role="dialog" aria-modal="true" aria-label="Text animation">
       <header class="text-animation-head">
-        <div class="text-animation-title"><b>TA</b><span>Text Animation</span><em class="text-animation-count">0 text</em></div>
+        <div class="text-animation-title"><b>TA</b><span>Text Animation</span><em class="text-animation-count">0 text</em><em class="tnt-selection-readout" data-tnt-selection></em></div>
         <button type="button" class="text-animation-close" aria-label="Close">x</button>
       </header>
       <div class="text-animation-body">
@@ -10647,6 +10650,7 @@ function renderTextAnimationPanel() {
 }
 
 function showTextAnimationPanel() {
+  if (typeof tntPaintSelectionReadouts === "function") setTimeout(() => tntPaintSelectionReadouts(document), 0);
   const el = ensureTextAnimationPanel();
   if (el.classList.contains("show")) {
     hideTextAnimationPanel();
@@ -11167,6 +11171,7 @@ async function runSnapPullPanelAction(action, target, anchor, options = {}) {
 }
 
 function showTimingOrderPanel() {
+  if (typeof tntPaintSelectionReadouts === "function") setTimeout(() => tntPaintSelectionReadouts(document), 0);
   const panel = ensureTimingOrderPanel();
   if (panel.classList.contains("show")) {
     hideTimingOrderPanel();

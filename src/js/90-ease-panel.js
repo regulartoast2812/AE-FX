@@ -7,7 +7,7 @@ function ensureEaseDialog() {
     <div class="ease-dialog">
       <div class="ease-dialog-head">
         <div class="ease-dialog-title-wrap">
-          <div class="ease-dialog-title"><b class="ease-shortcut-badge">E</b><span>Ease Editor</span><em class="ease-keyframe-count"></em></div>
+          <div class="ease-dialog-title"><b class="ease-shortcut-badge">E</b><span>Ease Editor</span><em class="ease-keyframe-count"></em><em class="tnt-selection-readout" data-tnt-selection></em></div>
         </div>
         <div class="ease-actions">
           <button type="button" class="ease-apply-saved">Apply Saved</button>
@@ -142,6 +142,7 @@ async function runEaseUtility(tool) {
 }
 
 async function showEaseDialog() {
+  if (typeof tntPaintSelectionReadouts === "function") setTimeout(() => tntPaintSelectionReadouts(document), 0);
   if (!state.comp) return;
   if (easeDialogEl && easeDialogEl.classList.contains("show")) {
     hideEaseDialog();

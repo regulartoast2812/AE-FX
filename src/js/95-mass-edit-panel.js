@@ -26,7 +26,7 @@ function ensureMassEditPanel() {
   massEditDialogEl.innerHTML = `
     <div class="mass-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="massEditTitle">
       <div class="mass-edit-head">
-        <div class="mass-edit-title"><b>ME</b><span id="massEditTitle">Mass Edit</span><em class="mass-edit-count"></em></div>
+        <div class="mass-edit-title"><b>ME</b><span id="massEditTitle">Mass Edit</span><em class="mass-edit-count"></em><em class="tnt-selection-readout" data-tnt-selection></em></div>
       </div>
       <div class="mass-edit-body">
         <section class="mass-edit-source">
@@ -189,6 +189,7 @@ async function runMassEditAction(action) {
 }
 
 function showMassEditPanel() {
+  if (typeof tntPaintSelectionReadouts === "function") setTimeout(() => tntPaintSelectionReadouts(document), 0);
   const el = ensureMassEditPanel();
   if (el.classList.contains("show")) {
     hideMassEditPanel();

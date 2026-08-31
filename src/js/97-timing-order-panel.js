@@ -457,6 +457,7 @@ async function runSnapPullPanelAction(action, target, anchor, options = {}) {
 }
 
 function showTimingOrderPanel() {
+  if (typeof tntPaintSelectionReadouts === "function") setTimeout(() => tntPaintSelectionReadouts(document), 0);
   const panel = ensureTimingOrderPanel();
   if (panel.classList.contains("show")) {
     hideTimingOrderPanel();
