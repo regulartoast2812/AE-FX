@@ -1740,3 +1740,9 @@ body.keyframe-mode .track-label {
   text-align: center !important;
   padding: 0 10px !important;
 }
+
+/* Sits under the align grid, above Distribute - same control as the anchor
+   panel's mask-bounds toggle, so it reads as a peer rather than a new idea. */
+.anchor-align-option {
+  margin: 8px 0 2px;
+}

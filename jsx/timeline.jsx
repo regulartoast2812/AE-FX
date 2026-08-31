@@ -1613,7 +1613,41 @@ function TNT_centerSelectedAnchorPoint() {
   }
 }
 
-function TNT_alignSelectedLayersToComp(mode, useMasks, target) {
+// "Ignore parenting" for align.
+//
+// A parented layer's Position is expressed in its parent's space, so aligning
+// it fights the hierarchy: the parent keeps dragging it back, and with a
+// keyframed or expression-driven parent the write may not survive at all.
+//
+// Detaching first sidesteps all of it. After Effects compensates a layer's
+// FULL transform when parenting changes - position, scale and rotation - so
+// the layer does not move when it is detached or reattached. Measured in AE:
+// a child of a 200%/+30deg parent reads scale 50 and rotation -30 while
+// parented, and its comp bounding box is identical detached, moved, and
+// reattached. So this is lossless, not an approximation.
+//
+// Every layer is detached before ANY of them moves, so a selected parent that
+// is itself being aligned cannot drag a selected child along with it.
+function TNT_detachParents(layers) {
+  var saved = [];
+  for (var i = 0; i < layers.length; i++) {
+    try {
+      if (layers[i].parent) {
+        saved.push({ layer: layers[i], parent: layers[i].parent });
+        layers[i].parent = null;
+      }
+    } catch (_) {}
+  }
+  return saved;
+}
+
+function TNT_restoreParents(saved) {
+  for (var i = saved.length - 1; i >= 0; i--) {
+    try { saved[i].layer.parent = saved[i].parent; } catch (_) {}
+  }
+}
+
+function TNT_alignSelectedLayersToComp(mode, useMasks, target, ignoreParent) {
   try {
     var comp = TNT_activeComp();
     if (!comp) return TNT_jsonStringify({ ok: false, error: "No active composition." });
@@ -1621,11 +1655,13 @@ function TNT_alignSelectedLayersToComp(mode, useMasks, target) {
     if (!layers) return TNT_jsonStringify({ ok: false, error: "Select at least one layer." });
 
     app.beginUndoGroup("Align Layers From Timeline Panel");
+    var detached = ignoreParent ? TNT_detachParents(layers) : [];
     var changed = 0;
     var targetX, targetY, dx, dy, bbox;
     var isDistribute = String(mode || "").indexOf("dist-") === 0;
     if (isDistribute) {
       if (layers.length < 3) {
+        TNT_restoreParents(detached);
         app.endUndoGroup();
         return TNT_jsonStringify({ ok: false, error: "Select at least three layers to distribute." });
       }
@@ -1662,6 +1698,7 @@ function TNT_alignSelectedLayersToComp(mode, useMasks, target) {
         TNT_addToPositionProperty(infos[si].layer, axis === "x" ? delta : 0, axis === "y" ? delta : 0);
         changed++;
       }
+      TNT_restoreParents(detached);
       app.endUndoGroup();
       return TNT_jsonStringify({ ok: true, changedCount: changed });
     }
@@ -1673,6 +1710,7 @@ function TNT_alignSelectedLayersToComp(mode, useMasks, target) {
     var edgeLeft = 0, edgeTop = 0, edgeRight = comp.width, edgeBottom = comp.height;
     if (toSelection) {
       if (layers.length < 2) {
+        TNT_restoreParents(detached);
         app.endUndoGroup();
         return TNT_jsonStringify({ ok: false, error: "Select at least two layers to align to the selection." });
       }
@@ -1720,9 +1758,11 @@ function TNT_alignSelectedLayersToComp(mode, useMasks, target) {
         changed++;
       } catch (_) {}
     }
+    TNT_restoreParents(detached);
     app.endUndoGroup();
     return TNT_jsonStringify({ ok: true, changedCount: changed });
   } catch (err) {
+    try { TNT_restoreParents(detached); } catch (_) {}
     try { app.endUndoGroup(); } catch (_) {}
     return TNT_jsonStringify({ ok: false, error: String(err) });
   }

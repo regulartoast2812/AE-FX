@@ -11429,7 +11429,13 @@ async function alignSelectedLayersFromAnchorPanel(mode) {
   await loadJSX();
   const alignTargetEl = document.getElementById("anchorAlignTarget");
   const alignTarget = alignTargetEl ? alignTargetEl.value : "selection";
-  const result = await aeCall("TNT_alignSelectedLayersToComp", [String(mode || ""), !!(anchorUseMasksEl && anchorUseMasksEl.checked), alignTarget]);
+  const ignoreParentEl = document.getElementById("anchorIgnoreParent");
+  const result = await aeCall("TNT_alignSelectedLayersToComp", [
+    String(mode || ""),
+    !!(anchorUseMasksEl && anchorUseMasksEl.checked),
+    alignTarget,
+    !!(ignoreParentEl && ignoreParentEl.checked)
+  ]);
   if (!result.ok) {
     anchorErrorEl.textContent = result.error || "Could not align selected layers.";
     return;
