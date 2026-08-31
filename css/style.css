@@ -15246,8 +15246,8 @@ body .ease-dialog-title {
    same centre, so a row of them reads as a row rather than as a wobble. */
 .tnk-key {
   position: absolute;
-  right: -2px;
-  bottom: -2px;
+  right: -4px;
+  bottom: -4px;
   display: grid;
   min-width: 12px;
   height: 11px;
@@ -15265,11 +15265,9 @@ body .ease-dialog-title {
   pointer-events: none;
 }
 
-.tnk-tool-icon { transform: translate(-2px, -2px); }
-
 .tnk-tool-icon {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.5;
