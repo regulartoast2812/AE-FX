@@ -7711,6 +7711,15 @@ function renderSelectionOnly(options = {}) {
   if (typeof updateAnchorSelectionCount === "function") updateAnchorSelectionCount();
   // Every panel's readout, wherever it is, follows the live selection.
   if (typeof tntPaintSelectionReadouts === "function") tntPaintSelectionReadouts(document);
+  // The timing sections live inside the Layout panel now, so nothing reopens
+  // them - they were only re-rendered by the timeline draw, which the overlay
+  // never runs. Without this they hold whatever the selection was when the
+  // panel opened, and sit disabled at "0 layers" while layers are selected.
+  if (typeof renderTimingOrderPanel === "function" &&
+      typeof timingOrderBackdropEl !== "undefined" && timingOrderBackdropEl &&
+      timingOrderBackdropEl.classList.contains("embedded")) {
+    renderTimingOrderPanel();
+  }
   document.querySelectorAll(".clip").forEach(clip => {
     const idx = Number(clip.dataset.layerIndex);
     const selected = state.selectedLayerIndices.includes(idx);
