@@ -883,6 +883,56 @@ function declareUserShortcutKeyInterest(add, letters) {
   });
 }
 
+// What is selected, in one place, for any panel to show.
+//
+// Layer type comes from TNT_layerType on the host - Null, Adjustment, Camera,
+// Light, Shape, Text, or the source name for footage - and rides along in the
+// layer payload, so this costs no round trip.
+function tntSelectionSummary() {
+  const indices = (state.selectedLayerIndices || []).map(Number);
+  const layers = (state.layers || []).filter(layer => indices.indexOf(Number(layer.index || 0)) >= 0);
+  const types = {};
+  layers.forEach(layer => {
+    const type = String(layer.type || "Layer");
+    types[type] = (types[type] || 0) + 1;
+  });
+  return { count: indices.length, resolved: layers.length, types };
+}
+
+// "no selection" / "1 Text layer" / "3 layers - 2 Shape, 1 Text".
+//
+// The breakdown only appears when it says something the count does not: one
+// layer names its own type, and a uniform selection names it once rather than
+// listing it. Mixed selections are the case worth spelling out.
+function tntSelectionLabel() {
+  const summary = tntSelectionSummary();
+  if (!summary.count) return "no selection";
+  const names = Object.keys(summary.types);
+  const plural = summary.count === 1 ? "" : "s";
+  if (names.length === 1) {
+    // "Layer" is the host's fallback when it cannot name the type, so repeating
+    // it reads as "2 Layer layers".
+    if (names[0] === "Layer") return `${summary.count} layer${plural}`;
+    return `${summary.count} ${names[0]} layer${plural}`;
+  }
+  if (!names.length) return `${summary.count} layer${plural}`;
+  const breakdown = names
+    .sort((a, b) => summary.types[b] - summary.types[a] || a.localeCompare(b))
+    .map(name => `${summary.types[name]} ${name}`)
+    .join(", ");
+  return `${summary.count} layer${plural} \u00b7 ${breakdown}`;
+}
+
+// Every panel shows it the same way: mark an element data-tnt-selection and it
+// is kept current from here, rather than each panel growing its own copy.
+function tntPaintSelectionReadouts(root) {
+  const scope = root || document;
+  const label = tntSelectionLabel();
+  scope.querySelectorAll("[data-tnt-selection]").forEach(el => {
+    el.textContent = label;
+  });
+}
+
 function registerPanelKeyEventsInterest() {
   if (!cs || typeof cs.registerKeyEventsInterest !== "function") return;
   const mac = isMacPlatform();
@@ -7389,6 +7439,8 @@ function renderSelectionOnly(options = {}) {
   // Keeps the anchor panel's header count honest while it is open - selection
   // changes in After Effects arrive here, not through the panel.
   if (typeof updateAnchorSelectionCount === "function") updateAnchorSelectionCount();
+  // Every panel's readout, wherever it is, follows the live selection.
+  if (typeof tntPaintSelectionReadouts === "function") tntPaintSelectionReadouts(document);
   document.querySelectorAll(".clip").forEach(clip => {
     const idx = Number(clip.dataset.layerIndex);
     const selected = state.selectedLayerIndices.includes(idx);
@@ -11222,11 +11274,7 @@ function setAnchorDialogPoint(point) {
 // seeing the number is the difference between a refusal and knowing why.
 function updateAnchorSelectionCount() {
   if (!anchorModalEl) return;
-  const count = (state.selectedLayerIndices || []).length;
-  const label = count ? `${count} layer${count === 1 ? "" : "s"}` : "no selection";
-  anchorModalEl.querySelectorAll(".anchor-selection-count").forEach(el => {
-    el.textContent = label;
-  });
+  tntPaintSelectionReadouts(anchorModalEl);
 }
 
 function showAnchorDialog() {
@@ -15102,7 +15150,7 @@ function ensureTnkPanel() {
   tnkBackdropEl.innerHTML = `
     <section class="tnk-dialog" role="dialog" aria-modal="true" aria-label="TNK tools" tabindex="-1">
       <header class="tnk-head">
-        <div class="tnk-title"><b>TNK</b><span>Tools</span><em class="tnk-count"></em></div>
+        <div class="tnk-title"><b>TNK</b><span>Tools</span><em class="tnk-count"></em><em class="tnk-selection" data-tnt-selection></em></div>
         <button type="button" class="tnk-bar-btn" data-tnk-reset data-icon="ui.refresh" data-tooltip="Reset Parameters\nReturn every value in the bar to its default."></button>
       </header>
       <div class="tnk-global-bar">${tnkParamBarMarkup()}</div>
@@ -15256,6 +15304,7 @@ function showTnkPanel() {
   tnkLoadParams();
   tnkSyncParamInputs();
   tnkRender();
+  if (typeof tntPaintSelectionReadouts === "function") tntPaintSelectionReadouts(panel);
   panel.classList.add("show");
   panel.setAttribute("aria-hidden", "false");
   window.addEventListener("keydown", tnkCaptureKeydown, true);

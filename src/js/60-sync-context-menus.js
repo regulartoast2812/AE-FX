@@ -171,6 +171,8 @@ function renderSelectionOnly(options = {}) {
   // Keeps the anchor panel's header count honest while it is open - selection
   // changes in After Effects arrive here, not through the panel.
   if (typeof updateAnchorSelectionCount === "function") updateAnchorSelectionCount();
+  // Every panel's readout, wherever it is, follows the live selection.
+  if (typeof tntPaintSelectionReadouts === "function") tntPaintSelectionReadouts(document);
   document.querySelectorAll(".clip").forEach(clip => {
     const idx = Number(clip.dataset.layerIndex);
     const selected = state.selectedLayerIndices.includes(idx);

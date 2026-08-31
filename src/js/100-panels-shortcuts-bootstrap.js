@@ -81,11 +81,7 @@ function setAnchorDialogPoint(point) {
 // seeing the number is the difference between a refusal and knowing why.
 function updateAnchorSelectionCount() {
   if (!anchorModalEl) return;
-  const count = (state.selectedLayerIndices || []).length;
-  const label = count ? `${count} layer${count === 1 ? "" : "s"}` : "no selection";
-  anchorModalEl.querySelectorAll(".anchor-selection-count").forEach(el => {
-    el.textContent = label;
-  });
+  tntPaintSelectionReadouts(anchorModalEl);
 }
 
 function showAnchorDialog() {

@@ -280,7 +280,7 @@ function ensureTnkPanel() {
   tnkBackdropEl.innerHTML = `
     <section class="tnk-dialog" role="dialog" aria-modal="true" aria-label="TNK tools" tabindex="-1">
       <header class="tnk-head">
-        <div class="tnk-title"><b>TNK</b><span>Tools</span><em class="tnk-count"></em></div>
+        <div class="tnk-title"><b>TNK</b><span>Tools</span><em class="tnk-count"></em><em class="tnk-selection" data-tnt-selection></em></div>
         <button type="button" class="tnk-bar-btn" data-tnk-reset data-icon="ui.refresh" data-tooltip="Reset Parameters\nReturn every value in the bar to its default."></button>
       </header>
       <div class="tnk-global-bar">${tnkParamBarMarkup()}</div>
@@ -434,6 +434,7 @@ function showTnkPanel() {
   tnkLoadParams();
   tnkSyncParamInputs();
   tnkRender();
+  if (typeof tntPaintSelectionReadouts === "function") tntPaintSelectionReadouts(panel);
   panel.classList.add("show");
   panel.setAttribute("aria-hidden", "false");
   window.addEventListener("keydown", tnkCaptureKeydown, true);

@@ -880,6 +880,56 @@ function declareUserShortcutKeyInterest(add, letters) {
   });
 }
 
+// What is selected, in one place, for any panel to show.
+//
+// Layer type comes from TNT_layerType on the host - Null, Adjustment, Camera,
+// Light, Shape, Text, or the source name for footage - and rides along in the
+// layer payload, so this costs no round trip.
+function tntSelectionSummary() {
+  const indices = (state.selectedLayerIndices || []).map(Number);
+  const layers = (state.layers || []).filter(layer => indices.indexOf(Number(layer.index || 0)) >= 0);
+  const types = {};
+  layers.forEach(layer => {
+    const type = String(layer.type || "Layer");
+    types[type] = (types[type] || 0) + 1;
+  });
+  return { count: indices.length, resolved: layers.length, types };
+}
+
+// "no selection" / "1 Text layer" / "3 layers - 2 Shape, 1 Text".
+//
+// The breakdown only appears when it says something the count does not: one
+// layer names its own type, and a uniform selection names it once rather than
+// listing it. Mixed selections are the case worth spelling out.
+function tntSelectionLabel() {
+  const summary = tntSelectionSummary();
+  if (!summary.count) return "no selection";
+  const names = Object.keys(summary.types);
+  const plural = summary.count === 1 ? "" : "s";
+  if (names.length === 1) {
+    // "Layer" is the host's fallback when it cannot name the type, so repeating
+    // it reads as "2 Layer layers".
+    if (names[0] === "Layer") return `${summary.count} layer${plural}`;
+    return `${summary.count} ${names[0]} layer${plural}`;
+  }
+  if (!names.length) return `${summary.count} layer${plural}`;
+  const breakdown = names
+    .sort((a, b) => summary.types[b] - summary.types[a] || a.localeCompare(b))
+    .map(name => `${summary.types[name]} ${name}`)
+    .join(", ");
+  return `${summary.count} layer${plural} \u00b7 ${breakdown}`;
+}
+
+// Every panel shows it the same way: mark an element data-tnt-selection and it
+// is kept current from here, rather than each panel growing its own copy.
+function tntPaintSelectionReadouts(root) {
+  const scope = root || document;
+  const label = tntSelectionLabel();
+  scope.querySelectorAll("[data-tnt-selection]").forEach(el => {
+    el.textContent = label;
+  });
+}
+
 function registerPanelKeyEventsInterest() {
   if (!cs || typeof cs.registerKeyEventsInterest !== "function") return;
   const mac = isMacPlatform();

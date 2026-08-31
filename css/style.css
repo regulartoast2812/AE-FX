@@ -15140,6 +15140,12 @@ body .ease-dialog-title {
   font-weight: 700;
 }
 
+.tnk-selection {
+  margin-left: 2px;
+  padding-left: 9px;
+  border-left: 1px solid rgba(255, 255, 255, .12);
+}
+
 .tnk-title em {
   color: rgba(228, 228, 234, .45);
   font-size: 11px;
