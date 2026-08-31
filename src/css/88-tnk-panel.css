@@ -323,3 +323,15 @@
 .tnk-tool.unmet::before {
   opacity: .55;
 }
+
+/* The selection bar sits above the parameters: what you are acting on, before
+   what you are acting with. */
+.tnk-selection-panel {
+  flex: 0 0 auto;
+  padding: 11px 12px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, .07);
+}
+
+.tnk-selection-panel:empty {
+  display: none;
+}

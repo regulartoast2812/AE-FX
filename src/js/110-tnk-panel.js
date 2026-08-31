@@ -283,6 +283,7 @@ function ensureTnkPanel() {
         <div class="tnk-title"><b>TNK</b><span>Tools</span><em class="tnk-count"></em><em class="tnk-selection" data-tnt-selection></em></div>
         <button type="button" class="tnk-bar-btn" data-tnk-reset data-icon="ui.refresh" data-tooltip="Reset Parameters\nReturn every value in the bar to its default."></button>
       </header>
+      <div class="tnk-selection-panel" data-tnt-selection-bar></div>
       <div class="tnk-global-bar">${tnkParamBarMarkup()}</div>
       <div class="tnk-search-row">
         <input class="tnk-filter" type="text" spellcheck="false" autocomplete="off" placeholder="Filter tools">

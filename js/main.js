@@ -923,6 +923,56 @@ function tntSelectionLabel() {
   return `${summary.count} layer${plural} \u00b7 ${breakdown}`;
 }
 
+// Colours per layer type, for the selection bar. Chosen to stay apart at a
+// glance rather than to match After Effects' label colours, which the user
+// reassigns freely and which say nothing about type.
+const TNT_LAYER_TYPE_COLORS = {
+  Text: "#d9a441",
+  Shape: "#68be82",
+  Null: "#9aa0a6",
+  Adjustment: "#c46fa8",
+  Camera: "#8f7ad6",
+  Light: "#e0d16a",
+  Solid: "#6894d6",
+  Layer: "#5f6b7a"
+};
+
+function tntLayerTypeColor(type) {
+  return TNT_LAYER_TYPE_COLORS[String(type || "Layer")] || "#6894d6";
+}
+
+// A proportional band per type, blended into its neighbour rather than butted
+// hard against it - the mix is the point, not the boundaries. Types are ordered
+// largest first so the bar reads the same way the chips below it do.
+function tntSelectionBarMarkup() {
+  const summary = tntSelectionSummary();
+  const names = Object.keys(summary.types)
+    .sort((a, b) => summary.types[b] - summary.types[a] || a.localeCompare(b));
+  if (!summary.count || !names.length) {
+    return `<div class="tnt-selection-bar empty" aria-hidden="true"></div>`;
+  }
+  const stops = [];
+  let at = 0;
+  names.forEach(name => {
+    const share = (summary.types[name] / summary.resolved) * 100;
+    const color = tntLayerTypeColor(name);
+    stops.push(`${color} ${at.toFixed(2)}%`);
+    at += share;
+    stops.push(`${color} ${at.toFixed(2)}%`);
+  });
+  const chips = names.map(name => {
+    const count = summary.types[name];
+    return `<span class="tnt-selection-chip" style="--tnt-chip: ${tntLayerTypeColor(name)}">` +
+      `${count} ${escapeHtml(name)}${count === 1 ? "" : "s"}</span>`;
+  }).join("");
+  const detail = names.map(name => `${summary.types[name]} ${name}`).join(" / ");
+  return `
+    <div class="tnt-selection-bar" style="background: linear-gradient(90deg, ${stops.join(", ")})" aria-hidden="true"></div>
+    <div class="tnt-selection-detail">${escapeHtml(detail)}</div>
+    <div class="tnt-selection-chips">${chips}</div>
+  `;
+}
+
 // Every panel shows it the same way: mark an element data-tnt-selection and it
 // is kept current from here, rather than each panel growing its own copy.
 function tntPaintSelectionReadouts(root) {
@@ -930,6 +980,11 @@ function tntPaintSelectionReadouts(root) {
   const label = tntSelectionLabel();
   scope.querySelectorAll("[data-tnt-selection]").forEach(el => {
     el.textContent = label;
+  });
+  // The richer variant: a proportional band per layer type, with a chip each.
+  const bar = tntSelectionBarMarkup();
+  scope.querySelectorAll("[data-tnt-selection-bar]").forEach(el => {
+    el.innerHTML = bar;
   });
 }
 
@@ -15307,6 +15362,7 @@ function ensureTnkPanel() {
         <div class="tnk-title"><b>TNK</b><span>Tools</span><em class="tnk-count"></em><em class="tnk-selection" data-tnt-selection></em></div>
         <button type="button" class="tnk-bar-btn" data-tnk-reset data-icon="ui.refresh" data-tooltip="Reset Parameters\nReturn every value in the bar to its default."></button>
       </header>
+      <div class="tnk-selection-panel" data-tnt-selection-bar></div>
       <div class="tnk-global-bar">${tnkParamBarMarkup()}</div>
       <div class="tnk-search-row">
         <input class="tnk-filter" type="text" spellcheck="false" autocomplete="off" placeholder="Filter tools">
