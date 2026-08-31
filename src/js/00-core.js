@@ -560,17 +560,23 @@ function showPanelTooltip(target, event) {
   // Two conventions on top of plain lines, so any panel can use them:
   //   data-tooltip-key="E"   a key chip beside the headline, drawn like the
   //                          badge on the button itself
+  //   data-tooltip-desc      what the tool does, set in italic under the
+  //                          headline and above the variations
   //   "- " line prefix       a bulleted variation rather than another
   //                          undifferentiated sentence
   // Everything is still escaped per line; neither convention accepts markup.
   const keyLabel = target && target.dataset ? (target.dataset.tooltipKey || "") : "";
+  const description = target && target.dataset ? (target.dataset.tooltipDesc || "") : "";
   const lines = String(text).split(/\n+/);
   el.innerHTML = lines.map((line, index) => {
     if (index === 0) {
       const chip = keyLabel
         ? `<kbd class="panel-tooltip-key">${escapeHtml(keyLabel)}</kbd>`
         : "";
-      return `<span class="panel-tooltip-line first">${escapeHtml(line)}${chip}</span>`;
+      const desc = description
+        ? `<span class="panel-tooltip-line desc">${escapeHtml(description)}</span>`
+        : "";
+      return `<span class="panel-tooltip-line first">${escapeHtml(line)}${chip}</span>${desc}`;
     }
     const bullet = /^-\s+/.test(line);
     return `<span class="panel-tooltip-line${bullet ? " bullet" : ""}">${escapeHtml(bullet ? line.replace(/^-\s+/, "") : line)}</span>`;

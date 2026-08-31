@@ -2048,3 +2048,13 @@ body.keyframe-mode .property-label-text,
   border-radius: 50%;
   background: rgba(233, 147, 96, .75);
 }
+
+/* What the tool does. Italic and indented to the bullets' text column, so it
+   reads as prose about the headline rather than as another option. */
+.panel-tooltip-line.desc {
+  margin: 2px 0 5px !important;
+  color: rgba(245, 245, 247, .62) !important;
+  font-style: italic !important;
+  line-height: 15px !important;
+  white-space: normal !important;
+}
