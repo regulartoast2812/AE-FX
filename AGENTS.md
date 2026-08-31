@@ -149,42 +149,34 @@ to go through a file: the loopback bridge runs helper-to-panel only, and
 ignored past ten seconds, so a scope left by a crash cannot hijack the next
 plain summon.
 
-### Custom shortcuts live inside the overlay
+### No keyboard event tap - deliberately
 
-They are **not** registered as global hot keys. `RegisterEventHotKey` claims a
-combination for the whole login session and swallows the keystroke before any
-frontmost check runs - so a binding would be eaten in every other application,
-not merely ignored there.
+The helper does **not** tap the keyboard, and should not be given one. A
+`CGEvent` keyboard tap sees every keystroke in every application; that is a
+keylogger-shaped capability, and it is too much to ask of a panel that trims
+layers. It was built once for plain `C` and again for Ctrl+Space, and removed
+both times.
 
-Ctrl+Space is the exception, and it goes through the key tap instead: it is
-claimed per keystroke, only while After Effects or the overlay is frontmost,
-and passes through everywhere else. **Without an Accessibility grant the tap
-cannot be created**, and it falls back to a Carbon hot key so the panel can
-always be summoned - swallowed session-wide, as before. `helper.log` says
-which of the two is in force on every launch.
+What that costs, and why it is the right trade:
 
-Making them behave would mean a `CGEvent` tap deciding per keystroke, which
-needs Accessibility permission and would put the summon hotkey behind a grant
-that lapses on every rebuild. Not worth it.
+- **Ctrl+Space is a Carbon hot key**, so macOS claims it for the whole login
+  session and it does not reach other applications - the input-source switcher
+  included. One key, one known cost.
+- **Plain, unmodified keys cannot be global at all.** RegisterEventHotKey would
+  make that character untypeable everywhere. `C` for TNK is therefore off the
+  table; it is Ctrl+D.
+- **Custom bindings are not global.** They live inside the overlay:
+  Ctrl+Space to summon, then the binding. `shortcutAllowedInEditable` lets a
+  modified user binding through even with the caret in the search box, which is
+  where it always sits on opening. Bare bindings stay blocked there so a single
+  letter is still typeable.
 
-So the flow is two steps and stays entirely inside the panel's own keyboard
-handling: **Ctrl+Space to summon, then the binding.** In the overlay,
-`shortcutAllowedInEditable` lets any modified user binding through even though
-the caret sits in the search box - which is where it always sits on opening.
-Bare bindings stay blocked there so a single letter is still typeable.
+The only tap left is on `rightMouseDown`, for the control-right-click layer
+menu. It predates this work and reads mouse events, not keystrokes.
 
 ### On hold
 
-- **Plain `C` opens TNK** - built and shipped, but inert until the helper is
-  granted Accessibility. `CGEvent.tapCreate` returns nil without it, silently.
-  The grant is bound to the code signature, so **every rebuild of the helper
-  drops it** and it has to be re-granted (remove and re-add the app in System
-  Settings > Privacy & Security > Accessibility; a stale entry matches the old
-  signature and will not take). The same grant covers control-right-click.
-  `Ctrl+D` needs none of this - Carbon hotkeys are not gated.
-  Permanent fix, if it becomes tiresome: sign with a stable identity instead of
-  the ad-hoc signature `scripts/build-native-helper.sh` uses now.
-  Check state after any rebuild: `cat ~/.ae-fx-quick-controls/helper.log`
+- (Plain `C` for TNK was removed - see the keyboard tap note above.)
 
 
 - Panel-owned shortcuts must be consumed inside the CEP panel.
