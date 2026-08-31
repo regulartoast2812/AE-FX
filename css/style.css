@@ -9349,8 +9349,6 @@ header {
   min-width: 0;
 }
 
-/* Only the Distribute sub-heading uses this now - Anchor and Align moved to
-   the shared .tnt-card-head component. */
 .anchor-section-title {
   margin: 0 0 10px;
   color: rgba(235,235,245,.42);
@@ -10589,6 +10587,20 @@ body.keyframe-mode .track-label {
 
 .anchor-align-target-flash {
   animation: tntAlignTargetFlash 420ms ease-out;
+}
+
+/* The live count rides the existing uppercase label rather than a taller
+   header. Align needs two layers and distribute three, so the number explains
+   a refusal before it happens - but it does not need 42px of chrome to say so.
+   The shared .tnt-card-head component stays available for the A/O merge. */
+.anchor-section-title em {
+  margin-left: 6px;
+  color: rgba(235, 235, 245, .3);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
 }
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {

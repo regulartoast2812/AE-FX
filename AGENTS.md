@@ -92,11 +92,17 @@ layers, one in the scene and one in the timeline, and they get used in and
 around each other. Done a step at a time so the halves never look unrelated.
 
 Done:
-- One shared card header, `.tnt-card-head` / `.tnt-card-title`. A had a plain
-  uppercase label, O a lettered badge with a live count; they now use the same
-  component. O keeps its old class names alongside, so it did not change.
-- A gained the header count. Align needs two layers and distribute three, so
-  the number explains a refusal before it happens.
+- `.tnt-card-head` / `.tnt-card-title` exists as a shared component and O uses
+  it. **A does not.** Putting it on A was tried and reverted: a 42px serif
+  header with a badge doubled the height of a label that had been 11px, and
+  inflated a panel whose whole appeal is that it is small. The component stays
+  available, but adopting it is not the way to make these two look related.
+- A gained the live selection count, on its existing small label. Align needs
+  two layers and distribute three, so the number explains a refusal before it
+  happens - without 42px of chrome to say so.
+
+Lesson for the remaining steps: **make O lighter rather than making A heavier.**
+A is the compact one and that is the thing worth keeping.
 
 Remaining, in the order they show:
 1. **A's sections have no card shell.** O's cards carry a border, background
