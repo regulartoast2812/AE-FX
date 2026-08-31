@@ -961,8 +961,8 @@ function tntSelectionBarCompactMarkup() {
     const count = summary.types[name];
     const share = (summary.types[name] / summary.resolved) * 100;
     const label = `${count} ${name}${count === 1 ? "" : "s"}`;
-    return `<span class="tnt-selection-band" style="flex: ${share.toFixed(3)} 1 0; --tnt-band: ${tntLayerTypeColor(name)}" title="${escapeHtml(label)}">` +
-      `<span class="tnt-selection-band-label">${escapeHtml(label)}</span></span>`;
+    return `<button type="button" class="tnt-selection-band" data-tnt-select-type="${escapeHtml(name)}" style="flex: ${share.toFixed(3)} 1 0; --tnt-band: ${tntLayerTypeColor(name)}" data-tooltip="${escapeHtml(label)}\n- Click to keep only these in the selection">` +
+      `<span class="tnt-selection-band-label">${escapeHtml(label)}</span></button>`;
   }).join("") + `</span>`;
 }
 
@@ -995,9 +995,41 @@ function tntSelectionBarMarkup() {
   `;
 }
 
+// Clicking a band narrows the After Effects selection to that type. The bar
+// stops being a readout and becomes the fastest way to say "just the shapes".
+async function tntSelectOnlyLayerType(type) {
+  const wanted = String(type || "");
+  if (!wanted) return;
+  const indices = (state.layers || [])
+    .filter(layer => String(layer.type || "Layer") === wanted)
+    .map(layer => Number(layer.index))
+    .filter(index => index >= 1);
+  const selected = (state.selectedLayerIndices || []).map(Number);
+  // Only ever narrows what is already selected - a band describes the
+  // selection, so acting on it must not reach outside it.
+  const next = indices.filter(index => selected.indexOf(index) >= 0);
+  if (!next.length) return;
+  if (typeof setSelectedLayers === "function") await setSelectedLayers(next, false);
+  tntPaintSelectionReadouts(document);
+}
+
 // Every panel shows it the same way: mark an element data-tnt-selection and it
 // is kept current from here, rather than each panel growing its own copy.
+let tntSelectionBandsBound = false;
+function tntBindSelectionBands() {
+  if (tntSelectionBandsBound) return;
+  tntSelectionBandsBound = true;
+  document.addEventListener("click", event => {
+    const band = event.target.closest && event.target.closest("[data-tnt-select-type]");
+    if (!band) return;
+    event.preventDefault();
+    event.stopPropagation();
+    tntSelectOnlyLayerType(band.dataset.tntSelectType);
+  }, true);
+}
+
 function tntPaintSelectionReadouts(root) {
+  tntBindSelectionBands();
   const scope = root || document;
   const label = tntSelectionLabel();
   scope.querySelectorAll("[data-tnt-selection]").forEach(el => {

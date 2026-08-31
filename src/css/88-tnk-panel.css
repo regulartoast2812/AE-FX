@@ -313,9 +313,9 @@
 .tnt-selection-strip {
   display: flex;
   flex: 1 1 auto;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
-  height: 22px;
+  height: 21px;
 }
 
 .tnt-selection-strip.empty {
@@ -324,18 +324,46 @@
   font-size: 11px;
 }
 
+/* Tinted rather than filled. At full saturation three bands across the header
+   shouted louder than anything in the panel they describe; this reads as a
+   quiet chart with a coloured edge, and the text stays legible on the panel's
+   own background instead of on a slab of colour. */
 .tnt-selection-band {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 0;
+  padding: 0;
   overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--tnt-band, #6894d6) 45%, transparent);
   border-radius: 5px;
-  background: var(--tnt-band, #6894d6);
-  color: rgba(12, 13, 14, .84);
+  background: color-mix(in srgb, var(--tnt-band, #6894d6) 15%, transparent);
+  color: rgba(245, 245, 247, .82);
+  font: inherit;
   font-size: 10.5px;
   font-weight: 600;
   white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+/* A 2px bar of the real colour, so the type is still identifiable at a glance
+   when the fill is this quiet. */
+.tnt-selection-band::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--tnt-band, #6894d6);
+}
+
+.tnt-selection-band:hover {
+  border-color: color-mix(in srgb, var(--tnt-band, #6894d6) 85%, transparent);
+  background: color-mix(in srgb, var(--tnt-band, #6894d6) 28%, transparent);
+  color: #fff;
 }
 
 .tnt-selection-band-label {
