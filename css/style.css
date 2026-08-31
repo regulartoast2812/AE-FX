@@ -19375,3 +19375,10 @@ body.quick-panel-mode .timing-order-layout {
 .quick-panel-search-result.unmet {
   opacity: .45;
 }
+
+/* While a pick is pending the search is choosing, not running. The border says
+   so, since the list looks identical either way. */
+.quick-panel-shell.picking .quick-panel-search-row,
+.quick-panel-shell.picking input[type="text"] {
+  border-color: rgba(233, 147, 96, .6);
+}

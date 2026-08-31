@@ -13043,10 +13043,52 @@ function resetQuickPanelSearch() {
   renderQuickPanelSearchResults();
 }
 
+// Picking a command, using the quick panel's own search rather than a text
+// field. It is the real list - icons, tags, shortcuts, the same navigation -
+// so choosing a command to bind is the same act as running one.
+//
+// While a pick is pending the search does not execute what you activate; it
+// hands the name back to whoever asked and restores what was on screen.
+let quickPanelPickRequest = null;
+
+function quickPanelPickCommand(prompt) {
+  if (!QUICK_PANEL_MODE || !quickPanelSearchEl) return Promise.resolve("");
+  return new Promise(resolve => {
+    quickPanelPickRequest = { resolve, prompt: String(prompt || "Pick a command") };
+    closeNativeQuickPanelSurfaces();
+    document.body.classList.remove("quick-subpanel-open");
+    quickPanelSearchParentEntry = null;
+    quickPanelSearchSelectedIndex = 0;
+    quickPanelSearchEl.value = "";
+    quickPanelSearchEl.placeholder = quickPanelPickRequest.prompt;
+    if (quickPanelShellEl) quickPanelShellEl.classList.add("picking");
+    renderQuickPanelSearchResults();
+    quickPanelSearchEl.focus();
+    scheduleNativeQuickPanelResize(0);
+  });
+}
+
+function quickPanelFinishPick(name) {
+  const request = quickPanelPickRequest;
+  quickPanelPickRequest = null;
+  if (quickPanelShellEl) quickPanelShellEl.classList.remove("picking");
+  if (quickPanelSearchEl) {
+    quickPanelSearchEl.value = "";
+    quickPanelSearchEl.placeholder = "Search commands or effects";
+  }
+  renderQuickPanelSearchResults();
+  if (request) request.resolve(String(name || ""));
+}
+
 async function applyQuickPanelSearchEntry(index = quickPanelSearchSelectedIndex) {
   const entries = quickPanelSearchEntries();
   const entry = entries[Math.max(0, Math.min(Number(index || 0), entries.length - 1))];
   if (!entry) return;
+  // A pending pick takes the name instead of running anything.
+  if (quickPanelPickRequest) {
+    quickPanelFinishPick(entry.name || "");
+    return;
+  }
   // A group parent does not run anything - it writes its scope token into the
   // search box and leaves the caret after it, so the next keystroke narrows
   // within the group. Same box, same keys, no separate mode.
@@ -13290,6 +13332,12 @@ if (quickPanelShellEl) {
         return;
       }
       if (event.key === "Escape") {
+        if (quickPanelPickRequest) {
+          event.preventDefault();
+          event.stopPropagation();
+          quickPanelFinishPick("");
+          return;
+        }
         if (quickPanelSearchParentEntry) {
           event.preventDefault();
           event.stopPropagation();
@@ -15226,6 +15274,9 @@ const TNK_GROUPS = [
       command: "Duplicate Selected Layers" },
     { label: "Split", icon: "split", desc: "Splits the selected layers at the playhead into two layers.",
       command: "Split Selected Layers" },
+    { label: "Track Matte", icon: "layers-2",
+      desc: "Sets the layer above as an alpha track matte. Shift also parents it; Alt breaks an existing matte.",
+      command: "Apply Alpha Track Matte", shift: "Apply Matte + Parent", alt: "Break Track Matte" },
     { label: "Null", icon: "square-dashed", desc: "Creates a null at the centre of the composition.",
       command: "Create Null", shift: "Parent to Null" }
   ] },
@@ -15665,6 +15716,15 @@ function tnkCaptureKeydown(event) {
 // Pick a command by name. The registry is the list, so anything the panel can
 // run can be put in a group or put behind a button.
 async function tnkPickCommand(title, current) {
+  // In the overlay, pick from the quick panel's own list - the real thing,
+  // with icons, tags and shortcuts - rather than typing a name into a box.
+  if (typeof quickPanelPickCommand === "function" && QUICK_PANEL_MODE) {
+    hideTnkPanel();
+    const picked = await quickPanelPickCommand(title);
+    showTnkPanel();
+    return picked;
+  }
+  // Docked panel: no quick panel to borrow, so fall back to a typed name.
   const names = Array.from(tnkEntryIndex().keys()).sort();
   const response = await showTntCommandDialog({
     title,
@@ -15675,11 +15735,7 @@ async function tnkPickCommand(title, current) {
   if (!response) return "";
   const wanted = String(response.values.command || "").trim();
   if (!wanted) return "";
-  const index = tnkEntryIndex();
-  if (index.has(wanted)) return wanted;
-  // Fall back to a unique case-insensitive match, so typing most of a name works.
-  const hits = names.filter(name => name.toLowerCase() === wanted.toLowerCase()) ;
-  if (hits.length === 1) return hits[0];
+  if (names.indexOf(wanted) >= 0) return wanted;
   const partial = names.filter(name => name.toLowerCase().indexOf(wanted.toLowerCase()) >= 0);
   if (partial.length === 1) return partial[0];
   if (statusEl) statusEl.textContent = `No single command matches "${wanted}".`;

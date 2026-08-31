@@ -89,6 +89,9 @@ const TNK_GROUPS = [
       command: "Duplicate Selected Layers" },
     { label: "Split", icon: "split", desc: "Splits the selected layers at the playhead into two layers.",
       command: "Split Selected Layers" },
+    { label: "Track Matte", icon: "layers-2",
+      desc: "Sets the layer above as an alpha track matte. Shift also parents it; Alt breaks an existing matte.",
+      command: "Apply Alpha Track Matte", shift: "Apply Matte + Parent", alt: "Break Track Matte" },
     { label: "Null", icon: "square-dashed", desc: "Creates a null at the centre of the composition.",
       command: "Create Null", shift: "Parent to Null" }
   ] },
@@ -528,6 +531,15 @@ function tnkCaptureKeydown(event) {
 // Pick a command by name. The registry is the list, so anything the panel can
 // run can be put in a group or put behind a button.
 async function tnkPickCommand(title, current) {
+  // In the overlay, pick from the quick panel's own list - the real thing,
+  // with icons, tags and shortcuts - rather than typing a name into a box.
+  if (typeof quickPanelPickCommand === "function" && QUICK_PANEL_MODE) {
+    hideTnkPanel();
+    const picked = await quickPanelPickCommand(title);
+    showTnkPanel();
+    return picked;
+  }
+  // Docked panel: no quick panel to borrow, so fall back to a typed name.
   const names = Array.from(tnkEntryIndex().keys()).sort();
   const response = await showTntCommandDialog({
     title,
@@ -538,11 +550,7 @@ async function tnkPickCommand(title, current) {
   if (!response) return "";
   const wanted = String(response.values.command || "").trim();
   if (!wanted) return "";
-  const index = tnkEntryIndex();
-  if (index.has(wanted)) return wanted;
-  // Fall back to a unique case-insensitive match, so typing most of a name works.
-  const hits = names.filter(name => name.toLowerCase() === wanted.toLowerCase()) ;
-  if (hits.length === 1) return hits[0];
+  if (names.indexOf(wanted) >= 0) return wanted;
   const partial = names.filter(name => name.toLowerCase().indexOf(wanted.toLowerCase()) >= 0);
   if (partial.length === 1) return partial[0];
   if (statusEl) statusEl.textContent = `No single command matches "${wanted}".`;
