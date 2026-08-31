@@ -10676,93 +10676,58 @@ body.keyframe-mode .track-label {
 }
 
 /* Layout panel geometry.
-   All five sections run side by side in one row: anchor, align, then the three
-   timing cards. Two rows put the timing half below the fold and made the panel
-   taller than the overlay it lives in.
 
-   The row does not wrap and the cards may shrink - their standalone
-   min-widths (300/330/340) are what pushed the sheet past the dialog and left
-   content painting outside it. */
-.anchor-dialog:has(.timing-order-backdrop.embedded) {
+   Five sections in one row: anchor, align, stagger, layer order, pull/snap.
+   The class is set in JS rather than matched with :has(), which CEP's Chromium
+   is too old to support - every :has() rule here was inert inside After
+   Effects while working perfectly in a current browser, which is why the panel
+   looked right in testing and wrong in use. */
+.anchor-panel.layout-panel {
+  display: flex !important;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 16px !important;
+}
+
+.anchor-dialog.layout-dialog {
   width: min(1280px, calc(100vw - 40px)) !important;
   max-width: none !important;
 }
 
-/* Docked only. In the overlay the anchor dialog is a bare wrapper - its child
-   sections carry the shadow and the fill - so painting the wrapper put a large
-   opaque rectangle behind five boxes that already had their own. */
-body:not(.quick-panel-mode) .anchor-dialog:has(.timing-order-backdrop.embedded) {
+body:not(.quick-panel-mode) .anchor-dialog.layout-dialog {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .012) 40%, rgba(0, 0, 0, .12)),
     #1c1d1f !important;
 }
 
-/* The 40px shadow gutter is for a backdrop that fills the window. Embedded,
-   this element is a column in a row, and that padding pushed the three timing
-   sections 40px below anchor and align.
-   Written with the body class because the gutter rule carries one too and
-   lands later in the bundle - equal specificity would have lost. */
-body.quick-panel-mode .timing-order-backdrop.embedded,
-.timing-order-backdrop.embedded {
+body.quick-panel-mode .anchor-dialog.layout-dialog {
   padding: 0 !important;
 }
 
-/* Same reason: the wrapper's own gutter padding made the overlay window 80px
-   wider and taller than the sections inside it. */
-body.quick-panel-mode .anchor-dialog:has(.timing-order-backdrop.embedded) {
-  padding: 0 !important;
-}
-
-.anchor-panel:has(.timing-order-backdrop.embedded) {
-  display: flex !important;
-  flex-wrap: nowrap;
-  align-items: flex-start;
-  /* Three earlier .anchor-panel rules set gap with !important - 10, 10 and 12 -
-     so the outer spacing came out 12 while the nested cards used 16 and the row
-     read as unevenly spaced. */
-  gap: 16px !important;
-  /* No height cap. The tallest column - Layer Order, nine buttons - decides
-     the panel height, and capping it let the columns paint past the dialog's
-     own background onto the list behind. The overlay sizes itself to the
-     content anyway. */
-  align-content: flex-start;
-}
-
-.anchor-panel:has(.timing-order-backdrop.embedded) > .anchor-section {
+.anchor-panel.layout-panel > .anchor-section {
   flex: 0 0 auto;
 }
 
-.anchor-panel:has(.timing-order-backdrop.embedded) > .anchor-section.anchor-align-section {
+.anchor-panel.layout-panel > .anchor-section.anchor-align-section {
   flex: 0 0 240px;
 }
 
-.timing-order-backdrop.embedded {
-  flex: 1 1 0 !important;
+/* The three sections, side by side, sharing the row's spacing. */
+.anchor-timing-sections {
+  display: flex;
+  flex: 1 1 0;
+  gap: 16px;
   min-width: 0;
 }
 
-/* Three columns that may all shrink, rather than a fixed 1120px sheet. */
-.timing-order-backdrop.embedded .timing-order-layout {
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  width: 100% !important;
-  /* The same 16px the outer row uses, so the gap between Align and Stagger
-     matches the gap between Stagger and Layer Order. A nested container with
-     its own spacing is what made them uneven. */
-  gap: 16px;
-  margin: 0 !important;
-  align-items: start;
+.anchor-timing-sections > .timing-order-card {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
-.timing-order-backdrop.embedded .timing-order-card {
-  min-width: 0 !important;
-}
-
-/* The migrated cards take the anchor/align box exactly - same padding, border,
-   radius and fill. Matching that look meant matching its rectangle, not
-   removing every shell: stripped bare, the three timing sections floated in the
-   panel while anchor and align sat in boxes beside them. */
-.anchor-panel .timing-order-card {
-  overflow: visible !important;
+/* Same box as anchor and align, taken from their rule rather than approximated. */
+.anchor-timing-sections .timing-order-card {
+  overflow: visible;
   padding: 10px !important;
   border: 1px solid rgba(255, 255, 255, .085) !important;
   border-radius: var(--tnt-radius-panel) !important;
@@ -10774,15 +10739,7 @@ body.quick-panel-mode .anchor-dialog:has(.timing-order-backdrop.embedded) {
   -webkit-backdrop-filter: none !important;
 }
 
-/* The inner card that Pull/Snap draws around its own two groups would be a box
-   inside a box now. */
-.timing-order-backdrop.embedded .timing-snap-pull-card .timing-order-field {
-  padding: 0 !important;
-  border: 0 !important;
-  background: none !important;
-}
-
-.timing-order-backdrop.embedded .timing-order-head {
+.anchor-timing-sections .timing-order-head {
   min-height: 0 !important;
   padding: 0 !important;
   border: 0 !important;
@@ -10790,8 +10747,7 @@ body.quick-panel-mode .anchor-dialog:has(.timing-order-backdrop.embedded) {
   margin-bottom: 8px;
 }
 
-/* Same 9px uppercase label the anchor and align sections use. */
-.timing-order-backdrop.embedded .timing-order-title {
+.anchor-timing-sections .timing-order-title {
   gap: 6px;
   font-family: inherit !important;
   font-size: 9px !important;
@@ -10801,73 +10757,44 @@ body.quick-panel-mode .anchor-dialog:has(.timing-order-backdrop.embedded) {
   color: rgba(235, 235, 245, .42);
 }
 
-/* The lettered badge belongs to the floating card, not to a section label. */
-.timing-order-backdrop.embedded .timing-order-title b {
+.anchor-timing-sections .timing-order-title b {
   display: none !important;
 }
 
-.timing-order-backdrop.embedded .timing-order-title em {
+.anchor-timing-sections .timing-order-title em {
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 0;
   text-transform: none;
 }
 
-.timing-order-backdrop.embedded .timing-order-body {
+.anchor-timing-sections .timing-order-body {
   padding: 0 !important;
+  gap: 12px;
 }
 
-/* The timing cards were laid out for a 1120px sheet, so their inner rows are
-   single-line and clip at a third of that. Embedded, they wrap. */
-.timing-order-backdrop.embedded .timing-amount-row,
-.timing-order-backdrop.embedded .timing-execute-actions,
-.timing-order-backdrop.embedded .timing-order-segmented {
-  flex-wrap: wrap;
+.anchor-timing-sections .timing-order-field {
+  gap: 6px;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
 }
 
-.timing-order-backdrop.embedded .timing-amount-row > * {
-  min-width: 0;
+.anchor-timing-sections .timing-order-field > span {
+  font-size: 9.5px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: rgba(235, 235, 245, .34);
 }
 
-.timing-order-backdrop.embedded .timing-amount-range {
-  flex: 1 1 100%;
-  min-width: 0;
-}
-
-.timing-order-backdrop.embedded .timing-amount-input,
-.timing-order-backdrop.embedded .timing-group-input {
-  width: 54px;
-  min-width: 0;
-}
-
-.timing-order-backdrop.embedded .timing-group-control {
-  flex: 0 1 auto;
-  min-width: 0;
-}
-
-/* The unit toggle is the last thing on the row and the 5px that would not
-   fit. Given its own line it stops being the deciding factor. */
-.timing-order-backdrop.embedded .timing-unit {
-  flex: 0 0 auto;
-  margin-left: auto;
-}
-
-.timing-order-backdrop.embedded .timing-execute-actions > button {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-/* Embedded, the timing controls are icon buttons - the same 26px square the
-   align grid uses. They were two lines of prose each ("Bottom up / Stagger
-   upward"), which is why three sections filled a 1280px panel and still had
-   room to spare. The words live in the tooltip, which is instant. */
-.timing-order-backdrop.embedded .timing-execute-actions {
+/* Icon buttons, the same 26px square the align grid uses. */
+.anchor-timing-sections .timing-execute-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
 }
 
-.timing-order-backdrop.embedded .timing-execute-actions > button {
+.anchor-timing-sections .timing-execute-actions > button {
   display: grid;
   box-sizing: border-box;
   width: 26px;
@@ -10883,25 +10810,24 @@ body.quick-panel-mode .anchor-dialog:has(.timing-order-backdrop.embedded) {
   font-size: 0;
 }
 
-.timing-order-backdrop.embedded .timing-execute-actions > button:hover:not(:disabled) {
+.anchor-timing-sections .timing-execute-actions > button:hover:not(:disabled) {
   border-color: rgba(217, 119, 66, .36);
   background: rgba(217, 119, 66, .13);
   color: #fff;
 }
 
-.timing-order-backdrop.embedded .timing-execute-actions > button.active {
+.anchor-timing-sections .timing-execute-actions > button.active {
   border-color: rgba(217, 119, 66, .5);
   background: rgba(217, 119, 66, .2);
   color: #fff;
 }
 
-/* The label text is the tooltip's job now. */
-.timing-order-backdrop.embedded .timing-execute-actions > button strong,
-.timing-order-backdrop.embedded .timing-execute-actions > button span {
+.anchor-timing-sections .timing-execute-actions > button strong,
+.anchor-timing-sections .timing-execute-actions > button span {
   display: none;
 }
 
-.timing-order-backdrop.embedded .timing-execute-actions svg {
+.anchor-timing-sections .timing-execute-actions svg {
   width: 15px;
   height: 15px;
   fill: none;
@@ -10911,27 +10837,31 @@ body.quick-panel-mode .anchor-dialog:has(.timing-order-backdrop.embedded) {
   stroke-linejoin: round;
 }
 
-/* Field labels shrink to match the section labels above them. */
-.timing-order-backdrop.embedded .timing-order-field > span {
-  font-size: 9.5px;
-  letter-spacing: .05em;
-  text-transform: uppercase;
-  color: rgba(235, 235, 245, .34);
+.anchor-timing-sections .timing-amount-row {
+  flex-wrap: wrap;
 }
 
-.timing-order-backdrop.embedded .timing-order-field {
-  gap: 6px;
+.anchor-timing-sections .timing-amount-row > * {
+  min-width: 0;
 }
 
-.timing-order-backdrop.embedded .timing-order-body {
-  gap: 12px;
+.anchor-timing-sections .timing-amount-range {
+  flex: 1 1 100%;
+  min-width: 0;
 }
 
-/* Pull/Snap keeps words - In and Out on a matrix of rows are not iconifiable
-   without inventing a code the user has to learn - but loses the padding of a
-   dialog button. */
-.timing-order-backdrop.embedded .timing-snap-grid button,
-.timing-order-backdrop.embedded .timing-snap-pull-card button {
+.anchor-timing-sections .timing-amount-input,
+.anchor-timing-sections .timing-group-input {
+  width: 54px;
+  min-width: 0;
+}
+
+.anchor-timing-sections .timing-unit {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.anchor-timing-sections .timing-snap-pull-card button {
   min-height: 0;
   padding: 5px 8px;
   font-size: 10.5px;

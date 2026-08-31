@@ -27,8 +27,139 @@ function timingOrderStaggerCount() {
   return timingOrderStaggerTarget() === "keyframes" ? timingOrderSelectedKeyCount() : timingOrderSelectedCount();
 }
 
+// Handlers, tooltips and icons. Shared by both hosts: the Layout panel's own
+// sections and the standalone backdrop.
+function bindTimingOrderPanel() {
+  if (typeof tntPaintDeclaredIcons === "function") tntPaintDeclaredIcons(timingOrderBackdropEl);
+  timingOrderBackdropEl.querySelectorAll("[data-tooltip]").forEach(control => {
+    control.setAttribute("aria-label", control.dataset.tooltip.replace(/\n+/g, ". "));
+    bindPanelTooltip(control);
+  });
+  // In the Layout panel the sections are direct children - there is no
+  // .timing-order-layout wrapper - so the host element is the listener target.
+  const layoutEl = timingOrderBackdropEl.querySelector(".timing-order-layout") || timingOrderBackdropEl;
+  layoutEl.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof hideAnchorDialog === "function") hideAnchorDialog();
+      focusPanel(2);
+    }
+  });
+  layoutEl.addEventListener("click", event => {
+    const staggerExecute = event.target.closest && event.target.closest("[data-stagger-execute]");
+    if (staggerExecute && !staggerExecute.disabled) {
+      timingOrderDirection = staggerExecute.dataset.staggerExecute || "";
+      captureTimingOrderBaseline();
+      renderTimingOrderPanel();
+      return;
+    }
+    const unit = event.target.closest && event.target.closest("[data-timing-unit]");
+    if (unit) {
+      const previousUnit = timingOrderUnit;
+      const nextUnit = unit.dataset.timingUnit || "frames";
+      const amountInput = timingOrderBackdropEl.querySelector(".timing-amount-input");
+      const amountRange = timingOrderBackdropEl.querySelector(".timing-amount-range");
+      const fps = Math.max(1, Number(state.comp && state.comp.frameRate || 30));
+      const currentAmount = Math.max(0, Number(amountInput.value || 0));
+      timingOrderUnit = nextUnit;
+      const seconds = nextUnit === "seconds";
+      const convertedAmount = previousUnit === nextUnit
+        ? currentAmount
+        : (seconds ? currentAmount / fps : currentAmount * fps);
+      amountInput.step = seconds ? "0.05" : "1";
+      amountRange.max = seconds ? "5" : "60";
+      amountRange.step = seconds ? "0.05" : "1";
+      amountInput.value = seconds
+        ? String(Math.round(convertedAmount * 100) / 100)
+        : String(Math.round(convertedAmount));
+      amountRange.value = amountInput.value;
+      updateTimingOrderRangeFill();
+      renderTimingOrderPanel();
+      scheduleTimingStaggerApply();
+      return;
+    }
+    const directionButton = event.target.closest && event.target.closest("[data-order-direction]");
+    if (directionButton) {
+      layerOrderDirection = directionButton.dataset.orderDirection || "asc";
+      renderTimingOrderPanel();
+      return;
+    }
+    const sortExecute = event.target.closest && event.target.closest("[data-order-sort]");
+    if (sortExecute && !sortExecute.disabled) {
+      runLayerOrderPanelAction(sortExecute.dataset.orderSort || "");
+      return;
+    }
+    const stackExecute = event.target.closest && event.target.closest("[data-order-stack]");
+    if (stackExecute && !stackExecute.disabled) {
+      runLayerStackPanelAction(stackExecute.dataset.orderStack || "");
+      return;
+    }
+    const pullLayer = event.target.closest && event.target.closest("[data-pull-layer]");
+    if (pullLayer && !pullLayer.disabled) {
+      runSnapPullPanelAction("pull", "layer", pullLayer.dataset.pullLayer || "in");
+      return;
+    }
+    const snapLayer = event.target.closest && event.target.closest("[data-snap-layer]");
+    if (snapLayer && !snapLayer.disabled) {
+      runSnapPullPanelAction("snap", "layer", snapLayer.dataset.snapLayer || "in");
+      return;
+    }
+    const snapKeys = event.target.closest && event.target.closest("[data-snap-keyframes]");
+    if (snapKeys && !snapKeys.disabled) {
+      runSnapPullPanelAction("snap", "keyframes", snapKeys.dataset.snapKeyframes || "first", { scope: snapKeys.dataset.keyScope || "layer" });
+    }
+  });
+  const amountRange = timingOrderBackdropEl.querySelector(".timing-amount-range");
+  const amountInput = timingOrderBackdropEl.querySelector(".timing-amount-input");
+  const groupInput = timingOrderBackdropEl.querySelector(".timing-group-input");
+  amountRange.addEventListener("input", () => {
+    amountInput.value = amountRange.value;
+    updateTimingOrderRangeFill();
+    scheduleTimingStaggerApply();
+  });
+  amountRange.addEventListener("change", () => {
+    scheduleTimingStaggerApply({ immediate: true });
+  });
+  amountInput.addEventListener("input", () => {
+    let value = Number(amountInput.value || 0);
+    if (!Number.isFinite(value)) value = 0;
+    if (value > Number(amountRange.max)) amountRange.max = String(value);
+    amountRange.value = String(Math.max(0, value));
+    updateTimingOrderRangeFill();
+    scheduleTimingStaggerApply();
+  });
+  amountInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      scheduleTimingStaggerApply({ immediate: true });
+    }
+  });
+  groupInput.addEventListener("input", () => {
+    let value = Math.round(Number(groupInput.value || 1));
+    if (!Number.isFinite(value) || value < 1) value = 1;
+    groupInput.value = String(value);
+    scheduleTimingStaggerApply();
+  });
+  groupInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      scheduleTimingStaggerApply({ immediate: true });
+    }
+  });
+}
+
 function ensureTimingOrderPanel() {
   if (timingOrderBackdropEl) return timingOrderBackdropEl;
+  // These sections are part of the Layout panel and live in index.html, so
+  // there is no backdrop to build - only handlers to bind. The variable keeps
+  // its name because the panel's 32 element lookups go through it.
+  const inPanel = document.getElementById("anchorTimingSections");
+  if (inPanel) {
+    timingOrderBackdropEl = inPanel;
+    bindTimingOrderPanel();
+    return timingOrderBackdropEl;
+  }
   timingOrderBackdropEl = document.createElement("div");
   timingOrderBackdropEl.className = "timing-order-backdrop";
   timingOrderBackdropEl.setAttribute("aria-hidden", "true");
@@ -141,121 +272,7 @@ function ensureTimingOrderPanel() {
     </div>
   `;
   document.body.appendChild(timingOrderBackdropEl);
-  if (typeof tntPaintDeclaredIcons === "function") tntPaintDeclaredIcons(timingOrderBackdropEl);
-  timingOrderBackdropEl.querySelectorAll("[data-tooltip]").forEach(control => {
-    control.setAttribute("aria-label", control.dataset.tooltip.replace(/\n+/g, ". "));
-    bindPanelTooltip(control);
-  });
-  const layoutEl = timingOrderBackdropEl.querySelector(".timing-order-layout");
-  layoutEl.addEventListener("keydown", event => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      event.stopPropagation();
-      if (typeof hideAnchorDialog === "function") hideAnchorDialog();
-      focusPanel(2);
-    }
-  });
-  layoutEl.addEventListener("click", event => {
-    const staggerExecute = event.target.closest && event.target.closest("[data-stagger-execute]");
-    if (staggerExecute && !staggerExecute.disabled) {
-      timingOrderDirection = staggerExecute.dataset.staggerExecute || "";
-      captureTimingOrderBaseline();
-      renderTimingOrderPanel();
-      return;
-    }
-    const unit = event.target.closest && event.target.closest("[data-timing-unit]");
-    if (unit) {
-      const previousUnit = timingOrderUnit;
-      const nextUnit = unit.dataset.timingUnit || "frames";
-      const amountInput = timingOrderBackdropEl.querySelector(".timing-amount-input");
-      const amountRange = timingOrderBackdropEl.querySelector(".timing-amount-range");
-      const fps = Math.max(1, Number(state.comp && state.comp.frameRate || 30));
-      const currentAmount = Math.max(0, Number(amountInput.value || 0));
-      timingOrderUnit = nextUnit;
-      const seconds = nextUnit === "seconds";
-      const convertedAmount = previousUnit === nextUnit
-        ? currentAmount
-        : (seconds ? currentAmount / fps : currentAmount * fps);
-      amountInput.step = seconds ? "0.05" : "1";
-      amountRange.max = seconds ? "5" : "60";
-      amountRange.step = seconds ? "0.05" : "1";
-      amountInput.value = seconds
-        ? String(Math.round(convertedAmount * 100) / 100)
-        : String(Math.round(convertedAmount));
-      amountRange.value = amountInput.value;
-      updateTimingOrderRangeFill();
-      renderTimingOrderPanel();
-      scheduleTimingStaggerApply();
-      return;
-    }
-    const directionButton = event.target.closest && event.target.closest("[data-order-direction]");
-    if (directionButton) {
-      layerOrderDirection = directionButton.dataset.orderDirection || "asc";
-      renderTimingOrderPanel();
-      return;
-    }
-    const sortExecute = event.target.closest && event.target.closest("[data-order-sort]");
-    if (sortExecute && !sortExecute.disabled) {
-      runLayerOrderPanelAction(sortExecute.dataset.orderSort || "");
-      return;
-    }
-    const stackExecute = event.target.closest && event.target.closest("[data-order-stack]");
-    if (stackExecute && !stackExecute.disabled) {
-      runLayerStackPanelAction(stackExecute.dataset.orderStack || "");
-      return;
-    }
-    const pullLayer = event.target.closest && event.target.closest("[data-pull-layer]");
-    if (pullLayer && !pullLayer.disabled) {
-      runSnapPullPanelAction("pull", "layer", pullLayer.dataset.pullLayer || "in");
-      return;
-    }
-    const snapLayer = event.target.closest && event.target.closest("[data-snap-layer]");
-    if (snapLayer && !snapLayer.disabled) {
-      runSnapPullPanelAction("snap", "layer", snapLayer.dataset.snapLayer || "in");
-      return;
-    }
-    const snapKeys = event.target.closest && event.target.closest("[data-snap-keyframes]");
-    if (snapKeys && !snapKeys.disabled) {
-      runSnapPullPanelAction("snap", "keyframes", snapKeys.dataset.snapKeyframes || "first", { scope: snapKeys.dataset.keyScope || "layer" });
-    }
-  });
-  const amountRange = timingOrderBackdropEl.querySelector(".timing-amount-range");
-  const amountInput = timingOrderBackdropEl.querySelector(".timing-amount-input");
-  const groupInput = timingOrderBackdropEl.querySelector(".timing-group-input");
-  amountRange.addEventListener("input", () => {
-    amountInput.value = amountRange.value;
-    updateTimingOrderRangeFill();
-    scheduleTimingStaggerApply();
-  });
-  amountRange.addEventListener("change", () => {
-    scheduleTimingStaggerApply({ immediate: true });
-  });
-  amountInput.addEventListener("input", () => {
-    let value = Number(amountInput.value || 0);
-    if (!Number.isFinite(value)) value = 0;
-    if (value > Number(amountRange.max)) amountRange.max = String(value);
-    amountRange.value = String(Math.max(0, value));
-    updateTimingOrderRangeFill();
-    scheduleTimingStaggerApply();
-  });
-  amountInput.addEventListener("keydown", event => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      scheduleTimingStaggerApply({ immediate: true });
-    }
-  });
-  groupInput.addEventListener("input", () => {
-    let value = Math.round(Number(groupInput.value || 1));
-    if (!Number.isFinite(value) || value < 1) value = 1;
-    groupInput.value = String(value);
-    scheduleTimingStaggerApply();
-  });
-  groupInput.addEventListener("keydown", event => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      scheduleTimingStaggerApply({ immediate: true });
-    }
-  });
+  bindTimingOrderPanel();
   return timingOrderBackdropEl;
 }
 

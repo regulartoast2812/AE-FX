@@ -85,29 +85,18 @@ function updateAnchorSelectionCount() {
 }
 
 // The Layout panel: where things sit and how they are ordered. Anchor, align
-// and distribute were already here; stagger, layer order and pull/snap have
-// moved in from the old Timing/Order panel, because all six act on the same
-// stable selection and were only separate because they were built separately.
-function mountLayoutSections() {
-  if (!anchorModalEl) return;
-  const host = anchorModalEl.querySelector(".anchor-panel");
-  if (!host) return;
-  // The whole backdrop element moves, not just the cards inside it. Every one
-  // of the timing panel's 32 lookups goes through timingOrderBackdropEl, so
-  // lifting the layout out of it would leave them all querying an empty node -
-  // which is exactly what happened on the first attempt.
-  if (typeof ensureTimingOrderPanel !== "function") return;
-  ensureTimingOrderPanel();
-  if (!timingOrderBackdropEl || timingOrderBackdropEl.parentElement === host) return;
-  timingOrderBackdropEl.classList.add("embedded");
-  timingOrderBackdropEl.removeAttribute("aria-hidden");
-  host.appendChild(timingOrderBackdropEl);
-}
-
+// and distribute sit with stagger, layer order and pull/snap - all six act on
+// the same stable selection. The timing sections are part of this panel's own
+// markup; ensureTimingOrderPanel only binds their handlers.
 function showAnchorDialog() {
   if (!state.comp || !anchorModalEl) return;
   anchorErrorEl.textContent = "";
-  mountLayoutSections();
+  if (typeof ensureTimingOrderPanel === "function") ensureTimingOrderPanel();
+  // Marked in JS, not matched with :has() - CEP's Chromium predates it.
+  const layoutPanel = anchorModalEl.querySelector(".anchor-panel");
+  const layoutDialog = anchorModalEl.querySelector(".anchor-dialog");
+  if (layoutPanel) layoutPanel.classList.add("layout-panel");
+  if (layoutDialog) layoutDialog.classList.add("layout-dialog");
   if (typeof renderTimingOrderPanel === "function") {
     if (typeof captureTimingOrderBaseline === "function") captureTimingOrderBaseline();
     renderTimingOrderPanel();
