@@ -941,33 +941,26 @@ function tntLayerTypeColor(type) {
 // A proportional band per type, blended into its neighbour rather than butted
 // hard against it - the mix is the point, not the boundaries. Types are ordered
 // largest first so the bar reads the same way the chips below it do.
-// Compact form for a header row: a short proportional bar and the chips, no
-// repeated sentence. Same data as the full version, sized to sit inline.
+// A full-width band per layer type, each carrying its own count and name. One
+// object rather than a bar plus a separate legend: the label sits inside the
+// band it describes, so there is nothing to cross-reference.
+//
+// A band too narrow for its text drops the label and keeps its colour, so the
+// proportion still reads when a selection is lopsided.
 function tntSelectionBarCompactMarkup() {
   const summary = tntSelectionSummary();
   const names = Object.keys(summary.types)
     .sort((a, b) => summary.types[b] - summary.types[a] || a.localeCompare(b));
   if (!summary.count || !names.length) {
-    return `<span class="tnt-selection-compact empty">no selection</span>`;
+    return `<span class="tnt-selection-strip empty">No selection</span>`;
   }
-  const stops = [];
-  let at = 0;
-  names.forEach(name => {
-    const share = (summary.types[name] / summary.resolved) * 100;
-    const color = tntLayerTypeColor(name);
-    stops.push(`${color} ${at.toFixed(2)}%`);
-    at += share;
-    stops.push(`${color} ${at.toFixed(2)}%`);
-  });
-  const chips = names.map(name => {
+  return `<span class="tnt-selection-strip">` + names.map(name => {
     const count = summary.types[name];
-    return `<span class="tnt-selection-chip" style="--tnt-chip: ${tntLayerTypeColor(name)}">` +
-      `${count} ${escapeHtml(name)}${count === 1 ? "" : "s"}</span>`;
-  }).join("");
-  return `<span class="tnt-selection-compact">` +
-    `<span class="tnt-selection-bar compact" style="background: linear-gradient(90deg, ${stops.join(", ")})" aria-hidden="true"></span>` +
-    chips +
-    `</span>`;
+    const share = (summary.types[name] / summary.resolved) * 100;
+    const label = `${count} ${name}${count === 1 ? "" : "s"}`;
+    return `<span class="tnt-selection-band" style="flex: ${share.toFixed(3)} 1 0; --tnt-band: ${tntLayerTypeColor(name)}" title="${escapeHtml(label)}">` +
+      `<span class="tnt-selection-band-label">${escapeHtml(label)}</span></span>`;
+  }).join("") + `</span>`;
 }
 
 function tntSelectionBarMarkup() {

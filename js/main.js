@@ -944,33 +944,26 @@ function tntLayerTypeColor(type) {
 // A proportional band per type, blended into its neighbour rather than butted
 // hard against it - the mix is the point, not the boundaries. Types are ordered
 // largest first so the bar reads the same way the chips below it do.
-// Compact form for a header row: a short proportional bar and the chips, no
-// repeated sentence. Same data as the full version, sized to sit inline.
+// A full-width band per layer type, each carrying its own count and name. One
+// object rather than a bar plus a separate legend: the label sits inside the
+// band it describes, so there is nothing to cross-reference.
+//
+// A band too narrow for its text drops the label and keeps its colour, so the
+// proportion still reads when a selection is lopsided.
 function tntSelectionBarCompactMarkup() {
   const summary = tntSelectionSummary();
   const names = Object.keys(summary.types)
     .sort((a, b) => summary.types[b] - summary.types[a] || a.localeCompare(b));
   if (!summary.count || !names.length) {
-    return `<span class="tnt-selection-compact empty">no selection</span>`;
+    return `<span class="tnt-selection-strip empty">No selection</span>`;
   }
-  const stops = [];
-  let at = 0;
-  names.forEach(name => {
-    const share = (summary.types[name] / summary.resolved) * 100;
-    const color = tntLayerTypeColor(name);
-    stops.push(`${color} ${at.toFixed(2)}%`);
-    at += share;
-    stops.push(`${color} ${at.toFixed(2)}%`);
-  });
-  const chips = names.map(name => {
+  return `<span class="tnt-selection-strip">` + names.map(name => {
     const count = summary.types[name];
-    return `<span class="tnt-selection-chip" style="--tnt-chip: ${tntLayerTypeColor(name)}">` +
-      `${count} ${escapeHtml(name)}${count === 1 ? "" : "s"}</span>`;
-  }).join("");
-  return `<span class="tnt-selection-compact">` +
-    `<span class="tnt-selection-bar compact" style="background: linear-gradient(90deg, ${stops.join(", ")})" aria-hidden="true"></span>` +
-    chips +
-    `</span>`;
+    const share = (summary.types[name] / summary.resolved) * 100;
+    const label = `${count} ${name}${count === 1 ? "" : "s"}`;
+    return `<span class="tnt-selection-band" style="flex: ${share.toFixed(3)} 1 0; --tnt-band: ${tntLayerTypeColor(name)}" title="${escapeHtml(label)}">` +
+      `<span class="tnt-selection-band-label">${escapeHtml(label)}</span></span>`;
+  }).join("") + `</span>`;
 }
 
 function tntSelectionBarMarkup() {
@@ -15276,6 +15269,55 @@ const TNK_KEYMAP = (() => {
   return map;
 })();
 
+// Per-group customisation, kept out of TNK_GROUPS so the shipped set stays the
+// shipped set and can change under a user's additions without conflict.
+//
+//   added:     tools the user put in a group, as { group, command, icon, key }
+//   overrides: changes to a shipped tool, keyed by its label
+//              { key, command } - either may be absent
+const TNK_CUSTOM_KEY = "tnkCustom.v1";
+let tnkCustom = { added: [], overrides: {} };
+
+function tnkLoadCustom() {
+  try {
+    const raw = window.localStorage.getItem(TNK_CUSTOM_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    tnkCustom = {
+      added: parsed && Array.isArray(parsed.added) ? parsed.added : [],
+      overrides: parsed && parsed.overrides && typeof parsed.overrides === "object" ? parsed.overrides : {}
+    };
+  } catch (_) {
+    tnkCustom = { added: [], overrides: {} };
+  }
+}
+
+function tnkSaveCustom() {
+  try { window.localStorage.setItem(TNK_CUSTOM_KEY, JSON.stringify(tnkCustom)); } catch (_) {}
+}
+
+// A shipped tool with the user's changes folded in, or the tool untouched.
+function tnkResolveItem(item) {
+  const override = tnkCustom.overrides[item.label];
+  if (!override) return item;
+  return Object.assign({}, item, {
+    key: "key" in override ? override.key : item.key,
+    command: override.command || item.command
+  });
+}
+
+function tnkAddedForGroup(title) {
+  return tnkCustom.added
+    .filter(entry => entry && entry.group === title)
+    .map(entry => ({
+      label: entry.label || entry.command,
+      icon: entry.icon || "circle-plus",
+      key: entry.key || "",
+      command: entry.command,
+      desc: entry.desc || "",
+      custom: true
+    }));
+}
+
 const TNK_PARAMS_KEY = "tnkParams.v1";
 
 let tnkParams = Object.assign({}, TNK_PARAM_DEFAULTS);
@@ -15287,7 +15329,6 @@ let tnkBackdropEl = null;
 // consts have initialised - and touching one then throws a temporal dead zone
 // error that aborts the rest of the bundle.
 function tnkToolRows() { return tnkBackdropEl && tnkBackdropEl.querySelector(".tnk-tool-rows"); }
-function tnkFilterInput() { return tnkBackdropEl && tnkBackdropEl.querySelector(".tnk-filter"); }
 function tnkCountLabel() { return tnkBackdropEl && tnkBackdropEl.querySelector(".tnk-count"); }
 
 function tnkLoadParams() {
@@ -15354,17 +15395,12 @@ function tnkCommandFor(item, modifiers) {
 
 function tnkResolvedGroups() {
   const index = tnkEntryIndex();
-  const query = String(tnkFilterInput() ? tnkFilterInput().value : "").toLowerCase().trim();
-  const terms = query.split(/\s+/).filter(Boolean);
   const flat = [];
   const groups = TNK_GROUPS.map(group => {
     const entries = group.commands
+      .map(tnkResolveItem)
+      .concat(tnkAddedForGroup(group.title))
       .filter(item => index.has(item.command))
-      .filter(item => {
-        if (!terms.length) return true;
-        const haystack = `${item.label} ${item.command} ${item.key || ""}`.toLowerCase();
-        return terms.every(term => haystack.indexOf(term) >= 0);
-      })
       .map(item => Object.assign({ item }, { index: flat.push(item) - 1 }));
     return { title: group.title, entries };
   }).filter(group => group.entries.length);
@@ -15396,9 +15432,6 @@ function ensureTnkPanel() {
         <button type="button" class="tnk-bar-btn" data-tnk-reset data-icon="ui.refresh" data-tooltip="Reset Parameters\nReturn every value in the bar to its default."></button>
       </header>
       <div class="tnk-global-bar">${tnkParamBarMarkup()}</div>
-      <div class="tnk-search-row">
-        <input class="tnk-filter" type="text" spellcheck="false" autocomplete="off" placeholder="Filter tools">
-      </div>
       <div class="tnk-tool-rows"></div>
     </section>
   `;
@@ -15415,7 +15448,6 @@ function ensureTnkPanel() {
       tnkRender();
       return;
     }
-    if (event.target === tnkFilterInput()) tnkRender();
   });
 
   tnkBackdropEl.addEventListener("click", event => {
@@ -15428,6 +15460,12 @@ function ensureTnkPanel() {
       if (statusEl) statusEl.textContent = "TNK parameters reset.";
       return;
     }
+    const add = event.target.closest("[data-tnk-add]");
+    if (add) {
+      event.preventDefault();
+      tnkAddToolTo(add.dataset.tnkAdd);
+      return;
+    }
     const tool = event.target.closest("[data-tnk-index]");
     if (tool) {
       event.preventDefault();
@@ -15435,10 +15473,23 @@ function ensureTnkPanel() {
     }
   });
 
+  tnkBackdropEl.addEventListener("contextmenu", event => {
+    const tool = event.target.closest("[data-tnk-index]");
+    if (!tool) return;
+    event.preventDefault();
+    const item = tnkResolvedGroups().flat[Number(tool.dataset.tnkIndex || 0)];
+    if (item) tnkOpenContextMenu(tool, item, event);
+  });
+
+  tnkBackdropEl.addEventListener("pointerdown", event => {
+    if (!event.target.closest(".tnk-context-menu")) tnkCloseContextMenu();
+  }, true);
+
   tnkBackdropEl.addEventListener("keydown", event => {
     if (event.key === "Escape") {
       event.preventDefault();
       event.stopPropagation();
+      if (tnkBackdropEl.querySelector(".tnk-context-menu")) { tnkCloseContextMenu(); return; }
       hideTnkPanel();
     }
   });
@@ -15487,6 +15538,9 @@ function tnkRender() {
       <h4>${escapeHtml(group.title)}</h4>
       <div class="tnk-group-tools">
         ${group.entries.map(row => tnkToolMarkup(row.item, row.index, index)).join("")}
+        <button type="button" class="tnk-tool tnk-add" data-tnk-add="${escapeHtml(group.title)}" aria-label="Add a tool to ${escapeHtml(group.title)}" data-tooltip="Add a tool\n- Puts any command in ${escapeHtml(group.title)}">
+          ${tntIconSvg("plus", "tnk-tool-icon") || ""}
+        </button>
       </div>
     </section>
   `).join("") || `<div class="tnk-empty">No tool matches that filter</div>`;
@@ -15540,6 +15594,120 @@ function tnkCaptureKeydown(event) {
   tnkHandleKey(event);
 }
 
+
+// Pick a command by name. The registry is the list, so anything the panel can
+// run can be put in a group or put behind a button.
+async function tnkPickCommand(title, current) {
+  const names = Array.from(tnkEntryIndex().keys()).sort();
+  const response = await showTntCommandDialog({
+    title,
+    subtitle: "Type a command name. Anything in the Functions list can go here.",
+    fields: [{ id: "command", label: "Command", value: current || "", suggest: names }],
+    buttons: [{ label: "Choose", value: "choose", primary: true }]
+  });
+  if (!response) return "";
+  const wanted = String(response.values.command || "").trim();
+  if (!wanted) return "";
+  const index = tnkEntryIndex();
+  if (index.has(wanted)) return wanted;
+  // Fall back to a unique case-insensitive match, so typing most of a name works.
+  const hits = names.filter(name => name.toLowerCase() === wanted.toLowerCase()) ;
+  if (hits.length === 1) return hits[0];
+  const partial = names.filter(name => name.toLowerCase().indexOf(wanted.toLowerCase()) >= 0);
+  if (partial.length === 1) return partial[0];
+  if (statusEl) statusEl.textContent = `No single command matches "${wanted}".`;
+  return "";
+}
+
+async function tnkAddToolTo(groupTitle) {
+  const command = await tnkPickCommand(`Add to ${groupTitle}`, "");
+  if (!command) return;
+  const key = await tnkPickKey(`Key for ${command}`, "");
+  tnkCustom.added.push({ group: groupTitle, command, label: command, key, icon: "circle-plus" });
+  tnkSaveCustom();
+  tnkRender();
+  if (statusEl) statusEl.textContent = `${command} added to ${groupTitle}.`;
+}
+
+// A key is typed, not captured: TNK is open while this runs, and its own
+// handler would eat the keystroke before any capture saw it.
+async function tnkPickKey(title, current) {
+  const response = await showTntCommandDialog({
+    title,
+    subtitle: "One key, or blank for none. Left-hand keys keep the panel fast.",
+    fields: [{ id: "key", label: "Key", value: current || "" }],
+    buttons: [{ label: "Set", value: "set", primary: true }]
+  });
+  if (!response) return current || "";
+  return String(response.values.key || "").trim().toLowerCase().slice(0, 12);
+}
+
+
+// Right-click a tool: change its key, change what it runs, or - if the user
+// added it - take it out again. A shipped tool is never deleted, only
+// overridden, so Reset puts it back.
+function tnkCloseContextMenu() {
+  const open = tnkBackdropEl && tnkBackdropEl.querySelector(".tnk-context-menu");
+  if (open) open.remove();
+}
+
+function tnkOpenContextMenu(button, item, event) {
+  tnkCloseContextMenu();
+  const custom = !!item.custom;
+  const overridden = !!tnkCustom.overrides[item.label];
+  const menu = document.createElement("div");
+  menu.className = "tnk-context-menu";
+  menu.innerHTML = `
+    <div class="tnk-context-title">${escapeHtml(item.label)}</div>
+    <button type="button" data-tnk-menu="key">Assign key${item.key ? ` (${escapeHtml(item.key.toUpperCase())})` : ""}</button>
+    <button type="button" data-tnk-menu="command">Change function</button>
+    ${custom
+      ? `<button type="button" data-tnk-menu="remove">Remove from group</button>`
+      : (overridden ? `<button type="button" data-tnk-menu="reset">Reset to default</button>` : "")}
+  `;
+  const rect = button.getBoundingClientRect();
+  menu.style.left = `${Math.round(rect.left)}px`;
+  menu.style.top = `${Math.round(rect.bottom + 4)}px`;
+  tnkBackdropEl.appendChild(menu);
+
+  menu.addEventListener("click", async menuEvent => {
+    const action = menuEvent.target.closest("[data-tnk-menu]");
+    if (!action) return;
+    menuEvent.preventDefault();
+    menuEvent.stopPropagation();
+    const what = action.dataset.tnkMenu;
+    tnkCloseContextMenu();
+    if (what === "key") {
+      const key = await tnkPickKey(`Key for ${item.label}`, item.key || "");
+      tnkApplyOverride(item, { key });
+    } else if (what === "command") {
+      const command = await tnkPickCommand(`Function for ${item.label}`, item.command);
+      if (command) tnkApplyOverride(item, { command });
+    } else if (what === "remove") {
+      tnkCustom.added = tnkCustom.added.filter(entry => entry.label !== item.label || entry.command !== item.command);
+      tnkSaveCustom();
+      tnkRender();
+    } else if (what === "reset") {
+      delete tnkCustom.overrides[item.label];
+      tnkSaveCustom();
+      tnkRender();
+    }
+  });
+}
+
+function tnkApplyOverride(item, patch) {
+  if (item.custom) {
+    tnkCustom.added = tnkCustom.added.map(entry =>
+      entry.label === item.label && entry.command === item.command
+        ? Object.assign({}, entry, patch)
+        : entry);
+  } else {
+    tnkCustom.overrides[item.label] = Object.assign({}, tnkCustom.overrides[item.label] || {}, patch);
+  }
+  tnkSaveCustom();
+  tnkRender();
+}
+
 function showTnkPanel() {
   const panel = ensureTnkPanel();
   if (panel.classList.contains("show")) {
@@ -15547,15 +15715,15 @@ function showTnkPanel() {
     return;
   }
   tnkLoadParams();
+tnkLoadCustom();
   tnkSyncParamInputs();
   tnkRender();
   if (typeof tntPaintSelectionReadouts === "function") tntPaintSelectionReadouts(panel);
   panel.classList.add("show");
   panel.setAttribute("aria-hidden", "false");
   window.addEventListener("keydown", tnkCaptureKeydown, true);
-  // Focus the dialog, not the filter. TNK is key-driven first and searched
-  // second; parking the caret in a text field would make every key below dead,
-  // since tnkHandleKey deliberately ignores keystrokes aimed at an input.
+  // Focus the dialog so its own keys land. There is no search field to compete
+  // with any more - TNK is key-driven, and the tools are grouped, not searched.
   const dialog = panel.querySelector(".tnk-dialog");
   if (dialog) requestAnimationFrame(() => dialog.focus());
 }

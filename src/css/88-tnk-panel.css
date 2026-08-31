@@ -45,6 +45,7 @@
 
 .tnk-title {
   display: flex;
+  flex: 1 1 auto;
   align-items: center;
   gap: 7px;
   min-width: 0;
@@ -139,11 +140,15 @@
   background: rgba(255, 255, 255, .1);
 }
 
+/* No margin-left:auto here. It would absorb the row's free space and leave the
+   selection strip sized to its content; the title flexes instead, so the button
+   is pushed right by the strip growing. */
 .tnk-bar-btn {
   display: grid;
+  flex: 0 0 auto;
   width: 24px;
   height: 24px;
-  margin-left: auto;
+  margin-left: 10px;
   place-items: center;
   padding: 0;
   border: 1px solid rgba(255, 255, 255, .14);
@@ -155,28 +160,6 @@
 .tnk-bar-btn:hover {
   border-color: rgba(233, 147, 96, .5);
   background: rgba(213, 111, 58, .14);
-}
-
-.tnk-search-row {
-  display: flex;
-  align-items: center;
-  flex: 0 0 auto;
-  gap: 10px;
-  padding: 9px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, .06);
-}
-
-.tnk-search-row input {
-  flex: 1 1 auto;
-  height: 30px;
-  padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, .16);
-  border-radius: 9px;
-  outline: 0;
-  background: rgba(8, 9, 10, .42);
-  color: #ededee;
-  font: inherit;
-  font-size: 12.5px;
 }
 
 /* Grouped, the way TNK laid its tools out - a labelled box per task, dense
@@ -313,38 +296,118 @@
 }
 
 
-/* Compact selection display, inline in the header row beside the tool count.
-   The bar is short because it only has to show proportion; the chips carry the
-   detail, and the full-width version with its repeated sentence was saying the
-   same thing three times. */
+
+/* The selection strip fills the rest of the header row. Each band carries its
+   own count and name, so there is no legend to cross-reference and no repeated
+   sentence underneath it. */
 .tnk-selection {
-  display: inline-flex;
+  display: flex;
+  flex: 1 1 auto;
   align-items: center;
-  margin-left: 2px;
-  padding-left: 9px;
+  min-width: 0;
+  margin-left: 10px;
+  padding-left: 11px;
   border-left: 1px solid rgba(255, 255, 255, .12);
 }
 
-.tnt-selection-compact {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.tnt-selection-strip {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 2px;
+  min-width: 0;
+  height: 22px;
 }
 
-.tnt-selection-compact.empty {
-  color: rgba(228, 228, 234, .38);
+.tnt-selection-strip.empty {
+  align-items: center;
+  color: rgba(228, 228, 234, .35);
   font-size: 11px;
 }
 
-.tnt-selection-bar.compact {
-  display: inline-block;
-  width: 46px;
-  height: 8px;
-  border-radius: 4px;
-  filter: blur(2px) saturate(115%);
+.tnt-selection-band {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--tnt-band, #6894d6);
+  color: rgba(12, 13, 14, .84);
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-.tnt-selection-compact .tnt-selection-chip {
-  padding: 2px 7px 2px 9px;
-  font-size: 10px;
+.tnt-selection-band-label {
+  overflow: hidden;
+  padding: 0 6px;
+  text-overflow: ellipsis;
+}
+
+/* The tools take the space the search row used to hold. */
+.tnk-tool-rows {
+  padding-top: 12px;
+}
+
+/* The add button reads as an empty slot rather than another tool. */
+.tnk-tool.tnk-add {
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, .16);
+  background: transparent;
+  color: rgba(228, 228, 234, .35);
+}
+
+.tnk-tool.tnk-add:hover {
+  border-style: solid;
+  color: rgba(240, 176, 137, .9);
+}
+
+/* Right-click menu. Positioned against the button, inside the dialog so it
+   travels with the overlay's own resizing. */
+.tnk-context-menu {
+  position: fixed;
+  z-index: 40;
+  min-width: 168px;
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, .13);
+  border-radius: 9px;
+  background: rgba(24, 25, 27, .98);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .5);
+}
+
+.tnk-context-title {
+  padding: 5px 8px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+  margin-bottom: 4px;
+  color: rgba(245, 245, 247, .9);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.tnk-context-menu button {
+  display: block;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(235, 235, 245, .8);
+  font: inherit;
+  font-size: 11.5px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tnk-context-menu button:hover {
+  background: rgba(213, 111, 58, .18);
+  color: #fff;
+}
+
+/* The title's own parts keep their size so the strip takes the remainder.
+   Direct children only: the strip is a span nested inside .tnk-selection, and a
+   descendant selector pinned it to 0 0 auto so it never grew. */
+.tnk-title > b,
+.tnk-title > span:not(.tnk-selection),
+.tnk-title > em {
+  flex: 0 0 auto;
 }
