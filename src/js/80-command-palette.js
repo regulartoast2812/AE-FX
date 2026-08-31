@@ -229,7 +229,7 @@ function searchFxConsoleEntries(query = "", parentEntry = null, limit = 24) {
       .filter(entry => entry && entry.group && entry.group.toLowerCase() === scope.group)
       .filter(entry => {
         if (!terms.length) return true;
-        const haystack = `${entry.name || ""} ${entry.category || ""} ${entry.shortcut || ""}`.toLowerCase();
+        const haystack = `${entry.name || ""} ${entry.category || ""} ${entry.shortcut || ""} ${tntEntryAliases(entry)}`.toLowerCase();
         return terms.every(term => haystack.indexOf(term) >= 0);
       })
       .slice(0, limit);
@@ -242,7 +242,7 @@ function searchFxConsoleEntries(query = "", parentEntry = null, limit = 24) {
     return children.filter(effect => {
       const source = fxConsoleSourceMeta(effect);
       const tags = safeFxConsoleEntryTags(effect).map(tag => tag.label).join(" ");
-      const haystack = `${effect.name || ""} ${effect.category || ""} ${effect.matchName || ""} ${effect.shortcut || ""} ${effect.parentName || ""} ${source.label} ${source.detail} ${tags}`.toLowerCase();
+      const haystack = `${effect.name || ""} ${effect.category || ""} ${effect.matchName || ""} ${effect.shortcut || ""} ${effect.parentName || ""} ${source.label} ${source.detail} ${tags} ${tntEntryAliases(effect)}`.toLowerCase();
       return terms.every(term => haystack.indexOf(term) >= 0);
     }).slice(0, limit);
   }
@@ -258,7 +258,7 @@ function searchFxConsoleEntries(query = "", parentEntry = null, limit = 24) {
   return entries.filter(effect => {
     const source = fxConsoleSourceMeta(effect);
     const tags = safeFxConsoleEntryTags(effect).map(tag => tag.label).join(" ");
-    const haystack = `${effect.name || ""} ${effect.category || ""} ${effect.matchName || ""} ${effect.shortcut || ""} ${source.label} ${source.detail} ${tags}`.toLowerCase();
+    const haystack = `${effect.name || ""} ${effect.category || ""} ${effect.matchName || ""} ${effect.shortcut || ""} ${source.label} ${source.detail} ${tags} ${tntEntryAliases(effect)}`.toLowerCase();
     return terms.every(term => haystack.indexOf(term) >= 0);
   }).slice(0, limit);
 }

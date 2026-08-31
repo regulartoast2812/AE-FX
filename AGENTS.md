@@ -210,6 +210,22 @@ Deliberately narrow:
 - **Entries with a panel-side `action` are not covered** - the derivation reads
   jsx, so those stay live. A command can opt in by hand with `requires: "..."`.
 
+### Command search is literal, so aliases carry the other words
+
+`searchFxConsoleEntries` matches terms as substrings - a word either appears in
+the haystack or it does not. That is right for a 200-entry list, where fuzzy
+matching would make everything match everything, but it means a name has to be
+guessed exactly. "remove effects" found nothing, because the registry says
+Delete.
+
+`src/js/07-command-aliases.js` holds the vocabulary that is not in the name,
+keyed by command name and applied at lookup, so adding a word is a line there
+rather than an edit to a registry row. An entry can also carry its own
+`aliases` string; both are searched.
+
+Add a word whenever a command is hard to find under a plausible name - that is
+the signal, not a rule about which words belong.
+
 ### On hold
 
 - (Plain `C` for TNK was removed - see the keyboard tap note above.)
