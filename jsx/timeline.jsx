@@ -1415,15 +1415,97 @@ function TNT_applyLayerAnchor(layer, nextAnchor) {
   TNT_adjustLayerPositionForAnchor(layer, dx, dy);
 }
 
+// layer.toComp() and layer.fromComp() are EXPRESSION-language methods. They do
+// not exist in ExtendScript - the scripting API has only copyToComp - so every
+// call threw "Function layer.toComp is undefined" and took the whole align
+// operation with it. The transform has to be done by hand.
+//
+// 2D only: anchor point, scale, Z rotation, position, walked up the parent
+// chain. 3D layers, cameras, and non-zero X/Y rotation are approximated on
+// their XY projection, which is what the align buttons act on anyway.
+function TNT_layerTransformAtTime(layer, time) {
+  var group = layer.property("ADBE Transform Group");
+  var anchorProp = group ? group.property("ADBE Anchor Point") : null;
+  var scaleProp = group ? group.property("ADBE Scale") : null;
+  var rotateProp = group ? group.property("ADBE Rotate Z") : null;
+  var posProp = group ? group.property("ADBE Position") : null;
+
+  var anchor = anchorProp ? anchorProp.valueAtTime(time, false) : [0, 0, 0];
+  var scale = scaleProp ? scaleProp.valueAtTime(time, false) : [100, 100, 100];
+  var rotate = 0;
+  try { if (rotateProp) rotate = rotateProp.valueAtTime(time, false); } catch (_) {}
+
+  var position = [0, 0, 0];
+  try {
+    if (posProp && posProp.dimensionsSeparated) {
+      position = [
+        posProp.getSeparationFollower(0).valueAtTime(time, false),
+        posProp.getSeparationFollower(1).valueAtTime(time, false),
+        0
+      ];
+    } else if (posProp) {
+      position = posProp.valueAtTime(time, false);
+    }
+  } catch (_) {}
+
+  return { anchor: anchor, scale: scale, rotate: rotate, position: position };
+}
+
+// One level: layer space -> its parent's space (or comp space if unparented).
+function TNT_pointToParentSpace(layer, point, time) {
+  var t = TNT_layerTransformAtTime(layer, time);
+  var x = (point[0] - t.anchor[0]) * (t.scale[0] / 100);
+  var y = (point[1] - (t.anchor[1] || 0)) * ((t.scale[1] == null ? 100 : t.scale[1]) / 100);
+  var radians = (t.rotate || 0) * Math.PI / 180;
+  var cos = Math.cos(radians);
+  var sin = Math.sin(radians);
+  return [
+    t.position[0] + (x * cos) - (y * sin),
+    (t.position[1] || 0) + (x * sin) + (y * cos)
+  ];
+}
+
+function TNT_layerPointToComp(layer, point, time) {
+  var current = TNT_pointToParentSpace(layer, point, time);
+  var parent = layer.parent;
+  var guard = 0;
+  while (parent && guard < 32) {
+    current = TNT_pointToParentSpace(parent, current, time);
+    parent = parent.parent;
+    guard++;
+  }
+  return current;
+}
+
+// Rotation and scale accumulated up the parent chain. Translating a layer by a
+// comp-space delta means undoing exactly this much before writing to Position,
+// which is local to the parent.
+function TNT_cumulativeRotationScale(layer, time) {
+  var rotate = 0;
+  var scaleX = 1;
+  var scaleY = 1;
+  var current = layer;
+  var guard = 0;
+  while (current && guard < 32) {
+    var t = TNT_layerTransformAtTime(current, time);
+    rotate += (t.rotate || 0);
+    scaleX *= (t.scale[0] / 100);
+    scaleY *= ((t.scale[1] == null ? 100 : t.scale[1]) / 100);
+    current = current.parent;
+    guard++;
+  }
+  return { rotate: rotate, scaleX: scaleX, scaleY: scaleY };
+}
+
 function TNT_layerCompBBox(layer, useMasks) {
   var curTime = layer.containingComp.time;
   var bbox = useMasks ? TNT_layerMaskBBox(layer, curTime) : null;
   if (!bbox) bbox = TNT_layerSourceBBox(layer, curTime);
   var pts = [
-    layer.toComp([bbox.left, bbox.top, 0]),
-    layer.toComp([bbox.right, bbox.top, 0]),
-    layer.toComp([bbox.right, bbox.bottom, 0]),
-    layer.toComp([bbox.left, bbox.bottom, 0])
+    TNT_layerPointToComp(layer, [bbox.left, bbox.top, 0], curTime),
+    TNT_layerPointToComp(layer, [bbox.right, bbox.top, 0], curTime),
+    TNT_layerPointToComp(layer, [bbox.right, bbox.bottom, 0], curTime),
+    TNT_layerPointToComp(layer, [bbox.left, bbox.bottom, 0], curTime)
   ];
   var minX = pts[0][0], maxX = pts[0][0];
   var minY = pts[0][1], maxY = pts[0][1];
@@ -1444,10 +1526,19 @@ function TNT_addToPositionProperty(layer, dx, dy) {
   var localDelta = [dx, dy];
   if (layer.parent) {
     try {
-      var anchorComp = layer.toComp([0, 0, 0]);
-      var before = layer.parent.fromComp(anchorComp);
-      var after = layer.parent.fromComp([anchorComp[0] + dx, anchorComp[1] + dy, anchorComp[2] || 0]);
-      localDelta = [after[0] - before[0], after[1] - before[1]];
+      // Position is local to the parent, so a comp-space delta has to have the
+      // parent chain's rotation and scale undone before it is written.
+      var time = layer.containingComp.time;
+      var chain = TNT_cumulativeRotationScale(layer.parent, time);
+      var radians = -chain.rotate * Math.PI / 180;
+      var cos = Math.cos(radians);
+      var sin = Math.sin(radians);
+      var rx = (dx * cos) - (dy * sin);
+      var ry = (dx * sin) + (dy * cos);
+      localDelta = [
+        chain.scaleX ? rx / chain.scaleX : rx,
+        chain.scaleY ? ry / chain.scaleY : ry
+      ];
     } catch (_) {}
   }
 
@@ -1539,19 +1630,26 @@ function TNT_alignSelectedLayersToComp(mode, useMasks, target) {
         return TNT_jsonStringify({ ok: false, error: "Select at least three layers to distribute." });
       }
       var axis = (mode === "dist-left" || mode === "dist-hcenter" || mode === "dist-right") ? "x" : "y";
-      var metric = mode === "dist-left" ? "left" :
-        mode === "dist-hcenter" ? "hcenter" :
-        mode === "dist-right" ? "right" :
-        mode === "dist-top" ? "top" :
-        mode === "dist-vcenter" ? "vcenter" : "bottom";
+      // Lookups, not a chained ternary. ExtendScript 4.5.6 parses
+      // `a ? b : c ? d : e` LEFT-associatively - as `(a ? b : c) ? d : e` -
+      // which is not what ES3 or any other JS engine does. The chain that used
+      // to be here resolved "dist-hcenter" to the metric "vcenter", so the
+      // three horizontal distribute buttons silently distributed vertically.
+      var METRIC_BY_MODE = {
+        "dist-left": "left", "dist-hcenter": "hcenter", "dist-right": "right",
+        "dist-top": "top", "dist-vcenter": "vcenter", "dist-bottom": "bottom"
+      };
+      var metric = METRIC_BY_MODE[mode] || "bottom";
       var infos = [];
       for (var di = 0; di < layers.length; di++) {
         bbox = TNT_layerCompBBox(layers[di], !!useMasks);
-        var value = metric === "left" ? bbox.left :
-          metric === "hcenter" ? (bbox.left + bbox.right) / 2 :
-          metric === "right" ? bbox.right :
-          metric === "top" ? bbox.top :
-          metric === "vcenter" ? (bbox.top + bbox.bottom) / 2 : bbox.bottom;
+        var value;
+        if (metric === "left") value = bbox.left;
+        else if (metric === "hcenter") value = (bbox.left + bbox.right) / 2;
+        else if (metric === "right") value = bbox.right;
+        else if (metric === "top") value = bbox.top;
+        else if (metric === "vcenter") value = (bbox.top + bbox.bottom) / 2;
+        else value = bbox.bottom;
         infos.push({ layer: layers[di], bbox: bbox, value: value });
       }
       infos.sort(function(a, b) { return a.value - b.value; });
