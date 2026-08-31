@@ -229,10 +229,6 @@ function closeActivePopup() {
     closeCompSelect();
     closed = true;
   }
-  if (flowChartOverlayEl && flowChartOverlayEl.classList.contains("open")) {
-    closeFlowChart();
-    closed = true;
-  }
   if (closed) focusPanel(2);
   return closed;
 }
@@ -264,6 +260,31 @@ async function centerSelectedAnchorPoints() {
   hideAnchorDialog();
   await refreshLayers({ forceRender: true });
   focusPanel(2);
+}
+
+// Tab was bound to the Composition Flow overlay, which is gone. In the anchor
+// panel it now flips "Align Layers to" between Selection and Composition -
+// the one setting you change constantly while aligning, and reaching for a
+// dropdown mid-flow is what made it tedious.
+//
+// It only acts while that panel is open. Everywhere else Tab is left alone
+// rather than silently bound to nothing.
+function toggleAlignTargetIfAnchorOpen() {
+  if (!anchorModalEl || !anchorModalEl.classList.contains("show")) return;
+  const select = document.getElementById("anchorAlignTarget");
+  if (!select) return;
+  select.value = select.value === "selection" ? "comp" : "selection";
+  select.dispatchEvent(new Event("change", { bubbles: true }));
+  if (statusEl) {
+    statusEl.textContent = select.value === "comp"
+      ? "Aligning to the composition."
+      : "Aligning to the selection.";
+  }
+  // A brief highlight, because the dropdown is easy to miss when the eye is on
+  // the align buttons.
+  select.classList.remove("anchor-align-target-flash");
+  void select.offsetWidth;
+  select.classList.add("anchor-align-target-flash");
 }
 
 async function alignSelectedLayersFromAnchorPanel(mode) {
@@ -349,7 +370,7 @@ const SHORTCUT_ACTIONS = {
   "alt+arrowdown": () => moveSelectedLayersInStack("down"),
   "shift+alt+arrowup": () => moveSelectedLayersInStack("top"),
   "shift+alt+arrowdown": () => moveSelectedLayersInStack("bottom"),
-  "tab": toggleFlowChart,
+  "tab": toggleAlignTargetIfAnchorOpen,
   "escape": closeActivePopup,
   "space": togglePlay,
   "a": () => openSubpanelByKey("anchor"),
@@ -1459,7 +1480,6 @@ function closeNativeQuickPanelSurfaces() {
   if (anchorModalEl && anchorModalEl.classList.contains("show")) hideAnchorDialog();
   if (durationModalEl && durationModalEl.classList.contains("show")) hideDurationDialog();
   if (compSelectEl && compSelectEl.classList.contains("open")) closeCompSelect();
-  if (flowChartOverlayEl && flowChartOverlayEl.classList.contains("open")) closeFlowChart();
 }
 
 function resetNativeQuickPanelToLauncher() {
@@ -3469,10 +3489,6 @@ if (anchorModalEl) anchorModalEl.addEventListener("click", e => {
 if (anchorModalEl) anchorModalEl.addEventListener("mousedown", e => { if (e.target === anchorModalEl) hideAnchorDialog(); });
 if (anchorModalEl) anchorModalEl.addEventListener("keydown", e => {
   if (e.key === "Escape") { e.preventDefault(); hideAnchorDialog(); }
-});
-if (flowChartCloseEl) flowChartCloseEl.addEventListener("click", closeFlowChart);
-if (flowChartOverlayEl) flowChartOverlayEl.addEventListener("mousedown", event => {
-  if (event.target === flowChartOverlayEl) closeFlowChart();
 });
 scrollAreaEl.addEventListener("scroll", syncBottomRulerPosition);
 if (horizontalScrollBarEl) horizontalScrollBarEl.addEventListener("mousedown", beginHorizontalScrollDrag);

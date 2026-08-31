@@ -1346,28 +1346,9 @@ body .ease-dialog .ease-control input[type="range"]:focus::-webkit-slider-thumb 
 body .dialog-title,
 body .layer-style-dialog-title,
 body .ease-dialog-title,
-body .flow-chart-title,
-body .timeline-command-dialog-title,
-body .mask-control-node-title {
-  font-family: var(--tnt-font-header) !important;
-  font-weight: 400 !important;
-  letter-spacing: 0 !important;
-  line-height: 1 !important;
-}
-
-body .dialog-title,
-body .layer-style-dialog-title,
-body .ease-dialog-title,
 body .timeline-command-dialog-title {
   display: flex !important;
   align-items: center !important;
-}
-
-body .dialog-title,
-body .timeline-command-dialog-title,
-body .flow-chart-title,
-body .mask-control-node-title {
-  font-size: 16px !important;
 }
 
 body .layer-style-dialog-title,
@@ -1382,23 +1363,6 @@ body .ease-dialog-title {
 .mask-control-count {
   display: inline-flex !important;
   align-items: center !important;
-  line-height: 1 !important;
-}
-
-.layer-style-dialog-head,
-.mask-control-head,
-.ease-dialog-head,
-.flow-chart-header {
-  align-items: center !important;
-}
-
-.layer-style-dialog-actions button,
-.ease-actions button,
-.dialog-actions button,
-.flow-chart-header button {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
   line-height: 1 !important;
 }
 

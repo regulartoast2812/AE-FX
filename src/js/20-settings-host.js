@@ -329,7 +329,6 @@ function openShortcutRundown() {
     [`${mod}+C / ${mod}+V`, "Copy / paste selection"],
     ["Enter", "Run selected command"],
     ["Right / Left", "Open or close command submenu"],
-    ["Tab", "Composition Flow"],
     ["X", "Go to next marker boundary"],
     ["Shift+X", "Layer Selection & Filters"],
     ["A", "Anchor Point Master"],

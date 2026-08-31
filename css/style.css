@@ -2874,14 +2874,6 @@ main#scrollArea {
   background: var(--ae-bg) !important;
   color: var(--ae-text) !important;
 }
-header,
-.time-ruler-wrap,
-.top-ruler .marker-rail,
-.horizontal-scrollbar,
-.flow-chart-header {
-  background: var(--ae-panel) !important;
-  border-color: var(--ae-border) !important;
-}
 .track,
 body.keyframe-mode .keyframe-layer-row {
   background: var(--ae-row) !important;
@@ -2995,19 +2987,6 @@ body.keyframe-mode #timeDisplay.editing {
 }
 #timeDisplay .time-display-input {
   pointer-events: auto !important;
-}
-
-/* v67: centered composition flow graph with curved directional links. */
-.flow-chart-panel {
-  width: min(950px, calc(100vw - 36px)) !important;
-}
-.flow-chart-body {
-  display: block !important;
-  position: relative !important;
-  min-height: 280px !important;
-  max-height: calc(100vh - 140px) !important;
-  overflow: auto !important;
-  padding: 14px !important;
 }
 .flow-graph {
   position: relative;
@@ -3138,14 +3117,6 @@ main#scrollArea {
   background: var(--ae-bg) !important;
   color: var(--ae-text) !important;
 }
-header,
-.time-ruler-wrap,
-.top-ruler .marker-rail,
-.horizontal-scrollbar,
-.flow-chart-header {
-  background: var(--ae-panel) !important;
-  border-color: var(--ae-border) !important;
-}
 .track,
 body.keyframe-mode .keyframe-layer-row {
   background: var(--ae-row) !important;
@@ -3202,11 +3173,6 @@ main#scrollArea {
   background: var(--ae-bg) !important;
   color: var(--ae-text) !important;
 }
-header,
-.flow-chart-header {
-  background: var(--ae-panel-raised) !important;
-  border-bottom-color: var(--ae-border) !important;
-}
 .time-ruler-wrap,
 .top-ruler .marker-rail,
 .horizontal-scrollbar {
@@ -3261,34 +3227,10 @@ body.keyframe-mode .keyframe-property-row.has-expression,
 #playhead::after {
   background: var(--ae-blue) !important;
 }
-.comp-select-button,
-.duration-dialog,
-.fx-console-panel,
-.flow-chart-panel {
-  background: #202020 !important;
-  border-color: var(--ae-border) !important;
-}
 .comp-select-menu,
 .layer-menu.open {
   background: #1b1b1b !important;
   border-color: var(--ae-border) !important;
-}
-.filter-btn,
-#durationBtn,
-#keyframeModeBtn,
-.dialog-btn,
-.flow-chart-close {
-  background: #303030 !important;
-  border-color: #454545 !important;
-  color: #d4d4d4 !important;
-}
-.filter-btn:hover,
-#durationBtn:hover,
-#keyframeModeBtn:hover,
-.dialog-btn:hover,
-.flow-chart-close:hover {
-  background: #3a3a3a !important;
-  border-color: #5a5a5a !important;
 }
 #keyframeModeBtn.active,
 .filter-btn.active,
@@ -5810,75 +5752,6 @@ body.keyframe-moving * {
   color: #888;
   font-size: 12px;
 }
-
-.flow-chart-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 450;
-  display: none;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 72px 18px 18px;
-  background: rgba(0,0,0,.22);
-}
-.flow-chart-overlay.open {
-  display: flex;
-}
-.flow-chart-panel {
-  width: min(760px, calc(100vw - 36px));
-  max-height: calc(100vh - 96px);
-  overflow: hidden;
-  border: 1px solid #3d3d3d;
-  border-radius: 6px;
-  background: #1d1d1d;
-  box-shadow: 0 18px 44px rgba(0,0,0,.62);
-}
-.flow-chart-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  height: 42px;
-  padding: 0 10px 0 12px;
-  border-bottom: 1px solid #343434;
-  background: #242424;
-}
-.flow-chart-title {
-  color: #e8e8e8;
-  font-size: 12px;
-  font-weight: 700;
-}
-.flow-chart-subtitle {
-  margin-top: 2px;
-  color: #8f8f8f;
-  font-size: 9px;
-}
-.flow-chart-close {
-  width: 24px;
-  height: 24px;
-  border: 1px solid #424242;
-  border-radius: 3px;
-  background: #2a2a2a;
-  color: #cfcfcf;
-  font-size: 16px;
-  line-height: 20px;
-  cursor: pointer;
-}
-.flow-chart-close:hover {
-  background: #343434;
-  border-color: #5b80a8;
-  color: #fff;
-}
-.flow-chart-body {
-  display: grid;
-  grid-template-columns: minmax(150px, 1fr) 34px minmax(170px, 1.2fr) 34px minmax(150px, 1fr);
-  gap: 0;
-  align-items: start;
-  min-height: 190px;
-  max-height: calc(100vh - 140px);
-  overflow: auto;
-  padding: 14px;
-}
 .flow-column {
   min-width: 0;
 }
@@ -6417,14 +6290,6 @@ main#scrollArea {
   background: var(--ae-bg) !important;
   color: var(--ae-text) !important;
 }
-header,
-.time-ruler-wrap,
-.top-ruler .marker-rail,
-.horizontal-scrollbar,
-.flow-chart-header {
-  background: var(--ae-panel) !important;
-  border-color: var(--ae-border) !important;
-}
 .track,
 body.keyframe-mode .keyframe-layer-row {
   background: var(--ae-row) !important;
@@ -6605,19 +6470,6 @@ header {
   background: linear-gradient(180deg, rgba(10,132,255,.92), rgba(0,96,210,.92)) !important;
   color: #fff !important;
   box-shadow: 0 0 0 1px rgba(10,132,255,.18), 0 6px 16px rgba(10,132,255,.18) !important;
-}
-
-.comp-select-menu,
-.settings-menu,
-.layer-menu.open,
-.duration-dialog,
-.timeline-command-dialog,
-.layer-style-dialog,
-.flow-chart-panel {
-  border-radius: 8px !important;
-  border-color: rgba(255,255,255,.12) !important;
-  background: rgba(33,34,38,.98) !important;
-  box-shadow: var(--apple-shadow) !important;
 }
 
 .comp-select-item,
@@ -6842,30 +6694,11 @@ main#scrollArea {
   background: var(--ae-bg) !important;
 }
 
-header,
-.time-ruler-wrap,
-.top-ruler .marker-rail,
-.horizontal-scrollbar,
-.flow-chart-header {
-  background: var(--ae-panel) !important;
-}
-
 .track-label,
 #timeDisplay,
 #scrollArea::after,
 .filter-column {
   background: linear-gradient(90deg, #15161a, #191a1f) !important;
-}
-
-.fx-console-panel,
-.comp-select-menu,
-.settings-menu,
-.layer-menu.open,
-.duration-dialog,
-.timeline-command-dialog,
-.layer-style-dialog,
-.flow-chart-panel {
-  background: rgba(20,21,25,.98) !important;
 }
 
 .ease-dialog-backdrop {
@@ -8214,45 +8047,10 @@ header {
   font-size: 12px !important;
 }
 
-.platform-badge,
-.comp-select-button,
-#durationBtn,
-#keyframeModeBtn,
-.filter-btn,
-.dialog-btn,
-.layer-style-close,
-.ease-close,
-.flow-chart-close,
-.marker-duration-reset,
-.timeline-command-dialog-actions button,
-.layer-style-dialog-actions button {
-  border: 1px solid var(--tnt-border) !important;
-  border-radius: 10px !important;
-  background: var(--tnt-surface-soft) !important;
-  color: rgba(245,245,247,.86) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.055) !important;
-}
-
 .comp-select-button,
 #durationBtn,
 #keyframeModeBtn {
   height: 34px !important;
-}
-
-.platform-badge:hover,
-.comp-select-button:hover,
-#durationBtn:hover,
-#keyframeModeBtn:hover,
-.filter-btn:hover,
-.dialog-btn:hover,
-.layer-style-close:hover,
-.ease-close:hover,
-.flow-chart-close:hover,
-.timeline-command-dialog-actions button:hover,
-.layer-style-dialog-actions button:hover {
-  border-color: rgba(255,255,255,.20) !important;
-  background: var(--tnt-surface-hover) !important;
-  color: #fff !important;
 }
 
 #keyframeModeBtn.active,
@@ -8403,42 +8201,6 @@ body.keyframe-mode .keyframe-property-row > .track-label,
   background: rgba(255,255,255,.28) !important;
 }
 
-.modal-backdrop,
-.ease-dialog-backdrop,
-.flow-chart-overlay {
-  background: rgba(0,0,0,.30) !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
-
-.duration-dialog,
-.expression-dialog,
-.anchor-dialog,
-.ease-dialog,
-.flow-chart-panel {
-  border: 1px solid rgba(255,255,255,.16) !important;
-  border-radius: 14px !important;
-  background: rgba(48,48,50,.78) !important;
-  box-shadow: var(--tnt-shadow), inset 0 1px 0 rgba(255,255,255,.08) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(118%) !important;
-  backdrop-filter: blur(22px) saturate(118%) !important;
-}
-
-.dialog-title,
-.ease-dialog-title,
-.flow-chart-title,
-.layer-style-dialog-title {
-  color: rgba(255,255,255,.94) !important;
-  font-weight: 650 !important;
-}
-
-.dialog-subtitle,
-.ease-dialog-subtitle,
-.flow-chart-subtitle,
-.layer-style-dialog-subtitle {
-  color: var(--tnt-text-soft) !important;
-}
-
 .duration-dialog input,
 .expression-dialog textarea,
 .timeline-command-dialog-field input,
@@ -8555,17 +8317,6 @@ body.keyframe-mode .keyframe-property-row > .track-label,
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255,255,255,.34);
   background-clip: padding-box;
-}
-
-/* v87: subpanel glass blur belongs to the panel surface, not the whole backdrop. */
-.fx-console,
-.timeline-command-dialog-backdrop,
-.layer-style-dialog-backdrop,
-.modal-backdrop,
-.ease-dialog-backdrop,
-.flow-chart-overlay {
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
 }
 
 /* v88: Claude-orange accent, with timeline grid/purple texture fully removed. */
@@ -8693,18 +8444,6 @@ main#scrollArea,
   border-radius: var(--tnt-radius-sm) !important;
 }
 
-.filter-btn,
-.platform-badge,
-.layer-style-close,
-.ease-close,
-.flow-chart-close {
-  width: var(--tnt-control-icon) !important;
-  height: var(--tnt-control-icon) !important;
-  min-width: var(--tnt-control-icon) !important;
-  min-height: var(--tnt-control-icon) !important;
-  border-radius: var(--tnt-radius-sm) !important;
-}
-
 .relation-toggle,
 .settings-btn {
   width: var(--tnt-control-icon) !important;
@@ -8737,20 +8476,6 @@ main#scrollArea,
 .fx-console-input {
   height: 46px !important;
   border-radius: 23px !important;
-}
-
-.fx-console-panel,
-.timeline-command-dialog,
-.layer-menu.open,
-.layer-style-dialog,
-.duration-dialog,
-.expression-dialog,
-.anchor-dialog,
-.ease-dialog,
-.flow-chart-panel,
-.settings-menu,
-.comp-select-menu {
-  border-radius: var(--tnt-radius-lg) !important;
 }
 
 .layer-style-node,
@@ -8823,20 +8548,6 @@ main#scrollArea,
 .marker-duration-reset {
   min-height: var(--tnt-control-h) !important;
   height: var(--tnt-control-h) !important;
-  border-radius: var(--tnt-radius-sm) !important;
-}
-
-.filter-btn,
-.platform-badge,
-.layer-style-close,
-.ease-close,
-.flow-chart-close,
-.relation-toggle,
-.settings-btn {
-  width: var(--tnt-control-icon) !important;
-  height: var(--tnt-control-icon) !important;
-  min-width: var(--tnt-control-icon) !important;
-  min-height: var(--tnt-control-icon) !important;
   border-radius: var(--tnt-radius-sm) !important;
 }
 
@@ -8916,21 +8627,6 @@ header {
   padding: 0 10px !important;
 }
 
-.filter-btn,
-.platform-badge,
-.layer-style-close,
-.ease-close,
-.flow-chart-close,
-.relation-toggle,
-.settings-btn,
-.layer-style-delete {
-  width: var(--tnt-control-icon) !important;
-  height: var(--tnt-control-icon) !important;
-  min-width: var(--tnt-control-icon) !important;
-  min-height: var(--tnt-control-icon) !important;
-  border-radius: var(--tnt-radius-control) !important;
-}
-
 .filter-column {
   width: 30px !important;
   min-width: 30px !important;
@@ -8963,20 +8659,6 @@ header {
 .marker-layer.has-text .marker-label,
 .marker-layer.marker-region-start.has-text .marker-label {
   border-radius: 3px !important;
-}
-
-.comp-select-menu,
-.layer-menu.open,
-.timeline-command-dialog,
-.layer-style-dialog,
-.duration-dialog,
-.expression-dialog,
-.anchor-dialog,
-.ease-dialog,
-.flow-chart-panel,
-.settings-menu,
-.fx-console-panel {
-  border-radius: var(--tnt-radius-panel) !important;
 }
 
 .layer-style-node,
@@ -9062,15 +8744,6 @@ header {
 .layer-style-add-grid,
 .layer-style-header-add-row {
   gap: var(--tnt-gap) !important;
-}
-
-.layer-style-node-head,
-.flow-chart-header,
-.layer-style-dialog-head,
-.layer-style-dialog-actions,
-.ease-actions {
-  padding-left: 10px !important;
-  padding-right: 10px !important;
 }
 
 .timeline-command-dialog,
@@ -10285,19 +9958,6 @@ body textarea {
   letter-spacing: 0 !important;
 }
 
-.dialog-title,
-.layer-style-dialog-title,
-.flow-chart-title,
-.timeline-command-dialog-title,
-.clip-name,
-.comp-select-name,
-.layer-style-node-head strong,
-.mask-control-node-title,
-.anchor-section-title,
-#timeDisplay {
-  font-weight: 500 !important;
-}
-
 header,
 .status-row,
 .comp-select {
@@ -10868,6 +10528,17 @@ body.keyframe-mode .track-label {
    panel's mask-bounds toggle, so it reads as a peer rather than a new idea. */
 .anchor-align-option {
   margin: 8px 0 2px;
+}
+
+/* Tab flips the align target; the flash is what tells you it happened, since
+   the eye is on the align buttons rather than the dropdown. */
+@keyframes tntAlignTargetFlash {
+  from { border-color: rgba(233, 147, 96, .85); background: rgba(213, 111, 58, .22); }
+  to   { border-color: rgba(255, 255, 255, .16); background: rgba(0, 0, 0, .26); }
+}
+
+.anchor-align-target-flash {
+  animation: tntAlignTargetFlash 420ms ease-out;
 }
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {
@@ -14223,28 +13894,9 @@ body .ease-dialog .ease-control input[type="range"]:focus::-webkit-slider-thumb 
 body .dialog-title,
 body .layer-style-dialog-title,
 body .ease-dialog-title,
-body .flow-chart-title,
-body .timeline-command-dialog-title,
-body .mask-control-node-title {
-  font-family: var(--tnt-font-header) !important;
-  font-weight: 400 !important;
-  letter-spacing: 0 !important;
-  line-height: 1 !important;
-}
-
-body .dialog-title,
-body .layer-style-dialog-title,
-body .ease-dialog-title,
 body .timeline-command-dialog-title {
   display: flex !important;
   align-items: center !important;
-}
-
-body .dialog-title,
-body .timeline-command-dialog-title,
-body .flow-chart-title,
-body .mask-control-node-title {
-  font-size: 16px !important;
 }
 
 body .layer-style-dialog-title,
@@ -14259,23 +13911,6 @@ body .ease-dialog-title {
 .mask-control-count {
   display: inline-flex !important;
   align-items: center !important;
-  line-height: 1 !important;
-}
-
-.layer-style-dialog-head,
-.mask-control-head,
-.ease-dialog-head,
-.flow-chart-header {
-  align-items: center !important;
-}
-
-.layer-style-dialog-actions button,
-.ease-actions button,
-.dialog-actions button,
-.flow-chart-header button {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
   line-height: 1 !important;
 }
 

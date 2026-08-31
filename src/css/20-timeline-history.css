@@ -1313,14 +1313,6 @@ main#scrollArea {
   background: var(--ae-bg) !important;
   color: var(--ae-text) !important;
 }
-header,
-.time-ruler-wrap,
-.top-ruler .marker-rail,
-.horizontal-scrollbar,
-.flow-chart-header {
-  background: var(--ae-panel) !important;
-  border-color: var(--ae-border) !important;
-}
 .track,
 body.keyframe-mode .keyframe-layer-row {
   background: var(--ae-row) !important;
@@ -1434,19 +1426,6 @@ body.keyframe-mode #timeDisplay.editing {
 }
 #timeDisplay .time-display-input {
   pointer-events: auto !important;
-}
-
-/* v67: centered composition flow graph with curved directional links. */
-.flow-chart-panel {
-  width: min(950px, calc(100vw - 36px)) !important;
-}
-.flow-chart-body {
-  display: block !important;
-  position: relative !important;
-  min-height: 280px !important;
-  max-height: calc(100vh - 140px) !important;
-  overflow: auto !important;
-  padding: 14px !important;
 }
 .flow-graph {
   position: relative;
@@ -1577,14 +1556,6 @@ main#scrollArea {
   background: var(--ae-bg) !important;
   color: var(--ae-text) !important;
 }
-header,
-.time-ruler-wrap,
-.top-ruler .marker-rail,
-.horizontal-scrollbar,
-.flow-chart-header {
-  background: var(--ae-panel) !important;
-  border-color: var(--ae-border) !important;
-}
 .track,
 body.keyframe-mode .keyframe-layer-row {
   background: var(--ae-row) !important;
@@ -1641,11 +1612,6 @@ main#scrollArea {
   background: var(--ae-bg) !important;
   color: var(--ae-text) !important;
 }
-header,
-.flow-chart-header {
-  background: var(--ae-panel-raised) !important;
-  border-bottom-color: var(--ae-border) !important;
-}
 .time-ruler-wrap,
 .top-ruler .marker-rail,
 .horizontal-scrollbar {
@@ -1700,34 +1666,10 @@ body.keyframe-mode .keyframe-property-row.has-expression,
 #playhead::after {
   background: var(--ae-blue) !important;
 }
-.comp-select-button,
-.duration-dialog,
-.fx-console-panel,
-.flow-chart-panel {
-  background: #202020 !important;
-  border-color: var(--ae-border) !important;
-}
 .comp-select-menu,
 .layer-menu.open {
   background: #1b1b1b !important;
   border-color: var(--ae-border) !important;
-}
-.filter-btn,
-#durationBtn,
-#keyframeModeBtn,
-.dialog-btn,
-.flow-chart-close {
-  background: #303030 !important;
-  border-color: #454545 !important;
-  color: #d4d4d4 !important;
-}
-.filter-btn:hover,
-#durationBtn:hover,
-#keyframeModeBtn:hover,
-.dialog-btn:hover,
-.flow-chart-close:hover {
-  background: #3a3a3a !important;
-  border-color: #5a5a5a !important;
 }
 #keyframeModeBtn.active,
 .filter-btn.active,

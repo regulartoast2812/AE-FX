@@ -42,10 +42,6 @@ const anchorErrorEl = document.getElementById("anchorError");
 const compositionModalEl = document.getElementById("compositionModal");
 const compositionNameEl = document.getElementById("compositionName");
 const compositionErrorEl = document.getElementById("compositionError");
-const flowChartOverlayEl = document.getElementById("flowChartOverlay");
-const flowChartBodyEl = document.getElementById("flowChartBody");
-const flowChartSubtitleEl = document.getElementById("flowChartSubtitle");
-const flowChartCloseEl = document.getElementById("flowChartClose");
 const layerMenuEl = document.getElementById("layerMenu");
 const filterColumnEl = document.getElementById("filterColumn");
 const settingsBtnEl = document.getElementById("settingsBtn");
@@ -217,7 +213,6 @@ const FX_CONSOLE_COMMANDS = [
   { type: "command", name: "Go to Next Marker Boundary", category: "Navigation", does: "Go To", targets: ["Marker"], shortcut: "X", action: () => goToMarkerBoundary(1) },
   { type: "command", name: "Go to Previous Marker Boundary", category: "Navigation", does: "Go To", targets: ["Marker"], shortcut: "Alt+X", action: () => goToMarkerBoundary(-1) },
   { type: "command", name: "Toggle Edit / Keyframe View", category: "View", does: "Show", targets: ["Animation"], shortcut: "Option/Alt+`", action: toggleTimelineMode },
-  { type: "command", name: "Composition Flow", category: "Navigation", does: "Show", targets: ["Comp"], shortcut: "Tab", action: toggleFlowChart },
   { type: "command", name: "Reveal Keyframes", category: "View", does: "Show", targets: ["Animation"], shortcut: "U", action: toggleSelectedKeyframeExpansion },
   { type: "command", name: "Expand Animated Keyframe Properties", category: "View", does: "Show", targets: ["Animation"], shortcut: "", action: expandAnimatedKeyframeProperties },
   { type: "command", name: "Collapse Keyframe Properties", category: "View", does: "Show", targets: ["Animation"], shortcut: "", action: collapseAllKeyframeProperties },
@@ -676,8 +671,7 @@ function isInternalPopupOpen() {
     (massEditDialogEl && massEditDialogEl.classList.contains("show")) ||
     (durationModalEl && durationModalEl.classList.contains("show")) ||
     (expressionModalEl && expressionModalEl.classList.contains("show")) ||
-    (compSelectEl && compSelectEl.classList.contains("open")) ||
-    (flowChartOverlayEl && flowChartOverlayEl.classList.contains("open"))
+    (compSelectEl && compSelectEl.classList.contains("open"))
   );
 }
 

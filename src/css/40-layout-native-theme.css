@@ -411,14 +411,6 @@ main#scrollArea {
   background: var(--ae-bg) !important;
   color: var(--ae-text) !important;
 }
-header,
-.time-ruler-wrap,
-.top-ruler .marker-rail,
-.horizontal-scrollbar,
-.flow-chart-header {
-  background: var(--ae-panel) !important;
-  border-color: var(--ae-border) !important;
-}
 .track,
 body.keyframe-mode .keyframe-layer-row {
   background: var(--ae-row) !important;
@@ -599,19 +591,6 @@ header {
   background: linear-gradient(180deg, rgba(10,132,255,.92), rgba(0,96,210,.92)) !important;
   color: #fff !important;
   box-shadow: 0 0 0 1px rgba(10,132,255,.18), 0 6px 16px rgba(10,132,255,.18) !important;
-}
-
-.comp-select-menu,
-.settings-menu,
-.layer-menu.open,
-.duration-dialog,
-.timeline-command-dialog,
-.layer-style-dialog,
-.flow-chart-panel {
-  border-radius: 8px !important;
-  border-color: rgba(255,255,255,.12) !important;
-  background: rgba(33,34,38,.98) !important;
-  box-shadow: var(--apple-shadow) !important;
 }
 
 .comp-select-item,
@@ -836,30 +815,11 @@ main#scrollArea {
   background: var(--ae-bg) !important;
 }
 
-header,
-.time-ruler-wrap,
-.top-ruler .marker-rail,
-.horizontal-scrollbar,
-.flow-chart-header {
-  background: var(--ae-panel) !important;
-}
-
 .track-label,
 #timeDisplay,
 #scrollArea::after,
 .filter-column {
   background: linear-gradient(90deg, #15161a, #191a1f) !important;
-}
-
-.fx-console-panel,
-.comp-select-menu,
-.settings-menu,
-.layer-menu.open,
-.duration-dialog,
-.timeline-command-dialog,
-.layer-style-dialog,
-.flow-chart-panel {
-  background: rgba(20,21,25,.98) !important;
 }
 
 .ease-dialog-backdrop {

@@ -1162,19 +1162,6 @@ body textarea {
   letter-spacing: 0 !important;
 }
 
-.dialog-title,
-.layer-style-dialog-title,
-.flow-chart-title,
-.timeline-command-dialog-title,
-.clip-name,
-.comp-select-name,
-.layer-style-node-head strong,
-.mask-control-node-title,
-.anchor-section-title,
-#timeDisplay {
-  font-weight: 500 !important;
-}
-
 header,
 .status-row,
 .comp-select {
@@ -1745,4 +1732,15 @@ body.keyframe-mode .track-label {
    panel's mask-bounds toggle, so it reads as a peer rather than a new idea. */
 .anchor-align-option {
   margin: 8px 0 2px;
+}
+
+/* Tab flips the align target; the flash is what tells you it happened, since
+   the eye is on the align buttons rather than the dropdown. */
+@keyframes tntAlignTargetFlash {
+  from { border-color: rgba(233, 147, 96, .85); background: rgba(213, 111, 58, .22); }
+  to   { border-color: rgba(255, 255, 255, .16); background: rgba(0, 0, 0, .26); }
+}
+
+.anchor-align-target-flash {
+  animation: tntAlignTargetFlash 420ms ease-out;
 }

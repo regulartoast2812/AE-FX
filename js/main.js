@@ -45,10 +45,6 @@ const anchorErrorEl = document.getElementById("anchorError");
 const compositionModalEl = document.getElementById("compositionModal");
 const compositionNameEl = document.getElementById("compositionName");
 const compositionErrorEl = document.getElementById("compositionError");
-const flowChartOverlayEl = document.getElementById("flowChartOverlay");
-const flowChartBodyEl = document.getElementById("flowChartBody");
-const flowChartSubtitleEl = document.getElementById("flowChartSubtitle");
-const flowChartCloseEl = document.getElementById("flowChartClose");
 const layerMenuEl = document.getElementById("layerMenu");
 const filterColumnEl = document.getElementById("filterColumn");
 const settingsBtnEl = document.getElementById("settingsBtn");
@@ -220,7 +216,6 @@ const FX_CONSOLE_COMMANDS = [
   { type: "command", name: "Go to Next Marker Boundary", category: "Navigation", does: "Go To", targets: ["Marker"], shortcut: "X", action: () => goToMarkerBoundary(1) },
   { type: "command", name: "Go to Previous Marker Boundary", category: "Navigation", does: "Go To", targets: ["Marker"], shortcut: "Alt+X", action: () => goToMarkerBoundary(-1) },
   { type: "command", name: "Toggle Edit / Keyframe View", category: "View", does: "Show", targets: ["Animation"], shortcut: "Option/Alt+`", action: toggleTimelineMode },
-  { type: "command", name: "Composition Flow", category: "Navigation", does: "Show", targets: ["Comp"], shortcut: "Tab", action: toggleFlowChart },
   { type: "command", name: "Reveal Keyframes", category: "View", does: "Show", targets: ["Animation"], shortcut: "U", action: toggleSelectedKeyframeExpansion },
   { type: "command", name: "Expand Animated Keyframe Properties", category: "View", does: "Show", targets: ["Animation"], shortcut: "", action: expandAnimatedKeyframeProperties },
   { type: "command", name: "Collapse Keyframe Properties", category: "View", does: "Show", targets: ["Animation"], shortcut: "", action: collapseAllKeyframeProperties },
@@ -679,8 +674,7 @@ function isInternalPopupOpen() {
     (massEditDialogEl && massEditDialogEl.classList.contains("show")) ||
     (durationModalEl && durationModalEl.classList.contains("show")) ||
     (expressionModalEl && expressionModalEl.classList.contains("show")) ||
-    (compSelectEl && compSelectEl.classList.contains("open")) ||
-    (flowChartOverlayEl && flowChartOverlayEl.classList.contains("open"))
+    (compSelectEl && compSelectEl.classList.contains("open"))
   );
 }
 
@@ -3875,7 +3869,6 @@ function openShortcutRundown() {
     [`${mod}+C / ${mod}+V`, "Copy / paste selection"],
     ["Enter", "Run selected command"],
     ["Right / Left", "Open or close command submenu"],
-    ["Tab", "Composition Flow"],
     ["X", "Go to next marker boundary"],
     ["Shift+X", "Layer Selection & Filters"],
     ["A", "Anchor Point Master"],
@@ -5248,182 +5241,6 @@ function uniqueIds(ids) {
     seen[key] = true;
     return true;
   });
-}
-
-function flowCompButton(comp, className = "") {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "flow-node" + (className ? ` ${className}` : "");
-  button.dataset.compId = String(comp.id || "");
-  button.innerHTML = `<span>${escapeHtml(comp.name || "Composition")}</span><em>${escapeHtml(formatCompSummary(comp))}</em>`;
-  button.addEventListener("click", () => {
-    closeFlowChart();
-    selectCompFromHeader(button.dataset.compId);
-  });
-  return button;
-}
-
-function renderFlowChart() {
-  if (!flowChartBodyEl) return;
-  const activeId = state.comp && state.comp.id ? String(state.comp.id) : "";
-  const map = compByIdMap();
-  const activeComp = map[activeId] || state.comp || null;
-  const parentIds = activeComp ? uniqueIds(activeComp.parentIds || []) : [];
-  const childIds = activeComp
-    ? uniqueIds((activeComp.childIds || []).concat((state.layers || []).map(layer => layer.sourceCompId || 0)))
-    : [];
-  flowChartBodyEl.innerHTML = "";
-  [
-    { title: "Parents", ids: parentIds, empty: "No parent comps" },
-    { title: "Current", ids: activeComp ? [activeComp.id] : [], empty: "No active comp", active: true },
-    { title: "Precomps", ids: childIds, empty: "No precomps" }
-  ].forEach((group, index) => {
-    const column = document.createElement("div");
-    column.className = "flow-column";
-    const title = document.createElement("div");
-    title.className = "flow-column-title";
-    title.textContent = group.title;
-    column.appendChild(title);
-    if (!group.ids.length) {
-      const empty = document.createElement("div");
-      empty.className = "flow-empty";
-      empty.textContent = group.empty;
-      column.appendChild(empty);
-    } else {
-      group.ids.forEach(id => {
-        const comp = map[String(id)] || (String(id) === activeId ? activeComp : null);
-        if (comp) column.appendChild(flowCompButton(comp, group.active ? "active" : ""));
-      });
-    }
-    flowChartBodyEl.appendChild(column);
-    if (index < 2) {
-      const connector = document.createElement("div");
-      connector.className = "flow-connector";
-      connector.textContent = "›";
-      flowChartBodyEl.appendChild(connector);
-    }
-  });
-  if (flowChartSubtitleEl) flowChartSubtitleEl.textContent = `${(state.comps || []).length} comps - click a node to open`;
-}
-
-function renderFlowGraph() {
-  if (!flowChartBodyEl) return;
-  const activeId = state.comp && state.comp.id ? String(state.comp.id) : "";
-  const map = compByIdMap();
-  const activeComp = map[activeId] || state.comp || null;
-  const parentIds = activeComp ? uniqueIds(activeComp.parentIds || []) : [];
-  const childIds = activeComp
-    ? uniqueIds((activeComp.childIds || []).concat((state.layers || []).map(layer => layer.sourceCompId || 0)))
-    : [];
-  const parents = parentIds.map(id => map[String(id)]).filter(Boolean);
-  const children = childIds.map(id => map[String(id)]).filter(Boolean);
-  const sideCount = Math.max(parents.length, children.length, 1);
-  const viewHeight = Math.max(240, sideCount * 58 + 88);
-  const centerY = viewHeight / 2;
-  const parentYs = flowNodeYs(parents.length, viewHeight);
-  const childYs = flowNodeYs(children.length, viewHeight);
-
-  flowChartBodyEl.innerHTML = "";
-  const graph = document.createElement("div");
-  graph.className = "flow-graph";
-  graph.style.minHeight = `${viewHeight}px`;
-
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("class", "flow-lines");
-  svg.setAttribute("viewBox", `0 0 900 ${viewHeight}`);
-  svg.setAttribute("preserveAspectRatio", "none");
-  svg.innerHTML = `
-    <defs>
-      <marker id="flowArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
-        <path d="M0,0 L8,4 L0,8 Z"></path>
-      </marker>
-    </defs>
-  `;
-  parents.forEach((comp, index) => svg.appendChild(flowCurvePath(282, parentYs[index], 365, centerY)));
-  children.forEach((comp, index) => svg.appendChild(flowCurvePath(535, centerY, 618, childYs[index])));
-  graph.appendChild(svg);
-  graph.appendChild(flowGraphColumn("Parents", parents, "left", parentYs, viewHeight));
-  graph.appendChild(flowGraphCurrent(activeComp, centerY));
-  graph.appendChild(flowGraphColumn("Precomps", children, "right", childYs, viewHeight));
-  flowChartBodyEl.appendChild(graph);
-  if (flowChartSubtitleEl) flowChartSubtitleEl.textContent = `${(state.comps || []).length} comps - click a node to open`;
-}
-
-function flowNodeYs(count, viewHeight) {
-  if (!count) return [];
-  if (count === 1) return [viewHeight / 2];
-  const top = 52;
-  const bottom = viewHeight - 52;
-  const step = (bottom - top) / Math.max(1, count - 1);
-  return Array.from({ length: count }, (_, index) => top + step * index);
-}
-
-function flowCurvePath(startX, startY, endX, endY) {
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  const bend = Math.max(50, Math.abs(endX - startX) * 0.55);
-  path.setAttribute("d", `M ${startX} ${startY} C ${startX + bend} ${startY}, ${endX - bend} ${endY}, ${endX} ${endY}`);
-  path.setAttribute("class", "flow-line");
-  path.setAttribute("marker-end", "url(#flowArrow)");
-  return path;
-}
-
-function flowGraphColumn(titleText, comps, side, ys, viewHeight) {
-  const column = document.createElement("div");
-  column.className = `flow-graph-column ${side}`;
-  const title = document.createElement("div");
-  title.className = "flow-column-title";
-  title.textContent = titleText;
-  column.appendChild(title);
-  if (!comps.length) {
-    const empty = document.createElement("div");
-    empty.className = "flow-empty graph-empty";
-    empty.textContent = side === "left" ? "No parent comps" : "No precomps";
-    empty.style.top = `${viewHeight / 2}px`;
-    column.appendChild(empty);
-    return column;
-  }
-  comps.forEach((comp, index) => {
-    const node = flowCompButton(comp);
-    node.style.top = `${ys[index]}px`;
-    column.appendChild(node);
-  });
-  return column;
-}
-
-function flowGraphCurrent(activeComp, centerY) {
-  const column = document.createElement("div");
-  column.className = "flow-graph-column center";
-  const title = document.createElement("div");
-  title.className = "flow-column-title";
-  title.textContent = "Current";
-  column.appendChild(title);
-  const node = activeComp ? flowCompButton(activeComp, "active current") : document.createElement("div");
-  if (!activeComp) {
-    node.className = "flow-empty graph-empty";
-    node.textContent = "No active comp";
-  }
-  node.style.top = `${centerY}px`;
-  column.appendChild(node);
-  return column;
-}
-
-function openFlowChart() {
-  if (!flowChartOverlayEl) return;
-  renderFlowGraph();
-  flowChartOverlayEl.classList.add("open");
-  flowChartOverlayEl.setAttribute("aria-hidden", "false");
-}
-
-function closeFlowChart() {
-  if (!flowChartOverlayEl) return;
-  flowChartOverlayEl.classList.remove("open");
-  flowChartOverlayEl.setAttribute("aria-hidden", "true");
-}
-
-function toggleFlowChart() {
-  if (!flowChartOverlayEl) return;
-  if (flowChartOverlayEl.classList.contains("open")) closeFlowChart();
-  else openFlowChart();
 }
 
 function formatCompSummary(comp) {
@@ -11386,10 +11203,6 @@ function closeActivePopup() {
     closeCompSelect();
     closed = true;
   }
-  if (flowChartOverlayEl && flowChartOverlayEl.classList.contains("open")) {
-    closeFlowChart();
-    closed = true;
-  }
   if (closed) focusPanel(2);
   return closed;
 }
@@ -11421,6 +11234,31 @@ async function centerSelectedAnchorPoints() {
   hideAnchorDialog();
   await refreshLayers({ forceRender: true });
   focusPanel(2);
+}
+
+// Tab was bound to the Composition Flow overlay, which is gone. In the anchor
+// panel it now flips "Align Layers to" between Selection and Composition -
+// the one setting you change constantly while aligning, and reaching for a
+// dropdown mid-flow is what made it tedious.
+//
+// It only acts while that panel is open. Everywhere else Tab is left alone
+// rather than silently bound to nothing.
+function toggleAlignTargetIfAnchorOpen() {
+  if (!anchorModalEl || !anchorModalEl.classList.contains("show")) return;
+  const select = document.getElementById("anchorAlignTarget");
+  if (!select) return;
+  select.value = select.value === "selection" ? "comp" : "selection";
+  select.dispatchEvent(new Event("change", { bubbles: true }));
+  if (statusEl) {
+    statusEl.textContent = select.value === "comp"
+      ? "Aligning to the composition."
+      : "Aligning to the selection.";
+  }
+  // A brief highlight, because the dropdown is easy to miss when the eye is on
+  // the align buttons.
+  select.classList.remove("anchor-align-target-flash");
+  void select.offsetWidth;
+  select.classList.add("anchor-align-target-flash");
 }
 
 async function alignSelectedLayersFromAnchorPanel(mode) {
@@ -11506,7 +11344,7 @@ const SHORTCUT_ACTIONS = {
   "alt+arrowdown": () => moveSelectedLayersInStack("down"),
   "shift+alt+arrowup": () => moveSelectedLayersInStack("top"),
   "shift+alt+arrowdown": () => moveSelectedLayersInStack("bottom"),
-  "tab": toggleFlowChart,
+  "tab": toggleAlignTargetIfAnchorOpen,
   "escape": closeActivePopup,
   "space": togglePlay,
   "a": () => openSubpanelByKey("anchor"),
@@ -12616,7 +12454,6 @@ function closeNativeQuickPanelSurfaces() {
   if (anchorModalEl && anchorModalEl.classList.contains("show")) hideAnchorDialog();
   if (durationModalEl && durationModalEl.classList.contains("show")) hideDurationDialog();
   if (compSelectEl && compSelectEl.classList.contains("open")) closeCompSelect();
-  if (flowChartOverlayEl && flowChartOverlayEl.classList.contains("open")) closeFlowChart();
 }
 
 function resetNativeQuickPanelToLauncher() {
@@ -14626,10 +14463,6 @@ if (anchorModalEl) anchorModalEl.addEventListener("click", e => {
 if (anchorModalEl) anchorModalEl.addEventListener("mousedown", e => { if (e.target === anchorModalEl) hideAnchorDialog(); });
 if (anchorModalEl) anchorModalEl.addEventListener("keydown", e => {
   if (e.key === "Escape") { e.preventDefault(); hideAnchorDialog(); }
-});
-if (flowChartCloseEl) flowChartCloseEl.addEventListener("click", closeFlowChart);
-if (flowChartOverlayEl) flowChartOverlayEl.addEventListener("mousedown", event => {
-  if (event.target === flowChartOverlayEl) closeFlowChart();
 });
 scrollAreaEl.addEventListener("scroll", syncBottomRulerPosition);
 if (horizontalScrollBarEl) horizontalScrollBarEl.addEventListener("mousedown", beginHorizontalScrollDrag);
