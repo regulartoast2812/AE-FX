@@ -1797,7 +1797,8 @@ body:not(.quick-panel-mode) #assistantHub {
 }
 
 .assistant-function-card[data-fx-source]::before,
-.quick-panel-search-result[data-fx-source]::before {
+.quick-panel-search-result[data-fx-source]::before,
+.tnk-tool[data-fx-source]::before {
   content: "";
   position: absolute;
   top: 0;
@@ -1810,12 +1811,14 @@ body:not(.quick-panel-mode) #assistantHub {
 }
 
 .assistant-function-card[data-fx-source="panel"]::before,
-.quick-panel-search-result[data-fx-source="panel"]::before {
+.quick-panel-search-result[data-fx-source="panel"]::before,
+.tnk-tool[data-fx-source="panel"]::before {
   background: rgba(104, 148, 214, .75);
 }
 
 .assistant-function-card[data-fx-source="custom"]::before,
-.quick-panel-search-result[data-fx-source="custom"]::before {
+.quick-panel-search-result[data-fx-source="custom"]::before,
+.tnk-tool[data-fx-source="custom"]::before {
   background: rgba(104, 190, 130, .8);
 }
 

@@ -304,3 +304,22 @@
 .tnk-tool.unmet {
   opacity: .38;
 }
+
+/* The source strip, same three colours as the Functions list and the quick
+   panel results. Narrower here because the button is 31px, and clipped to the
+   button's own radius so it follows the rounded corner. */
+.tnk-tool[data-fx-source] {
+  overflow: hidden;
+}
+
+.tnk-tool[data-fx-source]::before {
+  width: 2px !important;
+  border-radius: 0 !important;
+}
+
+/* The strip keeps its colour when the tool is unavailable - it says where the
+   command comes from, which does not change with the selection. It is the one
+   thing left at full strength on a dimmed button, so the row still scans. */
+.tnk-tool.unmet::before {
+  opacity: .55;
+}

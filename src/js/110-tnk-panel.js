@@ -358,7 +358,7 @@ function tnkToolMarkup(item, index, entryIndex) {
   if (item.alt && entryIndex.has(item.alt)) lines.push(`- Alt: ${item.alt}`);
   if (driven) lines.push("- Uses the bar parameters");
   return `
-    <button type="button" class="tnk-tool${driven ? " driven" : ""}${item.key ? " keyed" : ""}${unmet ? " unmet" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}"${item.desc ? ` data-tooltip-desc="${escapeHtml(item.desc)}"` : ""}${item.key ? ` data-tooltip-key="${escapeHtml(item.key === "`" ? "\u0060" : item.key.toUpperCase())}"` : ""}>
+    <button type="button" class="tnk-tool${driven ? " driven" : ""}${item.key ? " keyed" : ""}${unmet ? " unmet" : ""}" data-tnk-index="${index}" data-fx-source="${tntSourceGroup(entry)}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}"${item.desc ? ` data-tooltip-desc="${escapeHtml(item.desc)}"` : ""}${item.key ? ` data-tooltip-key="${escapeHtml(item.key === "`" ? "\u0060" : item.key.toUpperCase())}"` : ""}>
       ${tntIconSvg(item.icon, "tnk-tool-icon") || ""}
       ${tnkKeyBadge(item.key)}
     </button>
