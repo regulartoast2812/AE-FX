@@ -1793,12 +1793,31 @@ body.keyframe-mode .track-label {
 .anchor-dialog:has(.timing-order-backdrop.embedded) {
   width: min(1280px, calc(100vw - 40px)) !important;
   max-width: none !important;
-  /* Opaque. The dialog's own background is translucent with a blur, which was
-     fine for a small floating box over the timeline and reads as unfinished at
-     1280px - the Functions list showed straight through the timing columns. */
+}
+
+/* Docked only. In the overlay the anchor dialog is a bare wrapper - its child
+   sections carry the shadow and the fill - so painting the wrapper put a large
+   opaque rectangle behind five boxes that already had their own. */
+body:not(.quick-panel-mode) .anchor-dialog:has(.timing-order-backdrop.embedded) {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .012) 40%, rgba(0, 0, 0, .12)),
     #1c1d1f !important;
+}
+
+/* The 40px shadow gutter is for a backdrop that fills the window. Embedded,
+   this element is a column in a row, and that padding pushed the three timing
+   sections 40px below anchor and align.
+   Written with the body class because the gutter rule carries one too and
+   lands later in the bundle - equal specificity would have lost. */
+body.quick-panel-mode .timing-order-backdrop.embedded,
+.timing-order-backdrop.embedded {
+  padding: 0 !important;
+}
+
+/* Same reason: the wrapper's own gutter padding made the overlay window 80px
+   wider and taller than the sections inside it. */
+body.quick-panel-mode .anchor-dialog:has(.timing-order-backdrop.embedded) {
+  padding: 0 !important;
 }
 
 .anchor-panel:has(.timing-order-backdrop.embedded) {
@@ -1874,6 +1893,7 @@ body.keyframe-mode .track-label {
   min-height: 0 !important;
   padding: 0 !important;
   border: 0 !important;
+  background: none !important;
   margin-bottom: 8px;
 }
 
