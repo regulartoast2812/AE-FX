@@ -10524,10 +10524,13 @@ body.keyframe-mode .track-label {
   padding: 0 10px !important;
 }
 
-/* Sits under the align grid, above Distribute - same control as the anchor
-   panel's mask-bounds toggle, so it reads as a peer rather than a new idea. */
+/* Last row of the align section, under both grids: it governs align and
+   distribute alike, so sitting beside either one would misread as belonging
+   to just that half. Ruled off for the same reason. */
 .anchor-align-option {
-  margin: 8px 0 2px;
+  margin: 10px 0 0;
+  padding-top: 9px;
+  border-top: 1px solid rgba(255, 255, 255, .07);
 }
 
 /* Tab flips the align target; the flash is what tells you it happened, since
