@@ -525,11 +525,20 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             panel?.orderOut(nil)
             return
         }
-        // Opening straight into a subpanel means the window is ordered front at the
-        // launcher size, then resized (and recentred) once the page measures its
-        // content. Showing both states is the multiple blink. Order it front fully
-        // transparent instead and reveal it on the first resize.
-        let deferReveal = controlName != nil && !panel.isVisible
+        // The window opens at the launcher size and is resized once the page has
+        // measured its content. afterEffectsOverlayFrame centres it, so growing
+        // from 620px to a wider panel expands from the middle outward on both
+        // sides - which reads as a scale animation even though animate is false
+        // and it is one discrete jump.
+        //
+        // The cure is to not be visible while it happens: go transparent, take
+        // the resize, then reveal. This used to apply only when the panel was
+        // hidden, so summoning a subpanel while the launcher was already up
+        // showed the whole grow.
+        // A group scope resizes the same way, so it defers too. Read here rather
+        // than at the evaluate below, since the decision is needed now.
+        let pendingGroup = controlName == nil ? takePendingQuickPanelScope() : nil
+        let deferReveal = controlName != nil || pendingGroup != nil
         pendingRevealWorkItem?.cancel()
         pendingRevealWorkItem = nil
         panel.alphaValue = deferReveal ? 0 : 1
@@ -545,7 +554,6 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             scheduleReveal(after: 0.45)
         }
 
-        let pendingGroup = controlName == nil ? takePendingQuickPanelScope() : nil
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) { [weak self] in
             let showScript: String
             if let controlName {
