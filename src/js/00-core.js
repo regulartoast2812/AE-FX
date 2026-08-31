@@ -208,8 +208,11 @@ const EASE_GRAPH = {
 
 const FX_CONSOLE_COMMANDS = [
   { type: "command", name: "Open Quick Controls", category: "Native", does: "Open", targets: [], shortcut: "Ctrl+Space", action: launchNativeQuickControls },
-  { type: "command", name: "Trim In to Playhead", category: "Shortcut", does: "Set", targets: ["Layer"], shortcut: "Q", action: () => runBundledShortcut('Trim In to playhead.jsxbin') },
-  { type: "command", name: "Trim Out to Playhead", category: "Shortcut", does: "Set", targets: ["Layer"], shortcut: "W", action: () => runBundledShortcut('Trim Out to playhead.jsxbin') },
+  // A group parent. It runs by scoping the search to its children rather than
+  // doing anything itself - see parseFxConsoleScope in 80-command-palette.js.
+  { type: "command", name: "Trim Layer", category: "Layers", does: "Set", targets: ["Layer"], shortcut: "", groupParent: "Trim Layer" },
+  { type: "command", name: "Trim In to Playhead", category: "Shortcut", group: "Trim Layer", does: "Set", targets: ["Layer"], shortcut: "Q", action: () => runBundledShortcut('Trim In to playhead.jsxbin') },
+  { type: "command", name: "Trim Out to Playhead", category: "Shortcut", group: "Trim Layer", does: "Set", targets: ["Layer"], shortcut: "W", action: () => runBundledShortcut('Trim Out to playhead.jsxbin') },
   { type: "command", name: "Go to Next Marker Boundary", category: "Navigation", does: "Go To", targets: ["Marker"], shortcut: "X", action: () => goToMarkerBoundary(1) },
   { type: "command", name: "Go to Previous Marker Boundary", category: "Navigation", does: "Go To", targets: ["Marker"], shortcut: "Alt+X", action: () => goToMarkerBoundary(-1) },
   { type: "command", name: "Toggle Edit / Keyframe View", category: "View", does: "Show", targets: ["Animation"], shortcut: "Option/Alt+`", action: toggleTimelineMode },
@@ -338,7 +341,7 @@ const TNT_V3_COMMANDS = [
   { name: "Parent to Target Layer...", category: "Layers", action: promptParentToTargetLayer },
   { name: "Precompose Selected", category: "Layers", tntFunction: "precomposeSelected" },
   { name: "Lock Selected", category: "Layers", tntFunction: "lockSelected" },
-  { name: "Trim to Keyframes", category: "Layers", tntFunction: "trimToKeyframes" },
+  { name: "Trim to Keyframes", category: "Layers", group: "Trim Layer", tntFunction: "trimToKeyframes" },
   { name: "Hide Selected", category: "Layers", tntFunction: "hideSelected" },
   { name: "Show Selected", category: "Layers", tntFunction: "showSelected" },
   { name: "Track Matte", category: "Layers", children: [

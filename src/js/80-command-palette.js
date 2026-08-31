@@ -198,7 +198,42 @@ function visibleFxConsoleCommands(query = "") {
     }))).filter(commandVisibleInFxConsole);
 }
 
+// A scope token, written into the search box rather than held as hidden state:
+//
+//   [Trim]            every command in the Trim group
+//   [Trim] playhead   the same, narrowed by "playhead"
+//
+// Grouped commands are hidden from an unscoped search - their parent row
+// stands for them - so adding a family does not flood the flat list. The token
+// is visible and editable, so backing over it is how you leave the group;
+// there is no mode to get stuck in.
+function parseFxConsoleScope(query) {
+  const match = String(query || "").match(/^\s*\[([^\]]+)\]\s*(.*)$/);
+  if (!match) return { group: "", rest: String(query || "") };
+  return { group: match[1].trim().toLowerCase(), rest: match[2] || "" };
+}
+
+function fxConsoleGroupNames() {
+  const names = new Set();
+  visibleFxConsoleCommands("").forEach(entry => {
+    if (entry && entry.group) names.add(entry.group);
+  });
+  return Array.from(names).sort();
+}
+
 function searchFxConsoleEntries(query = "", parentEntry = null, limit = 24) {
+  const scope = parseFxConsoleScope(query);
+  if (scope.group && !parentEntry) {
+    const terms = scope.rest.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    return visibleFxConsoleCommands("")
+      .filter(entry => entry && entry.group && entry.group.toLowerCase() === scope.group)
+      .filter(entry => {
+        if (!terms.length) return true;
+        const haystack = `${entry.name || ""} ${entry.category || ""} ${entry.shortcut || ""}`.toLowerCase();
+        return terms.every(term => haystack.indexOf(term) >= 0);
+      })
+      .slice(0, limit);
+  }
   const normalizedQuery = String(query || "").toLowerCase().trim();
   if (parentEntry) {
     const children = (parentEntry.children || []).map(command => ({ ...command, source: parentEntry.source || "custom", type: command.action ? "command" : "tntCommand", parentName: parentEntry.name }));
@@ -215,7 +250,9 @@ function searchFxConsoleEntries(query = "", parentEntry = null, limit = 24) {
   const effects = panelSettings.showNativeEffects && !isFilterQuery
     ? (fxConsoleEffects || []).map(effect => ({ ...effect, source: "native", type: "effect" }))
     : [];
-  const entries = visibleFxConsoleCommands(normalizedQuery).concat(effects);
+  const entries = visibleFxConsoleCommands(normalizedQuery)
+    .filter(entry => !(entry && entry.group))
+    .concat(effects);
   if (!normalizedQuery) return entries.slice(0, limit);
   const terms = normalizedQuery.split(/\s+/).filter(Boolean);
   return entries.filter(effect => {
@@ -401,13 +438,26 @@ function fxConsoleResultClass(entry, index) {
   return [
     "fx-console-result",
     `source-${meta.key}`,
-    entry && entry.children ? "has-children" : "",
+    entry && (entry.children || entry.groupParent) ? "has-children" : "",
     index === fxConsoleSelectedIndex ? "active" : ""
   ].filter(Boolean).join(" ");
 }
 
 function openFxConsoleSubmenu(entry) {
-  if (!entry || !entry.children || !entry.children.length || !fxConsoleEl) return false;
+  if (!entry || !fxConsoleEl) return false;
+  // A group parent scopes the input instead of entering a submenu mode.
+  if (entry.groupParent) {
+    const scopeInput = fxConsoleEl.querySelector(".fx-console-input");
+    if (!scopeInput) return false;
+    fxConsoleParentEntry = null;
+    fxConsoleSelectedIndex = 0;
+    scopeInput.value = `[${entry.groupParent}] `;
+    renderFxConsole();
+    scopeInput.focus();
+    scopeInput.setSelectionRange(scopeInput.value.length, scopeInput.value.length);
+    return true;
+  }
+  if (!entry.children || !entry.children.length) return false;
   fxConsoleParentEntry = entry;
   fxConsoleSelectedIndex = 0;
   const input = fxConsoleEl.querySelector(".fx-console-input");
@@ -502,12 +552,40 @@ function renderFxConsoleResults() {
 async function applySelectedFxConsoleEffect() {
   const effect = filteredFxEffects()[fxConsoleSelectedIndex];
   if (!effect) return;
-  if (effect.children && openFxConsoleSubmenu(effect)) return;
+  if ((effect.children || effect.groupParent) && openFxConsoleSubmenu(effect)) return;
   await executeFxConsoleEntry(effect);
+}
+
+// One entry point for "open this group", whichever surface is in front. A group
+// parent has no action of its own - running it anywhere scopes a search box.
+function openCommandGroup(name) {
+  const token = `[${name}] `;
+  if (typeof QUICK_PANEL_MODE !== "undefined" && QUICK_PANEL_MODE &&
+      typeof quickPanelSearchEl !== "undefined" && quickPanelSearchEl) {
+    if (typeof resetNativeQuickPanelToLauncher === "function") resetNativeQuickPanelToLauncher();
+    quickPanelSearchEl.value = token;
+    if (typeof renderQuickPanelSearchResults === "function") renderQuickPanelSearchResults();
+    quickPanelSearchEl.focus();
+    quickPanelSearchEl.setSelectionRange(token.length, token.length);
+    return true;
+  }
+  if (typeof openFxConsole === "function") openFxConsole();
+  const input = fxConsoleEl && fxConsoleEl.querySelector(".fx-console-input");
+  if (!input) return false;
+  fxConsoleParentEntry = null;
+  fxConsoleSelectedIndex = 0;
+  input.value = token;
+  renderFxConsole();
+  input.focus();
+  input.setSelectionRange(token.length, token.length);
+  return true;
 }
 
 async function executeFxConsoleEntry(effect) {
   if (!effect) return false;
+  // Guard before the type switch: a group parent carries no action, so the
+  // command branch below would call undefined.
+  if (effect.groupParent) return openCommandGroup(effect.groupParent);
   if (effect.type === "command") {
     closeFxConsole();
     await effect.action();

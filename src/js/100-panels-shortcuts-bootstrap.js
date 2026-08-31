@@ -1590,6 +1590,17 @@ async function applyQuickPanelSearchEntry(index = quickPanelSearchSelectedIndex)
   const entries = quickPanelSearchEntries();
   const entry = entries[Math.max(0, Math.min(Number(index || 0), entries.length - 1))];
   if (!entry) return;
+  // A group parent does not run anything - it writes its scope token into the
+  // search box and leaves the caret after it, so the next keystroke narrows
+  // within the group. Same box, same keys, no separate mode.
+  if (entry.groupParent) {
+    quickPanelSearchEl.value = `[${entry.groupParent}] `;
+    quickPanelSearchSelectedIndex = 0;
+    renderQuickPanelSearchResults();
+    quickPanelSearchEl.focus();
+    quickPanelSearchEl.setSelectionRange(quickPanelSearchEl.value.length, quickPanelSearchEl.value.length);
+    return;
+  }
   if (entry.children && entry.children.length) {
     quickPanelSearchParentEntry = entry;
     quickPanelSearchSelectedIndex = 0;
