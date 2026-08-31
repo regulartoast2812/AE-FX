@@ -280,10 +280,9 @@ function ensureTnkPanel() {
   tnkBackdropEl.innerHTML = `
     <section class="tnk-dialog" role="dialog" aria-modal="true" aria-label="TNK tools" tabindex="-1">
       <header class="tnk-head">
-        <div class="tnk-title"><b>TNK</b><span>Tools</span><em class="tnk-count"></em><em class="tnk-selection" data-tnt-selection></em></div>
+        <div class="tnk-title"><b>TNK</b><span>Tools</span><em class="tnk-count"></em><span class="tnk-selection" data-tnt-selection-compact></span></div>
         <button type="button" class="tnk-bar-btn" data-tnk-reset data-icon="ui.refresh" data-tooltip="Reset Parameters\nReturn every value in the bar to its default."></button>
       </header>
-      <div class="tnk-selection-panel" data-tnt-selection-bar></div>
       <div class="tnk-global-bar">${tnkParamBarMarkup()}</div>
       <div class="tnk-search-row">
         <input class="tnk-filter" type="text" spellcheck="false" autocomplete="off" placeholder="Filter tools">
@@ -359,7 +358,7 @@ function tnkToolMarkup(item, index, entryIndex) {
   if (item.alt && entryIndex.has(item.alt)) lines.push(`- Alt: ${item.alt}`);
   if (driven) lines.push("- Uses the bar parameters");
   return `
-    <button type="button" class="tnk-tool${driven ? " driven" : ""}${item.key ? " keyed" : ""}${unmet ? " unmet" : ""}" data-tnk-index="${index}" data-fx-source="${tntSourceGroup(entry)}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}"${item.desc ? ` data-tooltip-desc="${escapeHtml(item.desc)}"` : ""}${item.key ? ` data-tooltip-key="${escapeHtml(item.key === "`" ? "\u0060" : item.key.toUpperCase())}"` : ""}>
+    <button type="button" class="tnk-tool${driven ? " driven" : ""}${item.key ? " keyed" : ""}${unmet ? " unmet" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}"${item.desc ? ` data-tooltip-desc="${escapeHtml(item.desc)}"` : ""}${item.key ? ` data-tooltip-key="${escapeHtml(item.key === "`" ? "\u0060" : item.key.toUpperCase())}"` : ""}>
       ${tntIconSvg(item.icon, "tnk-tool-icon") || ""}
       ${tnkKeyBadge(item.key)}
     </button>

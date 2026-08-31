@@ -944,6 +944,35 @@ function tntLayerTypeColor(type) {
 // A proportional band per type, blended into its neighbour rather than butted
 // hard against it - the mix is the point, not the boundaries. Types are ordered
 // largest first so the bar reads the same way the chips below it do.
+// Compact form for a header row: a short proportional bar and the chips, no
+// repeated sentence. Same data as the full version, sized to sit inline.
+function tntSelectionBarCompactMarkup() {
+  const summary = tntSelectionSummary();
+  const names = Object.keys(summary.types)
+    .sort((a, b) => summary.types[b] - summary.types[a] || a.localeCompare(b));
+  if (!summary.count || !names.length) {
+    return `<span class="tnt-selection-compact empty">no selection</span>`;
+  }
+  const stops = [];
+  let at = 0;
+  names.forEach(name => {
+    const share = (summary.types[name] / summary.resolved) * 100;
+    const color = tntLayerTypeColor(name);
+    stops.push(`${color} ${at.toFixed(2)}%`);
+    at += share;
+    stops.push(`${color} ${at.toFixed(2)}%`);
+  });
+  const chips = names.map(name => {
+    const count = summary.types[name];
+    return `<span class="tnt-selection-chip" style="--tnt-chip: ${tntLayerTypeColor(name)}">` +
+      `${count} ${escapeHtml(name)}${count === 1 ? "" : "s"}</span>`;
+  }).join("");
+  return `<span class="tnt-selection-compact">` +
+    `<span class="tnt-selection-bar compact" style="background: linear-gradient(90deg, ${stops.join(", ")})" aria-hidden="true"></span>` +
+    chips +
+    `</span>`;
+}
+
 function tntSelectionBarMarkup() {
   const summary = tntSelectionSummary();
   const names = Object.keys(summary.types)
@@ -985,6 +1014,10 @@ function tntPaintSelectionReadouts(root) {
   const bar = tntSelectionBarMarkup();
   scope.querySelectorAll("[data-tnt-selection-bar]").forEach(el => {
     el.innerHTML = bar;
+  });
+  const compact = tntSelectionBarCompactMarkup();
+  scope.querySelectorAll("[data-tnt-selection-compact]").forEach(el => {
+    el.innerHTML = compact;
   });
 }
 
@@ -15359,10 +15392,9 @@ function ensureTnkPanel() {
   tnkBackdropEl.innerHTML = `
     <section class="tnk-dialog" role="dialog" aria-modal="true" aria-label="TNK tools" tabindex="-1">
       <header class="tnk-head">
-        <div class="tnk-title"><b>TNK</b><span>Tools</span><em class="tnk-count"></em><em class="tnk-selection" data-tnt-selection></em></div>
+        <div class="tnk-title"><b>TNK</b><span>Tools</span><em class="tnk-count"></em><span class="tnk-selection" data-tnt-selection-compact></span></div>
         <button type="button" class="tnk-bar-btn" data-tnk-reset data-icon="ui.refresh" data-tooltip="Reset Parameters\nReturn every value in the bar to its default."></button>
       </header>
-      <div class="tnk-selection-panel" data-tnt-selection-bar></div>
       <div class="tnk-global-bar">${tnkParamBarMarkup()}</div>
       <div class="tnk-search-row">
         <input class="tnk-filter" type="text" spellcheck="false" autocomplete="off" placeholder="Filter tools">
@@ -15438,7 +15470,7 @@ function tnkToolMarkup(item, index, entryIndex) {
   if (item.alt && entryIndex.has(item.alt)) lines.push(`- Alt: ${item.alt}`);
   if (driven) lines.push("- Uses the bar parameters");
   return `
-    <button type="button" class="tnk-tool${driven ? " driven" : ""}${item.key ? " keyed" : ""}${unmet ? " unmet" : ""}" data-tnk-index="${index}" data-fx-source="${tntSourceGroup(entry)}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}"${item.desc ? ` data-tooltip-desc="${escapeHtml(item.desc)}"` : ""}${item.key ? ` data-tooltip-key="${escapeHtml(item.key === "`" ? "\u0060" : item.key.toUpperCase())}"` : ""}>
+    <button type="button" class="tnk-tool${driven ? " driven" : ""}${item.key ? " keyed" : ""}${unmet ? " unmet" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}"${item.desc ? ` data-tooltip-desc="${escapeHtml(item.desc)}"` : ""}${item.key ? ` data-tooltip-key="${escapeHtml(item.key === "`" ? "\u0060" : item.key.toUpperCase())}"` : ""}>
       ${tntIconSvg(item.icon, "tnk-tool-icon") || ""}
       ${tnkKeyBadge(item.key)}
     </button>

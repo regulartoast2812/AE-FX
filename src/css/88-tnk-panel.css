@@ -305,18 +305,6 @@
   opacity: .38;
 }
 
-/* The source strip, same three colours as the Functions list and the quick
-   panel results. Narrower here because the button is 31px, and clipped to the
-   button's own radius so it follows the rounded corner. */
-.tnk-tool[data-fx-source] {
-  overflow: hidden;
-}
-
-.tnk-tool[data-fx-source]::before {
-  width: 2px !important;
-  border-radius: 0 !important;
-}
-
 /* The strip keeps its colour when the tool is unavailable - it says where the
    command comes from, which does not change with the selection. It is the one
    thing left at full strength on a dimmed button, so the row still scans. */
@@ -324,14 +312,39 @@
   opacity: .55;
 }
 
-/* The selection bar sits above the parameters: what you are acting on, before
-   what you are acting with. */
-.tnk-selection-panel {
-  flex: 0 0 auto;
-  padding: 11px 12px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, .07);
+
+/* Compact selection display, inline in the header row beside the tool count.
+   The bar is short because it only has to show proportion; the chips carry the
+   detail, and the full-width version with its repeated sentence was saying the
+   same thing three times. */
+.tnk-selection {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 2px;
+  padding-left: 9px;
+  border-left: 1px solid rgba(255, 255, 255, .12);
 }
 
-.tnk-selection-panel:empty {
-  display: none;
+.tnt-selection-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tnt-selection-compact.empty {
+  color: rgba(228, 228, 234, .38);
+  font-size: 11px;
+}
+
+.tnt-selection-bar.compact {
+  display: inline-block;
+  width: 46px;
+  height: 8px;
+  border-radius: 4px;
+  filter: blur(2px) saturate(115%);
+}
+
+.tnt-selection-compact .tnt-selection-chip {
+  padding: 2px 7px 2px 9px;
+  font-size: 10px;
 }
