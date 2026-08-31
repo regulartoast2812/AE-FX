@@ -560,9 +560,24 @@ function showPanelTooltip(target, event) {
   const text = normalizePanelTooltipText(target && target.dataset ? target.dataset.tooltip : "");
   if (!text) return;
   const el = ensurePanelTooltip();
-  el.innerHTML = String(text).split(/\n+/).map((line, index) =>
-    `<span class="panel-tooltip-line${index === 0 ? " first" : ""}">${escapeHtml(line)}</span>`
-  ).join("");
+  // Two conventions on top of plain lines, so any panel can use them:
+  //   data-tooltip-key="E"   a key chip beside the headline, drawn like the
+  //                          badge on the button itself
+  //   "- " line prefix       a bulleted variation rather than another
+  //                          undifferentiated sentence
+  // Everything is still escaped per line; neither convention accepts markup.
+  const keyLabel = target && target.dataset ? (target.dataset.tooltipKey || "") : "";
+  const lines = String(text).split(/\n+/);
+  el.innerHTML = lines.map((line, index) => {
+    if (index === 0) {
+      const chip = keyLabel
+        ? `<kbd class="panel-tooltip-key">${escapeHtml(keyLabel)}</kbd>`
+        : "";
+      return `<span class="panel-tooltip-line first">${escapeHtml(line)}${chip}</span>`;
+    }
+    const bullet = /^-\s+/.test(line);
+    return `<span class="panel-tooltip-line${bullet ? " bullet" : ""}">${escapeHtml(bullet ? line.replace(/^-\s+/, "") : line)}</span>`;
+  }).join("");
   el.classList.toggle("rail-tooltip", !!(target && target.closest && target.closest(".subpanel-rail")));
   el.classList.add("show");
   el.setAttribute("aria-hidden", "false");
@@ -14849,15 +14864,15 @@ function tnkToolMarkup(item, index, entryIndex) {
   // data-tooltip, not title. The native title attribute waits on the OS hover
   // delay - over a second - which is unusable on a panel whose only label is
   // the tooltip. The panel's own tooltip renders on mouseenter with no delay.
+  // Headline, then one bulleted line per variation. The key goes in
+  // data-tooltip-key so the tooltip can draw it as a chip rather than spell it
+  // out mid-sentence.
   const lines = [item.label];
-  const detail = [];
-  if (item.key) detail.push(`Key: ${item.key.toUpperCase()}`);
-  if (item.shift && entryIndex.has(item.shift)) detail.push(`Shift: ${item.shift}`);
-  if (item.alt && entryIndex.has(item.alt)) detail.push(`Alt: ${item.alt}`);
-  if (driven) detail.push("Uses the bar parameters");
-  if (detail.length) lines.push(detail.join(" \u00b7 "));
+  if (item.shift && entryIndex.has(item.shift)) lines.push(`- Shift: ${item.shift}`);
+  if (item.alt && entryIndex.has(item.alt)) lines.push(`- Alt: ${item.alt}`);
+  if (driven) lines.push("- Uses the bar parameters");
   return `
-    <button type="button" class="tnk-tool${driven ? " driven" : ""}${item.key ? " keyed" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}">
+    <button type="button" class="tnk-tool${driven ? " driven" : ""}${item.key ? " keyed" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}"${item.key ? ` data-tooltip-key="${escapeHtml(item.key === "`" ? "\u0060" : item.key.toUpperCase())}"` : ""}>
       ${tntIconSvg(item.icon, "tnk-tool-icon") || ""}
       ${tnkKeyBadge(item.key)}
     </button>

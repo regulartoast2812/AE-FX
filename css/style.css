@@ -12596,6 +12596,50 @@ body.keyframe-mode .property-label-text,
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button i {
   display: none !important;
 }
+
+/* Tooltip headline carries the key chip, drawn like the badge on the button so
+   the two read as the same thing in two places. */
+.panel-tooltip-line.first {
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  font-weight: 600 !important;
+}
+
+.panel-tooltip-key {
+  display: grid;
+  min-width: 15px;
+  height: 14px;
+  place-items: center;
+  padding: 0 3px;
+  border: 1px solid rgba(233, 147, 96, .45);
+  border-radius: 4px;
+  background: #201c1a;
+  color: rgba(240, 176, 137, .95);
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Each variation on its own line, marked, rather than run together. */
+.panel-tooltip-line.bullet {
+  position: relative !important;
+  padding-left: 11px !important;
+  color: rgba(245, 245, 247, .72) !important;
+  white-space: normal !important;
+}
+
+.panel-tooltip-line.bullet::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 6px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(233, 147, 96, .75);
+}
 /* v122: Ease Editor follows the current layer-style glass system. */
 .ease-dialog-backdrop {
   background: transparent !important;

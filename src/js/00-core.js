@@ -557,9 +557,24 @@ function showPanelTooltip(target, event) {
   const text = normalizePanelTooltipText(target && target.dataset ? target.dataset.tooltip : "");
   if (!text) return;
   const el = ensurePanelTooltip();
-  el.innerHTML = String(text).split(/\n+/).map((line, index) =>
-    `<span class="panel-tooltip-line${index === 0 ? " first" : ""}">${escapeHtml(line)}</span>`
-  ).join("");
+  // Two conventions on top of plain lines, so any panel can use them:
+  //   data-tooltip-key="E"   a key chip beside the headline, drawn like the
+  //                          badge on the button itself
+  //   "- " line prefix       a bulleted variation rather than another
+  //                          undifferentiated sentence
+  // Everything is still escaped per line; neither convention accepts markup.
+  const keyLabel = target && target.dataset ? (target.dataset.tooltipKey || "") : "";
+  const lines = String(text).split(/\n+/);
+  el.innerHTML = lines.map((line, index) => {
+    if (index === 0) {
+      const chip = keyLabel
+        ? `<kbd class="panel-tooltip-key">${escapeHtml(keyLabel)}</kbd>`
+        : "";
+      return `<span class="panel-tooltip-line first">${escapeHtml(line)}${chip}</span>`;
+    }
+    const bullet = /^-\s+/.test(line);
+    return `<span class="panel-tooltip-line${bullet ? " bullet" : ""}">${escapeHtml(bullet ? line.replace(/^-\s+/, "") : line)}</span>`;
+  }).join("");
   el.classList.toggle("rail-tooltip", !!(target && target.closest && target.closest(".subpanel-rail")));
   el.classList.add("show");
   el.setAttribute("aria-hidden", "false");

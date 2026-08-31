@@ -308,15 +308,15 @@ function tnkToolMarkup(item, index, entryIndex) {
   // data-tooltip, not title. The native title attribute waits on the OS hover
   // delay - over a second - which is unusable on a panel whose only label is
   // the tooltip. The panel's own tooltip renders on mouseenter with no delay.
+  // Headline, then one bulleted line per variation. The key goes in
+  // data-tooltip-key so the tooltip can draw it as a chip rather than spell it
+  // out mid-sentence.
   const lines = [item.label];
-  const detail = [];
-  if (item.key) detail.push(`Key: ${item.key.toUpperCase()}`);
-  if (item.shift && entryIndex.has(item.shift)) detail.push(`Shift: ${item.shift}`);
-  if (item.alt && entryIndex.has(item.alt)) detail.push(`Alt: ${item.alt}`);
-  if (driven) detail.push("Uses the bar parameters");
-  if (detail.length) lines.push(detail.join(" \u00b7 "));
+  if (item.shift && entryIndex.has(item.shift)) lines.push(`- Shift: ${item.shift}`);
+  if (item.alt && entryIndex.has(item.alt)) lines.push(`- Alt: ${item.alt}`);
+  if (driven) lines.push("- Uses the bar parameters");
   return `
-    <button type="button" class="tnk-tool${driven ? " driven" : ""}${item.key ? " keyed" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}">
+    <button type="button" class="tnk-tool${driven ? " driven" : ""}${item.key ? " keyed" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}"${item.key ? ` data-tooltip-key="${escapeHtml(item.key === "`" ? "\u0060" : item.key.toUpperCase())}"` : ""}>
       ${tntIconSvg(item.icon, "tnk-tool-icon") || ""}
       ${tnkKeyBadge(item.key)}
     </button>
