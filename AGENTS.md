@@ -154,8 +154,14 @@ plain summon.
 They are **not** registered as global hot keys. `RegisterEventHotKey` claims a
 combination for the whole login session and swallows the keystroke before any
 frontmost check runs - so a binding would be eaten in every other application,
-not merely ignored there. Ctrl+Space already has this problem and is the
-reason it does not reach other apps.
+not merely ignored there.
+
+Ctrl+Space is the exception, and it goes through the key tap instead: it is
+claimed per keystroke, only while After Effects or the overlay is frontmost,
+and passes through everywhere else. **Without an Accessibility grant the tap
+cannot be created**, and it falls back to a Carbon hot key so the panel can
+always be summoned - swallowed session-wide, as before. `helper.log` says
+which of the two is in force on every launch.
 
 Making them behave would mean a `CGEvent` tap deciding per keystroke, which
 needs Accessibility permission and would put the summon hotkey behind a grant

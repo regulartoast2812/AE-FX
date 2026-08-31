@@ -40,6 +40,14 @@ private func isAfterEffectsFrontmost() -> Bool {
     return NSWorkspace.shared.frontmostApplication?.bundleIdentifier == afterEffectsBundleIdentifier
 }
 
+// Ctrl+Space toggles, so it has to work with the overlay itself in front too -
+// unlike plain C, which the overlay needs for its own Clone binding.
+private func isAfterEffectsOrOverlayFrontmost() -> Bool {
+    let frontmost = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? ""
+    return frontmost == afterEffectsBundleIdentifier ||
+        frontmost == (Bundle.main.bundleIdentifier ?? "\u{0}")
+}
+
 // The panel cannot talk to this process - the loopback bridge runs the other
 // way, and `open` on a running app passes it nothing - so a group scope is
 // handed over through a file beside bridge.json, written by
@@ -448,9 +456,11 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         // The NSEvent global monitor duplicates the Carbon hot keys, so running both
         // fires every shortcut twice. It is also the only thing here that needs an
         // Accessibility grant, so it stays off unless Carbon registration failed.
-        let carbonHotKeysReady = registerGlobalHotKeys()
         startControlRightClickMonitor()
         startBareKeyMonitor()
+        // Registered after the tap, so the summon key can be omitted from the
+        // Carbon table when the tap is live and able to claim it politely.
+        let carbonHotKeysReady = registerGlobalHotKeys()
         if !carbonHotKeysReady {
             startGlobalShortcutFallbackMonitor()
         }
@@ -721,7 +731,30 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         let callback: CGEventTapCallBack = { _, type, event, _ in
             let passThrough = Unmanaged.passUnretained(event)
             guard type == .keyDown else { return passThrough }
-            guard event.getIntegerValueField(.keyboardEventKeycode) == Int64(kVK_ANSI_C) else {
+            let code = event.getIntegerValueField(.keyboardEventKeycode)
+
+            // Ctrl+Space summons the overlay. Through the tap rather than
+            // RegisterEventHotKey, so it is claimed only while After Effects or
+            // the overlay is in front - a registered hot key is swallowed for
+            // the whole login session, which is why this key used to disappear
+            // from every other application, the input-source switcher included.
+            if code == Int64(kVK_Space) {
+                let flags = event.flags
+                guard flags.contains(.maskControl),
+                      !flags.contains(.maskCommand),
+                      !flags.contains(.maskAlternate),
+                      !flags.contains(.maskShift)
+                else {
+                    return passThrough
+                }
+                guard isAfterEffectsOrOverlayFrontmost() else { return passThrough }
+                DispatchQueue.main.async {
+                    activeAppDelegate?.togglePanelFromHotKey()
+                }
+                return nil
+            }
+
+            guard code == Int64(kVK_ANSI_C) else {
                 return passThrough
             }
             // Any real modifier means this is some other shortcut - Cmd+C above
@@ -825,12 +858,22 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         )
         guard installStatus == noErr else { return false }
 
-        let requested: [(keyCode: Int, id: UInt32)] = [
-            (kVK_Space, 1), (kVK_ANSI_K, 2),
+        // The tap claims Ctrl+Space per keystroke when it is available, so
+        // registering it here as well would swallow it session-wide anyway and
+        // defeat the point. Without the tap - no Accessibility grant - it falls
+        // back to the Carbon hot key, so the panel can always be summoned.
+        var requested: [(keyCode: Int, id: UInt32)] = [
+            (kVK_ANSI_K, 2),
             (kVK_ANSI_A, 10), (kVK_ANSI_C, 11), (kVK_ANSI_E, 12), (kVK_ANSI_F, 13),
             (kVK_ANSI_S, 14), (kVK_ANSI_M, 15), (kVK_ANSI_T, 16), (kVK_ANSI_O, 17),
             (kVK_ANSI_X, 18), (kVK_ANSI_D, 19)
         ]
+        if bareKeyEventTap == nil {
+            requested.append((kVK_Space, 1))
+            tntLog("no key tap - Ctrl+Space registered as a global hot key, so it will not reach other apps")
+        } else {
+            tntLog("key tap live - Ctrl+Space claimed only while After Effects or the overlay is frontmost")
+        }
         requested.forEach { entry in
             registerHotKey(keyCode: UInt32(entry.keyCode), modifiers: UInt32(controlKey), id: entry.id)
         }
