@@ -2342,13 +2342,17 @@ function renderAssistantFunctions() {
   // never lined up with the header.
   const columnHeader =
     '<div class="assistant-function-columns" aria-hidden="true">' +
-    '<span></span><span>Command</span><span>Type</span><span>Shortcut</span></div>';
+    '<span></span><span>Command</span><span>Type</span><span>Needs</span><span>Shortcut</span></div>';
   const rowMarkup = (entry, index, child) => {
     const shortcut = tntShortcutForEntry(entry);
     const capturing = tntShortcutCaptureName && tntShortcutCaptureName === String(entry.name || "");
     const custom = Object.prototype.hasOwnProperty.call(tntUserShortcuts, String(entry.name || ""));
     const group = entry.groupParent ? String(entry.groupParent) : "";
     const expanded = group && assistantExpandedGroups.has(group);
+    // Cross-check: what the command requires against what is selected.
+    const requirement = typeof tntEntryRequirement === "function" ? tntEntryRequirement(entry) : "";
+    const unmet = typeof tntEntryUnmetRequirement === "function" ? tntEntryUnmetRequirement(entry) : "";
+    const needsLabel = requirement ? (TNT_REQUIREMENT_LABELS[requirement] || requirement) : "";
     // The chevron sits before the icon and states which way the row is: a group
     // that cannot be told open from shut is worse than no group at all.
     const chevron = group
@@ -2360,11 +2364,12 @@ function renderAssistantFunctions() {
       child ? `data-group-child="${escapeHtml(child)}"` : ""
     ].filter(Boolean).join(" ");
     return `
-      <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}${group ? " is-group" : ""}${child ? " is-child" : ""}${tntRunClassFor(entry)}" ${attrs} data-fx-source="${tntSourceGroup(entry)}"${tntRunStyleFor(entry)}>
+      <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}${group ? " is-group" : ""}${child ? " is-child" : ""}${unmet ? " unmet" : ""}${tntRunClassFor(entry)}"${unmet ? ` title="${escapeHtml(unmet)}"` : ""} ${attrs} data-fx-source="${tntSourceGroup(entry)}"${tntRunStyleFor(entry)}>
         <span class="assistant-function-iconcell${tntIconNameForEntry(entry) ? " custom" : ""}" data-icon-for="${escapeHtml(String(entry.name || ""))}" title="Click to change the icon">${chevron}${tntActionIconMarkup(entry)}</span>
         <strong>${escapeHtml(entry.name || entry.matchName || "Function")}</strong>
         <span class="assistant-function-tags tnt-tags">${tntTagChips(entry, 2)}</span>
         <em>${escapeHtml(assistantFunctionDetail(entry))}</em>
+        <span class="assistant-function-needs">${escapeHtml(needsLabel)}</span>
         <kbd class="assistant-function-key${shortcut ? "" : " empty"}${custom ? " custom" : ""}${capturing ? " listening" : ""}" data-shortcut-for="${escapeHtml(String(entry.name || ""))}" title="Click to set a shortcut">${capturing ? "Press key&hellip;" : (shortcut ? escapeHtml(shortcut) : "&mdash;")}</kbd>
       </button>
     `;

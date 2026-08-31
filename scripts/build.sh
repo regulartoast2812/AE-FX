@@ -7,6 +7,7 @@ cd "$root"
 js_sources=(
   src/js/00-core.js
   src/js/05-icons.js
+  src/js/06-command-requirements.js
   src/js/10-style-mask-panels.js
   src/js/20-settings-host.js
   src/js/25-native-bridge-server.js
