@@ -508,6 +508,8 @@
   min-width: 0;
 }
 
+/* Only the Distribute sub-heading uses this now - Anchor and Align moved to
+   the shared .tnt-card-head component. */
 .anchor-section-title {
   margin: 0 0 10px;
   color: rgba(235,235,245,.42);

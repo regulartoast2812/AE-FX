@@ -35,8 +35,8 @@ function ensureTimingOrderPanel() {
   timingOrderBackdropEl.innerHTML = `
     <div class="timing-order-layout" role="dialog" aria-modal="true" aria-label="Stagger and layer order">
       <section class="timing-order-card timing-stagger-card">
-        <header class="timing-order-head">
-          <div class="timing-order-title"><b>ST</b><span>Stagger</span><em class="timing-order-count"></em></div>
+        <header class="timing-order-head tnt-card-head">
+          <div class="tnt-card-title timing-order-title"><b>ST</b><span>Stagger</span><em class="timing-order-count"></em></div>
         </header>
         <div class="timing-order-body">
           <div class="timing-execute-actions" role="group" aria-label="Choose stagger direction">
@@ -65,8 +65,8 @@ function ensureTimingOrderPanel() {
       </section>
 
       <section class="timing-order-card layer-order-card">
-        <header class="timing-order-head">
-          <div class="timing-order-title"><b>OR</b><span>Layer Order</span><em class="timing-order-count"></em></div>
+        <header class="timing-order-head tnt-card-head">
+          <div class="tnt-card-title timing-order-title"><b>OR</b><span>Layer Order</span><em class="timing-order-count"></em></div>
         </header>
         <div class="timing-order-body">
           <div class="timing-order-field">
@@ -98,8 +98,8 @@ function ensureTimingOrderPanel() {
       </section>
 
       <section class="timing-order-card timing-snap-pull-card">
-        <header class="timing-order-head">
-          <div class="timing-order-title"><b>SP</b><span>Pull / Snap</span><em class="timing-key-count"></em></div>
+        <header class="timing-order-head tnt-card-head">
+          <div class="tnt-card-title timing-order-title"><b>SP</b><span>Pull / Snap</span><em class="timing-key-count"></em></div>
         </header>
         <div class="timing-order-body">
           <div class="timing-compact-group timing-pull-group">

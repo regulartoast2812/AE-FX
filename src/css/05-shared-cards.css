@@ -1,0 +1,45 @@
+/* Shared subpanel card chrome.
+   Groundwork for merging Anchor/Align (A) with Timing/Order (O): the two were
+   built with unrelated headers - A a plain uppercase label, O a lettered badge
+   with a live count - so side by side they read as two different tools. These
+   are the one component both use, so a merged panel has a single voice.
+   The values are O's, since that treatment carries a count and A needs one. */
+.tnt-card-head {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 11px;
+  border-bottom: 1px solid rgba(255, 255, 255, .085);
+}
+
+.tnt-card-title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  font-family: "Ivory LL Web", "IvoryLLWeb-Light", "Iowan Old Style", Baskerville, Georgia, serif;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.tnt-card-title b {
+  display: grid;
+  width: 24px;
+  height: 20px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .15);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .05);
+  font-family: inherit;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.tnt-card-title em {
+  overflow: hidden;
+  color: rgba(228, 228, 234, .45);
+  font-size: 11px;
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

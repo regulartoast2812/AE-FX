@@ -27,6 +27,7 @@ js_sources=(
 
 css_sources=(
   src/css/00-base-timeline.css
+  src/css/05-shared-cards.css
   src/css/10-dialogs-markers.css
   src/css/20-timeline-history.css
   src/css/30-keyframes-filters.css

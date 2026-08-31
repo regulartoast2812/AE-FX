@@ -843,6 +843,9 @@ function registerPanelKeyEventsInterest() {
   [[49, 18], [50, 19], [51, 20], [52, 21], [53, 23], [54, 22]].forEach(codes => add(codes[0], codes[1]));
   add(32, 49); // Space
   add(190, 47); // Period
+  // Bare backquote flips the align target. Only alt+backquote was declared, and
+  // After Effects forwards nothing that is not on this list.
+  add(192, 50); // Backquote
   add(9, 48); // Tab
   add(8, 51); // Backspace
   add(46, 117); // Forward delete
@@ -7303,6 +7306,9 @@ async function syncTick(options = {}) {
 }
 
 function renderSelectionOnly(options = {}) {
+  // Keeps the anchor panel's header count honest while it is open - selection
+  // changes in After Effects arrive here, not through the panel.
+  if (typeof updateAnchorSelectionCount === "function") updateAnchorSelectionCount();
   document.querySelectorAll(".clip").forEach(clip => {
     const idx = Number(clip.dataset.layerIndex);
     const selected = state.selectedLayerIndices.includes(idx);
@@ -10526,8 +10532,8 @@ function ensureTimingOrderPanel() {
   timingOrderBackdropEl.innerHTML = `
     <div class="timing-order-layout" role="dialog" aria-modal="true" aria-label="Stagger and layer order">
       <section class="timing-order-card timing-stagger-card">
-        <header class="timing-order-head">
-          <div class="timing-order-title"><b>ST</b><span>Stagger</span><em class="timing-order-count"></em></div>
+        <header class="timing-order-head tnt-card-head">
+          <div class="tnt-card-title timing-order-title"><b>ST</b><span>Stagger</span><em class="timing-order-count"></em></div>
         </header>
         <div class="timing-order-body">
           <div class="timing-execute-actions" role="group" aria-label="Choose stagger direction">
@@ -10556,8 +10562,8 @@ function ensureTimingOrderPanel() {
       </section>
 
       <section class="timing-order-card layer-order-card">
-        <header class="timing-order-head">
-          <div class="timing-order-title"><b>OR</b><span>Layer Order</span><em class="timing-order-count"></em></div>
+        <header class="timing-order-head tnt-card-head">
+          <div class="tnt-card-title timing-order-title"><b>OR</b><span>Layer Order</span><em class="timing-order-count"></em></div>
         </header>
         <div class="timing-order-body">
           <div class="timing-order-field">
@@ -10589,8 +10595,8 @@ function ensureTimingOrderPanel() {
       </section>
 
       <section class="timing-order-card timing-snap-pull-card">
-        <header class="timing-order-head">
-          <div class="timing-order-title"><b>SP</b><span>Pull / Snap</span><em class="timing-key-count"></em></div>
+        <header class="timing-order-head tnt-card-head">
+          <div class="tnt-card-title timing-order-title"><b>SP</b><span>Pull / Snap</span><em class="timing-key-count"></em></div>
         </header>
         <div class="timing-order-body">
           <div class="timing-compact-group timing-pull-group">
@@ -11050,9 +11056,22 @@ function setAnchorDialogPoint(point) {
   });
 }
 
+// The shared card header carries a live count, the way the O panel's always
+// has. Align and distribute both have minimums - two layers and three - so
+// seeing the number is the difference between a refusal and knowing why.
+function updateAnchorSelectionCount() {
+  if (!anchorModalEl) return;
+  const count = (state.selectedLayerIndices || []).length;
+  const label = count ? `${count} layer${count === 1 ? "" : "s"}` : "no selection";
+  anchorModalEl.querySelectorAll(".anchor-selection-count").forEach(el => {
+    el.textContent = label;
+  });
+}
+
 function showAnchorDialog() {
   if (!state.comp || !anchorModalEl) return;
   anchorErrorEl.textContent = "";
+  updateAnchorSelectionCount();
   setAnchorDialogPoint(selectedAnchorPoint || "C");
   anchorModalEl.classList.add("show");
   anchorModalEl.setAttribute("aria-hidden", "false");
@@ -11236,13 +11255,15 @@ async function centerSelectedAnchorPoints() {
   focusPanel(2);
 }
 
-// Tab was bound to the Composition Flow overlay, which is gone. In the anchor
-// panel it now flips "Align Layers to" between Selection and Composition -
-// the one setting you change constantly while aligning, and reaching for a
-// dropdown mid-flow is what made it tedious.
+// Backtick flips "Align Layers to" between Selection and Composition - the one
+// setting that changes constantly while aligning, where reaching for the
+// dropdown breaks the flow.
 //
-// It only acts while that panel is open. Everywhere else Tab is left alone
-// rather than silently bound to nothing.
+// Not Tab: Tab is being kept free for cycling between subpanels. Backtick is
+// left-hand, unused, and next to the digits rather than in the middle of them.
+//
+// It only acts while the anchor panel is open. Everywhere else backtick is
+// left alone rather than silently bound to nothing.
 function toggleAlignTargetIfAnchorOpen() {
   if (!anchorModalEl || !anchorModalEl.classList.contains("show")) return;
   const select = document.getElementById("anchorAlignTarget");
@@ -11344,7 +11365,7 @@ const SHORTCUT_ACTIONS = {
   "alt+arrowdown": () => moveSelectedLayersInStack("down"),
   "shift+alt+arrowup": () => moveSelectedLayersInStack("top"),
   "shift+alt+arrowdown": () => moveSelectedLayersInStack("bottom"),
-  "tab": toggleAlignTargetIfAnchorOpen,
+  "`": toggleAlignTargetIfAnchorOpen,
   "escape": closeActivePopup,
   "space": togglePlay,
   "a": () => openSubpanelByKey("anchor"),

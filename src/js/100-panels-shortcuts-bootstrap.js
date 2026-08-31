@@ -76,9 +76,22 @@ function setAnchorDialogPoint(point) {
   });
 }
 
+// The shared card header carries a live count, the way the O panel's always
+// has. Align and distribute both have minimums - two layers and three - so
+// seeing the number is the difference between a refusal and knowing why.
+function updateAnchorSelectionCount() {
+  if (!anchorModalEl) return;
+  const count = (state.selectedLayerIndices || []).length;
+  const label = count ? `${count} layer${count === 1 ? "" : "s"}` : "no selection";
+  anchorModalEl.querySelectorAll(".anchor-selection-count").forEach(el => {
+    el.textContent = label;
+  });
+}
+
 function showAnchorDialog() {
   if (!state.comp || !anchorModalEl) return;
   anchorErrorEl.textContent = "";
+  updateAnchorSelectionCount();
   setAnchorDialogPoint(selectedAnchorPoint || "C");
   anchorModalEl.classList.add("show");
   anchorModalEl.setAttribute("aria-hidden", "false");
@@ -262,13 +275,15 @@ async function centerSelectedAnchorPoints() {
   focusPanel(2);
 }
 
-// Tab was bound to the Composition Flow overlay, which is gone. In the anchor
-// panel it now flips "Align Layers to" between Selection and Composition -
-// the one setting you change constantly while aligning, and reaching for a
-// dropdown mid-flow is what made it tedious.
+// Backtick flips "Align Layers to" between Selection and Composition - the one
+// setting that changes constantly while aligning, where reaching for the
+// dropdown breaks the flow.
 //
-// It only acts while that panel is open. Everywhere else Tab is left alone
-// rather than silently bound to nothing.
+// Not Tab: Tab is being kept free for cycling between subpanels. Backtick is
+// left-hand, unused, and next to the digits rather than in the middle of them.
+//
+// It only acts while the anchor panel is open. Everywhere else backtick is
+// left alone rather than silently bound to nothing.
 function toggleAlignTargetIfAnchorOpen() {
   if (!anchorModalEl || !anchorModalEl.classList.contains("show")) return;
   const select = document.getElementById("anchorAlignTarget");
@@ -370,7 +385,7 @@ const SHORTCUT_ACTIONS = {
   "alt+arrowdown": () => moveSelectedLayersInStack("down"),
   "shift+alt+arrowup": () => moveSelectedLayersInStack("top"),
   "shift+alt+arrowdown": () => moveSelectedLayersInStack("bottom"),
-  "tab": toggleAlignTargetIfAnchorOpen,
+  "`": toggleAlignTargetIfAnchorOpen,
   "escape": closeActivePopup,
   "space": togglePlay,
   "a": () => openSubpanelByKey("anchor"),

@@ -840,6 +840,9 @@ function registerPanelKeyEventsInterest() {
   [[49, 18], [50, 19], [51, 20], [52, 21], [53, 23], [54, 22]].forEach(codes => add(codes[0], codes[1]));
   add(32, 49); // Space
   add(190, 47); // Period
+  // Bare backquote flips the align target. Only alt+backquote was declared, and
+  // After Effects forwards nothing that is not on this list.
+  add(192, 50); // Backquote
   add(9, 48); // Tab
   add(8, 51); // Backspace
   add(46, 117); // Forward delete
