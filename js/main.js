@@ -15250,6 +15250,18 @@ const TNK_GROUPS = [
       command: "Delete All Effects" }
   ] },
   { title: "Motion", commands: [
+    { label: "Anim Up", icon: "arrow-up", key: "1",
+      desc: "Animates the layer in from above and out upward, using the bar's IN, OUT and easing values.",
+      command: "In+Out Up", shift: "In from Up", alt: "Out to Up" },
+    { label: "Anim Down", icon: "arrow-down", key: "2",
+      desc: "Animates the layer in from below and out downward, using the bar's IN, OUT and easing values.",
+      command: "In+Out Down", shift: "In from Down", alt: "Out to Down" },
+    { label: "Anim Left", icon: "arrow-left", key: "3",
+      desc: "Animates the layer in from the left and out leftward, using the bar's IN, OUT and easing values.",
+      command: "In+Out Left", shift: "In from Left", alt: "Out to Left" },
+    { label: "Anim Right", icon: "arrow-right", key: "4",
+      desc: "Animates the layer in from the right and out rightward, using the bar's IN, OUT and easing values.",
+      command: "In+Out Right", shift: "In from Right", alt: "Out to Right" },
     { label: "Scale", icon: "scaling", desc: "Animates scale in and out, using the bar's IN, OUT and easing values.",
       command: "Scale In+Out",
       shift: "Scale In", alt: "Scale Out" },
@@ -15405,13 +15417,29 @@ function tnkApplyParamsToArgs(args) {
 // as plain command names rather than duplicated definitions.
 function tnkEntryIndex() {
   const index = new Map();
-  let all = [];
-  try { all = searchFxConsoleEntries("", null, 2000) || []; } catch (_) {}
-  all.forEach(entry => {
+  const add = entry => {
     if (!entry || entry.children) return;
     const name = String(entry.name || "");
     if (name && !index.has(name)) index.set(name, entry);
+  };
+  let all = [];
+  try { all = searchFxConsoleEntries("", null, 3000) || []; } catch (_) {}
+  all.forEach(entry => {
+    add(entry);
+    // Children of a parent entry - the four directional animations, the track
+    // matte modes, the label colours - are not in the flat list, so without
+    // this TNK cannot name them.
+    (entry.children || []).forEach(add);
   });
+  // Commands in a group are hidden from an unscoped search, since their parent
+  // row stands for them there. TNK addresses them by name, so it needs them
+  // regardless - grouping "Trim In to Playhead" silently emptied TNK's Timing
+  // section, because a name that does not resolve is dropped without a word.
+  try {
+    (typeof fxConsoleGroupNames === "function" ? fxConsoleGroupNames() : []).forEach(group => {
+      (searchFxConsoleEntries(`[${group}]`, null, 200) || []).forEach(add);
+    });
+  } catch (_) {}
   return index;
 }
 
@@ -15432,7 +15460,14 @@ function tnkResolvedGroups() {
     const entries = group.commands
       .map(tnkResolveItem)
       .concat(tnkAddedForGroup(group.title))
-      .filter(item => index.has(item.command))
+      .filter(item => {
+        if (index.has(item.command)) return true;
+        // Say so rather than quietly rendering one button fewer.
+        if (typeof console !== "undefined" && console.warn) {
+          console.warn(`TNK: "${item.command}" is not in the registry - button omitted.`);
+        }
+        return false;
+      })
       .map(item => Object.assign({ item }, { index: flat.push(item) - 1 }));
     return { title: group.title, entries };
   }).filter(group => group.entries.length);
