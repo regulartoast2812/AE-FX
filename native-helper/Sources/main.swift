@@ -307,6 +307,7 @@ private final class WindowBridge: NSObject, WKScriptMessageHandler {
             height: min(max(height, 180), maximumHeight)
         )
         let frame = afterEffectsOverlayFrame(for: size) ?? NSRect(origin: panel.frame.origin, size: size)
+        activeAppDelegate?.rememberQuickPanelSize(size)
         panel.setFrame(frame, display: true, animate: false)
         // Reveal once sizes settle, not on the first one.
         // Was 70ms after every resize. One frame is enough to let the second
@@ -329,6 +330,14 @@ private final class DragStrip: NSView {
 private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var panel: BorderlessPanel?
     private var pendingRevealWorkItem: DispatchWorkItem?
+    // The window opens at the launcher size and is resized once the page has
+    // measured itself, and afterEffectsOverlayFrame centres it - so it grows
+    // from the middle outward. Hiding it during the resize helps, but the fix
+    // is to not resize at all: every surface's settled size is remembered and
+    // the window opens at it. Only the very first summon of a given panel can
+    // still change size.
+    private var lastSizeByControl: [String: NSSize] = [:]
+    private var showingControlName: String = "launcher"
     private var bridge: AfterEffectsBridge?
     private var windowBridge: WindowBridge?
     private weak var webView: WKWebView?
@@ -501,6 +510,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
     /// Reveals the panel once resizes stop arriving. scheduleNativeQuickPanelResize
     /// deliberately measures across two animation frames, so a single open can send
     /// two sizes; revealing on the first would show the second as a visible jump.
+    func rememberQuickPanelSize(_ size: NSSize) {
+        lastSizeByControl[showingControlName] = size
+    }
+
     func scheduleReveal(after delay: TimeInterval) {
         guard let panel, panel.alphaValue < 1 else { return }
         pendingRevealWorkItem?.cancel()
@@ -523,7 +536,9 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             let ms = Int(Date().timeIntervalSince(showStartedAt) * 1000)
             if ms > 250 { tntLog("showPanel took \(ms)ms\(controlName.map { " for " + $0 } ?? "")") }
         }
-        guard let panel, let frame = afterEffectsOverlayFrame(for: quickControlsLauncherSize) else {
+        showingControlName = controlName ?? "launcher"
+        let openingSize = lastSizeByControl[showingControlName] ?? quickControlsLauncherSize
+        guard let panel, let frame = afterEffectsOverlayFrame(for: openingSize) else {
             panel?.orderOut(nil)
             return
         }

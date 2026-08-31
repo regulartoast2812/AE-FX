@@ -1473,9 +1473,12 @@ function scheduleNativeQuickPanelResize(delay = 0) {
   const run = () => {
     quickPanelResizeTimer = null;
     requestAnimationFrame(() => {
-      const before = quickPanelLastSize;
       resizeNativeQuickPanel();
-      if (quickPanelLastSize === before) requestAnimationFrame(resizeNativeQuickPanel);
+      // Always take a second look. The first measurement can land before
+      // layout has settled, and skipping the correction would leave the window
+      // at the wrong size permanently. It is not a second native call unless
+      // the size actually changed - quickPanelLastSize sees to that.
+      requestAnimationFrame(resizeNativeQuickPanel);
     });
   };
   if (delay <= 0) run();
