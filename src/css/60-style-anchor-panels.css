@@ -1783,40 +1783,50 @@ body.keyframe-mode .track-label {
 }
 
 /* Layout panel geometry.
-   Anchor and Align keep their side-by-side row; the migrated timing cards run
-   full width beneath, which is what they were built for. The dialog widens and
-   scrolls rather than growing past the window - six sections is more than the
-   two this shell was sized for. */
+   All five sections run side by side in one row: anchor, align, then the three
+   timing cards. Two rows put the timing half below the fold and made the panel
+   taller than the overlay it lives in.
+
+   The row does not wrap and the cards may shrink - their standalone
+   min-widths (300/330/340) are what pushed the sheet past the dialog and left
+   content painting outside it. */
 .anchor-dialog:has(.timing-order-backdrop.embedded) {
-  width: min(680px, calc(100vw - 40px)) !important;
+  width: min(1280px, calc(100vw - 40px)) !important;
   max-width: none !important;
 }
 
-/* A later rule makes .anchor-panel flex, not grid, so grid-column on the
-   embedded backdrop was inert - it sat in the row rather than under it.
-   Wrapping flex, with the backdrop forced onto its own line. */
 .anchor-panel:has(.timing-order-backdrop.embedded) {
   display: flex !important;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  max-height: min(72vh, 720px);
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 14px;
+  max-height: min(70vh, 640px);
   overflow-y: auto;
   padding-right: 4px;
 }
 
-.timing-order-backdrop.embedded {
-  flex: 1 0 100% !important;
-  width: 100%;
+.anchor-panel:has(.timing-order-backdrop.embedded) > .anchor-section {
+  flex: 0 0 auto;
 }
 
-/* Standalone, the timing layout is a 1120px three-column sheet. Embedded, it
-   is one column at the panel's width - the 1120px was what spilled out over
-   the anchor row and read as overlap. */
+.anchor-panel:has(.timing-order-backdrop.embedded) > .anchor-section.anchor-align-section {
+  flex: 0 0 240px;
+}
+
+.timing-order-backdrop.embedded {
+  flex: 1 1 0 !important;
+  min-width: 0;
+}
+
+/* Three columns that may all shrink, rather than a fixed 1120px sheet. */
 .timing-order-backdrop.embedded .timing-order-layout {
-  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   width: 100% !important;
   gap: 10px;
-  margin-top: 14px;
+}
+
+.timing-order-backdrop.embedded .timing-order-card {
+  min-width: 0 !important;
 }
 
 /* Inside the panel the cards are sections, not floating dialogs. Their own
@@ -1827,4 +1837,44 @@ body.keyframe-mode .track-label {
   box-shadow: inset 0 1px rgba(255, 255, 255, .045) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+}
+
+/* The timing cards were laid out for a 1120px sheet, so their inner rows are
+   single-line and clip at a third of that. Embedded, they wrap. */
+.timing-order-backdrop.embedded .timing-amount-row,
+.timing-order-backdrop.embedded .timing-execute-actions,
+.timing-order-backdrop.embedded .timing-order-segmented {
+  flex-wrap: wrap;
+}
+
+.timing-order-backdrop.embedded .timing-amount-row > * {
+  min-width: 0;
+}
+
+.timing-order-backdrop.embedded .timing-amount-range {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+.timing-order-backdrop.embedded .timing-amount-input,
+.timing-order-backdrop.embedded .timing-group-input {
+  width: 54px;
+  min-width: 0;
+}
+
+.timing-order-backdrop.embedded .timing-group-control {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* The unit toggle is the last thing on the row and the 5px that would not
+   fit. Given its own line it stops being the deciding factor. */
+.timing-order-backdrop.embedded .timing-unit {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.timing-order-backdrop.embedded .timing-execute-actions > button {
+  flex: 1 1 auto;
+  min-width: 0;
 }
