@@ -2229,6 +2229,35 @@ let assistantAutoTestBusy = false;
 let assistantFunctionBusy = false;
 let assistantFunctionLastPointerRunAt = 0;
 
+// Group parents expand in place in the Functions list rather than taking over
+// the panel or opening a floating search. Expanded groups are remembered by
+// name, so a re-render - which happens on every run and every filter - does
+// not collapse what you just opened.
+let assistantExpandedGroups = new Set();
+
+function assistantToggleGroup(name, force) {
+  const key = String(name || "");
+  if (!key) return;
+  const open = force === undefined ? !assistantExpandedGroups.has(key) : !!force;
+  if (open) assistantExpandedGroups.add(key);
+  else assistantExpandedGroups.delete(key);
+  renderAssistantFunctions();
+  if (!open || !assistantFunctionListEl) return;
+  requestAnimationFrame(() => {
+    const row = assistantFunctionListEl.querySelector(`[data-group-parent="${CSS.escape(key)}"]`);
+    if (row && row.scrollIntoView) row.scrollIntoView({ block: "nearest" });
+  });
+}
+
+// Children of an expanded group, in registry order.
+function assistantGroupChildren(name) {
+  try {
+    return searchFxConsoleEntries(`[${name}]`, null, ASSISTANT_SEARCH_LIMIT) || [];
+  } catch (_) {
+    return [];
+  }
+}
+
 function assistantFunctionEntries() {
   if (!assistantFunctionSearchEl) return [];
   const query = assistantFunctionSearchEl.value;
@@ -2287,19 +2316,40 @@ function renderAssistantFunctions() {
   const columnHeader =
     '<div class="assistant-function-columns" aria-hidden="true">' +
     '<span></span><span>Command</span><span>Type</span><span>Shortcut</span></div>';
-  assistantFunctionListEl.innerHTML = columnHeader + shown.map((entry, index) => {
+  const rowMarkup = (entry, index, child) => {
     const shortcut = tntShortcutForEntry(entry);
     const capturing = tntShortcutCaptureName && tntShortcutCaptureName === String(entry.name || "");
     const custom = Object.prototype.hasOwnProperty.call(tntUserShortcuts, String(entry.name || ""));
+    const group = entry.groupParent ? String(entry.groupParent) : "";
+    const expanded = group && assistantExpandedGroups.has(group);
+    // The chevron sits before the icon and states which way the row is: a group
+    // that cannot be told open from shut is worse than no group at all.
+    const chevron = group
+      ? `<span class="assistant-function-chevron">${tntIconSvg(expanded ? "chevron-up" : "chevron-down", "assistant-chevron-icon") || ""}</span>`
+      : "";
+    const attrs = [
+      index === null ? "" : `data-assistant-function-index="${index}"`,
+      group ? `data-group-parent="${escapeHtml(group)}" aria-expanded="${expanded ? "true" : "false"}"` : "",
+      child ? `data-group-child="${escapeHtml(child)}"` : ""
+    ].filter(Boolean).join(" ");
     return `
-      <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}${tntRunClassFor(entry)}" data-assistant-function-index="${index}" data-fx-source="${tntSourceGroup(entry)}"${tntRunStyleFor(entry)}>
-        <span class="assistant-function-iconcell${tntIconNameForEntry(entry) ? " custom" : ""}" data-icon-for="${escapeHtml(String(entry.name || ""))}" title="Click to change the icon">${tntActionIconMarkup(entry)}</span>
+      <button type="button" class="assistant-function-card${index === assistantFunctionSelectedIndex ? " active" : ""}${group ? " is-group" : ""}${child ? " is-child" : ""}${tntRunClassFor(entry)}" ${attrs} data-fx-source="${tntSourceGroup(entry)}"${tntRunStyleFor(entry)}>
+        <span class="assistant-function-iconcell${tntIconNameForEntry(entry) ? " custom" : ""}" data-icon-for="${escapeHtml(String(entry.name || ""))}" title="Click to change the icon">${chevron}${tntActionIconMarkup(entry)}</span>
         <strong>${escapeHtml(entry.name || entry.matchName || "Function")}</strong>
         <span class="assistant-function-tags tnt-tags">${tntTagChips(entry, 2)}</span>
         <em>${escapeHtml(assistantFunctionDetail(entry))}</em>
         <kbd class="assistant-function-key${shortcut ? "" : " empty"}${custom ? " custom" : ""}${capturing ? " listening" : ""}" data-shortcut-for="${escapeHtml(String(entry.name || ""))}" title="Click to set a shortcut">${capturing ? "Press key&hellip;" : (shortcut ? escapeHtml(shortcut) : "&mdash;")}</kbd>
       </button>
     `;
+  };
+
+  assistantFunctionListEl.innerHTML = columnHeader + shown.map((entry, index) => {
+    let html = rowMarkup(entry, index, "");
+    const group = entry.groupParent ? String(entry.groupParent) : "";
+    if (group && assistantExpandedGroups.has(group)) {
+      html += assistantGroupChildren(group).map(child => rowMarkup(child, null, group)).join("");
+    }
+    return html;
   }).join("");
 }
 
@@ -2622,6 +2672,10 @@ async function runAssistantFunction(index = assistantFunctionSelectedIndex) {
   const entries = assistantFunctionEntries();
   const entry = entries[Math.max(0, Math.min(Number(index || 0), entries.length - 1))];
   if (!entry) return;
+  if (entry.groupParent) {
+    assistantToggleGroup(entry.groupParent);
+    return;
+  }
   if (entry.children && entry.children.length) {
     assistantFunctionsParentEntry = entry;
     assistantFunctionSelectedIndex = 0;
@@ -3172,6 +3226,27 @@ async function submitAssistantChat() {
 }
 
 function handleAssistantFunctionCardPointer(event, run = false) {
+  // A child row of an expanded group carries no index - it is not part of the
+  // filtered list - so it is matched on its own attribute and run by name.
+  const childRow = event.target.closest && event.target.closest("[data-group-child]");
+  if (childRow) {
+    if (event.target.closest && event.target.closest("[data-shortcut-for], [data-icon-for]")) return false;
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+    if (!run) return true;
+    const now = Date.now();
+    if (now - assistantFunctionLastPointerRunAt < 300) return true;
+    assistantFunctionLastPointerRunAt = now;
+    const name = String((childRow.querySelector("strong") || {}).textContent || "");
+    const entry = tntFindEntryByName(name);
+    if (entry) {
+      tntRunWithProgress(childRow, name, () => executeFxConsoleEntry(entry))
+        .then(ran => { if (ran) statusEl.textContent = `${name} \u00b7 ${tntFormatRunTime(tntRunElapsed)}`; })
+        .catch(err => { statusEl.textContent = `Function failed: ${String(err && err.message || err)}`; });
+    }
+    return true;
+  }
   const card = event.target.closest && event.target.closest("[data-assistant-function-index]");
   if (!card) return false;
   // The shortcut and icon cells are editable controls sitting inside the row.

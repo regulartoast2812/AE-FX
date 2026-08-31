@@ -135,6 +135,23 @@ lives there rather than in each caller. Affected callers found:
 subpanel that shows its own surface some other way must be added to
 `closeNativeQuickPanelSurfaces`, which is a hand-maintained list.
 
+### Group shortcuts do not summon the overlay
+
+A shortcut bound to a group parent works in two places and not a third:
+
+- **CEP panel focused** - expands the group inline in the Functions list.
+- **Overlay already open** - scopes its search to `[Group] `.
+- **After Effects focused, overlay shut** - nothing happens.
+
+The gap is that the native helpers register a fixed hotkey table compiled into
+them (`registerGlobalHotKeys` in native-helper, `ControlHotkeys` in
+native-helper-win). User bindings live in the panel's localStorage, which the
+helper has never seen, so it cannot claim a key it does not know about.
+
+Closing it means the panel publishing its bindings to the helper over the
+loopback bridge and the helper registering them at runtime rather than from a
+compiled list. Not built.
+
 ### On hold
 
 - **Plain `C` opens TNK** - built and shipped, but inert until the helper is

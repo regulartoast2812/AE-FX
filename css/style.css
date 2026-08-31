@@ -17957,6 +17957,57 @@ body:not(.quick-panel-mode) #assistantHub {
   font-size: 12px;
   text-align: center;
 }
+
+/* Group rows in the Functions list.
+   The chevron leads the icon cell and states open or shut - a group you cannot
+   tell the state of is worse than no group. Children are indented and slightly
+   dimmed so the nesting is readable without a second column. */
+/* The icon column is a fixed 24px grid cell, so an in-flow chevron lands on its
+   own row above the glyph. It is placed instead, just left of the icon, in the
+   list's left padding. */
+.assistant-function-chevron {
+  position: absolute;
+  left: -11px;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 10px;
+  transform: translateY(-50%);
+  color: rgba(228, 228, 234, .45);
+}
+
+.assistant-chevron-icon {
+  width: 11px;
+  height: 11px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.assistant-function-card.is-group .assistant-function-iconcell {
+  position: relative;
+  overflow: visible;
+}
+
+.assistant-function-card.is-group {
+  padding-left: 22px;
+}
+
+.assistant-function-card.is-group[aria-expanded="true"] .assistant-function-chevron {
+  color: rgba(233, 147, 96, .9);
+}
+
+.assistant-function-card.is-child {
+  margin-left: 18px;
+  background: rgba(255, 255, 255, .014);
+}
+
+.assistant-function-card.is-child strong {
+  color: rgba(245, 245, 247, .78);
+  font-weight: 500;
+}
 .quick-panel-shell {
   display: none;
 }

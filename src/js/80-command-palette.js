@@ -569,19 +569,15 @@ async function openCommandGroup(name) {
     quickPanelSearchEl.setSelectionRange(token.length, token.length);
     return true;
   }
-  // openFxConsole is async and clears the input on the way in, so the token has
-  // to be written after it settles - writing first looks fine and is silently
-  // wiped when the await resolves.
-  await openFxConsole();
-  const input = fxConsoleEl && fxConsoleEl.querySelector(".fx-console-input");
-  if (!input || !fxConsoleEl.classList.contains("open")) return false;
-  fxConsoleParentEntry = null;
-  fxConsoleSelectedIndex = 0;
-  input.value = token;
-  renderFxConsoleResults();
-  input.focus();
-  input.setSelectionRange(token.length, token.length);
-  return true;
+  // Docked panel: expand the group where it lives, in the Functions list. The
+  // floating console is deliberately not used here - a search popup over the
+  // list is a second way to do what the list already does.
+  if (typeof assistantToggleGroup === "function") {
+    if (typeof setAssistantTab === "function") setAssistantTab("functions");
+    assistantToggleGroup(name, true);
+    return true;
+  }
+  return false;
 }
 
 async function executeFxConsoleEntry(effect) {
