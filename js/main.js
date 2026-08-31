@@ -48,7 +48,6 @@ const compositionErrorEl = document.getElementById("compositionError");
 const layerMenuEl = document.getElementById("layerMenu");
 const filterColumnEl = document.getElementById("filterColumn");
 const settingsBtnEl = document.getElementById("settingsBtn");
-const layerSelectionModalEl = document.getElementById("layerSelectionModal");
 const layerSelectionCountEl = document.getElementById("layerSelectionCount");
 const layerSelectionSearchEl = document.getElementById("layerSelectionSearch");
 const layerSelectionSearchClearEl = document.getElementById("layerSelectionSearchClear");
@@ -58,7 +57,6 @@ const layerSelectionScopesEl = document.getElementById("layerSelectionScopes");
 const layerSelectionModesEl = document.getElementById("layerSelectionModes");
 const layerSelectionQuickFiltersEl = document.getElementById("layerSelectionQuickFilters");
 const layerSelectionShownCountEl = document.getElementById("layerSelectionShownCount");
-const layerSelectionListEl = document.getElementById("layerSelectionList");
 const platformBadgeEl = document.getElementById("platformBadge");
 
 let state = { comp: null, layers: [], selectedLayerIndices: [], compMarkers: [] };
@@ -237,7 +235,6 @@ const FX_CONSOLE_COMMANDS = [
   { type: "command", name: "Composition Tools", category: "Composition", does: "Open", targets: ["Comp"], shortcut: "C", action: () => openSubpanelByKey("composition") },
   { type: "command", name: "Anchor Point Master", category: "Anchor", does: "Open", targets: ["Layer"], shortcut: "A", action: () => openSubpanelByKey("anchor") },
   { type: "command", name: "Center Anchor Point", category: "Anchor", does: "Set", targets: ["Layer"], shortcut: "Shift+A", action: centerSelectedAnchorPoints },
-  { type: "command", name: "Layer Selection & Filters", category: "Layers", does: "Open", targets: ["Layer"], shortcut: "Shift+X", action: () => openSubpanelByKey("filter") },
   { type: "command", name: "Stagger & Layer Order", category: "Layers", does: "Open", targets: ["Layer"], shortcut: "", action: () => openSubpanelByKey("timing-order") },
   { type: "command", name: "Flip Layer Order", category: "Layers", does: "Set", targets: ["Layer"], shortcut: "", action: () => moveSelectedLayersInStack("reverse") },
   { type: "command", name: "Duplicate Selected Layers", category: "Edit", does: "Add", targets: ["Layer"], shortcut: "Ctrl+D", action: duplicateSelectedLayers },
@@ -691,7 +688,6 @@ function isInternalPopupOpen() {
     (quickLayerMenuDialogEl && quickLayerMenuDialogEl.classList.contains("show")) ||
     (tntCommandDialogEl && tntCommandDialogEl.classList.contains("show")) ||
     (shortcutRundownEl && shortcutRundownEl.classList.contains("show")) ||
-    (layerSelectionModalEl && layerSelectionModalEl.classList.contains("show")) ||
     (compositionModalEl && compositionModalEl.classList.contains("show")) ||
     (anchorModalEl && anchorModalEl.classList.contains("show")) ||
     (easeDialogEl && easeDialogEl.classList.contains("show")) ||
@@ -5144,53 +5140,6 @@ function layerSelectionBadges(layer, relationSets) {
   return badges.join("");
 }
 
-function renderLayerSelectionPanel() {
-  if (!layerSelectionModalEl || !layerSelectionModalEl.classList.contains("show") || !layerSelectionListEl) return;
-  const selected = new Set((state.selectedLayerIndices || []).map(Number));
-  const scopeLayers = layerSelectionScopeLayers();
-  const layers = layerSelectionCandidates();
-  const relationSets = allRelationshipLayerSets();
-  if (layerSelectionCountEl) {
-    const count = selected.size;
-    layerSelectionCountEl.textContent = `${count} selected`;
-  }
-  if (layerSelectionShownCountEl) {
-    layerSelectionShownCountEl.textContent = `${layers.length}/${scopeLayers.length} ${layerSelectionScopeLabel()} · ${layerSelectionModeLabel()}`;
-  }
-  updateFilterButtons();
-  if (layerSelectionSearchEl) layerSelectionSearchEl.placeholder = layerSelectionSearchPlaceholder();
-  renderLayerSelectionQuickFilters(scopeLayers, relationSets);
-  layerSelectionListEl.innerHTML = layers.length ? layers.map(layer => {
-    const index = Number(layer.index || 0);
-    const isSelected = selected.has(index);
-    const details = visibleLayerSelectionTerms(layer);
-    return `
-      <button type="button" class="layer-selection-row${isSelected ? " selected" : ""}" data-layer-index="${index}" role="option" aria-selected="${isSelected}">
-        <span class="layer-selection-check" aria-hidden="true"></span>
-        <span class="layer-selection-index">${index}</span>
-        <span class="layer-selection-name">${escapeHtml(layer.name || `Layer ${index}`)}</span>
-        <span class="layer-selection-detail">${details.map(item => `<em>${escapeHtml(item)}</em>`).join("")}</span>
-        <span class="layer-selection-badges">${layerSelectionBadges(layer, relationSets)}</span>
-      </button>`;
-  }).join("") : '<div class="layer-selection-empty">No layers match this filter.</div>';
-}
-
-function showLayerSelectionPanel() {
-  if (!layerSelectionModalEl || !state.comp) return;
-  layerSelectionModalEl.classList.add("show");
-  layerSelectionModalEl.setAttribute("aria-hidden", "false");
-  renderLayerSelectionPanel();
-  requestAnimationFrame(() => {
-    if (layerSelectionSearchEl) layerSelectionSearchEl.focus();
-  });
-}
-
-function hideLayerSelectionPanel() {
-  if (!layerSelectionModalEl) return;
-  layerSelectionModalEl.classList.remove("show");
-  layerSelectionModalEl.setAttribute("aria-hidden", "true");
-}
-
 async function queueLayerSelectionHostUpdate(indices) {
   layerSelectionPendingIndices = [...new Set((indices || []).map(Number).filter(Boolean))];
   if (layerSelectionApplyInFlight) return;
@@ -5209,7 +5158,6 @@ async function queueLayerSelectionHostUpdate(indices) {
       if (!layerSelectionPendingIndices) {
         state.selectedLayerIndices = result.selectedLayerIndices || next;
         renderSelectionOnly();
-        renderLayerSelectionPanel();
       }
     }
   } finally {
@@ -5237,7 +5185,6 @@ async function updateLayerSelectionFromPanel(layerIndex, shiftRange = false) {
   lastLayerSelectionIndex = index;
   state.selectedLayerIndices = [...current];
   renderSelectionOnly();
-  renderLayerSelectionPanel();
   await queueLayerSelectionHostUpdate(state.selectedLayerIndices);
 }
 
@@ -5255,7 +5202,6 @@ async function runLayerSelectionAction(action) {
   }
   state.selectedLayerIndices = next;
   renderSelectionOnly();
-  renderLayerSelectionPanel();
   await queueLayerSelectionHostUpdate(next);
 }
 
@@ -5272,7 +5218,6 @@ async function applyLayerSelectionQuickFilter(filter) {
   layerSelectionFilter = filter || null;
   state.selectedLayerIndices = next;
   renderSelectionOnly();
-  renderLayerSelectionPanel();
   await queueLayerSelectionHostUpdate(next);
 }
 function packLayers(layers) {
@@ -7778,7 +7723,6 @@ function renderSelectionOnly(options = {}) {
     row.classList.toggle("selected", selected);
     row.classList.toggle("last-selected", selected && idx === Number(lastSelectedLayerIndex));
   });
-  renderLayerSelectionPanel();
   if (!options.skipKeyframes) renderKeyframeSelectionOnly();
 }
 
@@ -11183,18 +11127,16 @@ function ensureTimingOrderPanel() {
     control.setAttribute("aria-label", control.dataset.tooltip.replace(/\n+/g, ". "));
     bindPanelTooltip(control);
   });
-  timingOrderBackdropEl.addEventListener("mousedown", event => {
-    if (event.target === timingOrderBackdropEl) hideTimingOrderPanel();
-  });
-  timingOrderBackdropEl.addEventListener("keydown", event => {
+  const layoutEl = timingOrderBackdropEl.querySelector(".timing-order-layout");
+  layoutEl.addEventListener("keydown", event => {
     if (event.key === "Escape") {
       event.preventDefault();
       event.stopPropagation();
-      hideTimingOrderPanel();
+      if (typeof hideAnchorDialog === "function") hideAnchorDialog();
       focusPanel(2);
     }
   });
-  timingOrderBackdropEl.addEventListener("click", event => {
+  layoutEl.addEventListener("click", event => {
     const staggerExecute = event.target.closest && event.target.closest("[data-stagger-execute]");
     if (staggerExecute && !staggerExecute.disabled) {
       timingOrderDirection = staggerExecute.dataset.staggerExecute || "";
@@ -11606,9 +11548,34 @@ function updateAnchorSelectionCount() {
   tntPaintSelectionReadouts(anchorModalEl);
 }
 
+// The Layout panel: where things sit and how they are ordered. Anchor, align
+// and distribute were already here; stagger, layer order and pull/snap have
+// moved in from the old Timing/Order panel, because all six act on the same
+// stable selection and were only separate because they were built separately.
+function mountLayoutSections() {
+  if (!anchorModalEl) return;
+  const host = anchorModalEl.querySelector(".anchor-panel");
+  if (!host) return;
+  // The whole backdrop element moves, not just the cards inside it. Every one
+  // of the timing panel's 32 lookups goes through timingOrderBackdropEl, so
+  // lifting the layout out of it would leave them all querying an empty node -
+  // which is exactly what happened on the first attempt.
+  if (typeof ensureTimingOrderPanel !== "function") return;
+  ensureTimingOrderPanel();
+  if (!timingOrderBackdropEl || timingOrderBackdropEl.parentElement === host) return;
+  timingOrderBackdropEl.classList.add("embedded");
+  timingOrderBackdropEl.removeAttribute("aria-hidden");
+  host.appendChild(timingOrderBackdropEl);
+}
+
 function showAnchorDialog() {
   if (!state.comp || !anchorModalEl) return;
   anchorErrorEl.textContent = "";
+  mountLayoutSections();
+  if (typeof renderTimingOrderPanel === "function") {
+    if (typeof captureTimingOrderBaseline === "function") captureTimingOrderBaseline();
+    renderTimingOrderPanel();
+  }
   updateAnchorSelectionCount();
   setAnchorDialogPoint(selectedAnchorPoint || "C");
   anchorModalEl.classList.add("show");
@@ -11671,8 +11638,7 @@ function openSubpanelByKey(key) {
     "layer-menu": openQuickPanelLayerMenu,
     "mass-edit": showMassEditPanel,
     "text-animation": showTextAnimationPanel,
-    "timing-order": showTimingOrderPanel,
-    filter: showLayerSelectionPanel,
+    "timing-order": toggleAnchorDialog,
     tnk: showTnkPanel
   };
   const action = panelActions[key];
@@ -11726,10 +11692,6 @@ function closeActivePopup() {
   }
   if (maskControlDialogEl && maskControlDialogEl.classList.contains("show")) {
     closeMaskControlDialog();
-    closed = true;
-  }
-  if (layerSelectionModalEl && layerSelectionModalEl.classList.contains("show")) {
-    hideLayerSelectionPanel();
     closed = true;
   }
   if (compositionModalEl && compositionModalEl.classList.contains("show")) {
@@ -12546,8 +12508,7 @@ async function openQuickPanelControl(name) {
     "layer-menu": openQuickPanelLayerMenu,
     "mass-edit": showMassEditPanel,
     "text-animation": showTextAnimationPanel,
-    "timing-order": showTimingOrderPanel,
-    filter: showLayerSelectionPanel,
+    "timing-order": toggleAnchorDialog,
     tnk: showTnkPanel
   };
   const action = actions[name];
@@ -12809,7 +12770,6 @@ const QUICK_PANEL_CONTROL_SHORTCUTS = {
   "ctrl+m": "mass-edit",
   "ctrl+t": "text-animation",
   "ctrl+o": "timing-order",
-  "ctrl+x": "filter",
   "ctrl+d": "tnk"
 };
 
@@ -12843,7 +12803,6 @@ function activeQuickPanelSurface() {
     ".modal-backdrop.show > .anchor-dialog",
     ".modal-backdrop.show > .duration-dialog",
     ".modal-backdrop.show > .composition-dialog",
-    ".modal-backdrop.show > .layer-selection-dialog"
   ];
   const visibleSubpanels = Array.from(document.querySelectorAll(subpanelSelectors.join(","))).filter(element => {
     const style = window.getComputedStyle(element);
@@ -12864,7 +12823,6 @@ function quickPanelSurfaceWidth(surface) {
   if (surface.classList.contains("duration-dialog")) return 380;
   if (surface.classList.contains("composition-dialog")) return 620;
   if (surface.classList.contains("timeline-command-dialog")) return 620;
-  if (surface.classList.contains("layer-selection-dialog")) return 820;
   if (surface.classList.contains("quick-layer-menu-dialog")) return 420;
   if (surface.classList.contains("layer-menu")) return 360;
   if (surface.classList.contains("layer-style-dialog")) {
@@ -12903,7 +12861,6 @@ function quickPanelSurfaceMinimumHeight(surface) {
   if (surface.classList.contains("text-animation-dialog")) return 560;
   if (surface.classList.contains("timing-order-layout")) return 420;
   if (surface.classList.contains("timeline-command-dialog")) return 300;
-  if (surface.classList.contains("layer-selection-dialog")) return 540;
   return 180;
 }
 
@@ -13014,7 +12971,6 @@ function closeNativeQuickPanelSurfaces() {
   if (textAnimationBackdropEl && textAnimationBackdropEl.classList.contains("show")) hideTextAnimationPanel();
   if (timingOrderBackdropEl && timingOrderBackdropEl.classList.contains("show")) hideTimingOrderPanel();
   if (typeof tnkBackdropEl !== "undefined" && tnkBackdropEl && tnkBackdropEl.classList.contains("show")) hideTnkPanel();
-  if (layerSelectionModalEl && layerSelectionModalEl.classList.contains("show")) hideLayerSelectionPanel();
   if (compositionModalEl && compositionModalEl.classList.contains("show")) hideCompositionPanel();
   if (anchorModalEl && anchorModalEl.classList.contains("show")) hideAnchorDialog();
   if (durationModalEl && durationModalEl.classList.contains("show")) hideDurationDialog();
@@ -13277,7 +13233,6 @@ window.__tntQuickPanelHitRects = function () {
     ".duration-dialog",
     ".expression-dialog",
     ".composition-dialog",
-    ".layer-selection-dialog",
     ".ease-dialog",
     ".mass-edit-dialog",
     ".text-animation-dialog",
@@ -15002,19 +14957,6 @@ if (assistantHubEl) {
   renderAssistantDraftActions();
   renderAssistantFunctions();
 }
-if (layerSelectionModalEl) {
-  layerSelectionModalEl.addEventListener("mousedown", event => {
-    if (event.target === layerSelectionModalEl) hideLayerSelectionPanel();
-  });
-  layerSelectionModalEl.addEventListener("keydown", event => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      event.stopPropagation();
-      hideLayerSelectionPanel();
-      focusPanel(2);
-    }
-  });
-}
 if (compositionModalEl) {
   compositionModalEl.addEventListener("mousedown", event => {
     if (event.target === compositionModalEl) {
@@ -15031,7 +14973,6 @@ if (compositionModalEl) {
 if (layerSelectionSearchEl) {
   layerSelectionSearchEl.addEventListener("input", () => {
     layerSelectionQuery = layerSelectionSearchEl.value || "";
-    renderLayerSelectionPanel();
   });
 }
 if (layerSelectionSearchClearEl) {
@@ -15041,7 +14982,6 @@ if (layerSelectionSearchClearEl) {
       layerSelectionSearchEl.value = "";
       layerSelectionSearchEl.focus();
     }
-    renderLayerSelectionPanel();
   });
 }
 if (layerSelectionSelectMatchesEl) {
@@ -15055,7 +14995,6 @@ if (layerSelectionModesEl) {
     if (!btn) return;
     layerSelectionMode = btn.dataset.selectionMode || "layer";
     lastLayerSelectionIndex = 0;
-    renderLayerSelectionPanel();
     if (layerSelectionSearchEl) layerSelectionSearchEl.focus();
   });
 }
@@ -15066,7 +15005,6 @@ if (layerSelectionScopesEl) {
     layerSelectionScope = btn.dataset.selectionScope || "selected";
     layerSelectionFilter = null;
     lastLayerSelectionIndex = 0;
-    renderLayerSelectionPanel();
   });
 }
 if (layerSelectionQuickFiltersEl) {
@@ -15081,27 +15019,12 @@ if (layerViewFiltersEl) {
     const btn = event.target.closest && event.target.closest("[data-layer-view-filter]");
     if (!btn) return;
     setLayerViewFilter(btn.dataset.layerViewFilter || null, null);
-    renderLayerSelectionPanel();
   });
 }
 if (activeFilterNoticeEl) {
   activeFilterNoticeEl.addEventListener("click", () => {
     clearLayerViewFilter();
     focusPanel(2);
-  });
-}
-if (layerSelectionListEl) {
-  layerSelectionListEl.addEventListener("click", event => {
-    const row = event.target.closest && event.target.closest(".layer-selection-row");
-    if (!row) return;
-    updateLayerSelectionFromPanel(Number(row.dataset.layerIndex || 0), !!event.shiftKey);
-  });
-}
-if (layerSelectionModalEl) {
-  layerSelectionModalEl.addEventListener("click", event => {
-    const action = event.target.closest && event.target.closest("[data-layer-selection-action]");
-    if (!action) return;
-    runLayerSelectionAction(action.dataset.layerSelectionAction);
   });
 }
 document.addEventListener("mousedown", event => {

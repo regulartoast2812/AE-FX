@@ -274,53 +274,6 @@ function layerSelectionBadges(layer, relationSets) {
   return badges.join("");
 }
 
-function renderLayerSelectionPanel() {
-  if (!layerSelectionModalEl || !layerSelectionModalEl.classList.contains("show") || !layerSelectionListEl) return;
-  const selected = new Set((state.selectedLayerIndices || []).map(Number));
-  const scopeLayers = layerSelectionScopeLayers();
-  const layers = layerSelectionCandidates();
-  const relationSets = allRelationshipLayerSets();
-  if (layerSelectionCountEl) {
-    const count = selected.size;
-    layerSelectionCountEl.textContent = `${count} selected`;
-  }
-  if (layerSelectionShownCountEl) {
-    layerSelectionShownCountEl.textContent = `${layers.length}/${scopeLayers.length} ${layerSelectionScopeLabel()} · ${layerSelectionModeLabel()}`;
-  }
-  updateFilterButtons();
-  if (layerSelectionSearchEl) layerSelectionSearchEl.placeholder = layerSelectionSearchPlaceholder();
-  renderLayerSelectionQuickFilters(scopeLayers, relationSets);
-  layerSelectionListEl.innerHTML = layers.length ? layers.map(layer => {
-    const index = Number(layer.index || 0);
-    const isSelected = selected.has(index);
-    const details = visibleLayerSelectionTerms(layer);
-    return `
-      <button type="button" class="layer-selection-row${isSelected ? " selected" : ""}" data-layer-index="${index}" role="option" aria-selected="${isSelected}">
-        <span class="layer-selection-check" aria-hidden="true"></span>
-        <span class="layer-selection-index">${index}</span>
-        <span class="layer-selection-name">${escapeHtml(layer.name || `Layer ${index}`)}</span>
-        <span class="layer-selection-detail">${details.map(item => `<em>${escapeHtml(item)}</em>`).join("")}</span>
-        <span class="layer-selection-badges">${layerSelectionBadges(layer, relationSets)}</span>
-      </button>`;
-  }).join("") : '<div class="layer-selection-empty">No layers match this filter.</div>';
-}
-
-function showLayerSelectionPanel() {
-  if (!layerSelectionModalEl || !state.comp) return;
-  layerSelectionModalEl.classList.add("show");
-  layerSelectionModalEl.setAttribute("aria-hidden", "false");
-  renderLayerSelectionPanel();
-  requestAnimationFrame(() => {
-    if (layerSelectionSearchEl) layerSelectionSearchEl.focus();
-  });
-}
-
-function hideLayerSelectionPanel() {
-  if (!layerSelectionModalEl) return;
-  layerSelectionModalEl.classList.remove("show");
-  layerSelectionModalEl.setAttribute("aria-hidden", "true");
-}
-
 async function queueLayerSelectionHostUpdate(indices) {
   layerSelectionPendingIndices = [...new Set((indices || []).map(Number).filter(Boolean))];
   if (layerSelectionApplyInFlight) return;
@@ -339,7 +292,6 @@ async function queueLayerSelectionHostUpdate(indices) {
       if (!layerSelectionPendingIndices) {
         state.selectedLayerIndices = result.selectedLayerIndices || next;
         renderSelectionOnly();
-        renderLayerSelectionPanel();
       }
     }
   } finally {
@@ -367,7 +319,6 @@ async function updateLayerSelectionFromPanel(layerIndex, shiftRange = false) {
   lastLayerSelectionIndex = index;
   state.selectedLayerIndices = [...current];
   renderSelectionOnly();
-  renderLayerSelectionPanel();
   await queueLayerSelectionHostUpdate(state.selectedLayerIndices);
 }
 
@@ -385,7 +336,6 @@ async function runLayerSelectionAction(action) {
   }
   state.selectedLayerIndices = next;
   renderSelectionOnly();
-  renderLayerSelectionPanel();
   await queueLayerSelectionHostUpdate(next);
 }
 
@@ -402,6 +352,5 @@ async function applyLayerSelectionQuickFilter(filter) {
   layerSelectionFilter = filter || null;
   state.selectedLayerIndices = next;
   renderSelectionOnly();
-  renderLayerSelectionPanel();
   await queueLayerSelectionHostUpdate(next);
 }

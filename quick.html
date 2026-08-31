@@ -31,7 +31,6 @@
       <button type="button" data-quick-panel="text-animation" data-tooltip="Text Animation\nShortcut: Ctrl+T\nBuild text animators and manage selected text layers." data-icon="panel.text-animation"><span class="quick-panel-name">Text Anim</span><kbd>Ctrl+T</kbd></button>
       <button type="button" data-quick-panel="timing-order" data-tooltip="Timing and Order\nShortcut: Ctrl+O\nStagger layers and reorganize selected layer order." data-icon="panel.timing-order"><span class="quick-panel-name">Timing / Order</span><kbd>Ctrl+O</kbd></button>
       <button type="button" data-quick-panel="tnk" data-tooltip="TNK Tools\nShortcut: Ctrl+D\nGlobal parameter bar feeding every tool, TNK v3 style." data-icon="panel.tnk"><span class="quick-panel-name">TNK</span><kbd>Ctrl+D</kbd></button>
-      <button type="button" data-quick-panel="filter" data-tooltip="Selection Filter\nShortcut: Ctrl+X\nBuild or refine the native layer selection." data-icon="panel.filter"><span class="quick-panel-name">Filter</span><kbd>Ctrl+X</kbd></button>
     </div>
     <p class="quick-panel-hint">Uses the current native Timeline or Composition selection.</p>
   </section>
@@ -189,83 +188,6 @@
         </section>
       </div>
       <div id="compositionError" class="composition-error"></div>
-    </div>
-  </div>
-
-  <div id="layerSelectionModal" class="modal-backdrop layer-selection-backdrop" aria-hidden="true">
-    <div class="layer-selection-dialog" role="dialog" aria-modal="true" aria-labelledby="layerSelectionTitle">
-      <div class="layer-selection-head">
-        <div class="layer-selection-title-wrap">
-          <span class="subpanel-shortcut-badge layer-selection-title-icon" aria-hidden="true"></span>
-          <div id="layerSelectionTitle" class="layer-selection-title">Filter / Select</div>
-          <span id="layerSelectionCount" class="layer-selection-count">0 selected</span>
-        </div>
-      </div>
-      <div class="layer-selection-controls">
-        <div class="layer-filter-panels">
-          <section class="layer-filter-panel layer-filter-view-panel">
-            <div class="layer-filter-panel-head">
-              <strong>Filter</strong>
-              <span>Timeline</span>
-            </div>
-            <div id="layerViewFilters" class="layer-selection-filters" aria-label="Filter timeline view">
-              <div class="layer-selection-filter-group filter-group-general">
-                <button type="button" data-layer-view-filter="" class="active">All</button>
-              </div>
-              <div class="layer-selection-filter-group filter-group-parent">
-                <button type="button" data-layer-view-filter="parent-source">Parents</button>
-                <button type="button" data-layer-view-filter="parented">Children</button>
-              </div>
-              <div class="layer-selection-filter-group filter-group-matte">
-                <button type="button" data-layer-view-filter="matte-source">Matte Sources</button>
-                <button type="button" data-layer-view-filter="matte-child">Matte Users</button>
-              </div>
-              <div class="layer-selection-filter-group filter-group-type">
-                <button type="button" data-layer-view-filter="text">Text</button>
-                <button type="button" data-layer-view-filter="shape">Shape</button>
-                <button type="button" data-layer-view-filter="media">Media</button>
-              </div>
-              <div class="layer-selection-filter-group filter-group-animation">
-                <button type="button" data-layer-view-filter="animated">Animated</button>
-                <button type="button" data-layer-view-filter="unanimated">Static</button>
-              </div>
-            </div>
-          </section>
-          <section class="layer-filter-panel layer-filter-selection-panel">
-            <div class="layer-filter-panel-head">
-              <strong>Select</strong>
-              <span>Native AE</span>
-            </div>
-            <div id="layerSelectionScopes" class="layer-selection-scopes" aria-label="Selection filter scope">
-              <button type="button" data-selection-scope="selected" class="active">Selection</button>
-              <button type="button" data-selection-scope="playhead">Playhead</button>
-              <button type="button" data-selection-scope="all">All</button>
-            </div>
-            <div id="layerSelectionModes" class="layer-selection-modes" aria-label="Select by">
-              <button type="button" data-selection-mode="layer" class="active">Name</button>
-              <button type="button" data-selection-mode="property">Props</button>
-              <button type="button" data-selection-mode="effect">FX</button>
-            </div>
-            <div class="layer-selection-search-wrap">
-              <span class="layer-selection-search-icon" aria-hidden="true"></span>
-              <input id="layerSelectionSearch" class="layer-selection-search" type="text" placeholder="Select layers by name" spellcheck="false" />
-              <button id="layerSelectionSelectMatches" class="layer-selection-select-matches" type="button">Select</button>
-              <button id="layerSelectionSearchClear" class="layer-selection-search-clear" type="button" title="Clear search" aria-label="Clear search"></button>
-            </div>
-            <div id="layerSelectionQuickFilters" class="layer-selection-quick-filters" aria-label="Selection filter actions"></div>
-          </section>
-        </div>
-      </div>
-      <div class="layer-selection-list-head">
-        <span id="layerSelectionShownCount">0 layers</span>
-        <span>Click toggles · Shift range</span>
-      </div>
-      <div id="layerSelectionList" class="layer-selection-list" role="listbox" aria-multiselectable="true"></div>
-      <div class="layer-selection-actions">
-        <button type="button" data-layer-selection-action="clear">Clear</button>
-        <button type="button" data-layer-selection-action="invert">Invert</button>
-        <button type="button" data-layer-selection-action="select">Select</button>
-      </div>
     </div>
   </div>
 

@@ -84,9 +84,34 @@ function updateAnchorSelectionCount() {
   tntPaintSelectionReadouts(anchorModalEl);
 }
 
+// The Layout panel: where things sit and how they are ordered. Anchor, align
+// and distribute were already here; stagger, layer order and pull/snap have
+// moved in from the old Timing/Order panel, because all six act on the same
+// stable selection and were only separate because they were built separately.
+function mountLayoutSections() {
+  if (!anchorModalEl) return;
+  const host = anchorModalEl.querySelector(".anchor-panel");
+  if (!host) return;
+  // The whole backdrop element moves, not just the cards inside it. Every one
+  // of the timing panel's 32 lookups goes through timingOrderBackdropEl, so
+  // lifting the layout out of it would leave them all querying an empty node -
+  // which is exactly what happened on the first attempt.
+  if (typeof ensureTimingOrderPanel !== "function") return;
+  ensureTimingOrderPanel();
+  if (!timingOrderBackdropEl || timingOrderBackdropEl.parentElement === host) return;
+  timingOrderBackdropEl.classList.add("embedded");
+  timingOrderBackdropEl.removeAttribute("aria-hidden");
+  host.appendChild(timingOrderBackdropEl);
+}
+
 function showAnchorDialog() {
   if (!state.comp || !anchorModalEl) return;
   anchorErrorEl.textContent = "";
+  mountLayoutSections();
+  if (typeof renderTimingOrderPanel === "function") {
+    if (typeof captureTimingOrderBaseline === "function") captureTimingOrderBaseline();
+    renderTimingOrderPanel();
+  }
   updateAnchorSelectionCount();
   setAnchorDialogPoint(selectedAnchorPoint || "C");
   anchorModalEl.classList.add("show");
@@ -149,8 +174,7 @@ function openSubpanelByKey(key) {
     "layer-menu": openQuickPanelLayerMenu,
     "mass-edit": showMassEditPanel,
     "text-animation": showTextAnimationPanel,
-    "timing-order": showTimingOrderPanel,
-    filter: showLayerSelectionPanel,
+    "timing-order": toggleAnchorDialog,
     tnk: showTnkPanel
   };
   const action = panelActions[key];
@@ -204,10 +228,6 @@ function closeActivePopup() {
   }
   if (maskControlDialogEl && maskControlDialogEl.classList.contains("show")) {
     closeMaskControlDialog();
-    closed = true;
-  }
-  if (layerSelectionModalEl && layerSelectionModalEl.classList.contains("show")) {
-    hideLayerSelectionPanel();
     closed = true;
   }
   if (compositionModalEl && compositionModalEl.classList.contains("show")) {
@@ -1024,8 +1044,7 @@ async function openQuickPanelControl(name) {
     "layer-menu": openQuickPanelLayerMenu,
     "mass-edit": showMassEditPanel,
     "text-animation": showTextAnimationPanel,
-    "timing-order": showTimingOrderPanel,
-    filter: showLayerSelectionPanel,
+    "timing-order": toggleAnchorDialog,
     tnk: showTnkPanel
   };
   const action = actions[name];
@@ -1287,7 +1306,6 @@ const QUICK_PANEL_CONTROL_SHORTCUTS = {
   "ctrl+m": "mass-edit",
   "ctrl+t": "text-animation",
   "ctrl+o": "timing-order",
-  "ctrl+x": "filter",
   "ctrl+d": "tnk"
 };
 
@@ -1321,7 +1339,6 @@ function activeQuickPanelSurface() {
     ".modal-backdrop.show > .anchor-dialog",
     ".modal-backdrop.show > .duration-dialog",
     ".modal-backdrop.show > .composition-dialog",
-    ".modal-backdrop.show > .layer-selection-dialog"
   ];
   const visibleSubpanels = Array.from(document.querySelectorAll(subpanelSelectors.join(","))).filter(element => {
     const style = window.getComputedStyle(element);
@@ -1342,7 +1359,6 @@ function quickPanelSurfaceWidth(surface) {
   if (surface.classList.contains("duration-dialog")) return 380;
   if (surface.classList.contains("composition-dialog")) return 620;
   if (surface.classList.contains("timeline-command-dialog")) return 620;
-  if (surface.classList.contains("layer-selection-dialog")) return 820;
   if (surface.classList.contains("quick-layer-menu-dialog")) return 420;
   if (surface.classList.contains("layer-menu")) return 360;
   if (surface.classList.contains("layer-style-dialog")) {
@@ -1381,7 +1397,6 @@ function quickPanelSurfaceMinimumHeight(surface) {
   if (surface.classList.contains("text-animation-dialog")) return 560;
   if (surface.classList.contains("timing-order-layout")) return 420;
   if (surface.classList.contains("timeline-command-dialog")) return 300;
-  if (surface.classList.contains("layer-selection-dialog")) return 540;
   return 180;
 }
 
@@ -1492,7 +1507,6 @@ function closeNativeQuickPanelSurfaces() {
   if (textAnimationBackdropEl && textAnimationBackdropEl.classList.contains("show")) hideTextAnimationPanel();
   if (timingOrderBackdropEl && timingOrderBackdropEl.classList.contains("show")) hideTimingOrderPanel();
   if (typeof tnkBackdropEl !== "undefined" && tnkBackdropEl && tnkBackdropEl.classList.contains("show")) hideTnkPanel();
-  if (layerSelectionModalEl && layerSelectionModalEl.classList.contains("show")) hideLayerSelectionPanel();
   if (compositionModalEl && compositionModalEl.classList.contains("show")) hideCompositionPanel();
   if (anchorModalEl && anchorModalEl.classList.contains("show")) hideAnchorDialog();
   if (durationModalEl && durationModalEl.classList.contains("show")) hideDurationDialog();
@@ -1755,7 +1769,6 @@ window.__tntQuickPanelHitRects = function () {
     ".duration-dialog",
     ".expression-dialog",
     ".composition-dialog",
-    ".layer-selection-dialog",
     ".ease-dialog",
     ".mass-edit-dialog",
     ".text-animation-dialog",
@@ -3480,19 +3493,6 @@ if (assistantHubEl) {
   renderAssistantDraftActions();
   renderAssistantFunctions();
 }
-if (layerSelectionModalEl) {
-  layerSelectionModalEl.addEventListener("mousedown", event => {
-    if (event.target === layerSelectionModalEl) hideLayerSelectionPanel();
-  });
-  layerSelectionModalEl.addEventListener("keydown", event => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      event.stopPropagation();
-      hideLayerSelectionPanel();
-      focusPanel(2);
-    }
-  });
-}
 if (compositionModalEl) {
   compositionModalEl.addEventListener("mousedown", event => {
     if (event.target === compositionModalEl) {
@@ -3509,7 +3509,6 @@ if (compositionModalEl) {
 if (layerSelectionSearchEl) {
   layerSelectionSearchEl.addEventListener("input", () => {
     layerSelectionQuery = layerSelectionSearchEl.value || "";
-    renderLayerSelectionPanel();
   });
 }
 if (layerSelectionSearchClearEl) {
@@ -3519,7 +3518,6 @@ if (layerSelectionSearchClearEl) {
       layerSelectionSearchEl.value = "";
       layerSelectionSearchEl.focus();
     }
-    renderLayerSelectionPanel();
   });
 }
 if (layerSelectionSelectMatchesEl) {
@@ -3533,7 +3531,6 @@ if (layerSelectionModesEl) {
     if (!btn) return;
     layerSelectionMode = btn.dataset.selectionMode || "layer";
     lastLayerSelectionIndex = 0;
-    renderLayerSelectionPanel();
     if (layerSelectionSearchEl) layerSelectionSearchEl.focus();
   });
 }
@@ -3544,7 +3541,6 @@ if (layerSelectionScopesEl) {
     layerSelectionScope = btn.dataset.selectionScope || "selected";
     layerSelectionFilter = null;
     lastLayerSelectionIndex = 0;
-    renderLayerSelectionPanel();
   });
 }
 if (layerSelectionQuickFiltersEl) {
@@ -3559,27 +3555,12 @@ if (layerViewFiltersEl) {
     const btn = event.target.closest && event.target.closest("[data-layer-view-filter]");
     if (!btn) return;
     setLayerViewFilter(btn.dataset.layerViewFilter || null, null);
-    renderLayerSelectionPanel();
   });
 }
 if (activeFilterNoticeEl) {
   activeFilterNoticeEl.addEventListener("click", () => {
     clearLayerViewFilter();
     focusPanel(2);
-  });
-}
-if (layerSelectionListEl) {
-  layerSelectionListEl.addEventListener("click", event => {
-    const row = event.target.closest && event.target.closest(".layer-selection-row");
-    if (!row) return;
-    updateLayerSelectionFromPanel(Number(row.dataset.layerIndex || 0), !!event.shiftKey);
-  });
-}
-if (layerSelectionModalEl) {
-  layerSelectionModalEl.addEventListener("click", event => {
-    const action = event.target.closest && event.target.closest("[data-layer-selection-action]");
-    if (!action) return;
-    runLayerSelectionAction(action.dataset.layerSelectionAction);
   });
 }
 document.addEventListener("mousedown", event => {

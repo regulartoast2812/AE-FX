@@ -185,7 +185,6 @@ function renderSelectionOnly(options = {}) {
     row.classList.toggle("selected", selected);
     row.classList.toggle("last-selected", selected && idx === Number(lastSelectedLayerIndex));
   });
-  renderLayerSelectionPanel();
   if (!options.skipKeyframes) renderKeyframeSelectionOnly();
 }
 

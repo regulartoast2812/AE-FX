@@ -145,18 +145,16 @@ function ensureTimingOrderPanel() {
     control.setAttribute("aria-label", control.dataset.tooltip.replace(/\n+/g, ". "));
     bindPanelTooltip(control);
   });
-  timingOrderBackdropEl.addEventListener("mousedown", event => {
-    if (event.target === timingOrderBackdropEl) hideTimingOrderPanel();
-  });
-  timingOrderBackdropEl.addEventListener("keydown", event => {
+  const layoutEl = timingOrderBackdropEl.querySelector(".timing-order-layout");
+  layoutEl.addEventListener("keydown", event => {
     if (event.key === "Escape") {
       event.preventDefault();
       event.stopPropagation();
-      hideTimingOrderPanel();
+      if (typeof hideAnchorDialog === "function") hideAnchorDialog();
       focusPanel(2);
     }
   });
-  timingOrderBackdropEl.addEventListener("click", event => {
+  layoutEl.addEventListener("click", event => {
     const staggerExecute = event.target.closest && event.target.closest("[data-stagger-execute]");
     if (staggerExecute && !staggerExecute.disabled) {
       timingOrderDirection = staggerExecute.dataset.staggerExecute || "";

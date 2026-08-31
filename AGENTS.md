@@ -85,146 +85,33 @@ Consequences to respect:
 
 - **Tab to cycle between subpanels** while one is open. Not built yet.
 
-### Merging the A and O panels
+### The Layout panel
 
-Anchor/Align (A) and Timing/Order (O) are being merged - both organise comp
-layers, one in the scene and one in the timeline, and they get used in and
-around each other. Done a step at a time so the halves never look unrelated.
+Anchor/Align and Timing/Order are one panel now: anchor, align, distribute,
+stagger, layer order, pull/snap. All six act on the same stable selection and
+were only separate because they were built separately. Ctrl+O opens it too.
 
-Done:
-- `.tnt-card-head` / `.tnt-card-title` exists as a shared component and O uses
-  it. **A does not.** Putting it on A was tried and reverted: a 42px serif
-  header with a badge doubled the height of a label that had been 11px, and
-  inflated a panel whose whole appeal is that it is small. The component stays
-  available, but adopting it is not the way to make these two look related.
-- A gained the live selection count, on its existing small label. Align needs
-  two layers and distribute three, so the number explains a refusal before it
-  happens - without 42px of chrome to say so.
+**The whole timing backdrop moves, not just its cards.** All 32 of that
+panel's element lookups go through `timingOrderBackdropEl`, so lifting the
+layout out of it leaves every one of them querying an empty node. Embedded, it
+carries an `embedded` class that turns it from a fixed overlay into a block in
+the flow.
 
-Lesson for the remaining steps: **make O lighter rather than making A heavier.**
-A is the compact one and that is the thing worth keeping.
+Two things that fought the layout, both worth knowing before editing it:
 
-Remaining, in the order they show:
-1. **A's sections have no card shell.** O's cards carry a border, background
-   and shadow; A's are bare. Side by side this is the loudest difference left.
-2. **Distribute is still a plain sub-heading** inside the Align card. Merged,
-   it should be its own card with a `DI` badge.
-3. **Layout.** Five cards need a grid, not a row.
+- `.anchor-panel` computes to **flex**, not grid, despite a `display: grid`
+  rule earlier in the file. `grid-column` on the embedded backdrop was inert;
+  it takes `flex: 1 0 100%` to get its own line.
+- The timing layout is a `min(1120px, …)` three-column sheet when standalone.
+  At the panel's width that spills out over the anchor row and reads as
+  overlap, so embedded it is forced to one column at 100%.
 
-Ctrl+O is a right-hand key, which the ergonomics rule above says triggers
-should avoid. Folding O into A retires it.
+The Filter panel is gone - its dialog, its registry entry, Ctrl+X and
+Shift+X. The view-filter helpers in `30-filter-selection.js` stay: the
+timeline render depends on `visibleLayers()`.
 
-### Dialogs opened from inside a subpanel
-
-`showTntCommandDialog` closes whatever subpanel is showing before it opens.
-It has to: nothing else did, so two surfaces ended up shown at once, and in
-the overlay the window is sized to `activeQuickPanelSurface()` - which
-prefers this dialog. The window shrank to the dialog while the subpanel
-behind it still laid out at its own size, so the panel appeared stretched and
-torn and the dialog only surfaced once a click outside dismissed the
-subpanel and let the resize settle.
-
-Every `prompt*` helper routes through that one function, which is why the fix
-lives there rather than in each caller. Affected callers found:
-
-- TNK: Stagger Layers, Set Text Content, Find / Replace Text, Add Marker -
-  every TNK command whose name ends in "..."
-- Text Animation panel: its Set Text and Find / Replace buttons
-
-**Adding a subpanel that opens a prompt needs nothing extra** - but a
-subpanel that shows its own surface some other way must be added to
-`closeNativeQuickPanelSurfaces`, which is a hand-maintained list.
-
-### Group shortcuts summon the overlay, not the panel
-
-The docked panel is a catalogue, not a working surface. A group shortcut
-therefore hands its scope to the overlay and summons it, rather than expanding
-a row behind the timeline. Clicking the row still expands it in place - that
-is for browsing the database, not for working.
-
-The scope travels through `~/.ae-fx-quick-controls/scope.json`, written by
-`TNT_writeQuickPanelScope` and read once by the helper in `showPanel`. It has
-to go through a file: the loopback bridge runs helper-to-panel only, and
-`open` on a running app passes it nothing. The file is deleted on read and
-ignored past ten seconds, so a scope left by a crash cannot hijack the next
-plain summon.
-
-### No keyboard event tap - deliberately
-
-The helper does **not** tap the keyboard, and should not be given one. A
-`CGEvent` keyboard tap sees every keystroke in every application; that is a
-keylogger-shaped capability, and it is too much to ask of a panel that trims
-layers. It was built once for plain `C` and again for Ctrl+Space, and removed
-both times.
-
-What that costs, and why it is the right trade:
-
-- **Ctrl+Space is a Carbon hot key**, so macOS claims it for the whole login
-  session and it does not reach other applications - the input-source switcher
-  included. One key, one known cost.
-- **Plain, unmodified keys cannot be global at all.** RegisterEventHotKey would
-  make that character untypeable everywhere. `C` for TNK is therefore off the
-  table; it is Ctrl+D.
-- **Custom bindings are not global.** They live inside the overlay:
-  Ctrl+Space to summon, then the binding. `shortcutAllowedInEditable` lets a
-  modified user binding through even with the caret in the search box, which is
-  where it always sits on opening. Bare bindings stay blocked there so a single
-  letter is still typeable.
-
-The only tap left is on `rightMouseDown`, for the control-right-click layer
-menu. It predates this work and reads mouse events, not keystrokes.
-
-### Command requirements are derived, not hand-tagged
-
-`src/js/06-command-requirements.js` is generated by
-`scripts/derive-command-requirements.py`, which reads what each host function
-requires out of its own guard clauses in `jsx/timeline.jsx`:
-
-```js
-var layers = getSelectedLayers(); if (!layers.length) return "No layers selected";
-```
-
-96 functions map that way - 84 need layers, 11 need keyframes, 1 needs a mask.
-**Re-run the script after adding host functions.**
-
-The cross-check runs on three surfaces, all dimming rather than hiding so
-nothing moves and everything stays findable:
-
-- **Functions list** - a Needs column plus a dimmed row. 55 of 150 dim with
-  nothing selected, 4 with layers selected.
-- **Quick panel search** - dimmed result, with the reason in its tooltip.
-- **TNK** - dimmed glyph, reason as the first bulleted line of its tooltip.
-  24 of 37 dim with nothing selected, 2 with layers selected.
-
-TNK matters most here: its buttons carry no label, so a dead one is
-indistinguishable from a live one until it fails.
-
-Deliberately narrow:
-
-- **Only what the code states.** Text-only and shape-only commands are not
-  derived - almost none of them say so, and a wrongly greyed button is worse
-  than none.
-- **"Needs a comp" is not derived** either, though 102 functions state it.
-  There is essentially always a comp open, so it would grey the list for
-  nothing.
-- **Entries with a panel-side `action` are not covered** - the derivation reads
-  jsx, so those stay live. A command can opt in by hand with `requires: "..."`.
-
-### Command search is literal, so aliases carry the other words
-
-`searchFxConsoleEntries` matches terms as substrings - a word either appears in
-the haystack or it does not. That is right for a 200-entry list, where fuzzy
-matching would make everything match everything, but it means a name has to be
-guessed exactly. "remove effects" found nothing, because the registry says
-Delete.
-
-`src/js/07-command-aliases.js` holds the vocabulary that is not in the name,
-keyed by command name and applied at lookup, so adding a word is a line there
-rather than an edit to a registry row. An entry can also carry its own
-`aliases` string; both are searched.
-
-Add a word whenever a command is hard to find under a plausible name - that is
-the signal, not a rule about which words belong.
+Still to do: Tab cycling between panels, and the type-aware skip - a tab the
+current selection cannot use should not be in the cycle.
 
 ### On hold
 

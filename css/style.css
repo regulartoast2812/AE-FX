@@ -10654,6 +10654,73 @@ body.keyframe-mode .track-label {
   letter-spacing: 0;
   text-transform: none;
 }
+
+/* Layout panel: the anchor/align sections and the migrated timing cards share
+   one column flow. The timing cards keep their own shell - they carry state
+   and read as distinct jobs - while anchor and align stay bare, which is the
+   density the panel was liked for.
+
+   The timing panel's own backdrop comes along, since all of its lookups go
+   through it. Embedded, it stops being a fixed overlay and becomes a plain
+   block in the flow. */
+.timing-order-backdrop.embedded {
+  position: static !important;
+  display: block !important;
+  width: 100%;
+  padding: 0 !important;
+  background: none !important;
+}
+
+.anchor-panel .timing-order-card {
+  width: 100%;
+}
+
+/* Layout panel geometry.
+   Anchor and Align keep their side-by-side row; the migrated timing cards run
+   full width beneath, which is what they were built for. The dialog widens and
+   scrolls rather than growing past the window - six sections is more than the
+   two this shell was sized for. */
+.anchor-dialog:has(.timing-order-backdrop.embedded) {
+  width: min(680px, calc(100vw - 40px)) !important;
+  max-width: none !important;
+}
+
+/* A later rule makes .anchor-panel flex, not grid, so grid-column on the
+   embedded backdrop was inert - it sat in the row rather than under it.
+   Wrapping flex, with the backdrop forced onto its own line. */
+.anchor-panel:has(.timing-order-backdrop.embedded) {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  max-height: min(72vh, 720px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.timing-order-backdrop.embedded {
+  flex: 1 0 100% !important;
+  width: 100%;
+}
+
+/* Standalone, the timing layout is a 1120px three-column sheet. Embedded, it
+   is one column at the panel's width - the 1120px was what spilled out over
+   the anchor row and read as overlap. */
+.timing-order-backdrop.embedded .timing-order-layout {
+  grid-template-columns: minmax(0, 1fr) !important;
+  width: 100% !important;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* Inside the panel the cards are sections, not floating dialogs. Their own
+   background is translucent and leans on a backdrop-filter, which reads as
+   the Functions list showing through once they sit inside another surface. */
+.anchor-panel .timing-order-card {
+  background: rgba(30, 31, 33, .97) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .045) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {
   display: grid !important;

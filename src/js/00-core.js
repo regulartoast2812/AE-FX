@@ -45,7 +45,6 @@ const compositionErrorEl = document.getElementById("compositionError");
 const layerMenuEl = document.getElementById("layerMenu");
 const filterColumnEl = document.getElementById("filterColumn");
 const settingsBtnEl = document.getElementById("settingsBtn");
-const layerSelectionModalEl = document.getElementById("layerSelectionModal");
 const layerSelectionCountEl = document.getElementById("layerSelectionCount");
 const layerSelectionSearchEl = document.getElementById("layerSelectionSearch");
 const layerSelectionSearchClearEl = document.getElementById("layerSelectionSearchClear");
@@ -55,7 +54,6 @@ const layerSelectionScopesEl = document.getElementById("layerSelectionScopes");
 const layerSelectionModesEl = document.getElementById("layerSelectionModes");
 const layerSelectionQuickFiltersEl = document.getElementById("layerSelectionQuickFilters");
 const layerSelectionShownCountEl = document.getElementById("layerSelectionShownCount");
-const layerSelectionListEl = document.getElementById("layerSelectionList");
 const platformBadgeEl = document.getElementById("platformBadge");
 
 let state = { comp: null, layers: [], selectedLayerIndices: [], compMarkers: [] };
@@ -234,7 +232,6 @@ const FX_CONSOLE_COMMANDS = [
   { type: "command", name: "Composition Tools", category: "Composition", does: "Open", targets: ["Comp"], shortcut: "C", action: () => openSubpanelByKey("composition") },
   { type: "command", name: "Anchor Point Master", category: "Anchor", does: "Open", targets: ["Layer"], shortcut: "A", action: () => openSubpanelByKey("anchor") },
   { type: "command", name: "Center Anchor Point", category: "Anchor", does: "Set", targets: ["Layer"], shortcut: "Shift+A", action: centerSelectedAnchorPoints },
-  { type: "command", name: "Layer Selection & Filters", category: "Layers", does: "Open", targets: ["Layer"], shortcut: "Shift+X", action: () => openSubpanelByKey("filter") },
   { type: "command", name: "Stagger & Layer Order", category: "Layers", does: "Open", targets: ["Layer"], shortcut: "", action: () => openSubpanelByKey("timing-order") },
   { type: "command", name: "Flip Layer Order", category: "Layers", does: "Set", targets: ["Layer"], shortcut: "", action: () => moveSelectedLayersInStack("reverse") },
   { type: "command", name: "Duplicate Selected Layers", category: "Edit", does: "Add", targets: ["Layer"], shortcut: "Ctrl+D", action: duplicateSelectedLayers },
@@ -688,7 +685,6 @@ function isInternalPopupOpen() {
     (quickLayerMenuDialogEl && quickLayerMenuDialogEl.classList.contains("show")) ||
     (tntCommandDialogEl && tntCommandDialogEl.classList.contains("show")) ||
     (shortcutRundownEl && shortcutRundownEl.classList.contains("show")) ||
-    (layerSelectionModalEl && layerSelectionModalEl.classList.contains("show")) ||
     (compositionModalEl && compositionModalEl.classList.contains("show")) ||
     (anchorModalEl && anchorModalEl.classList.contains("show")) ||
     (easeDialogEl && easeDialogEl.classList.contains("show")) ||
