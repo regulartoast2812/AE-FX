@@ -1902,6 +1902,9 @@ function tntRebuildUserShortcutIndex() {
     const key = String(tntUserShortcuts[name] || "").trim();
     if (key) tntUserShortcutIndex[key] = name;
   });
+  // The declared key list is built from this index, so it has to be rebuilt
+  // with it - otherwise a key bound now stays dead until the panel reloads.
+  if (typeof registerPanelKeyEventsInterest === "function") registerPanelKeyEventsInterest();
 }
 
 // Display form from the normalised form ("ctrl+shift+e" -> "Control+Shift+E").

@@ -452,7 +452,7 @@ function openFxConsoleSubmenu(entry) {
     fxConsoleParentEntry = null;
     fxConsoleSelectedIndex = 0;
     scopeInput.value = `[${entry.groupParent}] `;
-    renderFxConsole();
+    renderFxConsoleResults();
     scopeInput.focus();
     scopeInput.setSelectionRange(scopeInput.value.length, scopeInput.value.length);
     return true;
@@ -558,7 +558,7 @@ async function applySelectedFxConsoleEffect() {
 
 // One entry point for "open this group", whichever surface is in front. A group
 // parent has no action of its own - running it anywhere scopes a search box.
-function openCommandGroup(name) {
+async function openCommandGroup(name) {
   const token = `[${name}] `;
   if (typeof QUICK_PANEL_MODE !== "undefined" && QUICK_PANEL_MODE &&
       typeof quickPanelSearchEl !== "undefined" && quickPanelSearchEl) {
@@ -569,13 +569,16 @@ function openCommandGroup(name) {
     quickPanelSearchEl.setSelectionRange(token.length, token.length);
     return true;
   }
-  if (typeof openFxConsole === "function") openFxConsole();
+  // openFxConsole is async and clears the input on the way in, so the token has
+  // to be written after it settles - writing first looks fine and is silently
+  // wiped when the await resolves.
+  await openFxConsole();
   const input = fxConsoleEl && fxConsoleEl.querySelector(".fx-console-input");
-  if (!input) return false;
+  if (!input || !fxConsoleEl.classList.contains("open")) return false;
   fxConsoleParentEntry = null;
   fxConsoleSelectedIndex = 0;
   input.value = token;
-  renderFxConsole();
+  renderFxConsoleResults();
   input.focus();
   input.setSelectionRange(token.length, token.length);
   return true;

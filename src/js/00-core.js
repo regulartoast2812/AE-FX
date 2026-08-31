@@ -841,6 +841,45 @@ async function startNativeSelectionMonitor() {
   }
 }
 
+// After Effects forwards a CEP panel only the keys it declared here. The list
+// below is hand-written, but users can bind ANY key from the shortcut column -
+// so every binding outside that list was silently dead. Ctrl+W on a command
+// simply did nothing, with no error and nothing to read.
+//
+// So the user's own bindings are declared too, translated back from the
+// "ctrl+shift+w" strings the shortcut system stores.
+const TNT_KEY_CODES = {
+  a: [65, 0], b: [66, 11], c: [67, 8], d: [68, 2], e: [69, 14], f: [70, 3],
+  g: [71, 5], h: [72, 4], i: [73, 34], j: [74, 38], k: [75, 40], l: [76, 37],
+  m: [77, 46], n: [78, 45], o: [79, 31], p: [80, 35], q: [81, 12], r: [82, 15],
+  s: [83, 1], t: [84, 17], u: [85, 32], v: [86, 9], w: [87, 13], x: [88, 7],
+  y: [89, 16], z: [90, 6],
+  "1": [49, 18], "2": [50, 19], "3": [51, 20], "4": [52, 21], "5": [53, 23],
+  "6": [54, 22], "7": [55, 26], "8": [56, 28], "9": [57, 25], "0": [48, 29],
+  space: [32, 49], tab: [9, 48], enter: [13, 36], escape: [27, 53],
+  backspace: [8, 51], delete: [46, 117], period: [190, 47], ".": [190, 47],
+  "`": [192, 50], backquote: [192, 50], "-": [189, 27], "=": [187, 24],
+  "[": [219, 33], "]": [221, 30], ";": [186, 41], "'": [222, 39],
+  ",": [188, 43], "/": [191, 44], "\\": [220, 42],
+  arrowup: [38, 126], arrowdown: [40, 125], arrowleft: [37, 123], arrowright: [39, 124]
+};
+
+function declareUserShortcutKeyInterest(add, letters) {
+  if (typeof tntUserShortcutIndex === "undefined" || !tntUserShortcutIndex) return;
+  Object.keys(tntUserShortcutIndex).forEach(combo => {
+    const parts = String(combo).toLowerCase().split("+").map(part => part.trim()).filter(Boolean);
+    const base = parts.pop();
+    const codes = TNT_KEY_CODES[base] || (letters[base] || null);
+    if (!codes) return;
+    add(codes[0], codes[1], {
+      ctrlKey: parts.indexOf("ctrl") >= 0,
+      altKey: parts.indexOf("alt") >= 0 || parts.indexOf("option") >= 0,
+      shiftKey: parts.indexOf("shift") >= 0,
+      metaKey: parts.indexOf("cmd") >= 0 || parts.indexOf("meta") >= 0 || parts.indexOf("command") >= 0
+    });
+  });
+}
+
 function registerPanelKeyEventsInterest() {
   if (!cs || typeof cs.registerKeyEventsInterest !== "function") return;
   const mac = isMacPlatform();
@@ -889,6 +928,7 @@ function registerPanelKeyEventsInterest() {
 
   add(192, 50, { altKey: true });
   add(letters.x[0], letters.x[1], { altKey: true });
+  declareUserShortcutKeyInterest(add, letters);
   add(38, 126, { altKey: true });
   add(40, 125, { altKey: true });
   add(38, 126, { shiftKey: true, altKey: true });
