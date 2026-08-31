@@ -283,10 +283,22 @@ function tnkApplyParamsToArgs(args) {
 // as plain command names rather than duplicated definitions.
 function tnkEntryIndex() {
   const index = new Map();
-  const add = entry => {
+  // A child carries no type of its own - searchFxConsoleEntries assigns one
+  // when you drill into its parent, and reading children directly skips that.
+  // executeFxConsoleEntry then falls past every branch to the apply-an-effect
+  // path and calls the host with an undefined matchName, which After Effects
+  // reports as "does not have a value" at line 1.
+  const add = (entry, parent) => {
     if (!entry || entry.children) return;
     const name = String(entry.name || "");
-    if (name && !index.has(name)) index.set(name, entry);
+    if (!name || index.has(name)) return;
+    index.set(name, parent
+      ? Object.assign({}, entry, {
+          type: entry.action ? "command" : "tntCommand",
+          source: parent.source || "custom",
+          parentName: parent.name
+        })
+      : entry);
   };
   let all = [];
   try { all = searchFxConsoleEntries("", null, 3000) || []; } catch (_) {}
@@ -295,7 +307,7 @@ function tnkEntryIndex() {
     // Children of a parent entry - the four directional animations, the track
     // matte modes, the label colours - are not in the flat list, so without
     // this TNK cannot name them.
-    (entry.children || []).forEach(add);
+    (entry.children || []).forEach(child => add(child, entry));
   });
   // Commands in a group are hidden from an unscoped search, since their parent
   // row stands for them there. TNK addresses them by name, so it needs them
