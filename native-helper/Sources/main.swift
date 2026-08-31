@@ -40,6 +40,30 @@ private func isAfterEffectsFrontmost() -> Bool {
     return NSWorkspace.shared.frontmostApplication?.bundleIdentifier == afterEffectsBundleIdentifier
 }
 
+// The panel cannot talk to this process - the loopback bridge runs the other
+// way, and `open` on a running app passes it nothing - so a group scope is
+// handed over through a file beside bridge.json, written by
+// TNT_writeQuickPanelScope. Read once and deleted, and ignored if stale, so a
+// scope left behind by a crash cannot hijack the next plain summon.
+private func takePendingQuickPanelScope() -> String? {
+    let url = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent(".ae-fx-quick-controls")
+        .appendingPathComponent("scope.json")
+    guard
+        let data = try? Data(contentsOf: url),
+        let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+        let group = object["group"] as? String,
+        !group.isEmpty
+    else {
+        return nil
+    }
+    try? FileManager.default.removeItem(at: url)
+    let stamp = (object["ts"] as? Double) ?? 0
+    let ageSeconds = (Date().timeIntervalSince1970 * 1000 - stamp) / 1000
+    guard ageSeconds < 10 else { return nil }
+    return group
+}
+
 private func quickPanelControlName(forHotKeyId id: UInt32) -> String? {
     switch id {
     case 10: return "anchor"
@@ -525,10 +549,13 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             scheduleReveal(after: 0.45)
         }
 
+        let pendingGroup = controlName == nil ? takePendingQuickPanelScope() : nil
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) { [weak self] in
             let showScript: String
             if let controlName {
                 showScript = "if (window.__tntQuickPanelOpenControl) await window.__tntQuickPanelOpenControl(\(javaScriptLiteral(controlName)));"
+            } else if let pendingGroup {
+                showScript = "if (window.__tntQuickPanelOpenGroup) await window.__tntQuickPanelOpenGroup(\(javaScriptLiteral(pendingGroup)));"
             } else {
                 showScript = "if (window.__tntQuickPanelDidShow) await window.__tntQuickPanelDidShow();"
             }

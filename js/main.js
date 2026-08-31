@@ -9643,12 +9643,16 @@ async function openCommandGroup(name) {
     quickPanelSearchEl.setSelectionRange(token.length, token.length);
     return true;
   }
-  // Docked panel: expand the group where it lives, in the Functions list. The
-  // floating console is deliberately not used here - a search popup over the
-  // list is a second way to do what the list already does.
-  if (typeof assistantToggleGroup === "function") {
-    if (typeof setAssistantTab === "function") setAssistantTab("functions");
-    assistantToggleGroup(name, true);
+  // Docked panel: hand the scope to the overlay and summon it. The panel is a
+  // catalogue, not a working surface - a group shortcut should put the tools
+  // under the pointer in After Effects, not expand a row behind the timeline.
+  // Clicking the row still expands it in place; that is for browsing.
+  try {
+    await loadJSX();
+    await aeCall("TNT_writeQuickPanelScope", [String(name || "")]);
+  } catch (_) {}
+  if (typeof launchNativeQuickControls === "function") {
+    await launchNativeQuickControls();
     return true;
   }
   return false;
@@ -12789,6 +12793,15 @@ window.__tntQuickPanelOpenControl = async function (name) {
     closeNativeQuickPanelWindow();
     return;
   }
+  focusPanel(1);
+  scheduleNativeQuickPanelResize(0);
+};
+
+// Called by the native helper right after it shows the overlay, when the panel
+// asked for a group. Mirrors __tntQuickPanelOpenControl.
+window.__tntQuickPanelOpenGroup = async function (name) {
+  if (!QUICK_PANEL_MODE || !name) return;
+  await openCommandGroup(String(name));
   focusPanel(1);
   scheduleNativeQuickPanelResize(0);
 };

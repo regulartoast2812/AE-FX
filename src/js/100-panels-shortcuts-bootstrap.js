@@ -1656,6 +1656,15 @@ window.__tntQuickPanelOpenControl = async function (name) {
   scheduleNativeQuickPanelResize(0);
 };
 
+// Called by the native helper right after it shows the overlay, when the panel
+// asked for a group. Mirrors __tntQuickPanelOpenControl.
+window.__tntQuickPanelOpenGroup = async function (name) {
+  if (!QUICK_PANEL_MODE || !name) return;
+  await openCommandGroup(String(name));
+  focusPanel(1);
+  scheduleNativeQuickPanelResize(0);
+};
+
 window.__tntQuickPanelOpenLayerMenu = async function () {
   if (!QUICK_PANEL_MODE) return;
   await openQuickPanelLayerMenu();

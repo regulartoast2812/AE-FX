@@ -11648,6 +11648,29 @@ function TNT_launchNativeQuickControls(appPath) {
   }
 }
 
+// A one-shot handoff to the overlay: which group it should open scoped to.
+//
+// There is no channel from the panel to the helper - the loopback bridge runs
+// the other way, with the helper connecting to the panel to run scripts - and
+// `open` on an already-running app cannot pass arguments to it. So the scope
+// goes through a file beside bridge.json, the same discovery pattern the
+// bridge itself uses. The helper reads and deletes it when it shows.
+function TNT_writeQuickPanelScope(group) {
+  try {
+    var folder = new Folder(Folder.userData.parent.fsName + "/.ae-fx-quick-controls");
+    if (!folder.exists) folder = new Folder("~/.ae-fx-quick-controls");
+    if (!folder.exists) folder.create();
+    var file = new File(folder.fsName + "/scope.json");
+    file.encoding = "UTF-8";
+    if (!file.open("w")) return TNT_jsonStringify({ ok: false, error: "Could not write the scope file." });
+    file.write(TNT_jsonStringify({ group: String(group || ""), ts: (new Date()).getTime() }));
+    file.close();
+    return TNT_jsonStringify({ ok: true });
+  } catch (err) {
+    return TNT_jsonStringify({ ok: false, error: String(err) });
+  }
+}
+
 function TNT_shellQuote(value) {
   return "'" + String(value || "").replace(/'/g, "'\\''") + "'";
 }

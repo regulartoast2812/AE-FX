@@ -135,22 +135,27 @@ lives there rather than in each caller. Affected callers found:
 subpanel that shows its own surface some other way must be added to
 `closeNativeQuickPanelSurfaces`, which is a hand-maintained list.
 
-### Group shortcuts do not summon the overlay
+### Group shortcuts summon the overlay, not the panel
 
-A shortcut bound to a group parent works in two places and not a third:
+The docked panel is a catalogue, not a working surface. A group shortcut
+therefore hands its scope to the overlay and summons it, rather than expanding
+a row behind the timeline. Clicking the row still expands it in place - that
+is for browsing the database, not for working.
 
-- **CEP panel focused** - expands the group inline in the Functions list.
-- **Overlay already open** - scopes its search to `[Group] `.
-- **After Effects focused, overlay shut** - nothing happens.
+The scope travels through `~/.ae-fx-quick-controls/scope.json`, written by
+`TNT_writeQuickPanelScope` and read once by the helper in `showPanel`. It has
+to go through a file: the loopback bridge runs helper-to-panel only, and
+`open` on a running app passes it nothing. The file is deleted on read and
+ignored past ten seconds, so a scope left by a crash cannot hijack the next
+plain summon.
 
-The gap is that the native helpers register a fixed hotkey table compiled into
-them (`registerGlobalHotKeys` in native-helper, `ControlHotkeys` in
-native-helper-win). User bindings live in the panel's localStorage, which the
-helper has never seen, so it cannot claim a key it does not know about.
-
-Closing it means the panel publishing its bindings to the helper over the
-loopback bridge and the helper registering them at runtime rather than from a
-compiled list. Not built.
+**Still open:** with After Effects focused and the overlay shut, a group
+shortcut does nothing - the key never reaches the panel. The helpers register
+a hotkey table compiled into them (`registerGlobalHotKeys` in native-helper,
+`ControlHotkeys` in native-helper-win) and have never seen the user's
+bindings. Closing it means publishing those bindings to the helper and
+registering them at runtime. That would fix every custom shortcut, not just
+groups: today none of them can summon the overlay.
 
 ### On hold
 
