@@ -216,9 +216,11 @@
 }
 
 .tnk-tool {
+  position: relative;
   display: grid;
-  width: 30px;
-  height: 30px;
+  box-sizing: border-box;
+  width: 34px;
+  height: 34px;
   place-items: center;
   padding: 0;
   border: 1px solid rgba(255, 255, 255, .12);
@@ -231,25 +233,31 @@
   transition: transform 120ms ease, border-color 120ms ease, background-color 120ms ease, color 120ms ease;
 }
 
-/* Lucide ships bare paths; without these they render as filled blobs. */
-/* A key badge tucked into the corner, so a bound tool is identifiable without
-   hovering. Unkeyed tools stay a clean square. */
-.tnk-tool { position: relative; }
-
+/* The key badge is positioned, never in flow, and the icon is never nudged to
+   make room for it. A keyed and an unkeyed tool put their glyph on exactly the
+   same centre, so a row of them reads as a row rather than as a wobble. */
 .tnk-key {
   position: absolute;
-  right: 1px;
-  bottom: 0;
-  color: rgba(233, 147, 96, .85);
+  right: -2px;
+  bottom: -2px;
+  display: grid;
+  min-width: 12px;
+  height: 11px;
+  place-items: center;
+  padding: 0 2px;
+  border: 1px solid rgba(233, 147, 96, .45);
+  border-radius: 3px;
+  background: #201c1a;
+  color: rgba(240, 176, 137, .95);
   font-family: inherit;
-  font-size: 8px;
+  font-size: 7.5px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0;
   pointer-events: none;
 }
 
-.tnk-tool.keyed .tnk-tool-icon { transform: translate(-2px, -2px); }
+.tnk-tool-icon { transform: translate(-2px, -2px); }
 
 .tnk-tool-icon {
   width: 16px;
@@ -261,9 +269,15 @@
   stroke-linejoin: round;
 }
 
+.tnk-tool:hover .tnk-key {
+  border-color: rgba(233, 147, 96, .8);
+  background: #2a211c;
+}
+
 .tnk-tool:hover {
   transform: scale(1.08);
   color: rgba(245, 200, 168, .98);
+  z-index: 1;
   border-color: rgba(233, 147, 96, .5);
   background:
     linear-gradient(145deg, rgba(255, 255, 255, .1), rgba(213, 111, 58, .08)),

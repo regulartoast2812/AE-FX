@@ -85,6 +85,29 @@ Consequences to respect:
 
 - **Tab to cycle between subpanels** while one is open. Not built yet.
 
+### Merging the A and O panels
+
+Anchor/Align (A) and Timing/Order (O) are being merged - both organise comp
+layers, one in the scene and one in the timeline, and they get used in and
+around each other. Done a step at a time so the halves never look unrelated.
+
+Done:
+- One shared card header, `.tnt-card-head` / `.tnt-card-title`. A had a plain
+  uppercase label, O a lettered badge with a live count; they now use the same
+  component. O keeps its old class names alongside, so it did not change.
+- A gained the header count. Align needs two layers and distribute three, so
+  the number explains a refusal before it happens.
+
+Remaining, in the order they show:
+1. **A's sections have no card shell.** O's cards carry a border, background
+   and shadow; A's are bare. Side by side this is the loudest difference left.
+2. **Distribute is still a plain sub-heading** inside the Align card. Merged,
+   it should be its own card with a `DI` badge.
+3. **Layout.** Five cards need a grid, not a row.
+
+Ctrl+O is a right-hand key, which the ergonomics rule above says triggers
+should avoid. Folding O into A retires it.
+
 ### On hold
 
 - **Plain `C` opens TNK** - built and shipped, but inert until the helper is
