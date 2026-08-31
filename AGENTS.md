@@ -149,30 +149,23 @@ to go through a file: the loopback bridge runs helper-to-panel only, and
 ignored past ten seconds, so a scope left by a crash cannot hijack the next
 plain summon.
 
-### Custom shortcuts are registered globally
+### Custom shortcuts live inside the overlay
 
-The panel publishes its bindings to `~/.ae-fx-quick-controls/shortcuts.json`
-(`TNT_writeQuickPanelShortcuts`, called whenever the index is rebuilt) and the
-macOS helper registers them as Carbon hot keys at runtime, ids from 100 up. It
-re-reads on a 2s mtime check, so binding a key takes effect without a restart.
-Firing one summons the overlay and calls `__tntQuickPanelRunBinding`, which
-scopes if the entry is a group parent and runs it otherwise.
+They are **not** registered as global hot keys. `RegisterEventHotKey` claims a
+combination for the whole login session and swallows the keystroke before any
+frontmost check runs - so a binding would be eaten in every other application,
+not merely ignored there. Ctrl+Space already has this problem and is the
+reason it does not reach other apps.
 
-The file exists because the helper cannot read the bindings itself: the bridge
-runs helper-to-panel and evaluates ExtendScript in After Effects, so the
-panel's localStorage is out of its reach.
+Making them behave would mean a `CGEvent` tap deciding per keystroke, which
+needs Accessibility permission and would put the summon hotkey behind a grant
+that lapses on every rebuild. Not worth it.
 
-Two rules the parser enforces:
-
-- **Modified combinations only.** A bare key would be claimed session-wide by
-  RegisterEventHotKey and made untypeable in every application.
-- Unparseable combinations are skipped and logged, not guessed at.
-
-Like the rest of the hot keys, these fire only while After Effects or the
-overlay is frontmost.
-
-**Not done on Windows.** `native-helper-win` still uses its compiled
-`ControlHotkeys` table.
+So the flow is two steps and stays entirely inside the panel's own keyboard
+handling: **Ctrl+Space to summon, then the binding.** In the overlay,
+`shortcutAllowedInEditable` lets any modified user binding through even though
+the caret sits in the search box - which is where it always sits on opening.
+Bare bindings stay blocked there so a single letter is still typeable.
 
 ### On hold
 

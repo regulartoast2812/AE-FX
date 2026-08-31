@@ -11671,26 +11671,6 @@ function TNT_writeQuickPanelScope(group) {
   }
 }
 
-// The user's shortcut bindings, published for the native helper.
-//
-// The helper cannot read them itself: the loopback bridge runs helper-to-panel
-// and evaluates ExtendScript in After Effects, not JavaScript in the panel, so
-// localStorage is out of its reach. A file beside bridge.json is the same
-// handoff scope.json already uses.
-function TNT_writeQuickPanelShortcuts(payload) {
-  try {
-    var folder = new Folder("~/.ae-fx-quick-controls");
-    if (!folder.exists) folder.create();
-    var file = new File(folder.fsName + "/shortcuts.json");
-    file.encoding = "UTF-8";
-    if (!file.open("w")) return TNT_jsonStringify({ ok: false, error: "Could not write the shortcuts file." });
-    file.write(String(payload || "[]"));
-    file.close();
-    return TNT_jsonStringify({ ok: true });
-  } catch (err) {
-    return TNT_jsonStringify({ ok: false, error: String(err) });
-  }
-}
 
 function TNT_shellQuote(value) {
   return "'" + String(value || "").replace(/'/g, "'\\''") + "'";

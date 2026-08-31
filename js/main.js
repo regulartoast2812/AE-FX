@@ -11765,6 +11765,12 @@ function isEditableShortcutTarget(event) {
 
 function shortcutAllowedInEditable(shortcutKey, easeDialogOpen) {
   if (QUICK_PANEL_MODE && QUICK_PANEL_CONTROL_SHORTCUTS[shortcutKey]) return true;
+  // Custom bindings live inside the overlay rather than being claimed globally,
+  // so the overlay is where they have to work - and it opens with the caret in
+  // the search box, which is exactly the case this function otherwise blocks.
+  // Modified combinations only: a bare letter has to stay typeable in a search
+  // field.
+  if (QUICK_PANEL_MODE && tntUserShortcutIndex[shortcutKey] && /\+/.test(shortcutKey)) return true;
   return shortcutKey === "ctrl+z" ||
     shortcutKey === "ctrl+s" ||
     shortcutKey === "ctrl+space" ||
@@ -13070,30 +13076,8 @@ function tntRebuildUserShortcutIndex() {
   // The declared key list is built from this index, so it has to be rebuilt
   // with it - otherwise a key bound now stays dead until the panel reloads.
   if (typeof registerPanelKeyEventsInterest === "function") registerPanelKeyEventsInterest();
-  tntPublishUserShortcuts();
 }
 
-// Publishes the bindings so the helper can claim them globally. Without this a
-// custom shortcut only works while the panel or overlay has focus - which is
-// almost never, since the point of a shortcut is to fire while you are working
-// in After Effects.
-let tntPublishShortcutsTimer = null;
-function tntPublishUserShortcuts() {
-  if (QUICK_PANEL_MODE) return;
-  if (tntPublishShortcutsTimer) clearTimeout(tntPublishShortcutsTimer);
-  tntPublishShortcutsTimer = setTimeout(async () => {
-    tntPublishShortcutsTimer = null;
-    const bindings = Object.keys(tntUserShortcutIndex).map(key => {
-      const name = tntUserShortcutIndex[key];
-      const entry = typeof tntFindEntryByName === "function" ? tntFindEntryByName(name) : null;
-      return { key, name, group: entry && entry.groupParent ? String(entry.groupParent) : "" };
-    });
-    try {
-      await loadJSX();
-      await aeCall("TNT_writeQuickPanelShortcuts", [JSON.stringify(bindings)]);
-    } catch (_) {}
-  }, 250);
-}
 
 // Display form from the normalised form ("ctrl+shift+e" -> "Control+Shift+E").
 //
