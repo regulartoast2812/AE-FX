@@ -10959,9 +10959,12 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
   font-size: 10.5px;
 }
 
-/* No divider under a section label - anchor and align do not have one. */
+/* No divider under a section label - anchor and align do not have one. The
+   line is a box-shadow, not a border, which is why clearing the border left it
+   on screen. */
 .anchor-timing-sections .timing-order-head {
   border-bottom: 0 !important;
+  box-shadow: none !important;
 }
 
 /* Helper text sits with the label voice, not the control voice. */

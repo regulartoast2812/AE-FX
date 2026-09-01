@@ -55,6 +55,40 @@ private func takePendingQuickPanelScope() -> String? {
     return group
 }
 
+// Window sizes per surface, kept across launches. Without this the first open
+// of every panel in a session still has to grow from the launcher size, which
+// is the movement that reads as an animation.
+private func quickPanelSizesURL() -> URL {
+    FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent(".ae-fx-quick-controls")
+        .appendingPathComponent("panel-sizes.json")
+}
+
+private func loadQuickPanelSizes() -> [String: NSSize] {
+    guard
+        let data = try? Data(contentsOf: quickPanelSizesURL()),
+        let raw = try? JSONSerialization.jsonObject(with: data) as? [String: [String: Double]]
+    else {
+        return [:]
+    }
+    var sizes: [String: NSSize] = [:]
+    raw.forEach { key, value in
+        if let w = value["w"], let h = value["h"], w > 0, h > 0 {
+            sizes[key] = NSSize(width: w, height: h)
+        }
+    }
+    return sizes
+}
+
+private func saveQuickPanelSizes(_ sizes: [String: NSSize]) {
+    var raw: [String: [String: Double]] = [:]
+    sizes.forEach { key, size in raw[key] = ["w": size.width, "h": size.height] }
+    guard let data = try? JSONSerialization.data(withJSONObject: raw) else { return }
+    let url = quickPanelSizesURL()
+    try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+    try? data.write(to: url)
+}
+
 private func quickPanelControlName(forHotKeyId id: UInt32) -> String? {
     switch id {
     case 10: return "anchor"
@@ -340,7 +374,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
     // is to not resize at all: every surface's settled size is remembered and
     // the window opens at it. Only the very first summon of a given panel can
     // still change size.
-    private var lastSizeByControl: [String: NSSize] = [:]
+    private var lastSizeByControl: [String: NSSize] = loadQuickPanelSizes()
     private var showingControlName: String = "launcher"
     private var bridge: AfterEffectsBridge?
     private var windowBridge: WindowBridge?
@@ -535,7 +569,9 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
     }
 
     func rememberQuickPanelSize(_ size: NSSize) {
+        guard lastSizeByControl[showingControlName] != size else { return }
         lastSizeByControl[showingControlName] = size
+        saveQuickPanelSizes(lastSizeByControl)
     }
 
     func scheduleReveal(after delay: TimeInterval) {
@@ -583,7 +619,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         // A group scope resizes the same way, so it defers too. Read here rather
         // than at the evaluate below, since the decision is needed now.
         let pendingGroup = controlName == nil ? takePendingQuickPanelScope() : nil
-        let deferReveal = controlName != nil || pendingGroup != nil
+        // Always. The window only has to grow when its size is not yet known,
+        // which is the first open of any surface in a session - exactly the
+        // case the old condition let through.
+        let deferReveal = true
         pendingRevealWorkItem?.cancel()
         pendingRevealWorkItem = nil
         // Everything that puts the window on screen, with implicit animation off
