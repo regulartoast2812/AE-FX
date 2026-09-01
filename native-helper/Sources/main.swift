@@ -308,7 +308,11 @@ private final class WindowBridge: NSObject, WKScriptMessageHandler {
         )
         let frame = afterEffectsOverlayFrame(for: size) ?? NSRect(origin: panel.frame.origin, size: size)
         activeAppDelegate?.rememberQuickPanelSize(size)
-        panel.setFrame(frame, display: true, animate: false)
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0
+            context.allowsImplicitAnimation = false
+            panel.setFrame(frame, display: true, animate: false)
+        }
         // Reveal once sizes settle, not on the first one.
         // Was 70ms after every resize. One frame is enough to let the second
         // resize the page schedules arrive and coalesce.
@@ -516,6 +520,20 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
     /// Reveals the panel once resizes stop arriving. scheduleNativeQuickPanelResize
     /// deliberately measures across two animation frames, so a single open can send
     /// two sizes; revealing on the first would show the second as a visible jump.
+    // Every path that puts the window on screen goes through here. There were
+    // four, each ordering the panel front on its own, and any one of them left
+    // untouched brings the animation back.
+    private func presentPanelWithoutAnimation(_ panel: NSPanel, makeKey: Bool = true) {
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0
+            context.allowsImplicitAnimation = false
+            if NSApp.isHidden { NSApp.unhide(nil) }
+            NSApp.activate(ignoringOtherApps: true)
+            if makeKey { panel.makeKeyAndOrderFront(nil) }
+            panel.orderFrontRegardless()
+        }
+    }
+
     func rememberQuickPanelSize(_ size: NSSize) {
         lastSizeByControl[showingControlName] = size
     }
@@ -526,7 +544,11 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         let work = DispatchWorkItem { [weak self] in
             self?.pendingRevealWorkItem = nil
             guard let panel = self?.panel, panel.alphaValue < 1 else { return }
-            panel.alphaValue = 1
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0
+                context.allowsImplicitAnimation = false
+                panel.alphaValue = 1
+            }
         }
         pendingRevealWorkItem = work
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: work)
@@ -564,13 +586,20 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         let deferReveal = controlName != nil || pendingGroup != nil
         pendingRevealWorkItem?.cancel()
         pendingRevealWorkItem = nil
-        panel.alphaValue = deferReveal ? 0 : 1
-
-        panel.setFrame(frame, display: true, animate: false)
-        NSApp.unhide(nil)
-        NSApp.activate(ignoringOtherApps: true)
-        panel.makeKeyAndOrderFront(nil)
-        panel.orderFrontRegardless()
+        // Everything that puts the window on screen, with implicit animation off
+        // for the whole block. animationBehavior alone is not enough: AppKit
+        // will still run implicit CoreAnimation on alphaValue and setFrame, and
+        // NSApp.unhide animates the app's windows back in - which is a scale.
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0
+            context.allowsImplicitAnimation = false
+            panel.alphaValue = deferReveal ? 0 : 1
+            panel.setFrame(frame, display: true, animate: false)
+            // Only unhide when the app is actually hidden. Calling it every time
+            // asks AppKit to re-show windows that were never hidden, animation
+            // and all.
+        }
+        presentPanelWithoutAnimation(panel)
 
         if deferReveal {
             // Safety net: reveal anyway if the page never reports a size.
@@ -617,11 +646,12 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         let point = NSEvent.mouseLocation
         let frame = afterEffectsOverlayFrame(near: point, size: size)
         guard let panel else { return }
-        panel.setFrame(frame, display: true, animate: false)
-        NSApp.unhide(nil)
-        NSApp.activate(ignoringOtherApps: true)
-        panel.makeKeyAndOrderFront(nil)
-        panel.orderFrontRegardless()
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0
+            context.allowsImplicitAnimation = false
+            panel.setFrame(frame, display: true, animate: false)
+        }
+        presentPanelWithoutAnimation(panel)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) { [weak self] in
             self?.webView?.evaluateJavaScript("""
             (async function () {
@@ -634,9 +664,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
 
     private func openQuickPanelControl(_ name: String) {
         guard let panel, panel.isVisible else { return }
-        NSApp.unhide(nil)
-        NSApp.activate(ignoringOtherApps: true)
-        panel.makeKeyAndOrderFront(nil)
+        presentPanelWithoutAnimation(panel)
         webView?.evaluateJavaScript(
             "if (window.__tntQuickPanelOpenControl) window.__tntQuickPanelOpenControl(\(javaScriptLiteral(name)));"
         )
@@ -836,9 +864,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
 
     private func restorePanelFocusAfterBridgeExecution() {
         guard let panel, panel.isVisible else { return }
-        NSApp.unhide(nil)
-        NSApp.activate(ignoringOtherApps: true)
-        panel.makeKeyAndOrderFront(nil)
+        presentPanelWithoutAnimation(panel)
         webView?.evaluateJavaScript(
             "window.focus(); if (window.__tntQuickPanelRestoreFocus) window.__tntQuickPanelRestoreFocus();"
         )
