@@ -389,6 +389,12 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = false
+        // AppKit animates a panel in and out by default - for NSPanel that is
+        // the utility-window behaviour, a scale from the centre. It is not the
+        // resize and it is not CSS; it is the system's own window animation,
+        // which is why it survived hiding the window during the resize and
+        // opening at a remembered size.
+        panel.animationBehavior = .none
         panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.isMovableByWindowBackground = false
