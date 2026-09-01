@@ -78,9 +78,13 @@
     <div class="duration-dialog anchor-dialog">
       <div class="dialog-title">Anchor Point</div>
       <div class="dialog-subtitle">Pick where the selected layer anchor should sit</div>
+      <div class="layout-panel-head">
+        <span class="layout-panel-name">Layout</span>
+        <em class="layout-panel-count" data-tnt-selection></em>
+      </div>
       <div class="anchor-panel">
         <div class="anchor-section">
-          <div class="anchor-section-title">Anchor<em class="anchor-selection-count" data-tnt-selection></em></div>
+          <div class="anchor-section-title">Anchor</div>
           <div id="anchorGrid" class="anchor-grid" role="group" aria-label="Anchor point position">
             <button type="button" class="anchor-cell" data-point="TL" title="Top left"></button>
             <button type="button" class="anchor-cell" data-point="TC" title="Top center"></button>
@@ -98,7 +102,7 @@
           </label>
         </div>
         <div class="anchor-section anchor-align-section">
-          <div class="anchor-section-title">Align<em class="anchor-selection-count" data-tnt-selection></em></div>
+          <div class="anchor-section-title">Align</div>
           <label class="anchor-align-target">
             <span>Align Layers to:</span>
             <select id="anchorAlignTarget" aria-label="Align layers to">
@@ -131,7 +135,7 @@
         <div id="anchorTimingSections" class="anchor-timing-sections">
         <section class="timing-order-card timing-stagger-card">
           <header class="timing-order-head">
-            <div class="tnt-card-title timing-order-title"><b>ST</b><span>Stagger</span><em class="timing-order-count"></em></div>
+            <div class="tnt-card-title timing-order-title"><b>ST</b><span>Stagger</span></div>
           </header>
           <div class="timing-order-body">
             <div class="timing-execute-actions" role="group" aria-label="Choose stagger direction">
@@ -158,7 +162,7 @@
 
         <section class="timing-order-card layer-order-card">
           <header class="timing-order-head">
-            <div class="tnt-card-title timing-order-title"><b>OR</b><span>Layer Order</span><em class="timing-order-count"></em></div>
+            <div class="tnt-card-title timing-order-title"><b>OR</b><span>Layer Order</span></div>
           </header>
           <div class="timing-order-body">
             <div class="timing-order-field">
@@ -191,7 +195,7 @@
 
         <section class="timing-order-card timing-snap-pull-card">
           <header class="timing-order-head">
-            <div class="tnt-card-title timing-order-title"><b>SP</b><span>Pull / Snap</span><em class="timing-key-count"></em></div>
+            <div class="tnt-card-title timing-order-title"><b>SP</b><span>Pull / Snap</span></div>
           </header>
           <div class="timing-order-body">
             <div class="timing-compact-group timing-pull-group">

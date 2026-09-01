@@ -2131,3 +2131,32 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
 .anchor-timing-sections .timing-order-error:empty {
   display: none;
 }
+
+/* One header for the whole panel group: what it is, and what it is acting on.
+   Each section carried its own copy of the selection count, which said the same
+   thing five times and set five different section widths. */
+.layout-panel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 0 2px;
+}
+
+.layout-panel-name {
+  color: rgba(245, 245, 247, .82);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.layout-panel-count {
+  color: rgba(235, 235, 245, .34);
+  font-size: 10px;
+  font-style: normal;
+}
+
+body.quick-panel-mode .layout-panel-head {
+  padding: 0 4px;
+}

@@ -649,9 +649,14 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
 
         if deferReveal {
             // Safety net: reveal anyway if the page never reports a size.
-            // Safety net only - the page normally reports a size within a frame.
-            // Was 450ms, which is what a summon cost when anything hiccuped.
-            scheduleReveal(after: 0.18)
+            // The safety net is what made the first launch animate: with no
+            // remembered size the window is at the launcher size, and revealing
+            // on a timer showed it there and let the resize be seen. When the
+            // size is already known the page only has to confirm it, so a short
+            // net is safe; when it is not, wait long enough for the real size
+            // to arrive and reveal at it.
+            let sizeIsKnown = lastSizeByControl[showingControlName] != nil
+            scheduleReveal(after: sizeIsKnown ? 0.18 : 0.9)
         }
 
         // Was 80ms. The page is already loaded and idle - it does not need time
