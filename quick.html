@@ -138,21 +138,22 @@
             <div class="tnt-card-title timing-order-title"><b>ST</b><span>Stagger</span></div>
           </header>
           <div class="timing-order-body">
-            <div class="timing-execute-actions" role="group" aria-label="Choose stagger direction">
+            <div class="timing-inline-row"><div class="timing-execute-actions" role="group" aria-label="Choose stagger direction">
               <button type="button" data-stagger-execute="asc" data-icon="arrow-up-narrow-wide" data-tooltip="Bottom Up\nUse the bottom selected layer as the first layer, then stagger upward."><strong>Bottom up</strong><span>Stagger upward</span></button>
               <button type="button" data-stagger-execute="desc" data-icon="arrow-down-wide-narrow" data-tooltip="Top Down\nUse the top selected layer as the first layer, then stagger downward."><strong>Top down</strong><span>Stagger downward</span></button>
               <button type="button" data-stagger-execute="random" data-icon="shuffle" data-tooltip="Random Stagger\nShuffle the selected layers once, then use the slider to set the offset."><strong>Random</strong><span>Shuffle timing</span></button>
             </div>
+              <label class="timing-group-control" data-tooltip="Group Size\nRepeat offsets inside groups. 1 staggers every selected layer in one run."><span>Group</span><input class="timing-group-input" type="number" min="1" step="1" value="1"></label>
+              </div>
             <div class="timing-order-field">
               <span>Offset / gap</span>
               <div class="timing-amount-row">
                 <input class="timing-amount-range" type="range" min="0" max="60" step="1" value="0" data-tooltip="Apply Stagger\nChoose a direction above, then drag to apply the offset from the original layer positions.">
                 <input class="timing-amount-input" type="number" min="0" step="1" value="0" data-tooltip="Exact Offset\nEnter an exact amount. The selected stagger direction applies from the original layer positions.">
-                <label class="timing-group-control" data-tooltip="Group Size\nRepeat offsets inside groups. 1 staggers every selected layer in one run."><span>Group</span><input class="timing-group-input" type="number" min="1" step="1" value="1"></label>
-                <div class="timing-order-segmented timing-unit" role="group" aria-label="Timing unit">
-                  <button type="button" data-timing-unit="frames" data-tooltip="Frames\nMeasure the offset using composition frames.">F</button>
-                  <button type="button" data-timing-unit="seconds" data-tooltip="Seconds\nMeasure the offset using seconds.">S</button>
-                </div>
+                <select class="timing-unit-select" data-tooltip="Unit\nMeasure the offset in composition frames or in seconds.">
+                  <option value="frames">Frames</option>
+                  <option value="seconds">Seconds</option>
+                </select>
               </div>
               <div class="timing-live-status">Choose a direction, then move the slider to apply.</div>
             </div>
@@ -167,10 +168,10 @@
           <div class="timing-order-body">
             <div class="timing-order-field">
               <span>Direction</span>
-              <div class="timing-order-segmented order-direction" role="group" aria-label="Layer order direction">
-                <button type="button" data-order-direction="asc" data-tooltip="Ascending\nSmallest value goes to the top of the selected stack.">Ascending</button>
-                <button type="button" data-order-direction="desc" data-tooltip="Descending\nLargest value goes to the top of the selected stack.">Descending</button>
-              </div>
+              <select class="timing-direction-select" data-tooltip="Direction\nAscending puts the smallest value at the top of the selected stack.">
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
             </div>
             <div class="timing-order-field">
               <span>Sort selected layers</span>
@@ -198,36 +199,18 @@
             <div class="tnt-card-title timing-order-title"><b>SP</b><span>Pull / Snap</span></div>
           </header>
           <div class="timing-order-body">
-            <div class="timing-compact-group timing-pull-group">
-              <div class="timing-compact-head">
-                <strong>Pull whole selection</strong>
-                <span>Move the selected layer group together</span>
-              </div>
-              <div class="timing-execute-actions timing-two-actions" role="group" aria-label="Pull layer group">
-                <button type="button" data-pull-layer="in" data-icon="arrow-right-to-line" data-tooltip="Pull Group In\nMove the whole selected layer group so the earliest in point lands at the playhead."><strong>In to playhead</strong><span>Keep spacing</span></button>
-                <button type="button" data-pull-layer="out" data-icon="arrow-left-to-line" data-tooltip="Pull Group Out\nMove the whole selected layer group so the latest out point lands at the playhead."><strong>Out to playhead</strong><span>Keep spacing</span></button>
-              </div>
-            </div>
-            <div class="timing-compact-group timing-snap-group">
-              <div class="timing-compact-head">
-                <strong>Snap smaller groups</strong>
-                <span>Move layers, properties, or selected key groups independently</span>
-              </div>
-              <div class="timing-snap-grid">
-                <div class="timing-snap-scope">
-                  <span>Layers</span>
-                  <button type="button" data-snap-layer="in" data-tooltip="Snap Layer In Points\nMove each selected layer independently so its in point lands at the playhead.">In</button>
-                  <button type="button" data-snap-layer="out" data-tooltip="Snap Layer Out Points\nMove each selected layer independently so its out point lands at the playhead.">Out</button>
-                </div>
-                <div class="timing-snap-scope">
-                  <span>Properties</span>
-                  <button type="button" data-snap-keyframes="first" data-key-scope="property" data-tooltip="Snap Each Property First Key\nMove selected keys on each property so that property's first selected key lands at the playhead.">First</button>
-                  <button type="button" data-snap-keyframes="last" data-key-scope="property" data-tooltip="Snap Each Property Last Key\nMove selected keys on each property so that property's last selected key lands at the playhead.">Last</button>
-                </div>
-                <div class="timing-snap-scope">
-                  <span>Key groups</span>
-                  <button type="button" data-snap-keyframes="first" data-key-scope="layer" data-tooltip="Snap Key Group First\nMove selected keys as layer groups so each group's first selected key lands at the playhead.">First</button>
-                  <button type="button" data-snap-keyframes="last" data-key-scope="layer" data-tooltip="Snap Key Group Last\nMove selected keys as layer groups so each group's last selected key lands at the playhead.">Last</button>
+            <div class="timing-order-field">
+              <span>Pull</span>
+              <div class="timing-inline-row">
+                <select class="timing-pull-mode" data-tooltip="What to move\nThe whole selection together, each layer on its own, or the selected keyframes.">
+                  <option value="group">Whole selection</option>
+                  <option value="layers">Layers</option>
+                  <option value="properties">Properties</option>
+                  <option value="keys">Key groups</option>
+                </select>
+                <div class="timing-execute-actions" role="group" aria-label="Pull to playhead">
+                  <button type="button" data-pull-run="in" data-icon="arrow-right-to-line" data-tooltip="Pull In\nMove to the playhead by the in point, or by the first selected key."></button>
+                  <button type="button" data-pull-run="out" data-icon="arrow-left-to-line" data-tooltip="Pull Out\nMove to the playhead by the out point, or by the last selected key."></button>
                 </div>
               </div>
             </div>

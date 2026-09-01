@@ -11050,7 +11050,23 @@ function bindTimingOrderPanel() {
       const previousUnit = timingOrderUnit;
       const nextUnit = unit.dataset.timingUnit || "frames";
       const amountInput = timingOrderBackdropEl.querySelector(".timing-amount-input");
-      const amountRange = timingOrderBackdropEl.querySelector(".timing-amount-range");
+      const unitSelect = timingOrderBackdropEl.querySelector(".timing-unit-select");
+  if (unitSelect) {
+    unitSelect.value = timingOrderUnit;
+    unitSelect.addEventListener("change", () => {
+      timingOrderUnit = unitSelect.value === "seconds" ? "seconds" : "frames";
+      renderTimingOrderPanel();
+    });
+  }
+  const directionSelect = timingOrderBackdropEl.querySelector(".timing-direction-select");
+  if (directionSelect) {
+    directionSelect.value = layerOrderDirection;
+    directionSelect.addEventListener("change", () => {
+      layerOrderDirection = directionSelect.value === "desc" ? "desc" : "asc";
+      renderTimingOrderPanel();
+    });
+  }
+  const amountRange = timingOrderBackdropEl.querySelector(".timing-amount-range");
       const fps = Math.max(1, Number(state.comp && state.comp.frameRate || 30));
       const currentAmount = Math.max(0, Number(amountInput.value || 0));
       timingOrderUnit = nextUnit;
@@ -11084,6 +11100,21 @@ function bindTimingOrderPanel() {
     const stackExecute = event.target.closest && event.target.closest("[data-order-stack]");
     if (stackExecute && !stackExecute.disabled) {
       runLayerStackPanelAction(stackExecute.dataset.orderStack || "");
+      return;
+    }
+    // One In and one Out button; what they move comes from the mode select.
+    // Six buttons in a labelled matrix said the same four things.
+    const pullRun = event.target.closest && event.target.closest("[data-pull-run]");
+    if (pullRun && !pullRun.disabled) {
+      const select = timingOrderBackdropEl.querySelector(".timing-pull-mode");
+      const mode = select ? select.value : "group";
+      const edge = pullRun.dataset.pullRun === "out" ? "out" : "in";
+      if (mode === "group") runSnapPullPanelAction("pull", "layer", edge);
+      else if (mode === "layers") runSnapPullPanelAction("snap", "layer", edge);
+      else {
+        runSnapPullPanelAction("snap", "keyframes", edge === "out" ? "last" : "first",
+          { scope: mode === "properties" ? "property" : "layer" });
+      }
       return;
     }
     const pullLayer = event.target.closest && event.target.closest("[data-pull-layer]");

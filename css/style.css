@@ -11109,6 +11109,67 @@ body.quick-panel-mode .layout-panel-head {
   font-style: normal !important;
   color: rgba(235, 235, 245, .34) !important;
 }
+
+/* Selects match the align panel's, which is the pattern the whole group now
+   follows: a choice is a dropdown, an action is a button. */
+#anchorModal .timing-unit-select,
+#anchorModal .timing-direction-select,
+#anchorModal .timing-pull-mode {
+  box-sizing: border-box;
+  height: 26px;
+  padding: 0 22px 0 8px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: var(--tnt-radius-control, 7px);
+  background: rgba(255, 255, 255, .05);
+  color: rgba(245, 245, 247, .86);
+  font: inherit;
+  font-size: 11px;
+}
+
+#anchorModal .timing-direction-select,
+#anchorModal .timing-pull-mode {
+  flex: 0 0 auto;
+  min-width: 132px;
+}
+
+#anchorModal .timing-unit-select {
+  flex: 0 0 auto;
+  min-width: 84px;
+}
+
+/* Group sits with the direction buttons, not on the offset row. */
+.anchor-timing-sections .timing-inline-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.anchor-timing-sections .timing-inline-row > .timing-execute-actions {
+  flex: 0 0 auto;
+}
+
+.anchor-timing-sections .timing-group-control {
+  margin-left: auto;
+}
+
+/* The active stagger direction was not marked at all - the row gave no sign of
+   which mode it was in. */
+.anchor-timing-sections .timing-execute-actions > button.active,
+.anchor-timing-sections .timing-execute-actions > button[aria-pressed="true"] {
+  border-color: rgba(217, 119, 66, .55) !important;
+  background: rgba(217, 119, 66, .22) !important;
+  color: #fff !important;
+}
+
+/* The align select was sized by its longest option, which pushed that section
+   wider than its own controls and threw the row off centre. */
+#anchorModal .anchor-align-target select {
+  box-sizing: border-box;
+  width: 132px;
+  min-width: 0;
+  max-width: 132px;
+}
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {
   display: grid !important;
