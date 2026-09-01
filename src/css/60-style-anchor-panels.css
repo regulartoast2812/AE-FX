@@ -1796,9 +1796,16 @@ body.keyframe-mode .track-label {
   gap: 5px !important;
 }
 
+/* Must shrink to the sections, not sit at a fixed 1280. The overlay window is
+   sized from this element, so a fixed width made the transparent window ~400px
+   wider than the cards, which are laid out from its left edge - the group then
+   read as pushed left of centre on screen. Headless never showed it because a
+   narrow test viewport clamped the width down to the content anyway. */
 .anchor-dialog.layout-dialog {
-  width: min(1280px, calc(100vw - 40px)) !important;
-  max-width: none !important;
+  width: fit-content !important;
+  max-width: min(1280px, calc(100vw - 40px)) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 body:not(.quick-panel-mode) .anchor-dialog.layout-dialog {
