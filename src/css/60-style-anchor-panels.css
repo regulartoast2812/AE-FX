@@ -1827,7 +1827,7 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
   min-width: 0;
 }
 
-.anchor-timing-sections > .timing-order-card {
+.anchor-timing-sections .timing-order-card {
   flex: 1 1 0;
   min-width: 0;
 }
@@ -1962,7 +1962,7 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
    backdrop blur, which WebKit resolves against the desktop in a transparent
    NSWindow. */
 .anchor-panel.layout-panel > .anchor-section,
-.anchor-timing-sections > .timing-order-card {
+.anchor-timing-sections .timing-order-card {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .014) 40%, rgba(0, 0, 0, .16)),
     rgba(20, 21, 23, .93) !important;
@@ -2310,7 +2310,7 @@ body.quick-panel-mode .layout-panel-head {
   flex: 0 0 auto;
 }
 
-.anchor-timing-sections > .timing-order-card,
+.anchor-timing-sections .timing-order-card,
 .anchor-timing-sections .timing-column > .timing-order-card {
   flex: 0 0 auto;
   width: auto;
