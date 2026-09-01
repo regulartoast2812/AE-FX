@@ -62,6 +62,62 @@ This guide keeps future work compact and consistent for the `AE FX` CEP project.
 - Do not blur the whole app behind subpanels. Blur only under the panel shape.
 - Page scrollbars/sliders should stay neutral and thin. Property sliders can use functional accents only when intentional.
 
+## Validate before saying a task is done
+
+Every item below has broken this project more than once, and each is cheap to
+check. Run the ones the change touches, and report the number, not the
+intention.
+
+**1. Moved markup breaks selectors that depended on its position.**
+Putting Stagger and Pull inside a new column made them grandchildren, and their
+fill was written `.anchor-timing-sections > .timing-order-card` - so they went
+transparent over the timeline while Layer Order kept its background.
+→ After moving any element, grep the stylesheets for `>` selectors naming the
+classes involved, and for `:first-child` / `:last-child` / `+` / `~`.
+
+**2. An override at lower specificity loses silently.**
+The header font, Pull's select width and the timing-order padding all failed
+this way: the rule was written class-only against a rule carrying `#anchorModal`
+or a body class, and simply did nothing.
+→ Match the specificity of the rule being overridden. Confirm with
+`getComputedStyle`, never by reading the file.
+
+**3. The same thing is declared in more than one place.**
+Two `.timing-amount-row` blocks from different passes fought each other; the
+earlier one kept the slider on its own line. Two `.layout-panel-name` blocks.
+Two action maps. Two command registries.
+→ Before adding a rule or a case, `grep -n` for the selector or key. If it
+already exists, edit it rather than appending another.
+
+**4. Regex edits to markup break nesting.**
+A rewrite of the stagger section left a duplicated status line and a stray
+`</div>`, which threw on open.
+→ After any structural edit, count `<div|section|header|label>` against their
+closers in the affected block and assert it balances.
+
+**5. Verified in the wrong place.**
+Three commits were measured in the docked panel for a feature that only exists
+in the overlay.
+→ `quick.html` for anything in the overlay. `index.html` only for the docked
+panel.
+
+**6. Guessing the cause instead of measuring the element.**
+The 42px header, the stretch gap, the 700 weight and the box-shadow line each
+took several attempts while being edited by assumption, and each was found in
+one probe once measured.
+→ Probe the element - height, computed style, the specific property - before
+changing anything.
+
+**7. Dead code that compiles.**
+A `deferReveal` flag nothing ever set; a `renderFxConsole` call for a function
+that does not exist.
+→ Grep that every new identifier is both assigned and read.
+
+**8. `:has()` is unsupported.**
+CEP's Chromium predates it. Six rules were inert inside After Effects while
+working in a current browser.
+→ Never use it. Set a class in JS.
+
 ## Fix every instance, not the one in front of you
 
 This is the single most expensive recurring mistake in this codebase, measured
