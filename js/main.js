@@ -11107,13 +11107,20 @@ function bindTimingOrderPanel() {
     const pullRun = event.target.closest && event.target.closest("[data-pull-run]");
     if (pullRun && !pullRun.disabled) {
       const select = timingOrderBackdropEl.querySelector(".timing-pull-mode");
+      const spreadSelect = timingOrderBackdropEl.querySelector(".timing-pull-spread");
       const mode = select ? select.value : "layers";
+      // Two axes, four moves: what travels, and whether the selection keeps its
+      // relative spacing or every item lands on the playhead. Collapsing this to
+      // one dropdown is what dropped half the panel's function.
+      const together = !spreadSelect || spreadSelect.value !== "each";
       const edge = pullRun.dataset.pullRun === "out" ? "out" : "in";
       if (mode === "keys") {
         runSnapPullPanelAction("snap", "keyframes", edge === "out" ? "last" : "first",
-          { scope: "layer" });
-      } else {
+          { scope: together ? "layer" : "property" });
+      } else if (together) {
         runSnapPullPanelAction("pull", "layer", edge);
+      } else {
+        runSnapPullPanelAction("snap", "layer", edge);
       }
       return;
     }

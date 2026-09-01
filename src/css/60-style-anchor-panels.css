@@ -2234,6 +2234,7 @@ body.quick-panel-mode .layout-panel-head {
    follows: a choice is a dropdown, an action is a button. */
 #anchorModal .timing-unit-select,
 #anchorModal .timing-direction-select,
+#anchorModal .timing-pull-spread,
 #anchorModal .timing-pull-mode {
   box-sizing: border-box;
   height: 26px;
@@ -2450,4 +2451,29 @@ body.quick-panel-mode .layout-panel-head {
   width: 86px;
   min-width: 0;
   flex: 0 0 auto;
+}
+
+/* Pull carries two choices - what moves and how - so they share a row and split
+   it evenly rather than one of them setting the card width. */
+#anchorModal .anchor-timing-sections .timing-pull-choices {
+  display: flex !important;
+  gap: 5px !important;
+}
+
+#anchorModal .anchor-timing-sections .timing-pull-choices > select {
+  flex: 0 0 auto;
+  min-width: 0;
+  width: auto;
+  max-width: none;
+}
+
+/* Fixed widths on these selects have clipped their own options three times now
+   - "Fram", "Fran", "Keep spacin". A native select at width:auto sizes itself
+   to its longest option, so it cannot clip and there is no number to re-tune
+   when an option's wording changes. */
+#anchorModal .anchor-timing-sections .timing-unit-select,
+#anchorModal .anchor-timing-sections .timing-direction-select {
+  width: auto;
+  min-width: 0;
+  max-width: none;
 }

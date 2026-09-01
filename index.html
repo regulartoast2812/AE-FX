@@ -168,11 +168,17 @@
           <div class="timing-order-body">
             <div class="timing-order-field">
               <span>Pull</span>
-              <div class="timing-inline-row">
+              <div class="timing-inline-row timing-pull-choices">
                 <select class="timing-pull-mode" data-tooltip="What to move\nThe selected layers, or the selected keyframes.">
                   <option value="layers">Layers</option>
                   <option value="keys">Keyframes</option>
                 </select>
+                <select class="timing-pull-spread" data-tooltip="How they move\nKeep spacing moves the selection as one block, anchored by the earliest or latest edge.\nStack up moves every layer, or every property's keys, onto the playhead individually.">
+                  <option value="group">Keep spacing</option>
+                  <option value="each">Stack up</option>
+                </select>
+              </div>
+              <div class="timing-inline-row">
                 <div class="timing-execute-actions" role="group" aria-label="Pull to playhead">
                   <button type="button" data-pull-run="in" data-icon="arrow-right-to-line" data-tooltip="Pull In\nMove to the playhead by the in point, or by the first selected key."></button>
                   <button type="button" data-pull-run="out" data-icon="arrow-left-to-line" data-tooltip="Pull Out\nMove to the playhead by the out point, or by the last selected key."></button>

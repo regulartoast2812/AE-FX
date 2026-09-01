@@ -83,8 +83,10 @@ or a body class, and simply did nothing.
 `getComputedStyle`, never by reading the file.
 
 **2b. A `<select>` clips its text without changing `scrollWidth`.**
-The clip probe reported zero while the panel showed "Fran" and "Secon".
-→ Read the option text off a render, with the *longest* option selected.
+The clip probe reported zero while the panel showed "Fran" and "Secon", and
+checking only the option that happened to be selected then shipped "Frame".
+→ Do not put a fixed width on a select. `width: auto` sizes it to its longest
+option and cannot clip. If a width is unavoidable, render every option.
 
 **2c. A shared component carries rules from the panel it came from.**
 `.order-sort-actions button:last-child:nth-child(odd)` in the docked panel's
