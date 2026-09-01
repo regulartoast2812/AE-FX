@@ -82,6 +82,26 @@ or a body class, and simply did nothing.
 → Match the specificity of the rule being overridden. Confirm with
 `getComputedStyle`, never by reading the file.
 
+**2b. A `<select>` clips its text without changing `scrollWidth`.**
+The clip probe reported zero while the panel showed "Fran" and "Secon".
+→ Read the option text off a render, with the *longest* option selected.
+
+**2c. A shared component carries rules from the panel it came from.**
+`.order-sort-actions button:last-child:nth-child(odd)` in the docked panel's
+stylesheet spans an odd last button across a 2-column grid. In the layout
+panel's 4-column grid it broke 7 buttons into 4 / 2 / 1.
+→ Before changing a shared component's grid or flex, `grep -rn` every
+stylesheet for rules on its children, not just the file being edited.
+
+**2d. Never delete an element the render code writes into.**
+Hide it. `querySelector(...).textContent = ...` throws on null, and that break
+has shipped from this panel more than once.
+
+**2e. A fixed width on the dialog is a fixed width on the overlay window.**
+The native window is sized from `.anchor-dialog`. `width: min(1280px, 100vw)`
+made the transparent window 400px wider than the cards, so the group read as
+pushed left of centre. A narrow test viewport hides this - measure at 1600.
+
 **3. The same thing is declared in more than one place.**
 Two `.timing-amount-row` blocks from different passes fought each other; the
 earlier one kept the slider on its own line. Two `.layout-panel-name` blocks.
