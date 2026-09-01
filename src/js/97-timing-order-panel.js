@@ -116,13 +116,13 @@ function bindTimingOrderPanel() {
     const pullRun = event.target.closest && event.target.closest("[data-pull-run]");
     if (pullRun && !pullRun.disabled) {
       const select = timingOrderBackdropEl.querySelector(".timing-pull-mode");
-      const mode = select ? select.value : "group";
+      const mode = select ? select.value : "layers";
       const edge = pullRun.dataset.pullRun === "out" ? "out" : "in";
-      if (mode === "group") runSnapPullPanelAction("pull", "layer", edge);
-      else if (mode === "layers") runSnapPullPanelAction("snap", "layer", edge);
-      else {
+      if (mode === "keys") {
         runSnapPullPanelAction("snap", "keyframes", edge === "out" ? "last" : "first",
-          { scope: mode === "properties" ? "property" : "layer" });
+          { scope: "layer" });
+      } else {
+        runSnapPullPanelAction("pull", "layer", edge);
       }
       return;
     }

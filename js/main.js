@@ -11107,13 +11107,13 @@ function bindTimingOrderPanel() {
     const pullRun = event.target.closest && event.target.closest("[data-pull-run]");
     if (pullRun && !pullRun.disabled) {
       const select = timingOrderBackdropEl.querySelector(".timing-pull-mode");
-      const mode = select ? select.value : "group";
+      const mode = select ? select.value : "layers";
       const edge = pullRun.dataset.pullRun === "out" ? "out" : "in";
-      if (mode === "group") runSnapPullPanelAction("pull", "layer", edge);
-      else if (mode === "layers") runSnapPullPanelAction("snap", "layer", edge);
-      else {
+      if (mode === "keys") {
         runSnapPullPanelAction("snap", "keyframes", edge === "out" ? "last" : "first",
-          { scope: mode === "properties" ? "property" : "layer" });
+          { scope: "layer" });
+      } else {
+        runSnapPullPanelAction("pull", "layer", edge);
       }
       return;
     }
@@ -12159,7 +12159,17 @@ function consumeShortcutEvent(event, shortcutKey) {
 
 function isEditableShortcutTarget(event) {
   const tag = (event.target && event.target.tagName || "").toLowerCase();
-  return tag === "input" || tag === "textarea" || tag === "select" || !!(event.target && event.target.isContentEditable);
+  // A dropdown is not a text field. Treating it as one handed it every panel
+  // key, and its native type-ahead rotated whichever select happened to hold
+  // focus - pressing a letter in the Layout panel changed the dropdowns
+  // instead of running the action. It keeps only the keys it navigates with.
+  if (tag === "select") {
+    const key = (event.key || "").toLowerCase();
+    return key === "arrowup" || key === "arrowdown" ||
+      key === "arrowleft" || key === "arrowright" ||
+      key === "enter" || key === " " || key === "spacebar";
+  }
+  return tag === "input" || tag === "textarea" || !!(event.target && event.target.isContentEditable);
 }
 
 function shortcutAllowedInEditable(shortcutKey, easeDialogOpen) {

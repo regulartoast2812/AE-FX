@@ -624,7 +624,17 @@ function consumeShortcutEvent(event, shortcutKey) {
 
 function isEditableShortcutTarget(event) {
   const tag = (event.target && event.target.tagName || "").toLowerCase();
-  return tag === "input" || tag === "textarea" || tag === "select" || !!(event.target && event.target.isContentEditable);
+  // A dropdown is not a text field. Treating it as one handed it every panel
+  // key, and its native type-ahead rotated whichever select happened to hold
+  // focus - pressing a letter in the Layout panel changed the dropdowns
+  // instead of running the action. It keeps only the keys it navigates with.
+  if (tag === "select") {
+    const key = (event.key || "").toLowerCase();
+    return key === "arrowup" || key === "arrowdown" ||
+      key === "arrowleft" || key === "arrowright" ||
+      key === "enter" || key === " " || key === "spacebar";
+  }
+  return tag === "input" || tag === "textarea" || !!(event.target && event.target.isContentEditable);
 }
 
 function shortcutAllowedInEditable(shortcutKey, easeDialogOpen) {
