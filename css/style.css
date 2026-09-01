@@ -10686,7 +10686,7 @@ body.keyframe-mode .track-label {
   display: flex !important;
   flex-wrap: nowrap;
   align-items: flex-start;
-  gap: 16px !important;
+  gap: 5px !important;
 }
 
 .anchor-dialog.layout-dialog {
@@ -10716,7 +10716,7 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
 .anchor-timing-sections {
   display: flex;
   flex: 1 1 0;
-  gap: 16px;
+  gap: 5px;
   min-width: 0;
 }
 
@@ -10894,9 +10894,12 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
   box-sizing: border-box;
 }
 
+/* The range input's intrinsic width is 129px, which set the whole Stagger
+   section. It only has to be draggable. */
 .anchor-timing-sections .timing-amount-range {
-  flex: 1 1 auto;
-  min-width: 60px;
+  flex: 0 0 auto;
+  width: 88px;
+  min-width: 0;
 }
 
 .anchor-timing-sections .timing-group-control {
@@ -11166,9 +11169,9 @@ body.quick-panel-mode .layout-panel-head {
    wider than its own controls and threw the row off centre. */
 #anchorModal .anchor-align-target select {
   box-sizing: border-box;
-  width: 132px;
+  width: 108px;
   min-width: 0;
-  max-width: 132px;
+  max-width: 108px;
 }
 
 /* Stagger and Pull share a column; Layer Order stands beside it. */
@@ -11177,7 +11180,7 @@ body.quick-panel-mode .layout-panel-head {
   flex: 0 0 auto;
   flex-direction: column;
   align-items: stretch;
-  gap: 16px;
+  gap: 5px;
   min-width: 0;
 }
 
@@ -11219,7 +11222,8 @@ body.quick-panel-mode .layout-panel-head {
 
 #anchorModal .timing-pull-mode {
   min-width: 0;
-  width: 124px;
+  flex: 1 1 auto;
+  width: auto;
 }
 
 /* 78px left 48px of text room after the padding and the arrow, which clipped
