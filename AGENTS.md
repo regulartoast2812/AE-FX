@@ -108,6 +108,33 @@ Known duplicated registries to check whenever one of them changes:
 `activeQuickPanelSurface` and `__tntQuickPanelHitRects`; the macOS and Windows
 helper hotkey tables.
 
+## The overlay window must never animate or resize on screen
+
+`native-helper` shows an `NSPanel`. Four separate things animate it, and any
+one left alone brings the movement back:
+
+1. **`panel.animationBehavior`** defaults to the utility-window behaviour for
+   an NSPanel, which scales the window in from its centre. Set to `.none`.
+2. **Implicit CoreAnimation** on `alphaValue` and `setFrame`. Every one of
+   those is inside `NSAnimationContext.runAnimationGroup` with `duration = 0`
+   and `allowsImplicitAnimation = false`.
+3. **`NSApp.unhide(nil)`** re-shows the app's windows with an animation. Called
+   only when `NSApp.isHidden`.
+4. **The resize itself.** The window opens at the launcher size and is resized
+   once the page reports its content, and `afterEffectsOverlayFrame` centres
+   it - so it grows from the middle outward. Three defences: the reveal is
+   always deferred until a size arrives; every surface's settled size is
+   remembered in `~/.ae-fx-quick-controls/panel-sizes.json` and reused on open;
+   and if a resize does arrive while the window is visible and the size really
+   differs, it hides, resizes and shows inside one animation-free block.
+
+There were **four** separate call sites ordering the panel front, each with its
+own `unhide / activate / makeKeyAndOrderFront`. They all go through
+`presentPanelWithoutAnimation` now. Adding a fifth reintroduces the animation.
+
+The page is not the place to look: every element was scanned and nothing has a
+transform transition or a CSS animation except button hovers.
+
 ## Shortcut Rules
 
 ### Why the tool is split into subpanels

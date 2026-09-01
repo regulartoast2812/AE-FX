@@ -10962,7 +10962,14 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
 /* No divider under a section label - anchor and align do not have one. The
    line is a box-shadow, not a border, which is why clearing the border left it
    on screen. */
+/* The header held 42px around a 9px label. min-height was already 0 and the
+   padding already zero - the height came from the card's own layout stretching
+   it - so it is pinned to its content. */
 .anchor-timing-sections .timing-order-head {
+  height: auto !important;
+  min-height: 0 !important;
+  flex: 0 0 auto !important;
+  align-self: flex-start;
   border-bottom: 0 !important;
   box-shadow: none !important;
 }
