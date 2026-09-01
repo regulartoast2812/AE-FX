@@ -133,7 +133,8 @@
           </label>
         </div>
         <div id="anchorTimingSections" class="anchor-timing-sections">
-        <section class="timing-order-card timing-stagger-card">
+        <div class="timing-column">
+<section class="timing-order-card timing-stagger-card">
           <header class="timing-order-head">
             <div class="tnt-card-title timing-order-title"><b>ST</b><span>Stagger</span></div>
           </header>
@@ -160,6 +161,30 @@
           </div>
           <div class="timing-order-error"></div>
         </section>
+<section class="timing-order-card timing-snap-pull-card">
+          <header class="timing-order-head">
+            <div class="tnt-card-title timing-order-title"><b>SP</b><span>Pull / Snap</span></div>
+          </header>
+          <div class="timing-order-body">
+            <div class="timing-order-field">
+              <span>Pull</span>
+              <div class="timing-inline-row">
+                <select class="timing-pull-mode" data-tooltip="What to move\nThe whole selection together, each layer on its own, or the selected keyframes.">
+                  <option value="group">Whole selection</option>
+                  <option value="layers">Layers</option>
+                  <option value="properties">Properties</option>
+                  <option value="keys">Key groups</option>
+                </select>
+                <div class="timing-execute-actions" role="group" aria-label="Pull to playhead">
+                  <button type="button" data-pull-run="in" data-icon="arrow-right-to-line" data-tooltip="Pull In\nMove to the playhead by the in point, or by the first selected key."></button>
+                  <button type="button" data-pull-run="out" data-icon="arrow-left-to-line" data-tooltip="Pull Out\nMove to the playhead by the out point, or by the last selected key."></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="timing-order-error"></div>
+        </section>
+</div>
 
         <section class="timing-order-card layer-order-card">
           <header class="timing-order-head">
@@ -194,29 +219,7 @@
           <div class="timing-order-error"></div>
         </section>
 
-        <section class="timing-order-card timing-snap-pull-card">
-          <header class="timing-order-head">
-            <div class="tnt-card-title timing-order-title"><b>SP</b><span>Pull / Snap</span></div>
-          </header>
-          <div class="timing-order-body">
-            <div class="timing-order-field">
-              <span>Pull</span>
-              <div class="timing-inline-row">
-                <select class="timing-pull-mode" data-tooltip="What to move\nThe whole selection together, each layer on its own, or the selected keyframes.">
-                  <option value="group">Whole selection</option>
-                  <option value="layers">Layers</option>
-                  <option value="properties">Properties</option>
-                  <option value="keys">Key groups</option>
-                </select>
-                <div class="timing-execute-actions" role="group" aria-label="Pull to playhead">
-                  <button type="button" data-pull-run="in" data-icon="arrow-right-to-line" data-tooltip="Pull In\nMove to the playhead by the in point, or by the first selected key."></button>
-                  <button type="button" data-pull-run="out" data-icon="arrow-left-to-line" data-tooltip="Pull Out\nMove to the playhead by the out point, or by the last selected key."></button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="timing-order-error"></div>
-        </section>
+        
         </div>
       </div>
       <div id="anchorError" class="dialog-error"></div>

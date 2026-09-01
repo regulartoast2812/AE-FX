@@ -11170,6 +11170,76 @@ body.quick-panel-mode .layout-panel-head {
   min-width: 0;
   max-width: 132px;
 }
+
+/* Stagger and Pull share a column; Layer Order stands beside it. */
+.anchor-timing-sections .timing-column {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* Pull is narrower than Stagger, so in a stretched column its row sat against
+   the left with all the slack on the right. Its controls fill the width the
+   column gives them instead. */
+.anchor-timing-sections .timing-snap-pull-card .timing-inline-row {
+  width: 100%;
+}
+
+/* Written against the id, because the width above is set that way and would
+   otherwise outrank a class-only rule. */
+#anchorModal .timing-snap-pull-card .timing-pull-mode {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+
+/* Sections size to their contents rather than sharing the row equally. Equal
+   thirds left every section as wide as the widest, which is what was stretching
+   the panel and leaving uneven space around the buttons. */
+.anchor-timing-sections {
+  flex: 0 0 auto;
+}
+
+.anchor-timing-sections > .timing-order-card,
+.anchor-timing-sections .timing-column > .timing-order-card {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+/* The selects were 132px so the align dropdown could hold "Composition". These
+   only carry short words, and the extra width was pushing their sections wider
+   than the buttons inside them. */
+#anchorModal .timing-direction-select {
+  min-width: 0;
+  width: 112px;
+}
+
+#anchorModal .timing-pull-mode {
+  min-width: 0;
+  width: 124px;
+}
+
+/* 78px left 48px of text room after the padding and the arrow, which clipped
+   "Frames" to "Fram". */
+#anchorModal .timing-unit-select {
+  min-width: 0;
+  width: 92px;
+}
+
+/* Equal air on both sides of a section's controls. */
+.anchor-timing-sections .timing-order-card {
+  padding: 10px !important;
+}
+
+.anchor-timing-sections .timing-order-body,
+.anchor-timing-sections .timing-order-field,
+.anchor-timing-sections .timing-inline-row,
+.anchor-timing-sections .timing-amount-row {
+  width: 100%;
+}
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {
   display: grid !important;
