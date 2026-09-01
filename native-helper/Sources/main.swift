@@ -342,10 +342,17 @@ private final class WindowBridge: NSObject, WKScriptMessageHandler {
         )
         let frame = afterEffectsOverlayFrame(for: size) ?? NSRect(origin: panel.frame.origin, size: size)
         activeAppDelegate?.rememberQuickPanelSize(size)
+        // A window that is already on screen must never change size where it can
+        // be seen. If the size actually differs, hide, resize, show - which is
+        // instant and cannot read as a scale.
+        let sizeChanges = abs(panel.frame.width - frame.width) > 0.5 || abs(panel.frame.height - frame.height) > 0.5
+        let wasVisible = panel.isVisible && panel.alphaValue > 0
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0
             context.allowsImplicitAnimation = false
+            if sizeChanges && wasVisible { panel.alphaValue = 0 }
             panel.setFrame(frame, display: true, animate: false)
+            if sizeChanges && wasVisible { panel.alphaValue = 1 }
         }
         // Reveal once sizes settle, not on the first one.
         // Was 70ms after every resize. One frame is enough to let the second

@@ -10973,6 +10973,50 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
   font-size: 9.5px;
   color: rgba(235, 235, 245, .3);
 }
+
+/* The three sections were stretching to the tallest of them - a flex row
+   defaults to align-items: stretch - so Stagger and Layer Order carried a
+   column of empty space to match Pull/Snap. Each is its own height now. */
+.anchor-timing-sections {
+  align-items: flex-start;
+}
+
+/* Anchor and align run at 8-10px internal spacing; these were at 12-14 and
+   read as loose beside them. */
+.anchor-timing-sections .timing-order-body {
+  gap: 9px !important;
+}
+
+.anchor-timing-sections .timing-order-field {
+  gap: 5px !important;
+}
+
+.anchor-timing-sections .timing-execute-actions {
+  gap: 4px;
+}
+
+/* The count matches the anchor and align readout - small dim text after the
+   label, not a pill. Two different treatments for the same fact was the
+   mismatch. */
+.anchor-timing-sections .timing-order-count,
+.anchor-timing-sections .timing-key-count {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  margin-left: 6px;
+  color: rgba(235, 235, 245, .3) !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+/* Helper lines are one line, not two stacked messages. */
+.anchor-timing-sections .timing-live-status:empty,
+.anchor-timing-sections .timing-order-error:empty {
+  display: none;
+}
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {
   display: grid !important;
