@@ -62,6 +62,52 @@ This guide keeps future work compact and consistent for the `AE FX` CEP project.
 - Do not blur the whole app behind subpanels. Blur only under the panel shape.
 - Page scrollbars/sliders should stay neutral and thin. Property sliders can use functional accents only when intentional.
 
+## Fix every instance, not the one in front of you
+
+This is the single most expensive recurring mistake in this codebase, measured
+in round trips. The pattern is always the same: a thing exists in several
+places, one of them gets fixed, the bug survives in the others, and it comes
+back looking like the fix did not work.
+
+It has happened, at least, with:
+
+- **The window animation.** Four separate show paths each ordered the panel
+  front with their own `unhide / activate / makeKeyAndOrderFront`. Fixed one,
+  reported fixed, still animated. Three rounds.
+- **`closeNativeQuickPanelSurfaces`** - a hand-written list of fifteen `if`
+  statements. A new surface not added to it stays open over everything after
+  it, which is how TNK covered every other panel.
+- **Two identical action maps**, `openSubpanelByKey` and
+  `openQuickPanelControl`, ending in the same line. A single-occurrence replace
+  patched the first and left the hotkey path dead.
+- **Registering a subpanel** needs four edits: the action map, the surface
+  list, the Windows hit-rect list, and the teardown list. Three were done.
+- **`TNT_restoreParents`** landed inside `TNT_setSelectedAnchorPoint`, because
+  two functions ended with the same three lines and the replace matched the
+  wrong one.
+- **A CSS declaration** kept after its selector prefix was removed, so a rule
+  meant for one group of icons silently applied to all of them.
+
+The rule, in order:
+
+1. **Enumerate before editing.** `grep -n` for every occurrence of the call,
+   the selector, the pattern. Count them. If there is more than one, fix all
+   of them in the same change.
+2. **Never rely on a single-occurrence replace** against a pattern that could
+   match twice. Slice the target function out first, or match on something
+   unique to it.
+3. **Prove it afterwards.** Grep again and show zero remaining. "I fixed it"
+   is not a result; `grep -c` returning 0 is.
+4. **Test where the thing runs.** Three commits were verified in the docked
+   panel for a feature that only exists in the overlay. `quick.html`, not
+   `index.html`, for anything in the overlay.
+
+Known duplicated registries to check whenever one of them changes:
+`FX_CONSOLE_COMMANDS` and `TNT_V3_COMMANDS`; `openSubpanelByKey` and
+`openQuickPanelControl`; `closeNativeQuickPanelSurfaces`,
+`activeQuickPanelSurface` and `__tntQuickPanelHitRects`; the macOS and Windows
+helper hotkey tables.
+
 ## Shortcut Rules
 
 ### Why the tool is split into subpanels
