@@ -11283,6 +11283,67 @@ body.quick-panel-mode .layout-panel-head {
   min-width: 0;
   max-width: none;
 }
+
+/* --- Layout panel: strip the rows that only cost width ------------------- */
+
+/* The hint and error lines were the widest rows in Stagger and Pull, so they
+   set both card widths and a row of height each. Hidden, not removed: the
+   render code writes textContent into them and would throw on null - the same
+   break that has bitten this panel before. Unavailable buttons already dim. */
+#anchorModal .anchor-timing-sections .timing-live-status,
+#anchorModal .anchor-timing-sections .timing-order-error {
+  display: none !important;
+}
+
+/* The stacked caps micro-labels ("Offset / gap", "Pull", "Sort selected
+   layers") each repeat what the card title says and cost a row. Direction is
+   the exception: it is an inline label beside its select. */
+#anchorModal .anchor-timing-sections .timing-order-field > span {
+  display: none !important;
+}
+
+#anchorModal .anchor-timing-sections .order-direction-field > span {
+  display: block !important;
+}
+
+/* Sort and Send share one 4-column grid so their buttons line up instead of
+   running 7 wide and setting the card width. */
+#anchorModal .anchor-timing-sections .order-sort-actions,
+#anchorModal .anchor-timing-sections .order-stack-actions {
+  display: grid !important;
+  grid-template-columns: repeat(4, 26px);
+  gap: 4px !important;
+  justify-content: start;
+}
+
+/* Group belongs to the mode row, not shoved to the far right of it. */
+#anchorModal .anchor-timing-sections .timing-group-control {
+  margin-left: 10px !important;
+}
+
+#anchorModal .anchor-timing-sections .timing-group-control > span {
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(235, 235, 245, .66);
+}
+
+/* The docked panel spans an odd last button across its 2-column grid. In the
+   4-column layout grid that pushed the 7th sort button onto a row of its own,
+   giving 4 / 2 / 1 instead of 4 / 3. */
+#anchorModal .anchor-timing-sections .order-sort-actions button:last-child:nth-child(odd),
+#anchorModal .anchor-timing-sections .order-stack-actions button:last-child:nth-child(odd) {
+  grid-column: auto !important;
+}
+
+/* Frames / Seconds needed 92px for a 7-letter word. */
+#anchorModal .anchor-timing-sections .timing-unit-select {
+  /* 74 truncated "Frames" to "Fran" - a native select clips without changing
+     scrollWidth, so the clip probe reported nothing. Measured off the render. */
+  width: 86px;
+  min-width: 0;
+  flex: 0 0 auto;
+}
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {
   display: grid !important;
