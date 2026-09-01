@@ -11335,6 +11335,19 @@ function updateTimingOrderRangeFill() {
 
 function renderTimingOrderPanel() {
   if (!timingOrderBackdropEl) return;
+  // The status line and the error line are filled independently and land on
+  // the same sentence when a section is unusable, printing it twice.
+  const dedupeMessages = () => {
+    timingOrderBackdropEl.querySelectorAll(".timing-order-card").forEach(card => {
+      const status = card.querySelector(".timing-live-status");
+      const error = card.querySelector(".timing-order-error");
+      if (!status || !error) return;
+      if (status.textContent.trim() && status.textContent.trim() === error.textContent.trim()) {
+        error.textContent = "";
+      }
+    });
+  };
+  setTimeout(dedupeMessages, 0);
   const count = timingOrderSelectedCount();
   const keyCount = timingOrderSelectedKeyCount();
   const staggerTarget = timingOrderStaggerTarget();

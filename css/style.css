@@ -11053,6 +11053,62 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
 body.quick-panel-mode .layout-panel-head {
   padding: 0 4px;
 }
+
+/* Matching anchor and align exactly, measured rather than eyeballed:
+   their section title is 9px at weight 400, and these were 9px at 700 - which
+   is why STAGGER read heavier than ANCHOR beside it. */
+.anchor-timing-sections .timing-order-title {
+  font-weight: 400 !important;
+}
+
+/* Field labels were 9.5px at weight 650 - louder than the section title above
+   them. A sub-label cannot outrank its own heading. */
+.anchor-timing-sections .timing-order-field > span {
+  font-size: 9px !important;
+  font-weight: 400 !important;
+  color: rgba(235, 235, 245, .3) !important;
+}
+
+/* Layer Order drew a rule between its two button rows. Anchor and align have no
+   rule between their grids, so neither does this. */
+.anchor-timing-sections .timing-execute-actions {
+  border-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* The group header: larger and set in the panel's serif, which is what the
+   other panels use for a title rather than a label. */
+.layout-panel-name {
+  /* body sets the sans stack with !important, which wins the inheritance this
+     element would otherwise take. */
+  font-family: "Ivory LL Web", "IvoryLLWeb-Light", "Iowan Old Style", Baskerville, Georgia, serif !important;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: .01em;
+  text-transform: none;
+  color: rgba(245, 245, 247, .92);
+}
+
+.layout-panel-count {
+  font-size: 10.5px;
+}
+
+/* Written against the modal id so it outranks the dialog-scoped element rules
+   that were setting the font on any span inside it. */
+#anchorModal .layout-panel-name {
+  font-family: "Ivory LL Web", "IvoryLLWeb-Light", "Iowan Old Style", Baskerville, Georgia, serif !important;
+  font-size: 17px !important;
+  font-weight: 500 !important;
+  letter-spacing: .01em !important;
+  text-transform: none !important;
+  color: rgba(245, 245, 247, .92) !important;
+}
+
+#anchorModal .layout-panel-count {
+  font-size: 10.5px !important;
+  font-style: normal !important;
+  color: rgba(235, 235, 245, .34) !important;
+}
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {
   display: grid !important;
