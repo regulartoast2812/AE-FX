@@ -10837,30 +10837,6 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
   stroke-linejoin: round;
 }
 
-.anchor-timing-sections .timing-amount-row {
-  flex-wrap: wrap;
-}
-
-.anchor-timing-sections .timing-amount-row > * {
-  min-width: 0;
-}
-
-.anchor-timing-sections .timing-amount-range {
-  flex: 1 1 100%;
-  min-width: 0;
-}
-
-.anchor-timing-sections .timing-amount-input,
-.anchor-timing-sections .timing-group-input {
-  width: 54px;
-  min-width: 0;
-}
-
-.anchor-timing-sections .timing-unit {
-  flex: 0 0 auto;
-  margin-left: auto;
-}
-
 .anchor-timing-sections .timing-snap-pull-card button {
   min-height: 0;
   padding: 5px 8px;
@@ -10898,6 +10874,101 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
 .anchor-panel.layout-panel .anchor-cell {
   background: rgba(255, 255, 255, .05) !important;
   border-color: rgba(255, 255, 255, .14) !important;
+}
+
+/* The offset row sat crooked because its four controls had nothing in common:
+   a range input at its intrinsic height, two number fields at another, and a
+   two-part label stacking its caption above its input. One row height, one
+   baseline, and the caption beside its field rather than over it. */
+.anchor-timing-sections .timing-amount-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.anchor-timing-sections .timing-amount-row > *,
+.anchor-timing-sections .timing-amount-input,
+.anchor-timing-sections .timing-group-input,
+.anchor-timing-sections .timing-unit > button {
+  height: 26px;
+  box-sizing: border-box;
+}
+
+.anchor-timing-sections .timing-amount-range {
+  flex: 1 1 auto;
+  min-width: 60px;
+}
+
+.anchor-timing-sections .timing-group-control {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+}
+
+.anchor-timing-sections .timing-group-control > span {
+  position: static;
+  margin: 0;
+  color: rgba(235, 235, 245, .34);
+  font-size: 9px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.anchor-timing-sections .timing-amount-input,
+.anchor-timing-sections .timing-group-input {
+  width: 46px;
+  padding: 0 6px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: var(--tnt-radius-control, 7px);
+  background: rgba(255, 255, 255, .05);
+  color: #ededee;
+  font: inherit;
+  font-size: 11px;
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.anchor-timing-sections .timing-amount-input::-webkit-outer-spin-button,
+.anchor-timing-sections .timing-amount-input::-webkit-inner-spin-button,
+.anchor-timing-sections .timing-group-input::-webkit-outer-spin-button,
+.anchor-timing-sections .timing-group-input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* The F/S pair is a two-button segmented control, sized like the icon buttons
+   beside it rather than like a dialog button. */
+.anchor-timing-sections .timing-unit {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 2px;
+}
+
+.anchor-timing-sections .timing-unit > button {
+  width: 26px;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: var(--tnt-radius-control, 7px);
+  background: rgba(255, 255, 255, .05);
+  font-size: 10.5px;
+}
+
+/* No divider under a section label - anchor and align do not have one. */
+.anchor-timing-sections .timing-order-head {
+  border-bottom: 0 !important;
+}
+
+/* Helper text sits with the label voice, not the control voice. */
+.anchor-timing-sections .timing-live-status,
+.anchor-timing-sections .timing-order-error {
+  font-size: 9.5px;
+  color: rgba(235, 235, 245, .3);
 }
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {

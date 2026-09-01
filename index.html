@@ -130,7 +130,7 @@
         </div>
         <div id="anchorTimingSections" class="anchor-timing-sections">
         <section class="timing-order-card timing-stagger-card">
-          <header class="timing-order-head tnt-card-head">
+          <header class="timing-order-head">
             <div class="tnt-card-title timing-order-title"><b>ST</b><span>Stagger</span><em class="timing-order-count"></em></div>
           </header>
           <div class="timing-order-body">
@@ -144,10 +144,7 @@
               <div class="timing-amount-row">
                 <input class="timing-amount-range" type="range" min="0" max="60" step="1" value="0" data-tooltip="Apply Stagger\nChoose a direction above, then drag to apply the offset from the original layer positions.">
                 <input class="timing-amount-input" type="number" min="0" step="1" value="0" data-tooltip="Exact Offset\nEnter an exact amount. The selected stagger direction applies from the original layer positions.">
-                <label class="timing-group-control" data-tooltip="Group Size\nRepeat offsets inside groups. 1 staggers every selected layer in one run.">
-                  <span>Group</span>
-                  <input class="timing-group-input" type="number" min="1" step="1" value="1">
-                </label>
+                <label class="timing-group-control" data-tooltip="Group Size\nRepeat offsets inside groups. 1 staggers every selected layer in one run."><span>Group</span><input class="timing-group-input" type="number" min="1" step="1" value="1"></label>
                 <div class="timing-order-segmented timing-unit" role="group" aria-label="Timing unit">
                   <button type="button" data-timing-unit="frames" data-tooltip="Frames\nMeasure the offset using composition frames.">F</button>
                   <button type="button" data-timing-unit="seconds" data-tooltip="Seconds\nMeasure the offset using seconds.">S</button>
@@ -160,7 +157,7 @@
         </section>
 
         <section class="timing-order-card layer-order-card">
-          <header class="timing-order-head tnt-card-head">
+          <header class="timing-order-head">
             <div class="tnt-card-title timing-order-title"><b>OR</b><span>Layer Order</span><em class="timing-order-count"></em></div>
           </header>
           <div class="timing-order-body">
@@ -193,7 +190,7 @@
         </section>
 
         <section class="timing-order-card timing-snap-pull-card">
-          <header class="timing-order-head tnt-card-head">
+          <header class="timing-order-head">
             <div class="tnt-card-title timing-order-title"><b>SP</b><span>Pull / Snap</span><em class="timing-key-count"></em></div>
           </header>
           <div class="timing-order-body">
