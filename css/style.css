@@ -11271,12 +11271,16 @@ body.quick-panel-mode .layout-panel-head {
   gap: 8px !important;
 }
 
+/* The caps-label rule above carries !important on font-size, weight and color,
+   so this lost silently and Direction rendered 9px/.3 next to Align to: and
+   Group: at 11px/.66 - the same label in three sizes. */
 #anchorModal .anchor-timing-sections .order-direction-field > span {
-  font-size: 11px;
-  letter-spacing: 0;
-  text-transform: none;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
   white-space: nowrap;
-  color: rgba(235, 235, 245, .66);
+  color: rgba(235, 235, 245, .66) !important;
 }
 
 #anchorModal .anchor-timing-sections .order-direction-field .timing-direction-select {
