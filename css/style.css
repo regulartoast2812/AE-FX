@@ -11374,6 +11374,24 @@ body.quick-panel-mode .layout-panel-head {
   min-width: 0;
   max-width: none;
 }
+
+/* --- Consistency sweep across the Layout sections ----------------------- */
+
+/* Anchor and Align sat at 12px while the three timing cards were at 10px, so
+   the same card had two different insets depending on which panel it came
+   from. 10 everywhere, matching the compacted spacing. */
+#anchorModal .anchor-panel.layout-panel > .anchor-section {
+  padding: 10px !important;
+}
+
+/* Align's dropdown kept the old align-panel treatment - a fainter border, a
+   different fill and text at .48 against .86 - so "Selection" read as disabled
+   next to "Ascending". One select style for the group. */
+#anchorModal .anchor-align-target select {
+  border-color: rgba(255, 255, 255, .14);
+  background: rgba(255, 255, 255, .05);
+  color: rgba(245, 245, 247, .86);
+}
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {
   display: grid !important;
