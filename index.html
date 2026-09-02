@@ -169,19 +169,22 @@
             <div class="timing-order-field">
               <span>Pull</span>
               <div class="timing-inline-row timing-pull-choices">
+                <span>Move:</span>
                 <select class="timing-pull-mode" data-tooltip="What to move\nThe selected layers, or the selected keyframes.">
                   <option value="layers">Layers</option>
                   <option value="keys">Keyframes</option>
                 </select>
-                <select class="timing-pull-spread" data-tooltip="How they move\nKeep spacing moves the selection as one block, anchored by the earliest or latest edge.\nStack up moves every layer, or every property's keys, onto the playhead individually.">
-                  <option value="group">Keep spacing</option>
-                  <option value="each">Stack up</option>
-                </select>
               </div>
-              <div class="timing-inline-row">
+              <div class="timing-inline-row timing-pull-row">
+                <span>Pull:</span>
                 <div class="timing-execute-actions" role="group" aria-label="Pull to playhead">
-                  <button type="button" data-pull-run="in" data-icon="arrow-right-to-line" data-tooltip="Pull In\nMove to the playhead by the in point, or by the first selected key."></button>
-                  <button type="button" data-pull-run="out" data-icon="arrow-left-to-line" data-tooltip="Pull Out\nMove to the playhead by the out point, or by the last selected key."></button>
+                  <button type="button" data-pull-run="in" data-icon="arrow-right-to-line" data-tooltip="Pull In\nMove to the playhead by the in point, keeping the selection's relative spacing.\nWith Keyframes: the layer's keys travel as a group, anchored by the first."></button>
+                  <button type="button" data-pull-run="out" data-icon="arrow-left-to-line" data-tooltip="Pull Out\nMove to the playhead by the out point, keeping the selection's relative spacing.\nWith Keyframes: the layer's keys travel as a group, anchored by the last."></button>
+                </div>
+                <span>Snap:</span>
+                <div class="timing-execute-actions" role="group" aria-label="Snap to playhead">
+                  <button type="button" data-snap-run="in" data-icon="chevrons-right" data-tooltip="Snap In\nMove every selected layer's in point onto the playhead individually.\nWith Keyframes: each property's first key lands on the playhead."></button>
+                  <button type="button" data-snap-run="out" data-icon="chevrons-left" data-tooltip="Snap Out\nMove every selected layer's out point onto the playhead individually.\nWith Keyframes: each property's last key lands on the playhead."></button>
                 </div>
               </div>
             </div>
@@ -202,24 +205,31 @@
               <option value="desc">Descending</option>
             </select>
             </div>
-            <div class="timing-order-field">
-              <span>Sort selected layers</span>
-              <div class="timing-execute-actions order-sort-actions" role="group" aria-label="Sort selected layers">
+            <div class="timing-order-field order-group-field">
+              <span>Timing:</span>
+              <div class="timing-execute-actions order-sort-actions" role="group" aria-label="Sort selected layers by timing">
                 <button type="button" data-order-sort="in" data-icon="chevrons-left" data-tooltip="By In Point\nSort selected layers by in point."><strong>In point</strong><span>Layer start</span></button>
                 <button type="button" data-order-sort="out" data-icon="chevrons-right" data-tooltip="By Out Point\nSort selected layers by out point."><strong>Out point</strong><span>Layer end</span></button>
-                <button type="button" data-order-sort="x" data-icon="move-horizontal" data-tooltip="By X Position\nSort selected layers by Position X at the current time."><strong>X position</strong><span>Left to right</span></button>
-                <button type="button" data-order-sort="y" data-icon="move-vertical" data-tooltip="By Y Position\nSort selected layers by Position Y at the current time."><strong>Y position</strong><span>Top to bottom</span></button>
                 <button type="button" data-order-sort="firstKey" data-icon="skip-back" data-tooltip="Earliest Keyframe\nSort by each layer's earliest keyframe. Layers with no keys use their in point."><strong>First key</strong><span>Earliest key</span></button>
                 <button type="button" data-order-sort="lastKey" data-icon="skip-forward" data-tooltip="Last Keyframe\nSort by each layer's latest keyframe. Layers with no keys use their in point."><strong>Last key</strong><span>Latest key</span></button>
+              </div>
+            </div>
+            <div class="timing-order-field order-group-field">
+              <span>Position:</span>
+              <div class="timing-execute-actions order-sort-actions" role="group" aria-label="Sort selected layers by position">
+                <button type="button" data-order-sort="x" data-icon="move-horizontal" data-tooltip="By X Position\nSort selected layers by Position X at the current time."><strong>X position</strong><span>Left to right</span></button>
+                <button type="button" data-order-sort="y" data-icon="move-vertical" data-tooltip="By Y Position\nSort selected layers by Position Y at the current time."><strong>Y position</strong><span>Top to bottom</span></button>
+              </div>
+            </div>
+            <div class="timing-order-field order-group-field">
+              <span>Stack:</span>
+              <div class="timing-execute-actions order-stack-actions" role="group" aria-label="Reorder the selected stack">
+                <button type="button" data-order-stack="top" data-icon="arrow-up-to-line" data-tooltip="Send to Top\nMove the selected layers to the top of the composition stack while preserving their order."><strong>Send to top</strong><span>Top of layer stack</span></button>
+                <button type="button" data-order-stack="bottom" data-icon="arrow-down-to-line" data-tooltip="Send to Bottom\nMove the selected layers to the bottom of the composition stack while preserving their order."><strong>Send to bottom</strong><span>Bottom of layer stack</span></button>
+                <button type="button" data-order-stack="reverse" data-icon="flip-vertical-2" data-tooltip="Flip Layer Order\nReverse the selected layers inside their current stack slots."><strong>Flip order</strong><span>Reverse selected stack</span></button>
                 <button type="button" data-order-sort="random" data-icon="shuffle" data-tooltip="Randomize\nShuffle selected layers and move the shuffled selection to the top of the stack."><strong>Random</strong><span>Shuffle stack</span></button>
               </div>
             </div>
-            <div class="timing-execute-actions order-stack-actions" role="group" aria-label="Send selected layers">
-              <button type="button" data-order-stack="top" data-icon="arrow-up-to-line" data-tooltip="Send to Top\nMove the selected layers to the top of the composition stack while preserving their order."><strong>Send to top</strong><span>Top of layer stack</span></button>
-              <button type="button" data-order-stack="reverse" data-icon="flip-vertical-2" data-tooltip="Flip Layer Order\nReverse the selected layers inside their current stack slots."><strong>Flip order</strong><span>Reverse selected stack</span></button>
-              <button type="button" data-order-stack="bottom" data-icon="arrow-down-to-line" data-tooltip="Send to Bottom\nMove the selected layers to the bottom of the composition stack while preserving their order."><strong>Send to bottom</strong><span>Bottom of layer stack</span></button>
-            </div>
-          </div>
           <div class="timing-order-error"></div>
         </section>
 

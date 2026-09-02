@@ -11104,16 +11104,16 @@ function bindTimingOrderPanel() {
     }
     // One In and one Out button; what they move comes from the mode select.
     // Six buttons in a labelled matrix said the same four things.
-    const pullRun = event.target.closest && event.target.closest("[data-pull-run]");
+    // Two axes: what travels, and whether it keeps its relative spacing (pull)
+    // or every item lands on the playhead (snap). The panel is held to one
+    // dropdown so backtick has a single thing to rotate, so the second axis is
+    // the buttons: two for pull, two for snap.
+    const pullRun = event.target.closest && event.target.closest("[data-pull-run],[data-snap-run]");
     if (pullRun && !pullRun.disabled) {
       const select = timingOrderBackdropEl.querySelector(".timing-pull-mode");
-      const spreadSelect = timingOrderBackdropEl.querySelector(".timing-pull-spread");
       const mode = select ? select.value : "layers";
-      // Two axes, four moves: what travels, and whether the selection keeps its
-      // relative spacing or every item lands on the playhead. Collapsing this to
-      // one dropdown is what dropped half the panel's function.
-      const together = !spreadSelect || spreadSelect.value !== "each";
-      const edge = pullRun.dataset.pullRun === "out" ? "out" : "in";
+      const together = !pullRun.dataset.snapRun;
+      const edge = (pullRun.dataset.pullRun || pullRun.dataset.snapRun) === "out" ? "out" : "in";
       if (mode === "keys") {
         runSnapPullPanelAction("snap", "keyframes", edge === "out" ? "last" : "first",
           { scope: together ? "layer" : "property" });

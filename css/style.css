@@ -11392,6 +11392,54 @@ body.quick-panel-mode .layout-panel-head {
   background: rgba(255, 255, 255, .05);
   color: rgba(245, 245, 247, .86);
 }
+
+/* Layer Order's ten buttons were one undifferentiated block. They are three
+   labelled groups now - what you sort by, and what you do to the stack - using
+   the same inline label as Direction and Align to:, and each group wraps on its
+   own so a new button lands in its category rather than at the end of a run. */
+#anchorModal .anchor-timing-sections .order-group-field {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px !important;
+}
+
+#anchorModal .anchor-timing-sections .order-group-field > span {
+  display: block !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  white-space: nowrap;
+  color: rgba(235, 235, 245, .66) !important;
+}
+
+#anchorModal .anchor-timing-sections .order-group-field .timing-execute-actions {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 4px !important;
+  justify-content: start;
+}
+
+/* Pull and Snap sit on one row as two labelled pairs. */
+#anchorModal .anchor-timing-sections .timing-pull-row,
+#anchorModal .anchor-timing-sections .timing-pull-choices {
+  display: flex !important;
+  align-items: center;
+  gap: 8px !important;
+}
+
+#anchorModal .anchor-timing-sections .timing-pull-row > span,
+#anchorModal .anchor-timing-sections .timing-pull-choices > span {
+  font-size: 11px;
+  white-space: nowrap;
+  color: rgba(235, 235, 245, .66);
+}
+
+#anchorModal .anchor-timing-sections .timing-pull-row .timing-execute-actions {
+  flex: 0 0 auto;
+  gap: 4px !important;
+}
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {
   display: grid !important;
