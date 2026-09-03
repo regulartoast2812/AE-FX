@@ -115,6 +115,16 @@ that branch performed was lost with it.
 sits inside the branch that used to handle it. Then fire a real `change` event
 and assert the underlying state variable moved.
 
+**2g. Check icon centring by measuring, every time an icon button changes.**
+`.timing-snap-pull-card button { padding: 5px 8px }` was left over from when
+those buttons carried text. On a 26px button that leaves a 10px content box for
+a 15px icon, so the icon starts at the left padding edge and overhangs right -
+4 buttons 3.5px off while the other 26 were exact. Two separate rounds of "the
+icons are off" went into finding it.
+→ Probe every icon button's svg centre against its button centre and assert the
+worst offset is 0. Do it after any change to an icon button's box, not just the
+ones you touched.
+
 **3. The same thing is declared in more than one place.**
 Two `.timing-amount-row` blocks from different passes fought each other; the
 earlier one kept the slider on its own line. Two `.layout-panel-name` blocks.
