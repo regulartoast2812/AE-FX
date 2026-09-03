@@ -3484,8 +3484,15 @@ function TNT_sortSelectedLayers(indices, basis, direction) {
         else if (basis === "firstKey") delta = keyframeSortTime(a, true) - keyframeSortTime(b, true);
         else if (basis === "lastKey") delta = keyframeSortTime(a, false) - keyframeSortTime(b, false);
         else delta = Number(a.inPoint || 0) - Number(b.inPoint || 0);
-        if (Math.abs(delta) < 0.00001) delta = a.index - b.index;
-        return direction === "desc" ? -delta : delta;
+        // desiredOrder[0] becomes layer index 1, which is the TOP of the comp,
+        // so the largest value has to sort first for Ascending to read as
+        // smallest-at-the-bottom. This was inverted: every basis stacked the
+        // opposite way from what the Direction dropdown said.
+        //
+        // Ties keep their current stack order rather than being flipped with
+        // the rest, which the old single-delta tie-break did.
+        if (Math.abs(delta) >= 0.00001) return direction === "desc" ? delta : -delta;
+        return a.index - b.index;
       });
     }
 

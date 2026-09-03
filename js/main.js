@@ -11232,7 +11232,7 @@ function ensureTimingOrderPanel() {
           <div class="timing-order-field">
             <span>Direction</span>
             <div class="timing-order-segmented order-direction" role="group" aria-label="Layer order direction">
-              <button type="button" data-order-direction="asc" data-tooltip="Ascending\nSmallest value goes to the top of the selected stack.">Ascending</button>
+              <button type="button" data-order-direction="asc" data-tooltip="Ascending\nSmallest value goes to the bottom of the selected stack.">Ascending</button>
               <button type="button" data-order-direction="desc" data-tooltip="Descending\nLargest value goes to the top of the selected stack.">Descending</button>
             </div>
           </div>
