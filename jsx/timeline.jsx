@@ -3418,6 +3418,28 @@ function TNT_sortSelectedLayers(indices, basis, direction) {
       return Number(value && value.length ? value[axis] || 0 : 0);
     }
 
+    // The anchor is the final layer in the selection AE hands us, which is the
+    // bottom-most selected layer in the stack - After Effects does not expose
+    // the order the user clicked in, so there is no "most recently clicked" to
+    // read. Its position is read once rather than per comparison.
+    var distanceAnchor = null;
+    if (selectedLayers.length) {
+      var anchorLayer = selectedLayers[selectedLayers.length - 1];
+      distanceAnchor = [
+        layerPositionValue(anchorLayer, 0),
+        layerPositionValue(anchorLayer, 1),
+        layerPositionValue(anchorLayer, 2)
+      ];
+    }
+
+    function layerDistanceValue(layer) {
+      if (!distanceAnchor) return 0;
+      var dx = layerPositionValue(layer, 0) - distanceAnchor[0];
+      var dy = layerPositionValue(layer, 1) - distanceAnchor[1];
+      var dz = layerPositionValue(layer, 2) - distanceAnchor[2];
+      return Math.sqrt((dx * dx) + (dy * dy) + (dz * dz));
+    }
+
     function collectLayerKeyTimes(propGroup, times) {
       try {
         if (!propGroup || propGroup.numProperties === undefined) return;
@@ -3458,6 +3480,7 @@ function TNT_sortSelectedLayers(indices, basis, direction) {
         if (basis === "out") delta = Number(a.outPoint || 0) - Number(b.outPoint || 0);
         else if (basis === "x") delta = layerPositionValue(a, 0) - layerPositionValue(b, 0);
         else if (basis === "y") delta = layerPositionValue(a, 1) - layerPositionValue(b, 1);
+        else if (basis === "distance") delta = layerDistanceValue(a) - layerDistanceValue(b);
         else if (basis === "firstKey") delta = keyframeSortTime(a, true) - keyframeSortTime(b, true);
         else if (basis === "lastKey") delta = keyframeSortTime(a, false) - keyframeSortTime(b, false);
         else delta = Number(a.inPoint || 0) - Number(b.inPoint || 0);
