@@ -11859,22 +11859,40 @@ async function centerSelectedAnchorPoints() {
 //
 // It only acts while the anchor panel is open. Everywhere else backtick is
 // left alone rather than silently bound to nothing.
+// Backtick steps every choice in the open panel one place on: each dropdown
+// advances to its next option, and Stagger - whose mode is three buttons rather
+// than a dropdown - steps to its next mode. One key moves the whole panel's
+// state forward without reaching for anything.
 function toggleAlignTargetIfAnchorOpen() {
   if (!anchorModalEl || !anchorModalEl.classList.contains("show")) return;
-  const select = document.getElementById("anchorAlignTarget");
-  if (!select) return;
-  select.value = select.value === "selection" ? "comp" : "selection";
-  select.dispatchEvent(new Event("change", { bubbles: true }));
-  if (statusEl) {
-    statusEl.textContent = select.value === "comp"
-      ? "Aligning to the composition."
-      : "Aligning to the selection.";
+  // The stagger mode first: clicking it re-renders the sections, and the select
+  // values are only written at bind time, so the flips below survive it.
+  const modes = anchorModalEl.querySelectorAll("[data-stagger-execute]");
+  if (modes.length) {
+    let current = -1;
+    modes.forEach((button, index) => { if (button.classList.contains("active")) current = index; });
+    modes[(current + 1) % modes.length].click();
   }
-  // A brief highlight, because the dropdown is easy to miss when the eye is on
-  // the align buttons.
-  select.classList.remove("anchor-align-target-flash");
-  void select.offsetWidth;
-  select.classList.add("anchor-align-target-flash");
+  const selects = anchorModalEl.querySelectorAll("select");
+  let stepped = 0;
+  selects.forEach(select => {
+    if (!select.options || select.options.length < 2 || select.disabled) return;
+    select.selectedIndex = (select.selectedIndex + 1) % select.options.length;
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    // A brief highlight, because a dropdown is easy to miss when the eye is on
+    // the buttons.
+    select.classList.remove("anchor-align-target-flash");
+    void select.offsetWidth;
+    select.classList.add("anchor-align-target-flash");
+    stepped++;
+  });
+  if (statusEl) {
+    const target = document.getElementById("anchorAlignTarget");
+    const alignWord = target && target.value === "comp" ? "composition" : "selection";
+    statusEl.textContent = stepped
+      ? "Stepped " + stepped + " dropdown" + (stepped === 1 ? "" : "s") + "; aligning to the " + alignWord + "."
+      : "Stepped the stagger mode.";
+  }
 }
 
 async function alignSelectedLayersFromAnchorPanel(mode) {
