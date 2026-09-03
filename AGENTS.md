@@ -104,6 +104,17 @@ The native window is sized from `.anchor-dialog`. `width: min(1280px, 100vw)`
 made the transparent window 400px wider than the cards, so the group read as
 pushed left of centre. A narrow test viewport hides this - measure at 1600.
 
+**2f. Replacing a control can orphan the code that was bound to the old one.**
+Swapping the segmented unit control for a `<select>` left the select/direction
+binding stranded inside the click handler's `[data-timing-unit]` branch. The
+Layout panel has no such element, so neither select ever got a change listener -
+picking Seconds left stagger running in frames - while the docked panel, which
+does have it, added a duplicate listener on every click. The amount conversion
+that branch performed was lost with it.
+→ After replacing a control, grep for its old selector and check what still
+sits inside the branch that used to handle it. Then fire a real `change` event
+and assert the underlying state variable moved.
+
 **3. The same thing is declared in more than one place.**
 Two `.timing-amount-row` blocks from different passes fought each other; the
 earlier one kept the slider on its own line. Two `.layout-panel-name` blocks.

@@ -3418,19 +3418,29 @@ function TNT_sortSelectedLayers(indices, basis, direction) {
       return Number(value && value.length ? value[axis] || 0 : 0);
     }
 
-    // The anchor is the final layer in the selection AE hands us, which is the
-    // bottom-most selected layer in the stack - After Effects does not expose
-    // the order the user clicked in, so there is no "most recently clicked" to
-    // read. Its position is read once rather than per comparison.
+    // comp.selectedLayers DOES preserve the order the layers were selected in -
+    // selecting 4, 1, 3 comes back as 4, 1, 3, not sorted. The panel loses that
+    // by walking the stack 1..numLayers to build selectedLayerIndices, so the
+    // anchor is read from the live selection here instead of from the array the
+    // panel passed. Without this the anchor was always the bottom-most selected
+    // layer rather than the one the editor picked last.
     var distanceAnchor = null;
-    if (selectedLayers.length) {
-      var anchorLayer = selectedLayers[selectedLayers.length - 1];
+    var anchorLayer = null;
+    try {
+      var liveSelection = comp.selectedLayers;
+      for (var ls = liveSelection.length - 1; ls >= 0; ls--) {
+        if (isSelectedLayer(liveSelection[ls])) { anchorLayer = liveSelection[ls]; break; }
+      }
+    } catch (_) { anchorLayer = null; }
+    if (!anchorLayer && selectedLayers.length) anchorLayer = selectedLayers[selectedLayers.length - 1];
+    if (anchorLayer) {
       distanceAnchor = [
         layerPositionValue(anchorLayer, 0),
         layerPositionValue(anchorLayer, 1),
         layerPositionValue(anchorLayer, 2)
       ];
     }
+
 
     function layerDistanceValue(layer) {
       if (!distanceAnchor) return 0;

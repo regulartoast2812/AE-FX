@@ -11050,23 +11050,7 @@ function bindTimingOrderPanel() {
       const previousUnit = timingOrderUnit;
       const nextUnit = unit.dataset.timingUnit || "frames";
       const amountInput = timingOrderBackdropEl.querySelector(".timing-amount-input");
-      const unitSelect = timingOrderBackdropEl.querySelector(".timing-unit-select");
-  if (unitSelect) {
-    unitSelect.value = timingOrderUnit;
-    unitSelect.addEventListener("change", () => {
-      timingOrderUnit = unitSelect.value === "seconds" ? "seconds" : "frames";
-      renderTimingOrderPanel();
-    });
-  }
-  const directionSelect = timingOrderBackdropEl.querySelector(".timing-direction-select");
-  if (directionSelect) {
-    directionSelect.value = layerOrderDirection;
-    directionSelect.addEventListener("change", () => {
-      layerOrderDirection = directionSelect.value === "desc" ? "desc" : "asc";
-      renderTimingOrderPanel();
-    });
-  }
-  const amountRange = timingOrderBackdropEl.querySelector(".timing-amount-range");
+      const amountRange = timingOrderBackdropEl.querySelector(".timing-amount-range");
       const fps = Math.max(1, Number(state.comp && state.comp.frameRate || 30));
       const currentAmount = Math.max(0, Number(amountInput.value || 0));
       timingOrderUnit = nextUnit;
@@ -11139,6 +11123,49 @@ function bindTimingOrderPanel() {
       runSnapPullPanelAction("snap", "keyframes", snapKeys.dataset.snapKeyframes || "first", { scope: snapKeys.dataset.keyScope || "layer" });
     }
   });
+  // These two were spliced inside the click handler's [data-timing-unit] branch
+  // by an earlier edit. The Layout panel has no [data-timing-unit] element - it
+  // uses these selects instead - so the branch never ran and neither select had
+  // a change listener: picking Seconds left stagger still working in frames.
+  // In the docked panel, which does have that element, every click on it added
+  // another duplicate listener.
+  const unitSelect = timingOrderBackdropEl.querySelector(".timing-unit-select");
+  if (unitSelect) {
+    unitSelect.value = timingOrderUnit;
+    unitSelect.addEventListener("change", () => {
+      const previousUnit = timingOrderUnit;
+      const nextUnit = unitSelect.value === "seconds" ? "seconds" : "frames";
+      if (nextUnit === previousUnit) return;
+      timingOrderUnit = nextUnit;
+      // Carry the amount across the unit change instead of reinterpreting the
+      // number: 5 frames becomes 0.2s, not 5s. The segmented control this select
+      // replaced did this conversion, and it was lost with it.
+      const amountInput = timingOrderBackdropEl.querySelector(".timing-amount-input");
+      const amountRange = timingOrderBackdropEl.querySelector(".timing-amount-range");
+      if (amountInput && amountRange) {
+        const fps = Math.max(1, Number(state.comp && state.comp.frameRate || 30));
+        const seconds = nextUnit === "seconds";
+        const current = Math.max(0, Number(amountInput.value || 0));
+        const converted = seconds ? current / fps : current * fps;
+        amountInput.step = seconds ? "0.05" : "1";
+        amountRange.max = seconds ? "5" : "60";
+        amountRange.step = seconds ? "0.05" : "1";
+        amountInput.value = seconds ? String(Math.round(converted * 100) / 100) : String(Math.round(converted));
+        amountRange.value = amountInput.value;
+        updateTimingOrderRangeFill();
+      }
+      renderTimingOrderPanel();
+      scheduleTimingStaggerApply();
+    });
+  }
+  const directionSelect = timingOrderBackdropEl.querySelector(".timing-direction-select");
+  if (directionSelect) {
+    directionSelect.value = layerOrderDirection;
+    directionSelect.addEventListener("change", () => {
+      layerOrderDirection = directionSelect.value === "desc" ? "desc" : "asc";
+      renderTimingOrderPanel();
+    });
+  }
   const amountRange = timingOrderBackdropEl.querySelector(".timing-amount-range");
   const amountInput = timingOrderBackdropEl.querySelector(".timing-amount-input");
   const groupInput = timingOrderBackdropEl.querySelector(".timing-group-input");
