@@ -11440,6 +11440,19 @@ body.quick-panel-mode .layout-panel-head {
   flex: 0 0 auto;
   gap: 4px !important;
 }
+
+/* Pull / Snap stretches to Stagger's width in the shared column, so its rows
+   have to reach the card's right edge or the whole section reads as pushed
+   left. The Move select takes the slack on its row; the Snap pair is pushed
+   flush right on its own. Sized-to-content rows inside a stretched card is what
+   made this look crooked. */
+#anchorModal .anchor-timing-sections .timing-pull-choices > select {
+  flex: 1 1 auto;
+}
+
+#anchorModal .anchor-timing-sections .timing-pull-row > span:nth-of-type(2) {
+  margin-left: auto;
+}
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {
   display: grid !important;
