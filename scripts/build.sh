@@ -80,8 +80,22 @@ build_bundle() {
 
 build_bundle js/main.js "${js_sources[@]}"
 build_bundle css/style.css "${css_sources[@]}"
+
+# Cache-buster, from the content of what was just built.
+#
+# This used to be a hand-written constant, and it went unchanged from
+# 2026-08-17 through dozens of rebuilds. On macOS the helper is restarted
+# constantly so nothing noticed; WebView2 on Windows keeps a persistent cache
+# and went on serving an August js/main.js against current markup, which is how
+# the tool "stopped working on Windows after a few updates". Hashing the built
+# bundles means the URL changes exactly when their contents do.
+asset_stamp="$(cat js/main.js css/style.css | shasum | cut -c1-12)"
+tmp_html="$(mktemp "${TMPDIR:-/tmp}/ae-panel-html.XXXXXX")"
+# "#" as the delimiter: the alternation below contains "|".
+sed -E "s#(main\.js|style\.css)\?v=[0-9a-zA-Z._-]+#\1?v=${asset_stamp}#g" index.html > "$tmp_html"
+mv "$tmp_html" index.html
 cp index.html quick.html
 
 echo "built: js/main.js (${#js_sources[@]} modules, v${panel_version})"
 echo "built: css/style.css (${#css_sources[@]} modules)"
-echo "built: quick.html"
+echo "built: quick.html (assets stamped ?v=${asset_stamp})"

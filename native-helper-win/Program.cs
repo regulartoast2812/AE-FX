@@ -470,7 +470,6 @@ internal sealed class OverlayWindow : Window
         ['M'] = "mass-edit",
         ['T'] = "text-animation",
         ['O'] = "timing-order",
-        ['X'] = "filter",
         ['D'] = "tnk",
     };
 
@@ -953,6 +952,41 @@ internal sealed class OverlayWindow : Window
         return true;
     }
 
+    /// <summary>
+    /// A group scope is handed over through scope.json beside bridge.json,
+    /// written by TNT_writeQuickPanelScope, because a summon carries no
+    /// arguments. Read once, deleted, and ignored when stale so a scope left
+    /// behind by a crash cannot hijack the next plain summon. Mirrors
+    /// takePendingQuickPanelScope() in the macOS helper - without this the
+    /// Windows overlay opened the launcher instead of the requested group.
+    /// </summary>
+    private static string? TakePendingScope()
+    {
+        var path = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            ".ae-fx-quick-controls",
+            "scope.json");
+        try
+        {
+            if (!File.Exists(path)) return null;
+            var text = File.ReadAllText(path);
+            try { File.Delete(path); } catch (IOException) { } catch (UnauthorizedAccessException) { }
+            using var document = JsonDocument.Parse(text);
+            var root = document.RootElement;
+            if (!root.TryGetProperty("group", out var groupValue)) return null;
+            var group = groupValue.GetString();
+            if (string.IsNullOrEmpty(group)) return null;
+            var stamp = root.TryGetProperty("ts", out var tsValue) && tsValue.TryGetDouble(out var ts) ? ts : 0;
+            var ageSeconds = (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - stamp) / 1000.0;
+            return ageSeconds < 10 ? group : null;
+        }
+        catch (Exception error)
+        {
+            Log.Write($"scope read failed: {error.Message}");
+            return null;
+        }
+    }
+
     private void ShowOverlay(string? control)
     {
         // No AE window means nothing to sit over, and the bridge would fail anyway.
@@ -977,10 +1011,22 @@ internal sealed class OverlayWindow : Window
 
         // Give the page the same beat the macOS helper does before driving it, so a
         // freshly shown WebView has finished its first paint.
-        var script = control is null
-            ? "if (window.__tntQuickPanelDidShow) await window.__tntQuickPanelDidShow();"
-            : "if (window.__tntQuickPanelOpenControl) await window.__tntQuickPanelOpenControl("
-              + JsonSerializer.Serialize(control) + ");";
+        var pendingGroup = control is null ? TakePendingScope() : null;
+        string script;
+        if (control is not null)
+        {
+            script = "if (window.__tntQuickPanelOpenControl) await window.__tntQuickPanelOpenControl("
+                     + JsonSerializer.Serialize(control) + ");";
+        }
+        else if (pendingGroup is not null)
+        {
+            script = "if (window.__tntQuickPanelOpenGroup) await window.__tntQuickPanelOpenGroup("
+                     + JsonSerializer.Serialize(pendingGroup) + ");";
+        }
+        else
+        {
+            script = "if (window.__tntQuickPanelDidShow) await window.__tntQuickPanelDidShow();";
+        }
 
         var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(80) };
         timer.Tick += async (_, _) =>

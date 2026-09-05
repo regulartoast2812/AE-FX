@@ -99,7 +99,6 @@ private func quickPanelControlName(forHotKeyId id: UInt32) -> String? {
     case 15: return "mass-edit"
     case 16: return "text-animation"
     case 17: return "timing-order"
-    case 18: return "filter"
     case 19: return "tnk"
     default: return nil
     }
@@ -127,7 +126,6 @@ private func quickPanelControlName(for event: NSEvent) -> String? {
     case "m": return "mass-edit"
     case "t": return "text-animation"
     case "o": return "timing-order"
-    case "x": return "filter"
     default: return nil
     }
 }

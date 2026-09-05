@@ -9,6 +9,7 @@ target="${1:-all}"
 case "$target" in
   build)
     scripts/build.sh
+    python3 scripts/check-platform-parity.py
     ;;
   js|main)
     scripts/build.sh
@@ -21,9 +22,14 @@ case "$target" in
     scripts/build.sh
     osacompile -l JavaScript -o /tmp/ae_panel_main.scpt js/main.js
     osacompile -l JavaScript -o /tmp/ae_panel_timeline.scpt jsx/timeline.jsx
+    python3 scripts/check-platform-parity.py
+    ;;
+  parity)
+    scripts/build.sh
+    python3 scripts/check-platform-parity.py
     ;;
   *)
-    echo "Usage: scripts/check.sh [all|build|js|jsx]" >&2
+    echo "Usage: scripts/check.sh [all|build|js|jsx|parity]" >&2
     exit 2
     ;;
 esac

@@ -161,6 +161,31 @@ CEP's Chromium predates it. Six rules were inert inside After Effects while
 working in a current browser.
 → Never use it. Set a class in JS.
 
+## Windows is a second target, and nothing here runs it
+
+The panel ships one web bundle and two native helpers - Swift in
+`native-helper/`, C# in `native-helper-win/`. Neither can be built or tested on
+this machine, so Windows regressions are invisible until a user hits them.
+
+`scripts/check-platform-parity.py` (also `scripts/check.sh parity`) is the
+substitute. It fails when:
+
+- the page calls a `window.__tnt*` bridge hook a helper does not implement,
+  unless it is listed in `KNOWN_GAPS` with a reason;
+- a helper still maps a hotkey to a control the panel no longer offers, or
+  offers a control a helper has no hotkey for;
+- `index.html` / `quick.html` carry a `?v=` stamp that does not match the hash
+  of the built bundles.
+
+That last one is how the tool broke on Windows: the `?v=` was a hand-written
+constant, unchanged from 2026-08-17 through dozens of rebuilds. macOS never
+noticed because the helper is restarted constantly, while WebView2 keeps a
+persistent cache and went on serving an August `js/main.js` against September
+markup. `scripts/build.sh` now stamps it from the bundle hash, so the URL
+changes exactly when the contents do.
+
+Run the parity check before saying a change is done.
+
 ## Fix every instance, not the one in front of you
 
 This is the single most expensive recurring mistake in this codebase, measured
