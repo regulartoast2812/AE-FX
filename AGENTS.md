@@ -161,6 +161,40 @@ CEP's Chromium predates it. Six rules were inert inside After Effects while
 working in a current browser.
 → Never use it. Set a class in JS.
 
+## Restarting the native listener
+
+`open` on an app that is already running **activates it, it does not restart
+it**. The helper owns all eleven Carbon hot keys for as long as it lives, so a
+stale instance - older code, or a dead webview - could never be replaced from
+the panel: Start listener re-activated the broken process and reported success,
+and no combination was available for anything else to claim. That is what "the
+listener stopped working entirely" looks like.
+
+Both launch paths therefore kill first and launch second:
+`scripts/launch-native-helper.sh` and `TNT_launchNativeQuickControls` in
+`jsx/timeline.jsx`. Change one, change the other.
+
+The helper also kills duplicates itself at startup, and does it by process name
+via `pgrep -x`, not only through `NSRunningApplication`: an instance started
+straight from `Contents/MacOS` - which the launch fallback does when `open`
+fails - is invisible to LaunchServices. It then waits for them to exit before
+registering, and retries registration, because the keys are not released the
+instant the owner dies.
+
+`registerHotKey` used to drop its `OSStatus` on the floor and
+`applicationDidFinishLaunching` used to `NSApp.terminate` in silence. Both log
+now. **If the listener misbehaves, read `~/.ae-fx-quick-controls/helper.log`
+first** - it records the extension root, how many hot keys registered, and any
+Accessibility skip.
+
+### Accessibility is lost on every rebuild
+`scripts/build-native-helper.sh` signs ad-hoc (`--sign -`), so every build
+changes the code hash and macOS treats it as a new app, discarding the
+Accessibility grant. The Carbon hot keys do not need it, but the
+Control-right-click layer menu does, and it silently stays off. Fixing this
+needs a stable self-signed identity in the login keychain, as PR FX does; this
+machine currently has no signing identities at all.
+
 ## Windows is a second target, and nothing here runs it
 
 The panel ships one web bundle and two native helpers - Swift in

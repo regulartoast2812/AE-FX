@@ -11681,7 +11681,14 @@ function TNT_launchNativeQuickControls(appPath) {
       return TNT_jsonStringify({ ok: false, error: "Native helper app was not found. Run scripts/build-native-helper.sh." });
     }
     var quotedPath = "'" + appFolder.fsName.replace(/'/g, "'\\''") + "'";
-    system.callSystem("open " + quotedPath + " >/dev/null 2>&1 &");
+    var exePath = appFolder.fsName + "/Contents/MacOS/AEFXQuickControls";
+    var exeFile = new File(exePath);
+    var quotedExe = "'" + exeFile.fsName.replace(/'/g, "'\\''") + "'";
+    // Stop any running instance first. `open` on an already-running app only
+    // activates it, so without this a stale helper could never be replaced -
+    // and it keeps ownership of every global hot key while it lives.
+    system.callSystem("pkill -x AEFXQuickControls >/dev/null 2>&1; sleep 0.4; " +
+      "(open " + quotedPath + " || nohup " + quotedExe + " >/dev/null 2>&1 &) >/dev/null 2>&1");
     return TNT_jsonStringify({ ok: true });
   } catch (err) {
     return TNT_jsonStringify({ ok: false, error: String(err) });

@@ -139,17 +139,29 @@ function settingsNodeRequire(moduleName) {
 }
 
 function nativeListenerExtensionRoot() {
+  const normalizeRoot = value => {
+    let root = String(value || "");
+    if (!root) return "";
+    root = root.replace(/^file:\/\//i, "");
+    root = root.replace(/^localhost\//i, "/");
+    root = decodeURIComponent(root);
+    if (isMacPlatform()) {
+      root = root.replace(/\/(?:index|quick)\.html(?:[?#].*)?$/i, "");
+      return root;
+    }
+    root = root.replace(/^\/([A-Za-z]:\/)/, "$1").replace(/\//g, "\\");
+    return root.replace(/\\(?:index|quick)\.html(?:[?#].*)?$/i, "");
+  };
   try {
     if (typeof SystemPath !== "undefined" && cs && typeof cs.getSystemPath === "function") {
       const value = cs.getSystemPath(SystemPath.EXTENSION);
-      if (value) return value;
+      if (value) return normalizeRoot(value);
     }
   } catch (_) {}
   try {
-    let pathname = decodeURIComponent(window.location.pathname || "");
-    if (isMacPlatform() && pathname.charAt(0) === "/") return pathname.replace(/\/[^\/]*$/, "");
-    pathname = pathname.replace(/^\/([A-Za-z]:\/)/, "$1").replace(/\//g, "\\");
-    return pathname.replace(/\\[^\\]*$/, "");
+    const href = window.location && window.location.href ? window.location.href : "";
+    if (href) return normalizeRoot(href);
+    return normalizeRoot(window.location.pathname || "");
   } catch (_) {
     return "";
   }
@@ -173,7 +185,8 @@ function nativeListenerStatus() {
   const artifact = mac
     ? path.join(root, "native", "AE FX Quick Controls.app", "Contents", "MacOS", "AEFXQuickControls")
     : path.join(root, "native-helper-win", "bin", "Release", "net8.0-windows", "AEFXQuickControls.exe");
-  const installed = fs.existsSync(artifact);
+  const appBundle = mac ? path.join(root, "native", "AE FX Quick Controls.app") : "";
+  const installed = fs.existsSync(artifact) || (mac && fs.existsSync(appBundle));
   const active = nativeListenerProcessActive(childProcess, mac);
 
   return {
@@ -225,8 +238,11 @@ function installNativeListener() {
 
 function installMacNativeListener(childProcess, root) {
   const script = `${root}/scripts/launch-native-helper.sh`;
-  childProcess.execFile("/bin/bash", [script], { cwd: root }, error => {
-    statusEl.textContent = error ? `Listener failed: ${error.message}` : "Quick Controls listener is starting.";
+  childProcess.execFile("/bin/bash", [script], { cwd: root }, (error, stdout, stderr) => {
+    const detail = String((stderr || stdout || "")).trim();
+    statusEl.textContent = error
+      ? `Listener failed: ${detail || error.message}`
+      : "Quick Controls listener is starting.";
     if (settingsMenuEl && settingsMenuEl.classList.contains("open")) renderSettingsMenu();
   });
 }

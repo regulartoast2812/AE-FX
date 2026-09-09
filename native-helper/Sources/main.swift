@@ -164,17 +164,67 @@ private func afterEffectsApplication() -> NSRunningApplication? {
     NSRunningApplication.runningApplications(withBundleIdentifier: afterEffectsBundleIdentifier).first
 }
 
-private func terminateDuplicateQuickControlsInstances() {
-    guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return }
+// Every live instance holds the Carbon hot keys, and only one process can own a
+// given combination. A survivor therefore does not just waste memory - it takes
+// the whole shortcut set, and the new instance registers nothing.
+//
+// Two things were wrong here. runningApplications(withBundleIdentifier:) only
+// sees instances LaunchServices started, so anything run straight from
+// Contents/MacOS - which is what the launch script's `open || nohup` fallback
+// does when `open` fails - was invisible and survived. And termination was
+// asynchronous while registerGlobalHotKeys() ran immediately afterwards, so even
+// a visible duplicate usually still owned the keys at that moment.
+private func quickControlsDuplicatePIDs() -> [pid_t] {
     let currentPID = ProcessInfo.processInfo.processIdentifier
-    NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier).forEach { application in
-        guard application.processIdentifier != currentPID else { return }
-        application.terminate()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            if !application.isTerminated {
-                application.forceTerminate()
-            }
+    var pids: [pid_t] = []
+    if let bundleIdentifier = Bundle.main.bundleIdentifier {
+        NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier).forEach { application in
+            let pid = application.processIdentifier
+            if pid != currentPID && !pids.contains(pid) { pids.append(pid) }
         }
+    }
+    // Catches the bare-executable launches LaunchServices never registered.
+    let probe = Process()
+    probe.executableURL = URL(fileURLWithPath: "/usr/bin/pgrep")
+    probe.arguments = ["-x", "AEFXQuickControls"]
+    let pipe = Pipe()
+    probe.standardOutput = pipe
+    probe.standardError = FileHandle.nullDevice
+    if (try? probe.run()) != nil {
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        probe.waitUntilExit()
+        String(data: data, encoding: .utf8)?
+            .split(whereSeparator: { $0.isNewline })
+            .forEach { line in
+                guard let pid = pid_t(line.trimmingCharacters(in: .whitespaces)),
+                      pid != currentPID, !pids.contains(pid) else { return }
+                pids.append(pid)
+            }
+    }
+    return pids
+}
+
+private func terminateDuplicateQuickControlsInstances() {
+    let duplicates = quickControlsDuplicatePIDs()
+    guard !duplicates.isEmpty else { return }
+    tntLog("found \(duplicates.count) older instance(s) holding the hot keys: \(duplicates)")
+    duplicates.forEach { kill($0, SIGTERM) }
+    // Block until they are actually gone. Returning early hands the new instance
+    // a keyboard the old one still owns.
+    let deadline = Date().addingTimeInterval(1.5)
+    while Date() < deadline {
+        let remaining = duplicates.filter { kill($0, 0) == 0 }
+        if remaining.isEmpty {
+            tntLog("older instance(s) exited")
+            return
+        }
+        usleep(40_000)
+    }
+    let stubborn = duplicates.filter { kill($0, 0) == 0 }
+    stubborn.forEach { kill($0, SIGKILL) }
+    if !stubborn.isEmpty {
+        tntLog("force-killed \(stubborn.count) instance(s) that ignored SIGTERM")
+        usleep(200_000)
     }
 }
 
@@ -266,6 +316,10 @@ private func isControlRightMouseDown(_ event: CGEvent) -> Bool {
         !flags.contains(.maskCommand) &&
         !flags.contains(.maskAlternate) &&
         !flags.contains(.maskShift)
+}
+
+private func accessibilityTrustedNoPrompt() -> Bool {
+    AXIsProcessTrusted()
 }
 
 private final class AfterEffectsBridge: NSObject, WKScriptMessageHandler {
@@ -396,14 +450,19 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
     private var activeBridgeExecutions = 0
     private var bridgeFocusGraceUntil = Date.distantPast
     private let launchInBackground = CommandLine.arguments.contains("--background")
+    private var loggedAccessibilitySkip = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         terminateDuplicateQuickControlsInstances()
         activeAppDelegate = self
         guard let extensionRoot = extensionRootURL() else {
+            // This used to terminate in silence, which is indistinguishable from
+            // "the listener stopped working" with nothing to read anywhere.
+            tntLog("FATAL: could not resolve the extension root; the helper cannot load the panel page. Exiting.")
             NSApp.terminate(nil)
             return
         }
+        tntLog("launched: extension root \(extensionRoot.path)")
 
         let configuration = WKWebViewConfiguration()
         let controller = WKUserContentController()
@@ -497,7 +556,20 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         // The NSEvent global monitor duplicates the Carbon hot keys, so running both
         // fires every shortcut twice. It is also the only thing here that needs an
         // Accessibility grant, so it stays off unless Carbon registration failed.
-        let carbonHotKeysReady = registerGlobalHotKeys()
+        var carbonHotKeysReady = registerGlobalHotKeys()
+        // The kernel does not always release a departed owner's hot keys by the
+        // time we ask. Retry briefly before falling back to the monitor that
+        // needs an Accessibility grant.
+        var attempt = 0
+        while !carbonHotKeysReady && attempt < 5 {
+            attempt += 1
+            usleep(120_000)
+            unregisterGlobalHotKeys()
+            carbonHotKeysReady = registerGlobalHotKeys()
+        }
+        if attempt > 0 {
+            tntLog("hotkeys: settled after \(attempt) retry attempt(s), ready=\(carbonHotKeysReady)")
+        }
         startControlRightClickMonitor()
         if !carbonHotKeysReady {
             startGlobalShortcutFallbackMonitor()
@@ -756,6 +828,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
     }
 
     private func startGlobalShortcutFallbackMonitor() {
+        guard accessibilityTrustedNoPrompt() else {
+            logAccessibilitySkip("global shortcut fallback")
+            return
+        }
         globalShortcutMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
             if isQuickPanelSummonShortcut(event) {
                 DispatchQueue.main.async {
@@ -772,6 +848,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
 
     private func startControlRightClickMonitor() {
         guard rightClickEventTap == nil else { return }
+        guard accessibilityTrustedNoPrompt() else {
+            logAccessibilitySkip("Control-right-click monitor")
+            return
+        }
         let mask = CGEventMask(1 << CGEventType.rightMouseDown.rawValue)
         let callback: CGEventTapCallBack = { _, type, event, _ in
             guard type == .rightMouseDown, isControlRightMouseDown(event) else {
@@ -790,6 +870,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             callback: callback,
             userInfo: nil
         ) else {
+            guard accessibilityTrustedNoPrompt() else {
+                logAccessibilitySkip("Control-right-click fallback")
+                return
+            }
             rightClickFallbackMonitor = NSEvent.addGlobalMonitorForEvents(matching: .rightMouseDown) { event in
                 let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
                 guard flags.contains(.control),
@@ -809,6 +893,12 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             CFRunLoopAddSource(CFRunLoopGetMain(), rightClickRunLoopSource, .commonModes)
         }
         CGEvent.tapEnable(tap: tap, enable: true)
+    }
+
+    private func logAccessibilitySkip(_ feature: String) {
+        guard !loggedAccessibilitySkip else { return }
+        loggedAccessibilitySkip = true
+        tntLog("Accessibility is not trusted yet; skipping \(feature) without prompting.")
     }
 
     // Plain C opens TNK - the binding TNK v3 always used inside After Effects.
@@ -872,18 +962,27 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             nil,
             &hotKeyEventHandler
         )
-        guard installStatus == noErr else { return false }
+        guard installStatus == noErr else {
+            tntLog("FATAL: InstallEventHandler failed with OSStatus \(installStatus); no global hotkey will fire.")
+            return false
+        }
 
         let requested: [(keyCode: Int, id: UInt32)] = [
             (kVK_Space, 1), (kVK_ANSI_K, 2),
             (kVK_ANSI_A, 10), (kVK_ANSI_C, 11), (kVK_ANSI_E, 12), (kVK_ANSI_F, 13),
             (kVK_ANSI_S, 14), (kVK_ANSI_M, 15), (kVK_ANSI_T, 16), (kVK_ANSI_O, 17),
-            (kVK_ANSI_X, 18), (kVK_ANSI_D, 19)
+            (kVK_ANSI_D, 19)
         ]
         requested.forEach { entry in
             registerHotKey(keyCode: UInt32(entry.keyCode), modifiers: UInt32(controlKey), id: entry.id)
         }
-        return hotKeyRefs.count == requested.count
+        let registered = hotKeyRefs.count
+        if registered == requested.count {
+            tntLog("hotkeys: registered all \(registered)")
+        } else {
+            tntLog("hotkeys: registered \(registered) of \(requested.count) - the rest are taken by another app")
+        }
+        return registered == requested.count
     }
 
     private func registerHotKey(keyCode: UInt32, modifiers: UInt32, id: UInt32) {
@@ -899,6 +998,8 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         )
         if status == noErr, let ref {
             hotKeyRefs.append(ref)
+        } else {
+            tntLog("hotkey id \(id) (keyCode \(keyCode)) failed to register: OSStatus \(status)")
         }
     }
 

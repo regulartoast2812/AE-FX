@@ -728,11 +728,23 @@ function resumePanelSync() {
 }
 
 function extensionRootPath() {
-  if (window.__TNT_EXTENSION_PATH__) return String(window.__TNT_EXTENSION_PATH__);
+  const normalizeRoot = value => {
+    let root = String(value || "");
+    if (!root) return "";
+    root = root.replace(/^file:\/\//i, "");
+    root = root.replace(/^localhost\//i, "/");
+    root = decodeURIComponent(root);
+    if (/mac/i.test(platformLabel())) {
+      return root.replace(/\/(?:index|quick)\.html(?:[?#].*)?$/i, "");
+    }
+    return root
+      .replace(/^\/([A-Za-z]:\/)/, "$1")
+      .replace(/\//g, "\\")
+      .replace(/\\(?:index|quick)\.html(?:[?#].*)?$/i, "");
+  };
+  if (window.__TNT_EXTENSION_PATH__) return normalizeRoot(window.__TNT_EXTENSION_PATH__);
   try {
-    const url = new URL(window.location.href);
-    const path = decodeURIComponent(url.pathname || "");
-    return path.replace(/\/(?:index|quick)\.html$/i, "");
+    return normalizeRoot(window.location.href || window.location.pathname || "");
   } catch (_) {
     return "";
   }
