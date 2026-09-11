@@ -287,7 +287,7 @@ function ensureTimingOrderPanel() {
           </div>
           <div class="timing-execute-actions order-stack-actions" role="group" aria-label="Send selected layers">
             <button type="button" data-order-stack="top" data-icon="arrow-up-to-line" data-tooltip="Send to Top\nMove the selected layers to the top of the composition stack while preserving their order."><strong>Send to top</strong><span>Top of layer stack</span></button>
-            <button type="button" data-order-stack="reverse" data-icon="flip-vertical-2" data-tooltip="Flip Layer Order\nReverse the selected layers inside their current stack slots."><strong>Flip order</strong><span>Reverse selected stack</span></button>
+            <button type="button" data-order-stack="reverse" data-icon="flip-vertical-2" data-tooltip="Reverse Layer Order  (R)\nReverse the selected layers inside their current stack slots. The unselected layers do not move."><strong>Reverse</strong><span>Reverse selected stack</span></button>
             <button type="button" data-order-stack="bottom" data-icon="arrow-down-to-line" data-tooltip="Send to Bottom\nMove the selected layers to the bottom of the composition stack while preserving their order."><strong>Send to bottom</strong><span>Bottom of layer stack</span></button>
           </div>
         </div>

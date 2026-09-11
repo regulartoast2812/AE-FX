@@ -293,6 +293,22 @@ async function centerSelectedAnchorPoints() {
 // advances to its next option, and Stagger - whose mode is three buttons rather
 // than a dropdown - steps to its next mode. One key moves the whole panel's
 // state forward without reaching for anything.
+// R reverses the selected layers inside their own stack slots, while the Layout
+// panel is open. It goes through the button rather than calling the action
+// directly so it inherits the disabled state the panel already computes for the
+// current selection - a key that fires when the button is greyed out would be
+// the one case the panel cannot explain.
+//
+// Like backtick, it does nothing anywhere else rather than being claimed
+// globally: R is Rotation in After Effects and has to stay that way.
+function reverseLayerOrderIfAnchorOpen() {
+  if (!anchorModalEl || !anchorModalEl.classList.contains("show")) return;
+  const button = anchorModalEl.querySelector('[data-order-stack="reverse"]');
+  if (!button || button.disabled) return;
+  button.click();
+  if (statusEl) statusEl.textContent = "Reversed the selected layer order.";
+}
+
 function toggleAlignTargetIfAnchorOpen() {
   if (!anchorModalEl || !anchorModalEl.classList.contains("show")) return;
   // The stagger mode first: clicking it re-renders the sections, and the select
@@ -409,6 +425,7 @@ const SHORTCUT_ACTIONS = {
   "shift+alt+arrowup": () => moveSelectedLayersInStack("top"),
   "shift+alt+arrowdown": () => moveSelectedLayersInStack("bottom"),
   "`": toggleAlignTargetIfAnchorOpen,
+  "r": reverseLayerOrderIfAnchorOpen,
   "escape": closeActivePopup,
   "space": togglePlay,
   "a": () => openSubpanelByKey("anchor"),

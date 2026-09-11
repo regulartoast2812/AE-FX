@@ -9,6 +9,7 @@
 // applied at lookup rather than baked into each entry, so adding a word is a
 // line here rather than an edit to a registry row.
 const TNT_COMMAND_ALIASES = {
+  "Flip Layer Order": "reverse invert backwards flip stack order",
   "Delete All Effects": "remove clear strip wipe purge",
   "Delete All Keyframes": "remove clear strip wipe purge keys",
   "Delete All Expressions": "remove clear strip wipe purge",

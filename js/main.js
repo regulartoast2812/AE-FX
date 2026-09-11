@@ -2135,6 +2135,7 @@ const TNT_REQUIREMENT_LABELS = {
 // applied at lookup rather than baked into each entry, so adding a word is a
 // line here rather than an edit to a registry row.
 const TNT_COMMAND_ALIASES = {
+  "Flip Layer Order": "reverse invert backwards flip stack order",
   "Delete All Effects": "remove clear strip wipe purge",
   "Delete All Keyframes": "remove clear strip wipe purge keys",
   "Delete All Expressions": "remove clear strip wipe purge",
@@ -11306,7 +11307,7 @@ function ensureTimingOrderPanel() {
           </div>
           <div class="timing-execute-actions order-stack-actions" role="group" aria-label="Send selected layers">
             <button type="button" data-order-stack="top" data-icon="arrow-up-to-line" data-tooltip="Send to Top\nMove the selected layers to the top of the composition stack while preserving their order."><strong>Send to top</strong><span>Top of layer stack</span></button>
-            <button type="button" data-order-stack="reverse" data-icon="flip-vertical-2" data-tooltip="Flip Layer Order\nReverse the selected layers inside their current stack slots."><strong>Flip order</strong><span>Reverse selected stack</span></button>
+            <button type="button" data-order-stack="reverse" data-icon="flip-vertical-2" data-tooltip="Reverse Layer Order  (R)\nReverse the selected layers inside their current stack slots. The unselected layers do not move."><strong>Reverse</strong><span>Reverse selected stack</span></button>
             <button type="button" data-order-stack="bottom" data-icon="arrow-down-to-line" data-tooltip="Send to Bottom\nMove the selected layers to the bottom of the composition stack while preserving their order."><strong>Send to bottom</strong><span>Bottom of layer stack</span></button>
           </div>
         </div>
@@ -11891,6 +11892,22 @@ async function centerSelectedAnchorPoints() {
 // advances to its next option, and Stagger - whose mode is three buttons rather
 // than a dropdown - steps to its next mode. One key moves the whole panel's
 // state forward without reaching for anything.
+// R reverses the selected layers inside their own stack slots, while the Layout
+// panel is open. It goes through the button rather than calling the action
+// directly so it inherits the disabled state the panel already computes for the
+// current selection - a key that fires when the button is greyed out would be
+// the one case the panel cannot explain.
+//
+// Like backtick, it does nothing anywhere else rather than being claimed
+// globally: R is Rotation in After Effects and has to stay that way.
+function reverseLayerOrderIfAnchorOpen() {
+  if (!anchorModalEl || !anchorModalEl.classList.contains("show")) return;
+  const button = anchorModalEl.querySelector('[data-order-stack="reverse"]');
+  if (!button || button.disabled) return;
+  button.click();
+  if (statusEl) statusEl.textContent = "Reversed the selected layer order.";
+}
+
 function toggleAlignTargetIfAnchorOpen() {
   if (!anchorModalEl || !anchorModalEl.classList.contains("show")) return;
   // The stagger mode first: clicking it re-renders the sections, and the select
@@ -12007,6 +12024,7 @@ const SHORTCUT_ACTIONS = {
   "shift+alt+arrowup": () => moveSelectedLayersInStack("top"),
   "shift+alt+arrowdown": () => moveSelectedLayersInStack("bottom"),
   "`": toggleAlignTargetIfAnchorOpen,
+  "r": reverseLayerOrderIfAnchorOpen,
   "escape": closeActivePopup,
   "space": togglePlay,
   "a": () => openSubpanelByKey("anchor"),
