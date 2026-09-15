@@ -237,9 +237,20 @@
   min-width: 0;
 }
 
-.text-animation-field.text-animation-properties,
-.text-animation-field.text-animation-duration {
+/* Animate pairs with Style on the first row - both say what kind of animation
+   this is - so it is no longer full width. Seconds and Apply still are. */
+.text-animation-field.text-animation-duration,
+.text-animation-field.text-animation-apply-row {
   grid-column: 1 / -1;
+}
+
+/* Apply is the only action in the panel. A rule above it separates the settings
+   from the thing that commits them, so the panel reads top to bottom and ends
+   on the action rather than burying it in the middle of the grid. */
+.text-animation-field.text-animation-apply-row {
+  margin-top: 3px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,.075);
 }
 
 .text-animation-properties .text-animation-checks {

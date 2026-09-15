@@ -10812,14 +10812,14 @@ function ensureTextAnimationPanel() {
                 <button type="button" data-text-option="style" data-value="bounce">Bounce</button>
               </div>
             </label>
-            <label class="text-animation-field">
-              <span>Apply:</span>
-              <div class="text-animation-segmented" data-text-option-group="mode">
-                <button type="button" data-text-option="mode" data-value="in" aria-label="Apply animate in" data-tooltip="Apply In\nBuild the entrance animation from the settings above. The highlight shows the last mode applied.">${tntIconSvg("log-in")}</button>
-                <button type="button" data-text-option="mode" data-value="out" aria-label="Apply animate out" data-tooltip="Apply Out\nBuild the exit animation from the settings above.">${tntIconSvg("log-out")}</button>
-                <button type="button" data-text-option="mode" data-value="both" aria-label="Apply animate in and out" data-tooltip="Apply In and Out\nBuild both the entrance and the exit from the settings above.">${tntIconSvg("arrow-left-right")}</button>
+            <div class="text-animation-field text-animation-properties">
+              <span>Animate:</span>
+              <div class="text-animation-checks">
+                <button type="button" data-text-toggle="usePosition" aria-label="Animate position" aria-pressed="false" data-tooltip="Position\nInclude movement in the text animation.">${tntIconSvg("move")}</button>
+                <button type="button" data-text-toggle="useOpacity" aria-label="Animate opacity" aria-pressed="false" data-tooltip="Opacity\nInclude fading in the text animation.">${tntIconSvg("blend")}</button>
+                <button type="button" data-text-toggle="useScale" aria-label="Animate scale" aria-pressed="false" data-tooltip="Scale\nInclude scaling in the text animation.">${tntIconSvg("scaling")}</button>
               </div>
-            </label>
+            </div>
             <label class="text-animation-field">
               <span>Move:</span>
               <div class="text-animation-segmented direction" data-text-option-group="direction">
@@ -10837,14 +10837,6 @@ function ensureTextAnimationPanel() {
                 <button type="button" data-text-option="basedOn" data-value="4" aria-label="By lines" data-tooltip="By Lines\nStagger the animation one line at a time.">${tntIconSvg("wrap-text")}</button>
               </div>
             </label>
-            <div class="text-animation-field text-animation-properties">
-              <span>Animate:</span>
-              <div class="text-animation-checks">
-                <button type="button" data-text-toggle="usePosition" aria-label="Animate position" aria-pressed="false" data-tooltip="Position\nInclude movement in the text animation.">${tntIconSvg("move")}</button>
-                <button type="button" data-text-toggle="useOpacity" aria-label="Animate opacity" aria-pressed="false" data-tooltip="Opacity\nInclude fading in the text animation.">${tntIconSvg("blend")}</button>
-                <button type="button" data-text-toggle="useScale" aria-label="Animate scale" aria-pressed="false" data-tooltip="Scale\nInclude scaling in the text animation.">${tntIconSvg("scaling")}</button>
-              </div>
-            </div>
             <div class="text-animation-field text-animation-duration">
               <span>Seconds:</span>
               <div class="text-animation-times">
@@ -10852,6 +10844,14 @@ function ensureTextAnimationPanel() {
                 <label><span>Out</span><input type="number" min="0" step="0.05" data-text-number="outTime"></label>
               </div>
             </div>
+            <label class="text-animation-field text-animation-apply-row">
+              <span>Apply:</span>
+              <div class="text-animation-segmented" data-text-option-group="mode">
+                <button type="button" data-text-option="mode" data-value="in" aria-label="Apply animate in" data-tooltip="Apply In\nBuild the entrance animation from the settings above. The highlight shows the last mode applied.">${tntIconSvg("log-in")}</button>
+                <button type="button" data-text-option="mode" data-value="out" aria-label="Apply animate out" data-tooltip="Apply Out\nBuild the exit animation from the settings above.">${tntIconSvg("log-out")}</button>
+                <button type="button" data-text-option="mode" data-value="both" aria-label="Apply animate in and out" data-tooltip="Apply In and Out\nBuild both the entrance and the exit from the settings above.">${tntIconSvg("arrow-left-right")}</button>
+              </div>
+            </label>
           </div>
           <div class="text-animation-presets">
           <div class="text-animation-section-head">
