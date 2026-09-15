@@ -14,28 +14,42 @@
 }
 
 .text-animation-dialog {
-  width: min(760px, calc(100vw - 24px));
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,.115);
-  border-radius: var(--tnt-radius-panel, 14px);
-  background:
-    linear-gradient(135deg, rgba(255,255,255,.050), rgba(255,255,255,.014) 42%, rgba(0,0,0,.16)),
-    rgba(18,19,21,.91);
-  box-shadow: inset 0 1px rgba(255,255,255,.055), 0 20px 48px rgba(0,0,0,.42);
+  width: fit-content;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   color: rgba(245,245,247,.88);
-  -webkit-backdrop-filter: blur(20px) saturate(114%);
-  backdrop-filter: blur(20px) saturate(114%);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
-.text-animation-head {
+.text-animation-head.layout-panel-head {
   display: flex;
-  min-height: 42px;
+  min-height: 26px !important;
+  height: 26px !important;
+  max-height: 26px !important;
+  box-sizing: border-box;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 0 10px 0 11px;
-  border-bottom: 1px solid rgba(255,255,255,.085);
+  gap: 10px;
+  padding: 0 2px !important;
+  margin-bottom: 8px;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
+
+.text-animation-head .layout-panel-name {
+  font-family: "Ivory LL Web", "IvoryLLWeb-Light", "Iowan Old Style", Baskerville, Georgia, serif !important;
+  font-size: 17px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+.text-animation-head .text-animation-count { color: rgba(235,235,245,.62); font-size: 11px; }
+.text-animation-head .text-animation-close { margin-left: auto; }
 
 .text-animation-title {
   display: flex;
@@ -70,8 +84,12 @@
 }
 
 .text-animation-close {
-  width: 24px;
-  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 26px;
+  height: 26px;
   border: 1px solid rgba(255,255,255,.10);
   border-radius: var(--tnt-radius-control, 6px);
   background: rgba(255,255,255,.04);
@@ -87,24 +105,42 @@
 
 .text-animation-body {
   display: grid;
-  grid-template-columns: minmax(180px, .75fr) minmax(310px, 1.25fr);
-  gap: 8px;
-  padding: 10px 11px 8px;
+  grid-template-columns: max-content 400px;
+  align-items: start;
+  gap: 5px;
+  padding: 0;
 }
 
 .text-animation-builder {
-  grid-row: span 2;
+  grid-row: auto;
 }
 
 .text-animation-section {
   display: grid;
   align-content: start;
-  gap: 8px;
+  gap: 5px;
   min-width: 0;
-  padding: 9px;
-  border: 1px solid rgba(255,255,255,.075);
-  border-radius: var(--tnt-radius-node, 7px);
-  background: rgba(0,0,0,.18);
+  padding: 10px;
+  /* The exact card the A panel uses. This was rgba(17,18,18,.86) behind a 9px
+     blur - thin enough that whatever sits behind the overlay tints the panel,
+     which is the same complaint the Layout sections had before they were given
+     a real ground. Radius 12 and border .105 to match as well. */
+  border: 1px solid rgba(255,255,255,.105);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.014) 40%, rgba(0,0,0,.16)),
+    rgba(20,21,23,.93);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 8px 24px rgba(0,0,0,.45);
+  -webkit-backdrop-filter: blur(22px) saturate(116%);
+  backdrop-filter: blur(22px) saturate(116%);
+}
+
+.text-animation-section-head.text-animation-builder-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .text-animation-section-head {
@@ -112,10 +148,15 @@
   gap: 2px;
 }
 
+/* The A panel's card titles are a quiet 9px/.42 micro-label - ANCHOR, ALIGN,
+   STAGGER. These were 11px/.88 semibold, which made the headings louder than
+   the controls under them. */
 .text-animation-section-head strong {
-  color: rgba(245,245,247,.88);
-  font-size: 10px;
-  font-weight: 650;
+  color: rgba(235,235,245,.42);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: .05em;
+  text-transform: uppercase;
 }
 
 .text-animation-section-head span {
@@ -129,14 +170,28 @@
   gap: 6px;
 }
 
+.text-animation-command-row {
+  grid-template-columns: repeat(2, 26px);
+  gap: 5px;
+}
+
+.text-animation-command-row button {
+  padding: 0 !important;
+  width: 26px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
 .text-animation-command-row button,
 .text-animation-preset-grid button,
 .text-animation-apply {
   display: grid;
-  min-height: 38px;
+  min-height: 26px;
   align-content: center;
   gap: 2px;
-  padding: 6px 8px;
+  height: 26px;
+  padding: 0 7px;
   border: 1px solid rgba(255,255,255,.085);
   border-radius: var(--tnt-radius-node, 7px);
   background: rgba(255,255,255,.03);
@@ -157,12 +212,13 @@
 .text-animation-command-row strong,
 .text-animation-preset-grid strong,
 .text-animation-apply {
-  font-size: 9px;
-  font-weight: 650;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .text-animation-command-row span,
 .text-animation-preset-grid span {
+  display: none;
   color: rgba(235,235,245,.45);
   font-size: 7px;
 }
@@ -170,34 +226,65 @@
 .text-animation-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 5px 10px;
 }
 
 .text-animation-field {
   display: grid;
-  gap: 5px;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
   min-width: 0;
 }
 
-.text-animation-field > span {
-  color: rgba(235,235,245,.48);
-  font-size: 8px;
-  font-weight: 650;
-  text-transform: uppercase;
+.text-animation-field.text-animation-properties,
+.text-animation-field.text-animation-duration {
+  grid-column: 1 / -1;
 }
 
+.text-animation-properties .text-animation-checks {
+  display: flex;
+  gap: 4px;
+}
+
+/* Same inline label as Align to: / Direction: in the A panel. The column stays
+   a fixed width so the labels line up down the panel, which per-field auto
+   widths would not do. */
+.text-animation-field > span {
+  color: rgba(235,235,245,.66);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* No container chrome. These were troughs - a bordered, filled box with 3px
+   between transparent buttons - which is what made them read as one welded
+   control. The A panel gives every button its own border and fill and spaces
+   them 4px apart, and nothing wraps them. */
 .text-animation-segmented {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 3px;
-  padding: 3px;
-  border: 1px solid rgba(255,255,255,.075);
-  border-radius: 7px;
-  background: rgba(5,6,7,.30);
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
 }
 
 .text-animation-segmented.direction {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: flex;
+  width: fit-content;
+}
+
+.text-animation-segmented[data-text-option-group="mode"] {
+  display: flex;
+  width: fit-content;
+}
+
+.text-animation-segmented.direction button,
+.text-animation-segmented[data-text-option-group="mode"] button {
+  flex: 0 0 26px;
+  width: 26px;
+  padding: 0;
 }
 
 .text-animation-segmented.based-on {
@@ -205,40 +292,89 @@
 }
 
 .text-animation-segmented button {
-  min-height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
   padding: 0 6px;
-  border: 1px solid transparent;
+  border: 1px solid rgba(255,255,255,.14);
   border-radius: 5px;
-  background: transparent;
-  color: rgba(235,235,245,.56);
+  background: rgba(255,255,255,.05);
+  color: rgba(235,235,245,.5);
   font: inherit;
-  font-size: 8px;
+  font-size: 11px;
 }
 
-.text-animation-segmented button:hover,
+.text-animation-dialog svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+}
+
 .text-animation-segmented button.active {
-  border-color: rgba(217,119,66,.34);
-  background: rgba(217,119,66,.13);
-  color: rgba(255,238,228,.95);
+  border-color: rgba(217,119,66,.55);
+  background: rgba(217,119,66,.22);
+  color: #fff;
+}
+
+.text-animation-segmented button:hover {
+  background: rgba(255,255,255,.08);
+  color: rgba(245,245,247,.9);
+}
+
+.text-animation-segmented button.active:hover {
+  background: rgba(217,119,66,.30);
+  color: #fff;
 }
 
 .text-animation-checks {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 5px;
+  grid-template-columns: repeat(3, auto);
+  gap: 4px;
 }
 
-.text-animation-checks label {
+.text-animation-checks button {
   display: flex;
   align-items: center;
-  gap: 5px;
-  min-height: 26px;
-  padding: 0 7px;
-  border: 1px solid rgba(255,255,255,.075);
-  border-radius: var(--tnt-radius-control, 6px);
-  background: rgba(255,255,255,.03);
-  color: rgba(235,235,245,.66);
-  font-size: 8px;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  padding: 0;
+  /* Same box as every other button in the panel. This one kept a fainter
+     border, no fill and brighter text, so the Animate row read as a different
+     kind of control from the rows above it. */
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 5px;
+  background: rgba(255,255,255,.05);
+  color: rgba(235,235,245,.5);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.text-animation-checks button:hover {
+  background: rgba(255,255,255,.08);
+  color: rgba(245,245,247,.9);
+}
+
+.text-animation-checks button.active {
+  border-color: rgba(217,119,66,.55);
+  background: rgba(217,119,66,.22);
+  color: #fff;
+}
+
+.text-animation-checks button.active:hover {
+  background: rgba(217,119,66,.30);
+}
+
+.text-animation-checks button:focus-visible {
+  outline: 1px solid #d97742;
+  outline-offset: 2px;
 }
 
 .text-animation-times {
@@ -252,26 +388,31 @@
   grid-template-columns: 22px minmax(0, 1fr);
   align-items: center;
   gap: 5px;
-  color: rgba(235,235,245,.56);
-  font-size: 8px;
+  color: rgba(235,235,245,.66);
+  font-size: 11px;
 }
 
 .text-animation-times input {
   box-sizing: border-box;
   width: 100%;
-  height: 25px;
+  height: 26px;
   padding: 0 6px;
-  border: 1px solid rgba(255,255,255,.11);
-  border-radius: var(--tnt-radius-control, 6px);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 5px;
   outline: none;
-  background: rgba(0,0,0,.28);
-  color: rgba(245,245,247,.90);
+  /* The A panel's number fields sit slightly raised on the card; this one was a
+     sunken near-black well, which read as a different control family. */
+  background: rgba(255,255,255,.07);
+  color: rgba(245,245,247,.94);
   font: inherit;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .text-animation-apply {
-  min-height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
   justify-content: center;
   border-color: rgba(217,119,66,.24);
   background: rgba(217,119,66,.12);
@@ -280,13 +421,34 @@
 
 .text-animation-error {
   min-height: 12px;
-  padding: 0 11px 9px;
+  padding: 0;
   color: #efa0a0;
-  font-size: 8px;
+  font-size: 11px;
+}
+
+.text-animation-error:empty {
+  display: none;
+}
+
+.text-animation-presets {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  margin-top: 0;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255,255,255,.085);
 }
 
 .text-animation-preset-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+}
+
+.text-animation-preset-grid button {
+  flex: 1 0 auto;
+  white-space: nowrap;
+  text-align: center;
 }
 
 .text-animation-preset-grid button:disabled,
@@ -295,13 +457,14 @@
   cursor: default;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 560px) {
   .text-animation-dialog {
-    width: min(360px, calc(100vw - 18px));
+    width: min(340px, calc(100vw - 24px));
   }
 
   .text-animation-body,
   .text-animation-grid {
     grid-template-columns: 1fr;
   }
+
 }

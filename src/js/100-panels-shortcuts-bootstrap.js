@@ -2952,7 +2952,9 @@ function renderAssistantHistoryMenu() {
     .slice()
     .sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")));
   if (!sessions.length) {
-    assistantHistoryMenuEl.innerHTML = `<div class="assistant-history-empty">No saved chats yet.</div>`;
+    assistantHistoryMenuEl.innerHTML = `
+      <div class="assistant-history-empty">No saved chats yet.</div>
+      <button type="button" class="assistant-history-clear" data-assistant-clear-history>Clear chat history</button>`;
     return;
   }
   assistantHistoryMenuEl.innerHTML = sessions.map(session => `
@@ -2960,7 +2962,20 @@ function renderAssistantHistoryMenu() {
       <strong>${escapeHtml(session.title || "New session")}</strong>
       <span>${escapeHtml(providerLabel(session.provider || assistantProvider))} · ${escapeHtml(assistantHistoryDateLabel(session.updatedAt))} · ${(session.messages || []).length} messages</span>
     </button>
-  `).join("");
+  `).join("") + `<button type="button" class="assistant-history-clear" data-assistant-clear-history>Clear chat history</button>`;
+}
+
+function clearAssistantHistory() {
+  assistantSessions = [];
+  assistantCurrentSessionId = "";
+  if (assistantStorageAvailable()) {
+    try { window.localStorage.removeItem(ASSISTANT_HISTORY_STORAGE_KEY); } catch (_) {}
+  }
+  const session = createAssistantSession();
+  renderAssistantSession(session);
+  renderAssistantHistoryMenu();
+  closeAssistantHistoryMenu();
+  if (assistantChatInputEl) assistantChatInputEl.focus();
 }
 
 function toggleAssistantHistoryMenu() {
@@ -3423,6 +3438,11 @@ if (assistantHubEl) {
     const historyButton = event.target.closest && event.target.closest("[data-assistant-history]");
     if (historyButton) {
       toggleAssistantHistoryMenu();
+      return;
+    }
+    const clearHistory = event.target.closest && event.target.closest("[data-assistant-clear-history]");
+    if (clearHistory) {
+      clearAssistantHistory();
       return;
     }
     const historyItem = event.target.closest && event.target.closest("[data-assistant-session-id]");

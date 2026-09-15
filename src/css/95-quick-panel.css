@@ -1121,6 +1121,18 @@ body.quick-panel-mode .timing-order-layout {
   box-shadow: none !important;
 }
 
+/* Text tools use independent surfaces, like the A/Layout group. Override the
+   shared native-dialog glass here; otherwise it repaints their empty wrapper. */
+body.quick-panel-mode .text-animation-dialog {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
 /* A command the current selection cannot satisfy. Dimmed, never hidden: it
    stays findable and its tooltip says what is missing. */
 .quick-panel-search-result.unmet {

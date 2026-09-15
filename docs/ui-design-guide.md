@@ -289,6 +289,22 @@ Before adding a new control:
 
 ### Compact utility panels
 
+- Text animation settings pair Style/Mode and Move/By in two columns, with shared full-width property and duration rows. Use 26px fixed-height buttons and 5px row gaps; the desktop Animation surface is 400px wide. Keep its header's flex selector more specific than the shared section heading rule. Short preset labels retain full descriptions in tooltips.
+
+- The Text Animation group has an unpainted serif group title, one selection count, and a close control above independent Functions and Animation surfaces. Keep the native quick-panel wrapper transparent too, overriding the shared dialog glass in `95-quick-panel.css`.
+
+### Panel Group Philosophy
+
+- Start with the operation and its scope: one unframed serif title and one accurate selection summary per group. Never repeat selection badges inside each surface.
+- Separate working groups by purpose, not arbitrary widget counts. Each surface owns its background; the enclosing group has no fill, border, or blur.
+- Use 26px square icons for recognizable commands and spatial modes, with shared tooltips and accessible names. Keep words for choices whose icons would need guessing, such as Characters/Words/Lines or named presets. Independent icon properties use a single toggle button with highlighted on and neutral off states plus aria-pressed; never add a checkbox beside the same icon. Use numeric inputs for exact values.
+- Settings precede a deliberate Apply command. Presets are a compact bottom row of immediate actions; do not let preset descriptions become permanent body copy.
+- Size groups from their contents. Use consistent 5px gaps and 10px insets, stable control dimensions, and narrow-screen stacking. Verify computed styles and icon centers in quick.html.
+- Mass Edit should communicate Source -> Targets once, with the source selector and target count visible. Group Copy Effects/Copy Keys as Transfer, the property/value/Apply controls as Value, and Link/Unlink as Links. Use tooltips for explanations; keep source, property, value and target scope as visible labels. Distinguish append, overwrite and expression linking in action names or tooltips. Do not merge these different operations into an ambiguous Apply All.
+- This is the intended Mass Edit design contract; its existing panel has not yet been migrated to this layout.
+
+- Text Animation follows the A/Layout group: Functions and Animation sit side by side with 5px gaps, 10px insets, 26px controls, and inline field labels. Presets form an unframed horizontal row at the bottom of Animation, scrolling on narrow screens. At narrow widths the two sections stack. Keep preset descriptions in tooltips and preserve data attributes when rearranging controls.
+
 - Secondary utility panels should use the same compact density as the timeline: approximately 40-44px headers, 22-28px controls, and 8-12px internal padding.
 - Do not let a two-function utility panel approach the size of the Style or Ease editors unless its content genuinely needs that workspace.
 - Every icon-only, abbreviated, or workflow-specific control must use the shared multiline panel tooltip, with the action name on the first line and the behavior on the next line.

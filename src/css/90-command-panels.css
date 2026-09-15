@@ -1571,6 +1571,23 @@ body:not(.quick-panel-mode) #assistantHub {
   padding: 8px;
 }
 
+.assistant-history-clear {
+  display: block;
+  width: calc(100% - 16px);
+  margin: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(223,119,85,.4);
+  border-radius: 6px;
+  background: rgba(223,119,85,.1);
+  color: #f09a78;
+  cursor: pointer;
+  text-align: left;
+}
+
+.assistant-history-clear:hover {
+  background: rgba(223,119,85,.2);
+}
+
 
 
 
