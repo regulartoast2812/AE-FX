@@ -10921,7 +10921,9 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  gap: 5px;
+  /* 8, like every other label-to-control pair in this panel. This one was 5,
+     the single place the A panel broke its own spacing rule. */
+  gap: 8px;
   margin: 0;
   padding: 0;
 }
@@ -15372,7 +15374,7 @@ body .ease-dialog-title {
 
 .text-animation-command-row {
   grid-template-columns: repeat(2, 26px);
-  gap: 5px;
+  gap: 4px;
 }
 
 .text-animation-command-row button {
@@ -15440,7 +15442,9 @@ body .ease-dialog-title {
   display: grid;
   grid-template-columns: 54px minmax(0, 1fr);
   align-items: center;
-  gap: 6px;
+  /* 8px label to control, the A panel's standard: Align to:, Direction:,
+     Timing: and Pull: all sit 8 from their control. This was 6. */
+  gap: 8px;
   min-width: 0;
 }
 
@@ -15608,14 +15612,14 @@ body .ease-dialog-title {
    a 170px box. They hold "0.35" and nothing longer. */
 .text-animation-times {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .text-animation-times label {
   display: grid;
   grid-template-columns: 22px minmax(0, 1fr);
   align-items: center;
-  gap: 5px;
+  gap: 8px;
   color: rgba(235,235,245,.66);
   font-size: 11px;
 }
@@ -15674,7 +15678,7 @@ body .ease-dialog-title {
 .text-animation-preset-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 4px;
 }
 
 .text-animation-preset-grid button {

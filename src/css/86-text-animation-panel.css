@@ -174,7 +174,7 @@
 
 .text-animation-command-row {
   grid-template-columns: repeat(2, 26px);
-  gap: 5px;
+  gap: 4px;
 }
 
 .text-animation-command-row button {
@@ -242,7 +242,9 @@
   display: grid;
   grid-template-columns: 54px minmax(0, 1fr);
   align-items: center;
-  gap: 6px;
+  /* 8px label to control, the A panel's standard: Align to:, Direction:,
+     Timing: and Pull: all sit 8 from their control. This was 6. */
+  gap: 8px;
   min-width: 0;
 }
 
@@ -410,14 +412,14 @@
    a 170px box. They hold "0.35" and nothing longer. */
 .text-animation-times {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .text-animation-times label {
   display: grid;
   grid-template-columns: 22px minmax(0, 1fr);
   align-items: center;
-  gap: 5px;
+  gap: 8px;
   color: rgba(235,235,245,.66);
   font-size: 11px;
 }
@@ -476,7 +478,7 @@
 .text-animation-preset-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 4px;
 }
 
 .text-animation-preset-grid button {

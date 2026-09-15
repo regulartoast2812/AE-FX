@@ -2028,7 +2028,9 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  gap: 5px;
+  /* 8, like every other label-to-control pair in this panel. This one was 5,
+     the single place the A panel broke its own spacing rule. */
+  gap: 8px;
   margin: 0;
   padding: 0;
 }

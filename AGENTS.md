@@ -161,6 +161,24 @@ CEP's Chromium predates it. Six rules were inert inside After Effects while
 working in a current browser.
 → Never use it. Set a class in JS.
 
+## Panel spacing standard
+
+Measured off the A panel, which is the reference every other subpanel is
+matched to:
+
+- **4px** between controls inside one group (icon buttons in a row, presets)
+- **8px** between a label and its control, and between two labelled groups
+  sharing a row
+- **5px** between sections, and between cards in a group
+
+Nothing else. Before adding a `gap`, use one of these three; a fourth value is
+how the T panel ended up with 4, 5, 6, 8 and 10 all at once and read as
+"beyond weird" spacing. The A panel itself broke the rule in one place -
+`Group:` sat at 5 - so check the reference before trusting it.
+
+To verify, measure the rendered gaps rather than reading the CSS: several of
+these come from nested containers whose declared gap is not what lands.
+
 ## Restarting the native listener
 
 `open` on an app that is already running **activates it, it does not restart
