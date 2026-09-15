@@ -10805,13 +10805,6 @@ function ensureTextAnimationPanel() {
             <strong>Animation</strong>
           </div>
           <div class="text-animation-grid">
-            <label class="text-animation-field">
-              <span>Style:</span>
-              <div class="text-animation-segmented" data-text-option-group="style">
-                <button type="button" data-text-option="style" data-value="ease" data-tooltip="Ease\nA smooth eased entrance and exit.">${tntIconSvg("spline")}<strong>Ease</strong></button>
-                <button type="button" data-text-option="style" data-value="bounce" data-tooltip="Bounce\nOvershoot and settle instead of easing.">${tntIconSvg("activity")}<strong>Bounce</strong></button>
-              </div>
-            </label>
             <div class="text-animation-field text-animation-properties">
               <span>Animate:</span>
               <div class="text-animation-pair">
@@ -10844,14 +10837,21 @@ function ensureTextAnimationPanel() {
                 <label><span>Out</span><input type="number" min="0" step="0.05" data-text-number="outTime" data-tooltip="Out Duration\nSeconds the exit takes."></label>
               </div>
             </div>
-            <label class="text-animation-field text-animation-apply-row">
-              <span>Apply:</span>
+            <div class="text-animation-field text-animation-apply-row">
+              <span>Style:</span>
+              <div class="text-animation-pair">
+                <select class="text-animation-style-select" aria-label="Animation style" data-tooltip="Style\nEase is a smooth entrance and exit. Bounce overshoots and settles.\nBacktick steps this while the panel is open.">
+                  <option value="ease">Ease</option>
+                  <option value="bounce">Bounce</option>
+                </select>
+                <span class="text-animation-pair-label">Apply:</span>
               <div class="text-animation-segmented" data-text-option-group="mode">
                 <button type="button" data-text-option="mode" data-value="in" aria-label="Apply animate in" data-tooltip="Apply In\nBuild the entrance animation from the settings above.">${tntIconSvg("log-in")}</button>
                 <button type="button" data-text-option="mode" data-value="out" aria-label="Apply animate out" data-tooltip="Apply Out\nBuild the exit animation from the settings above.">${tntIconSvg("log-out")}</button>
                 <button type="button" data-text-option="mode" data-value="both" aria-label="Apply animate in and out" data-tooltip="Apply In and Out\nBuild both the entrance and the exit from the settings above.">${tntIconSvg("arrow-left-right")}</button>
               </div>
-            </label>
+              </div>
+            </div>
           </div>
           <div class="text-animation-presets">
           <div class="text-animation-section-head">
@@ -10934,6 +10934,12 @@ function ensureTextAnimationPanel() {
     if (number) {
       textAnimationState[number.dataset.textNumber] = Math.max(0, Number(number.value || 0));
       renderTextAnimationPanel();
+      return;
+    }
+    const styleSelect = event.target.closest && event.target.closest(".text-animation-style-select");
+    if (styleSelect) {
+      textAnimationState.style = styleSelect.value === "bounce" ? "bounce" : "ease";
+      renderTextAnimationPanel();
     }
   });
   return textAnimationBackdropEl;
@@ -10971,6 +10977,8 @@ function renderTextAnimationPanel() {
   textAnimationBackdropEl.querySelectorAll("[data-text-number]").forEach(input => {
     input.value = String(textAnimationState[input.dataset.textNumber]);
   });
+  const styleSelect = textAnimationBackdropEl.querySelector(".text-animation-style-select");
+  if (styleSelect) styleSelect.value = textAnimationState.style === "bounce" ? "bounce" : "ease";
   // Mode runs the build, so it is the control that needs a text layer. The
   // other option rows are plain choices and stay usable.
   textAnimationBackdropEl.querySelectorAll('[data-text-option="mode"]').forEach(button => {
@@ -11939,16 +11947,23 @@ function reverseLayerOrderIfAnchorOpen() {
 }
 
 function toggleAlignTargetIfAnchorOpen() {
-  if (!anchorModalEl || !anchorModalEl.classList.contains("show")) return;
+  // Whichever subpanel is open owns backtick. The Layout panel has several
+  // dropdowns plus the stagger mode; the Text panel has one, its style. A panel
+  // that is not open is left alone, so backtick is never bound to nothing.
+  const anchorOpen = !!(anchorModalEl && anchorModalEl.classList.contains("show"));
+  const textOpen = !anchorOpen && typeof textAnimationBackdropEl !== "undefined" &&
+    textAnimationBackdropEl && textAnimationBackdropEl.classList.contains("show");
+  const surface = anchorOpen ? anchorModalEl : (textOpen ? textAnimationBackdropEl : null);
+  if (!surface) return;
   // The stagger mode first: clicking it re-renders the sections, and the select
   // values are only written at bind time, so the flips below survive it.
-  const modes = anchorModalEl.querySelectorAll("[data-stagger-execute]");
+  const modes = anchorOpen ? anchorModalEl.querySelectorAll("[data-stagger-execute]") : [];
   if (modes.length) {
     let current = -1;
     modes.forEach((button, index) => { if (button.classList.contains("active")) current = index; });
     modes[(current + 1) % modes.length].click();
   }
-  const selects = anchorModalEl.querySelectorAll("select");
+  const selects = surface.querySelectorAll("select");
   let stepped = 0;
   selects.forEach(select => {
     if (!select.options || select.options.length < 2 || select.disabled) return;
@@ -11962,11 +11977,16 @@ function toggleAlignTargetIfAnchorOpen() {
     stepped++;
   });
   if (statusEl) {
-    const target = document.getElementById("anchorAlignTarget");
-    const alignWord = target && target.value === "comp" ? "composition" : "selection";
-    statusEl.textContent = stepped
-      ? "Stepped " + stepped + " dropdown" + (stepped === 1 ? "" : "s") + "; aligning to the " + alignWord + "."
-      : "Stepped the stagger mode.";
+    if (!anchorOpen) {
+      const style = surface.querySelector(".text-animation-style-select");
+      statusEl.textContent = style ? "Text style: " + style.options[style.selectedIndex].text + "." : "Stepped the panel.";
+    } else {
+      const target = document.getElementById("anchorAlignTarget");
+      const alignWord = target && target.value === "comp" ? "composition" : "selection";
+      statusEl.textContent = stepped
+        ? "Stepped " + stepped + " dropdown" + (stepped === 1 ? "" : "s") + "; aligning to the " + alignWord + "."
+        : "Stepped the stagger mode.";
+    }
   }
 }
 

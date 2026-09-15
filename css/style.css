@@ -15711,6 +15711,21 @@ body .ease-dialog-title {
   gap: 5px;
   padding: 0 9px;
 }
+
+/* The Style dropdown takes the same box as the A panel's selects. */
+.text-animation-style-select {
+  box-sizing: border-box;
+  height: 26px;
+  width: auto;
+  min-width: 0;
+  padding: 0 22px 0 8px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 5px;
+  background: rgba(255,255,255,.05);
+  color: rgba(245,245,247,.86);
+  font: inherit;
+  font-size: 11px;
+}
 .timing-order-backdrop {
   display: none;
   position: fixed;

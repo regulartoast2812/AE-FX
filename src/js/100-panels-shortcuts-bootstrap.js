@@ -310,16 +310,23 @@ function reverseLayerOrderIfAnchorOpen() {
 }
 
 function toggleAlignTargetIfAnchorOpen() {
-  if (!anchorModalEl || !anchorModalEl.classList.contains("show")) return;
+  // Whichever subpanel is open owns backtick. The Layout panel has several
+  // dropdowns plus the stagger mode; the Text panel has one, its style. A panel
+  // that is not open is left alone, so backtick is never bound to nothing.
+  const anchorOpen = !!(anchorModalEl && anchorModalEl.classList.contains("show"));
+  const textOpen = !anchorOpen && typeof textAnimationBackdropEl !== "undefined" &&
+    textAnimationBackdropEl && textAnimationBackdropEl.classList.contains("show");
+  const surface = anchorOpen ? anchorModalEl : (textOpen ? textAnimationBackdropEl : null);
+  if (!surface) return;
   // The stagger mode first: clicking it re-renders the sections, and the select
   // values are only written at bind time, so the flips below survive it.
-  const modes = anchorModalEl.querySelectorAll("[data-stagger-execute]");
+  const modes = anchorOpen ? anchorModalEl.querySelectorAll("[data-stagger-execute]") : [];
   if (modes.length) {
     let current = -1;
     modes.forEach((button, index) => { if (button.classList.contains("active")) current = index; });
     modes[(current + 1) % modes.length].click();
   }
-  const selects = anchorModalEl.querySelectorAll("select");
+  const selects = surface.querySelectorAll("select");
   let stepped = 0;
   selects.forEach(select => {
     if (!select.options || select.options.length < 2 || select.disabled) return;
@@ -333,11 +340,16 @@ function toggleAlignTargetIfAnchorOpen() {
     stepped++;
   });
   if (statusEl) {
-    const target = document.getElementById("anchorAlignTarget");
-    const alignWord = target && target.value === "comp" ? "composition" : "selection";
-    statusEl.textContent = stepped
-      ? "Stepped " + stepped + " dropdown" + (stepped === 1 ? "" : "s") + "; aligning to the " + alignWord + "."
-      : "Stepped the stagger mode.";
+    if (!anchorOpen) {
+      const style = surface.querySelector(".text-animation-style-select");
+      statusEl.textContent = style ? "Text style: " + style.options[style.selectedIndex].text + "." : "Stepped the panel.";
+    } else {
+      const target = document.getElementById("anchorAlignTarget");
+      const alignWord = target && target.value === "comp" ? "composition" : "selection";
+      statusEl.textContent = stepped
+        ? "Stepped " + stepped + " dropdown" + (stepped === 1 ? "" : "s") + "; aligning to the " + alignWord + "."
+        : "Stepped the stagger mode.";
+    }
   }
 }
 
