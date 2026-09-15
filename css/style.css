@@ -15391,11 +15391,14 @@ body .ease-dialog-title {
   align-content: center;
   gap: 2px;
   height: 26px;
-  padding: 0 7px;
-  border: 1px solid rgba(255,255,255,.085);
-  border-radius: var(--tnt-radius-node, 7px);
-  background: rgba(255,255,255,.03);
-  color: rgba(245,245,247,.84);
+  padding: 0 9px;
+  /* Was radius 7 on .085/.03 - the only buttons in the panel still wearing the
+     old box, which is why Functions and Presets read as a different family from
+     the rows between them. */
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 5px;
+  background: rgba(255,255,255,.05);
+  color: rgba(235,235,245,.66);
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -15409,11 +15412,12 @@ body .ease-dialog-title {
   color: rgba(255,238,228,.95);
 }
 
+/* One label weight in the panel. These were 500 at .84, which made the presets
+   louder than every control above them. */
 .text-animation-command-row strong,
-.text-animation-preset-grid strong,
-.text-animation-apply {
+.text-animation-preset-grid strong {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .text-animation-command-row span,
@@ -15725,6 +15729,18 @@ body .ease-dialog-title {
   color: rgba(245,245,247,.86);
   font: inherit;
   font-size: 11px;
+}
+
+/* The close button had a box of its own - .1 on .04 - for no reason. */
+.text-animation-close {
+  border: 1px solid rgba(255,255,255,.14) !important;
+  border-radius: 5px !important;
+  background: rgba(255,255,255,.05) !important;
+}
+
+/* The divider added 3px to one gap, so the rows were not on a single pitch. */
+.text-animation-field.text-animation-apply-row {
+  margin-top: 0;
 }
 .timing-order-backdrop {
   display: none;

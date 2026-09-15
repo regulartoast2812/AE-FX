@@ -10833,8 +10833,8 @@ function ensureTextAnimationPanel() {
             <div class="text-animation-field text-animation-duration">
               <span></span>
               <div class="text-animation-times">
-                <label><span>In</span><input type="number" min="0" step="0.05" data-text-number="inTime" data-tooltip="In Duration\nSeconds the entrance takes."></label>
-                <label><span>Out</span><input type="number" min="0" step="0.05" data-text-number="outTime" data-tooltip="Out Duration\nSeconds the exit takes."></label>
+                <label><span>In</span><input type="number" aria-label="In duration in seconds" min="0" step="0.05" data-text-number="inTime" data-tooltip="In Duration\nSeconds the entrance takes."></label>
+                <label><span>Out</span><input type="number" aria-label="Out duration in seconds" min="0" step="0.05" data-text-number="outTime" data-tooltip="Out Duration\nSeconds the exit takes."></label>
               </div>
             </div>
             <div class="text-animation-field text-animation-apply-row">
