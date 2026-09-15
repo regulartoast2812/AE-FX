@@ -105,7 +105,9 @@
 
 .text-animation-body {
   display: grid;
-  grid-template-columns: max-content 400px;
+  /* Was "max-content 400px". That fixed 400 pinned the Animation card wide
+     regardless of what was in it; both cards size to their content now. */
+  grid-template-columns: max-content max-content;
   align-items: start;
   gap: 5px;
   padding: 0;
@@ -223,10 +225,13 @@
   font-size: 7px;
 }
 
+/* One column. Two columns forced the card wider than any single row needed and
+   put unrelated controls side by side; stacked, each row is only as wide as its
+   own buttons and the panel reads straight down. */
 .text-animation-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 5px 10px;
+  grid-template-columns: minmax(0, max-content);
+  gap: 5px;
 }
 
 .text-animation-field {
@@ -397,10 +402,11 @@
   outline-offset: 2px;
 }
 
+/* The inputs used to take half the card each, so a two-character number sat in
+   a 170px box. They hold "0.35" and nothing longer. */
 .text-animation-times {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
+  display: flex;
+  gap: 10px;
 }
 
 .text-animation-times label {
@@ -414,7 +420,7 @@
 
 .text-animation-times input {
   box-sizing: border-box;
-  width: 100%;
+  width: 58px;
   height: 26px;
   padding: 0 6px;
   border: 1px solid rgba(255,255,255,.12);
@@ -461,12 +467,12 @@
 
 .text-animation-preset-grid {
   display: flex;
+  flex-wrap: wrap;
   gap: 5px;
-  overflow-x: auto;
 }
 
 .text-animation-preset-grid button {
-  flex: 1 0 auto;
+  flex: 0 0 auto;
   white-space: nowrap;
   text-align: center;
 }
