@@ -1,6 +1,6 @@
 let textAnimationBackdropEl = null;
 let textAnimationState = {
-  style: "master",
+  style: "ease",
   mode: "both",
   direction: "up",
   basedOn: 3,
@@ -41,16 +41,24 @@ function ensureTextAnimationPanel() {
             <label class="text-animation-field">
               <span>Style:</span>
               <div class="text-animation-segmented" data-text-option-group="style">
-                <button type="button" data-text-option="style" data-value="master">Master</button>
-                <button type="button" data-text-option="style" data-value="bounce">Bounce</button>
+                <button type="button" data-text-option="style" data-value="ease" data-tooltip="Ease\nA smooth eased entrance and exit.">${tntIconSvg("spline")}<strong>Ease</strong></button>
+                <button type="button" data-text-option="style" data-value="bounce" data-tooltip="Bounce\nOvershoot and settle instead of easing.">${tntIconSvg("activity")}<strong>Bounce</strong></button>
               </div>
             </label>
             <div class="text-animation-field text-animation-properties">
               <span>Animate:</span>
-              <div class="text-animation-checks">
-                <button type="button" data-text-toggle="usePosition" aria-label="Animate position" aria-pressed="false" data-tooltip="Position\nInclude movement in the text animation.">${tntIconSvg("move")}</button>
-                <button type="button" data-text-toggle="useOpacity" aria-label="Animate opacity" aria-pressed="false" data-tooltip="Opacity\nInclude fading in the text animation.">${tntIconSvg("blend")}</button>
-                <button type="button" data-text-toggle="useScale" aria-label="Animate scale" aria-pressed="false" data-tooltip="Scale\nInclude scaling in the text animation.">${tntIconSvg("scaling")}</button>
+              <div class="text-animation-pair">
+                <div class="text-animation-checks">
+                  <button type="button" data-text-toggle="usePosition" aria-label="Animate position" aria-pressed="false" data-tooltip="Position\nInclude movement in the text animation.">${tntIconSvg("move")}</button>
+                  <button type="button" data-text-toggle="useOpacity" aria-label="Animate opacity" aria-pressed="false" data-tooltip="Opacity\nInclude fading in the text animation.">${tntIconSvg("blend")}</button>
+                  <button type="button" data-text-toggle="useScale" aria-label="Animate scale" aria-pressed="false" data-tooltip="Scale\nInclude scaling in the text animation.">${tntIconSvg("scaling")}</button>
+                </div>
+                <span class="text-animation-pair-label">By:</span>
+                <div class="text-animation-segmented based-on" data-text-option-group="basedOn">
+                  <button type="button" data-text-option="basedOn" data-value="1" aria-label="By characters" data-tooltip="By Characters\nStagger the animation one character at a time.">${tntIconSvg("case-sensitive")}</button>
+                  <button type="button" data-text-option="basedOn" data-value="3" aria-label="By words" data-tooltip="By Words\nStagger the animation one word at a time.">${tntIconSvg("whole-word")}</button>
+                  <button type="button" data-text-option="basedOn" data-value="4" aria-label="By lines" data-tooltip="By Lines\nStagger the animation one line at a time.">${tntIconSvg("wrap-text")}</button>
+                </div>
               </div>
             </div>
             <label class="text-animation-field">
@@ -62,25 +70,17 @@ function ensureTextAnimationPanel() {
                 <button type="button" data-text-option="direction" data-value="right" aria-label="Right" title="Right">${tntIconSvg("arrow-right")}</button>
               </div>
             </label>
-            <label class="text-animation-field">
-              <span>By:</span>
-              <div class="text-animation-segmented based-on" data-text-option-group="basedOn">
-                <button type="button" data-text-option="basedOn" data-value="1" aria-label="By characters" data-tooltip="By Characters\nStagger the animation one character at a time.">${tntIconSvg("case-sensitive")}</button>
-                <button type="button" data-text-option="basedOn" data-value="3" aria-label="By words" data-tooltip="By Words\nStagger the animation one word at a time.">${tntIconSvg("whole-word")}</button>
-                <button type="button" data-text-option="basedOn" data-value="4" aria-label="By lines" data-tooltip="By Lines\nStagger the animation one line at a time.">${tntIconSvg("wrap-text")}</button>
-              </div>
-            </label>
             <div class="text-animation-field text-animation-duration">
-              <span>Seconds:</span>
+              <span></span>
               <div class="text-animation-times">
-                <label><span>In</span><input type="number" min="0" step="0.05" data-text-number="inTime"></label>
-                <label><span>Out</span><input type="number" min="0" step="0.05" data-text-number="outTime"></label>
+                <label><span>In</span><input type="number" min="0" step="0.05" data-text-number="inTime" data-tooltip="In Duration\nSeconds the entrance takes."></label>
+                <label><span>Out</span><input type="number" min="0" step="0.05" data-text-number="outTime" data-tooltip="Out Duration\nSeconds the exit takes."></label>
               </div>
             </div>
             <label class="text-animation-field text-animation-apply-row">
               <span>Apply:</span>
               <div class="text-animation-segmented" data-text-option-group="mode">
-                <button type="button" data-text-option="mode" data-value="in" aria-label="Apply animate in" data-tooltip="Apply In\nBuild the entrance animation from the settings above. The highlight shows the last mode applied.">${tntIconSvg("log-in")}</button>
+                <button type="button" data-text-option="mode" data-value="in" aria-label="Apply animate in" data-tooltip="Apply In\nBuild the entrance animation from the settings above.">${tntIconSvg("log-in")}</button>
                 <button type="button" data-text-option="mode" data-value="out" aria-label="Apply animate out" data-tooltip="Apply Out\nBuild the exit animation from the settings above.">${tntIconSvg("log-out")}</button>
                 <button type="button" data-text-option="mode" data-value="both" aria-label="Apply animate in and out" data-tooltip="Apply In and Out\nBuild both the entrance and the exit from the settings above.">${tntIconSvg("arrow-left-right")}</button>
               </div>
@@ -184,6 +184,14 @@ function renderTextAnimationPanel() {
   if (countEl) countEl.textContent = `${count} text layer${count === 1 ? "" : "s"}`;
   textAnimationBackdropEl.querySelectorAll("[data-text-option]").forEach(button => {
     const key = button.dataset.textOption;
+    // Mode runs the build, so it is a row of actions. Showing one of them as
+    // held down said the panel was in a state it is not in - the mode is chosen
+    // and spent in the same click.
+    if (key === "mode") {
+      button.classList.remove("active");
+      button.removeAttribute("aria-pressed");
+      return;
+    }
     const active = String(textAnimationState[key]) === String(button.dataset.value);
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", String(active));
@@ -252,6 +260,8 @@ async function applyTextAnimationBuilder() {
     renderTextAnimationPanel();
     return;
   }
+  // "ease" is the panel's name for it; the host function is still
+  // applyTextAnimMaster, and anything that is not bounce lands there.
   const fn = textAnimationState.style === "bounce" ? "applyTextAnimBounce" : "applyTextAnimMaster";
   await runTntV3Command({ name: "Text Animation", tntFunction: fn, args: textAnimationArgsFromState() });
   renderTextAnimationPanel();

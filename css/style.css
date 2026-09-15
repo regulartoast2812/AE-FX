@@ -15692,6 +15692,25 @@ body .ease-dialog-title {
   }
 
 }
+
+/* Animate and By share one row: two icon groups with a label between them. */
+.text-animation-pair {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.text-animation-pair-label {
+  color: rgba(235,235,245,.66);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* The Style buttons carry an icon before the word. */
+.text-animation-segmented[data-text-option-group="style"] button {
+  gap: 5px;
+  padding: 0 9px;
+}
 .timing-order-backdrop {
   display: none;
   position: fixed;
