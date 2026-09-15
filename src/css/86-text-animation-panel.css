@@ -287,8 +287,17 @@
   padding: 0;
 }
 
+/* Icon buttons now, so they take the fixed 26px box the Mode and Move rows use
+   rather than stretching to fill the field. */
 .text-animation-segmented.based-on {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  width: fit-content;
+}
+
+.text-animation-segmented.based-on button {
+  flex: 0 0 26px;
+  width: 26px;
+  padding: 0;
 }
 
 .text-animation-segmented button {

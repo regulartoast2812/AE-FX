@@ -10813,11 +10813,11 @@ function ensureTextAnimationPanel() {
               </div>
             </label>
             <label class="text-animation-field">
-              <span>Mode:</span>
+              <span>Apply:</span>
               <div class="text-animation-segmented" data-text-option-group="mode">
-                <button type="button" data-text-option="mode" data-value="in" aria-label="Animate in" data-tooltip="Animate In\nAnimate the text entrance.">${tntIconSvg("log-in")}</button>
-                <button type="button" data-text-option="mode" data-value="out" aria-label="Animate out" data-tooltip="Animate Out\nAnimate the text exit.">${tntIconSvg("log-out")}</button>
-                <button type="button" data-text-option="mode" data-value="both" aria-label="Animate in and out" data-tooltip="Animate In and Out\nAnimate both the entrance and exit.">${tntIconSvg("arrow-left-right")}</button>
+                <button type="button" data-text-option="mode" data-value="in" aria-label="Apply animate in" data-tooltip="Apply In\nBuild the entrance animation from the settings above. The highlight shows the last mode applied.">${tntIconSvg("log-in")}</button>
+                <button type="button" data-text-option="mode" data-value="out" aria-label="Apply animate out" data-tooltip="Apply Out\nBuild the exit animation from the settings above.">${tntIconSvg("log-out")}</button>
+                <button type="button" data-text-option="mode" data-value="both" aria-label="Apply animate in and out" data-tooltip="Apply In and Out\nBuild both the entrance and the exit from the settings above.">${tntIconSvg("arrow-left-right")}</button>
               </div>
             </label>
             <label class="text-animation-field">
@@ -10832,9 +10832,9 @@ function ensureTextAnimationPanel() {
             <label class="text-animation-field">
               <span>By:</span>
               <div class="text-animation-segmented based-on" data-text-option-group="basedOn">
-                <button type="button" data-text-option="basedOn" data-value="1">Chars</button>
-                <button type="button" data-text-option="basedOn" data-value="3">Words</button>
-                <button type="button" data-text-option="basedOn" data-value="4">Lines</button>
+                <button type="button" data-text-option="basedOn" data-value="1" aria-label="By characters" data-tooltip="By Characters\nStagger the animation one character at a time.">${tntIconSvg("case-sensitive")}</button>
+                <button type="button" data-text-option="basedOn" data-value="3" aria-label="By words" data-tooltip="By Words\nStagger the animation one word at a time.">${tntIconSvg("whole-word")}</button>
+                <button type="button" data-text-option="basedOn" data-value="4" aria-label="By lines" data-tooltip="By Lines\nStagger the animation one line at a time.">${tntIconSvg("wrap-text")}</button>
               </div>
             </label>
             <div class="text-animation-field text-animation-properties">
@@ -10853,7 +10853,6 @@ function ensureTextAnimationPanel() {
               </div>
             </div>
           </div>
-          <button type="button" class="text-animation-apply" data-text-apply="builder" data-tooltip="Apply Text Animator\nBuild text animators using the selected style, mode, direction, grouping, properties, and timing.">${tntIconSvg("play")}<strong>Apply</strong></button>
           <div class="text-animation-presets">
           <div class="text-animation-section-head">
             <strong>Presets</strong>
@@ -10907,9 +10906,14 @@ function ensureTextAnimationPanel() {
     }
     const option = event.target.closest && event.target.closest("[data-text-option]");
     if (option) {
+      if (option.disabled) return;
       const key = option.dataset.textOption;
       textAnimationState[key] = key === "basedOn" ? Number(option.dataset.value || 3) : option.dataset.value;
       renderTextAnimationPanel();
+      // Mode is the apply. The separate Apply bar restated a choice the editor
+      // had already made one row above, so picking In, Out or In + Out builds
+      // straight away using everything set above it.
+      if (key === "mode") applyTextAnimationBuilder();
       return;
     }
     const command = event.target.closest && event.target.closest("[data-text-command]");
@@ -10959,8 +10963,11 @@ function renderTextAnimationPanel() {
   textAnimationBackdropEl.querySelectorAll("[data-text-number]").forEach(input => {
     input.value = String(textAnimationState[input.dataset.textNumber]);
   });
-  const apply = textAnimationBackdropEl.querySelector("[data-text-apply]");
-  if (apply) apply.disabled = count < 1;
+  // Mode runs the build, so it is the control that needs a text layer. The
+  // other option rows are plain choices and stay usable.
+  textAnimationBackdropEl.querySelectorAll('[data-text-option="mode"]').forEach(button => {
+    button.disabled = count < 1;
+  });
   textAnimationBackdropEl.querySelectorAll("[data-text-preset]").forEach(button => {
     button.disabled = count < 1;
   });
