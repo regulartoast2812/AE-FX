@@ -424,7 +424,11 @@
 
 .text-animation-times input {
   box-sizing: border-box;
-  width: 58px;
+  /* The A panel strips the spinner from its number fields; these kept it, which
+     cost ~14px of the box to chrome nobody uses at 0.05 steps. */
+  -moz-appearance: textfield;
+  appearance: textfield;
+  width: 46px;
   height: 26px;
   padding: 0 6px;
   border: 1px solid rgba(255,255,255,.12);
@@ -543,4 +547,11 @@
 /* The divider added 3px to one gap, so the rows were not on a single pitch. */
 .text-animation-field.text-animation-apply-row {
   margin-top: 0;
+}
+
+.text-animation-times input::-webkit-outer-spin-button,
+.text-animation-times input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
 }

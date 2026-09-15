@@ -54,20 +54,19 @@ function ensureTextAnimationPanel() {
                 </div>
               </div>
             </div>
-            <label class="text-animation-field">
+            <div class="text-animation-field">
               <span>Move:</span>
+              <div class="text-animation-pair">
               <div class="text-animation-segmented direction" data-text-option-group="direction">
                 <button type="button" data-text-option="direction" data-value="up" aria-label="Up" title="Up">${tntIconSvg("arrow-up")}</button>
                 <button type="button" data-text-option="direction" data-value="down" aria-label="Down" title="Down">${tntIconSvg("arrow-down")}</button>
                 <button type="button" data-text-option="direction" data-value="left" aria-label="Left" title="Left">${tntIconSvg("arrow-left")}</button>
                 <button type="button" data-text-option="direction" data-value="right" aria-label="Right" title="Right">${tntIconSvg("arrow-right")}</button>
               </div>
-            </label>
-            <div class="text-animation-field text-animation-duration">
-              <span></span>
               <div class="text-animation-times">
                 <label><span>In</span><input type="number" aria-label="In duration in seconds" min="0" step="0.05" data-text-number="inTime" data-tooltip="In Duration\nSeconds the entrance takes."></label>
                 <label><span>Out</span><input type="number" aria-label="Out duration in seconds" min="0" step="0.05" data-text-number="outTime" data-tooltip="Out Duration\nSeconds the exit takes."></label>
+              </div>
               </div>
             </div>
             <div class="text-animation-field text-animation-apply-row">
@@ -91,9 +90,6 @@ function ensureTextAnimationPanel() {
             <strong>Presets</strong>
           </div>
           <div class="text-animation-preset-grid">
-            <button type="button" data-text-preset="master-in-up"><strong>In</strong><span>In Up: position + opacity</span></button>
-            <button type="button" data-text-preset="master-out-up"><strong>Out</strong><span>Out Up: position + opacity</span></button>
-            <button type="button" data-text-preset="master-both-up"><strong>In + Out</strong><span>In + Out Up: balanced default</span></button>
             <button type="button" data-text-preset="master-both-left"><strong>Slide</strong><span>In + Out Left: side reveal</span></button>
             <button type="button" data-text-preset="master-scale-both"><strong>Pop</strong><span>Scale Pop: scale + opacity</span></button>
             <button type="button" data-text-preset="bounce-in-up"><strong>Bounce</strong><span>Bounce In: upward bounce</span></button>
