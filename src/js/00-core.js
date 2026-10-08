@@ -317,6 +317,9 @@ const TNT_V3_COMMANDS = [
     { name: "Text Anim In+Out Up", category: "Text", tntFunction: "applyTextAnimMaster", args: ["up", 3, true, true, false, 0.35, 0.35, "both"] },
     { name: "Text Bounce In Up", category: "Text", tntFunction: "applyTextAnimBounce", args: ["up", 3, true, true, false, 0.35, 0.35, "in"] }
   ] },
+  { name: "Split Text to Characters", category: "Text", tntFunction: "splitTextCharacters", does: "Split", targets: ["Text", "Layer"] },
+  { name: "Split Text to Words", category: "Text", tntFunction: "splitTextWords", does: "Split", targets: ["Text", "Layer"] },
+  { name: "Split Text to Lines", category: "Text", tntFunction: "splitTextLines", does: "Split", targets: ["Text", "Layer"] },
   { name: "Apply Wiggle FFX", category: "Effects", tntFunction: "applyWiggleFFX", args: [2, 20] },
   { name: "Apply Glow", category: "Effects", tntFunction: "applyGlow" },
   { name: "Apply Light Sweep", category: "Effects", tntFunction: "applyLightSweep", args: [{ inTime: 1, easeIn: 75, easeOut: 75 }] },
@@ -337,6 +340,8 @@ const TNT_V3_COMMANDS = [
   { name: "Parent to Last Selected Layer", category: "Layers", action: parentToLastSelectedLayer },
   { name: "Parent to Target Layer...", category: "Layers", action: promptParentToTargetLayer },
   { name: "Precompose Selected", category: "Layers", tntFunction: "precomposeSelected" },
+  { name: "Decompose Precomp", category: "Composition", tntFunction: "decomposeComp" },
+  { name: "Decompose + Delete Source", category: "Composition", tntFunction: "decomposeCompAndDelete" },
   { name: "Lock Selected", category: "Layers", tntFunction: "lockSelected" },
   { name: "Trim to Keyframes", category: "Layers", group: "Trim Layer", tntFunction: "trimToKeyframes" },
   { name: "Hide Selected", category: "Layers", tntFunction: "hideSelected" },
@@ -894,14 +899,31 @@ function declareUserShortcutKeyInterest(add, letters) {
 // Light, Shape, Text, or the source name for footage - and rides along in the
 // layer payload, so this costs no round trip.
 function tntSelectionSummary() {
-  const indices = (state.selectedLayerIndices || []).map(Number);
-  const layers = (state.layers || []).filter(layer => indices.indexOf(Number(layer.index || 0)) >= 0);
+  // A selection is addressed by layer index, and indices move whenever layers
+  // are reordered - which this tool does constantly. So validate rather than
+  // trust the arrays:
+  //
+  //  - repeats are collapsed. [1,1,1] used to count as three layers.
+  //  - a layer only matches on an index of its own. Number(layer.index || 0)
+  //    turned a layer carrying no index into index 0, which then matched any
+  //    selection containing 0.
+  //  - resolved says how many of them were actually found, so callers can tell
+  //    a complete picture from a partial one.
+  const selected = new Set();
+  (state.selectedLayerIndices || []).forEach(value => {
+    const index = Number(value);
+    if (Number.isFinite(index) && index > 0) selected.add(index);
+  });
+  const layers = (state.layers || []).filter(layer => {
+    const index = Number(layer && layer.index);
+    return Number.isFinite(index) && index > 0 && selected.has(index);
+  });
   const types = {};
   layers.forEach(layer => {
     const type = String(layer.type || "Layer");
     types[type] = (types[type] || 0) + 1;
   });
-  return { count: indices.length, resolved: layers.length, types };
+  return { count: selected.size, resolved: layers.length, types };
 }
 
 // "no selection" / "1 Text layer" / "3 layers - 2 Shape, 1 Text".
@@ -909,23 +931,30 @@ function tntSelectionSummary() {
 // The breakdown only appears when it says something the count does not: one
 // layer names its own type, and a uniform selection names it once rather than
 // listing it. Mixed selections are the case worth spelling out.
+//
+// It also only appears when every selected layer was found. A partial resolve
+// used to print a breakdown that did not add up to its own headline - "3 layers
+// - 1 Shape, 1 Text" - which is the normal state for a moment after any
+// reorder, while the panel's layer list is still behind the selection.
 function tntSelectionLabel() {
   const summary = tntSelectionSummary();
   if (!summary.count) return "no selection";
   const names = Object.keys(summary.types);
   const plural = summary.count === 1 ? "" : "s";
+  if (!names.length || summary.resolved !== summary.count) {
+    return `${summary.count} layer${plural}`;
+  }
   if (names.length === 1) {
     // "Layer" is the host's fallback when it cannot name the type, so repeating
     // it reads as "2 Layer layers".
     if (names[0] === "Layer") return `${summary.count} layer${plural}`;
     return `${summary.count} ${names[0]} layer${plural}`;
   }
-  if (!names.length) return `${summary.count} layer${plural}`;
   const breakdown = names
     .sort((a, b) => summary.types[b] - summary.types[a] || a.localeCompare(b))
     .map(name => `${summary.types[name]} ${name}`)
     .join(", ");
-  return `${summary.count} layer${plural} \u00b7 ${breakdown}`;
+  return `${summary.count} layer${plural} · ${breakdown}`;
 }
 
 // Colours per layer type, for the selection bar. Chosen to stay apart at a
@@ -1315,22 +1344,31 @@ async function ensureVendoredTntCommands(options = {}) {
 }
 
 async function runTntV3Command(command) {
-  if (!command || !command.tntFunction) return;
+  if (!command || !command.tntFunction) return false;
   suppressSyncUntil = Date.now() + 1200;
   const loaded = await ensureVendoredTntCommands();
   if (!loaded.ok) {
     statusEl.textContent = loaded.error || "Could not load panel commands.";
-    return;
+    if (QUICK_PANEL_MODE) {
+      const contextEl = document.getElementById("quickPanelContext");
+      if (contextEl) contextEl.textContent = statusEl.textContent;
+    }
+    return false;
   }
   const result = await aeCall("TNT_runTntV3Command", [command.tntFunction, command.args || []]);
   if (!result.ok) {
     statusEl.textContent = result.error || "Panel command failed.";
-    return;
+    if (QUICK_PANEL_MODE) {
+      const contextEl = document.getElementById("quickPanelContext");
+      if (contextEl) contextEl.textContent = statusEl.textContent;
+    }
+    return false;
   }
   statusEl.textContent = String(result.result || `${command.name} done`);
   closeFxConsole();
   await refreshLayers({ forceRender: true });
   focusPanel(2);
+  return true;
 }
 
 async function callTntV3Command(functionName, args = [], options = {}) {

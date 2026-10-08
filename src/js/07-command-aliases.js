@@ -69,3 +69,54 @@ function tntEntryAliases(entry) {
   const shared = TNT_COMMAND_ALIASES[String(entry.name || "")] || "";
   return own && shared ? `${own} ${shared}` : (own || shared);
 }
+
+// Moved here out of 06-command-requirements.js. That file is written whole by
+// scripts/derive-command-requirements.py, which emits the map and stops - so
+// these two lived below the generator's last line and would have been deleted
+// the next time anyone regenerated the requirements.
+
+// Badge text for the Functions list, next to a command whose requirement the
+// selection does not meet. Falls back to the raw requirement key.
+//
+// RECONSTRUCTED: this lived at the bottom of 06-command-requirements.js and was
+// lost when that file was truncated. The wording is a guess at the original.
+const TNT_REQUIREMENT_LABELS = {
+  layers: "Needs layers",
+  keyframes: "Needs keyframes",
+  masks: "Needs a mask"
+};
+
+// What a registry entry requires, or "" when nothing is known. tntFunction
+// commands look their host function up in the derived table; entries with a
+// panel-side action are not covered by the derivation, so they stay live.
+function tntEntryRequirement(entry) {
+  if (!entry) return "";
+  if (entry.requires) return String(entry.requires);
+  const fn = entry.tntFunction ? String(entry.tntFunction) : "";
+  return fn && TNT_FUNCTION_REQUIREMENTS[fn] ? TNT_FUNCTION_REQUIREMENTS[fn] : "";
+}
+
+// The cross-check: requirement against what is actually selected. Returns the
+// reason it cannot run, or "" when it can.
+function tntEntryUnmetRequirement(entry) {
+  const requirement = tntEntryRequirement(entry);
+  if (!requirement) return "";
+  // Counted through tntSelectionSummary rather than off the raw array, which
+  // keeps repeats and indices that no longer point at a layer. [1,1,1] read as
+  // three layers there, so a command could look runnable on a selection that
+  // was really one layer, or none.
+  const layerCount = typeof tntSelectionSummary === "function"
+    ? tntSelectionSummary().count
+    : (state.selectedLayerIndices || []).length;
+  if (requirement === "layers") {
+    return layerCount ? "" : "Needs a layer selected";
+  }
+  if (requirement === "keyframes") {
+    const keys = typeof selectedKeyframes !== "undefined" ? (selectedKeyframes || []) : [];
+    return keys.length ? "" : "Needs keyframes selected";
+  }
+  if (requirement === "masks") {
+    return layerCount ? "" : "Needs a layer with a mask";
+  }
+  return "";
+}

@@ -55,6 +55,27 @@ function TNT_openCompInNativeViewer(comp) {
   return opened;
 }
 
+function TNT_prepareCompForNativeCommand(comp) {
+  if (!comp) return false;
+  var nativeComp = TNT_nativeActiveComp();
+  try {
+    if (nativeComp && nativeComp.id === comp.id) return true;
+  } catch (_) {}
+  try {
+    comp.openInViewer();
+    return true;
+  } catch (_) {}
+  return false;
+}
+
+function TNT_restoreNativeCompById(compId) {
+  var comp = TNT_findCompById(compId);
+  if (!comp) return null;
+  TNT_forcedCompId = comp.id;
+  try { comp.openInViewer(); } catch (_) {}
+  return comp;
+}
+
 function TNT_activeComp(preferNative) {
   // Do NOT call app.activeViewer.setActive() here. It steals focus from the CEP panel
   // and makes keyboard shortcuts like 1/2 zoom unreliable. A dropdown-selected comp
@@ -4003,6 +4024,7 @@ function TNT_openCompMarkerDialog(keyIndex) {
     comp.time = prop.keyTime(keyIndex);
     try { prop.setSelectedAtKey(keyIndex, true); } catch (_) {}
     app.endUndoGroup();
+    TNT_prepareCompForNativeCommand(comp);
     var opened = TNT_tryOpenMarkerDialog();
     return TNT_jsonStringify({ ok: opened, error: opened ? "" : "Could not open marker dialog in this AE version." });
   } catch (err) {
@@ -4028,6 +4050,7 @@ function TNT_openLayerMarkerDialog(layerIndex, keyIndex) {
     comp.time = prop.keyTime(keyIndex);
     try { prop.setSelectedAtKey(keyIndex, true); } catch (_) {}
     app.endUndoGroup();
+    TNT_prepareCompForNativeCommand(comp);
     var opened = TNT_tryOpenMarkerDialog();
     return TNT_jsonStringify({ ok: opened, error: opened ? "" : "Could not open marker dialog in this AE version." });
   } catch (err) {
@@ -4202,6 +4225,9 @@ function TNT_runNativeEditShortcut(kind) {
       label = "Pasted at playhead.";
     } else {
       return TNT_jsonStringify({ ok: false, error: "Unknown edit command." });
+    }
+    if (!TNT_prepareCompForNativeCommand(comp)) {
+      return TNT_jsonStringify({ ok: false, error: "Could not activate the target composition." });
     }
     app.executeCommand(commandId);
     var selected = [];
@@ -5133,6 +5159,7 @@ function seEditGradient() {
     } catch (_) {}
   }
   if (found) {
+    TNT_prepareCompForNativeCommand(comp);
     try { app.executeCommand(app.findMenuCommandId("Edit Value...")); } catch (_) {}
   }
   for (var k = 0; k < original.length; k++) {
@@ -7393,6 +7420,7 @@ function toggleEffects() {
 function copyEffects() {
   var comp = getComp(); if (!comp) return "No comp";
   var layers = comp.selectedLayers; if (layers.length < 2) return "Select 2+ layers (source first)";
+  if (!TNT_prepareCompForNativeCommand(comp)) return "Could not activate target comp";
   return _undo("TNT: Copy Effects", function() {
     var src = layers[0];
     for (var i = 1; i < layers.length; i++) {
@@ -8888,7 +8916,249 @@ function shapeToPath()        { return "[WIP] Convert shape to path"; }
 
 
 // ── fn/splitText.jsx
-function splitText()          { return "[WIP] Split text"; }
+function TNT_splitTextLineRanges(textDocument) {
+  var ranges = [];
+  var count = 0;
+  try { count = Number(textDocument.composedLineCount || 0); } catch (_) {}
+  for (var lineIndex = 0; lineIndex < count; lineIndex++) {
+    try {
+      var range = textDocument.composedLineRange(lineIndex, lineIndex + 1);
+      ranges.push({ start: Number(range.characterStart), end: Number(range.characterEnd), lineIndex: lineIndex });
+    } catch (_) {}
+  }
+  if (!ranges.length) {
+    var text = String(textDocument.text || "");
+    var start = 0;
+    for (var i = 0; i <= text.length; i++) {
+      if (i === text.length || text.charAt(i) === "\r" || text.charAt(i) === "\n") {
+        if (i > start) ranges.push({ start: start, end: i, lineIndex: ranges.length });
+        if (text.charAt(i) === "\r" && text.charAt(i + 1) === "\n") i++;
+        start = i + 1;
+      }
+    }
+  }
+  return ranges;
+}
+
+function TNT_splitTextLineForIndex(lineRanges, characterIndex) {
+  for (var i = 0; i < lineRanges.length; i++) {
+    if (characterIndex >= lineRanges[i].start && characterIndex < lineRanges[i].end) return lineRanges[i];
+  }
+  return null;
+}
+
+function TNT_splitTextSegments(textDocument, mode) {
+  var segments = [];
+  var match;
+  var pattern;
+  var index;
+  var text = String(textDocument.text || "");
+  var lineRanges = TNT_splitTextLineRanges(textDocument);
+  mode = String(mode || "characters").toLowerCase();
+
+  if (mode === "characters") {
+    for (index = 0; index < text.length; index++) {
+      if (/\s/.test(text.charAt(index))) continue;
+      var characterEnd = index + 1;
+      var firstCodeUnit = text.charCodeAt(index);
+      if (firstCodeUnit >= 0xD800 && firstCodeUnit <= 0xDBFF && characterEnd < text.length) {
+        var secondCodeUnit = text.charCodeAt(characterEnd);
+        if (secondCodeUnit >= 0xDC00 && secondCodeUnit <= 0xDFFF) characterEnd++;
+      }
+      var charLine = TNT_splitTextLineForIndex(lineRanges, index);
+      if (charLine) segments.push({
+        start: index,
+        end: characterEnd,
+        label: text.substring(index, characterEnd),
+        lineIndex: charLine.lineIndex,
+        lineStart: charLine.start
+      });
+      index = characterEnd - 1;
+    }
+    return segments;
+  }
+
+  if (mode === "words") {
+    pattern = /\S+/g;
+    while ((match = pattern.exec(text)) !== null) {
+      var wordStart = match.index;
+      var wordEnd = match.index + match[0].length;
+      for (var wordLineIndex = 0; wordLineIndex < lineRanges.length; wordLineIndex++) {
+        var wordLine = lineRanges[wordLineIndex];
+        var pieceStart = Math.max(wordStart, wordLine.start);
+        var pieceEnd = Math.min(wordEnd, wordLine.end);
+        if (pieceEnd <= pieceStart) continue;
+        segments.push({
+          start: pieceStart,
+          end: pieceEnd,
+          label: text.substring(pieceStart, pieceEnd),
+          lineIndex: wordLine.lineIndex,
+          lineStart: wordLine.start
+        });
+      }
+    }
+    return segments;
+  }
+
+  if (mode === "lines") {
+    for (var lineRangeIndex = 0; lineRangeIndex < lineRanges.length; lineRangeIndex++) {
+      var line = lineRanges[lineRangeIndex];
+      var lineEnd = line.end;
+      while (lineEnd > line.start && /[\r\n]/.test(text.charAt(lineEnd - 1))) lineEnd--;
+      if (lineEnd <= line.start) continue;
+      segments.push({
+        start: line.start,
+        end: lineEnd,
+        label: text.substring(line.start, lineEnd),
+        lineIndex: line.lineIndex,
+        lineStart: line.start
+      });
+    }
+  }
+  return segments;
+}
+
+function TNT_splitTextDocumentSlice(sourceDocument, start, end) {
+  var text = String(sourceDocument.text || "");
+  var sliceText = text.substring(start, end);
+  var result = new TextDocument(sliceText);
+  if (!sliceText.length) return result;
+  try {
+    result.characterRange(0, sliceText.length).pasteFrom(sourceDocument.characterRange(start, end));
+  } catch (_) {
+    result.text = sliceText;
+  }
+  return result;
+}
+
+function TNT_splitTextBaseline(textDocument, lineIndex) {
+  var baselines = [];
+  try { baselines = textDocument.baselineLocs || []; } catch (_) {}
+  var offset = Number(lineIndex || 0) * 4;
+  if (baselines.length < offset + 4) return null;
+  return {
+    startX: Number(baselines[offset]),
+    startY: Number(baselines[offset + 1]),
+    endX: Number(baselines[offset + 2]),
+    endY: Number(baselines[offset + 3])
+  };
+}
+
+function TNT_shiftTextSplitAnchor(layer, deltaX, deltaY) {
+  var anchor = layer.property("ADBE Transform Group").property("ADBE Anchor Point");
+  if (!anchor) throw new Error("Anchor Point is unavailable on " + layer.name + ".");
+  if (anchor.canSetExpression && anchor.expressionEnabled) {
+    throw new Error(layer.name + ": disable the Anchor Point expression before splitting.");
+  }
+  var keyCount = Number(anchor.numKeys || 0);
+  if (keyCount > 0) {
+    for (var keyIndex = 1; keyIndex <= keyCount; keyIndex++) {
+      var keyed = anchor.keyValue(keyIndex);
+      keyed[0] += deltaX;
+      keyed[1] += deltaY;
+      anchor.setValueAtKey(keyIndex, keyed);
+    }
+    return;
+  }
+  var value = anchor.value;
+  value[0] += deltaX;
+  value[1] += deltaY;
+  anchor.setValue(value);
+}
+
+function TNT_splitTextLayerName(sourceName, mode, ordinal, label) {
+  var singular = mode === "characters" ? "Char" : (mode === "words" ? "Word" : "Line");
+  var cleanLabel = String(label || "").replace(/[\r\n\t]+/g, " ").replace(/^\s+|\s+$/g, "");
+  if (cleanLabel.length > 24) cleanLabel = cleanLabel.substring(0, 21) + "...";
+  return sourceName + " - " + singular + " " + ordinal + (cleanLabel ? " - " + cleanLabel : "");
+}
+
+function splitTextBy(mode) {
+  var comp = getComp();
+  if (!comp) return "No comp";
+  mode = String(mode || "characters").toLowerCase();
+  if (mode !== "characters" && mode !== "words" && mode !== "lines") return "Unknown split mode";
+  var selected = comp.selectedLayers;
+  if (!selected || !selected.length) return "Select at least one text layer";
+
+  var jobs = [];
+  for (var i = 0; i < selected.length; i++) {
+    var layer = selected[i];
+    if (!(layer instanceof TextLayer)) continue;
+    var sourceText = layer.property("ADBE Text Properties").property("ADBE Text Document");
+    if (!sourceText) continue;
+    if (sourceText.numKeys > 0 || (sourceText.canSetExpression && sourceText.expressionEnabled)) {
+      return layer.name + ": animated or expression-driven Source Text must be baked before splitting";
+    }
+    var sourceAnchor = layer.property("ADBE Transform Group").property("ADBE Anchor Point");
+    if (sourceAnchor && sourceAnchor.canSetExpression && sourceAnchor.expressionEnabled) {
+      return layer.name + ": disable the Anchor Point expression before splitting";
+    }
+    var sourceDocument = sourceText.value;
+    var segments = TNT_splitTextSegments(sourceDocument, mode);
+    if (segments.length) jobs.push({ layer: layer, sourceDocument: sourceDocument, segments: segments });
+  }
+  if (!jobs.length) return "No splittable text found in the selected layers";
+
+  return _undo("TNT: Split Text to " + mode, function() {
+    var created = 0;
+    for (var jobIndex = 0; jobIndex < jobs.length; jobIndex++) {
+      var job = jobs[jobIndex];
+      var sourceLayer = job.layer;
+      var measureLayer = sourceLayer.duplicate();
+      measureLayer.name = "__TNT Text Split Measure__";
+      measureLayer.selected = false;
+      try {
+        for (var segmentIndex = 0; segmentIndex < job.segments.length; segmentIndex++) {
+          var segment = job.segments[segmentIndex];
+          var originalBaseline = TNT_splitTextBaseline(job.sourceDocument, segment.lineIndex);
+          if (!originalBaseline) throw new Error("Could not read the original composed-line baseline.");
+
+          var prefixX = 0;
+          var prefixY = 0;
+          if (segment.start > segment.lineStart) {
+            var prefixDocument = TNT_splitTextDocumentSlice(job.sourceDocument, segment.lineStart, segment.start);
+            var measureText = measureLayer.property("ADBE Text Properties").property("ADBE Text Document");
+            measureText.setValue(prefixDocument);
+            var measuredPrefix = measureText.value;
+            var prefixBaseline = TNT_splitTextBaseline(measuredPrefix, 0);
+            if (prefixBaseline) {
+              prefixX = prefixBaseline.endX - prefixBaseline.startX;
+              prefixY = prefixBaseline.endY - prefixBaseline.startY;
+            }
+          }
+
+          var targetBaselineX = originalBaseline.startX + prefixX;
+          var targetBaselineY = originalBaseline.startY + prefixY;
+          var duplicate = sourceLayer.duplicate();
+          duplicate.name = TNT_splitTextLayerName(sourceLayer.name, mode, segmentIndex + 1, segment.label);
+          var duplicateText = duplicate.property("ADBE Text Properties").property("ADBE Text Document");
+          duplicateText.setValue(TNT_splitTextDocumentSlice(job.sourceDocument, segment.start, segment.end));
+          var isolatedBaseline = TNT_splitTextBaseline(duplicateText.value, 0);
+          if (!isolatedBaseline) throw new Error("Could not read the isolated text baseline.");
+          TNT_shiftTextSplitAnchor(
+            duplicate,
+            isolatedBaseline.startX - targetBaselineX,
+            isolatedBaseline.startY - targetBaselineY
+          );
+          duplicate.selected = true;
+          created++;
+        }
+      } finally {
+        try { measureLayer.remove(); } catch (_) {}
+      }
+      sourceLayer.enabled = false;
+      sourceLayer.selected = false;
+    }
+    return "Split " + jobs.length + " text layer" + (jobs.length === 1 ? "" : "s") +
+      " into " + created + " " + mode + "; original" + (jobs.length === 1 ? "" : "s") + " hidden";
+  });
+}
+
+function splitTextCharacters() { return splitTextBy("characters"); }
+function splitTextWords() { return splitTextBy("words"); }
+function splitTextLines() { return splitTextBy("lines"); }
+function splitText() { return splitTextCharacters(); }
 
 
 // ── fn/applyTypewriterRig.jsx
@@ -9238,6 +9508,7 @@ function sePickColor(gMn, pMn) {
     try { cpProp.setValue(targetProp.value); } catch(e) {}
     nullLayer.selected = true;
     cpProp.selected = true;
+    TNT_prepareCompForNativeCommand(comp);
     app.executeCommand(app.findMenuCommandId("Edit Value..."));
     var newColor = cpProp.value;
     if (newColor && newColor.length >= 3) {
@@ -9291,6 +9562,7 @@ function seEditGradient() {
     } catch(e) {}
   }
   if (found > 0) {
+    TNT_prepareCompForNativeCommand(comp);
     try { app.executeCommand(app.findMenuCommandId("Edit Value...")); } catch(e) {}
   }
   // Restore selection
@@ -9698,7 +9970,393 @@ function cropComp(useActive, pad) {
 
 
 // ── fn/decomposeComp.jsx
-function decomposeComp()     { return "[WIP] Decompose comp — needs implementation"; }
+function TNT_decomposeHasUnsafeExpression(prop) {
+  if (!prop) return false;
+  try {
+    if (prop.canSetExpression && prop.expressionEnabled && prop.expression) {
+      var expression = String(prop.expression || "");
+      if (/\bthisComp\b|\bcomp\s*\(|\bthisLayer\.index\b|\bindex\b|\b(?:to|from)Comp\s*\(/i.test(expression)) {
+        return true;
+      }
+    }
+  } catch (_) {}
+  var count = 0;
+  try { count = Number(prop.numProperties || 0); } catch (_) {}
+  for (var i = 1; i <= count; i++) {
+    try {
+      if (TNT_decomposeHasUnsafeExpression(prop.property(i))) return true;
+    } catch (_) {}
+  }
+  return false;
+}
+
+function TNT_decomposeOuterMatteIndex(comp, layer) {
+  try {
+    if (TNT_trackMatteTypeName(layer.trackMatteType)) return layer.index;
+  } catch (_) {}
+  for (var i = 1; i <= comp.numLayers; i++) {
+    var candidate = comp.layer(i);
+    if (candidate === layer) continue;
+    try {
+      if (candidate.trackMatteLayer === layer) return candidate.index;
+    } catch (_) {}
+    try {
+      if (TNT_trackMatteTypeName(candidate.trackMatteType) && candidate.index - 1 === layer.index) return candidate.index;
+    } catch (_) {}
+  }
+  return 0;
+}
+
+function TNT_decomposeLayerById(id) {
+  if (!id && id !== 0) return null;
+  try { return app.project.layerByID(Number(id)); } catch (_) {}
+  return null;
+}
+
+function TNT_decomposeCopyTransformProperty(sourceProp, targetProp) {
+  if (!sourceProp || !targetProp) return;
+  var keyCount = 0;
+  try { keyCount = Number(sourceProp.numKeys || 0); } catch (_) {}
+  if (keyCount > 0) {
+    try { while (targetProp.numKeys > 0) targetProp.removeKey(1); } catch (_) {}
+    for (var keyIndex = 1; keyIndex <= keyCount; keyIndex++) {
+      var snapshot = TNT_keySnapshot(sourceProp, keyIndex);
+      var keyTime = sourceProp.keyTime(keyIndex);
+      targetProp.setValueAtTime(keyTime, snapshot.value);
+      TNT_restoreKeySnapshot(targetProp, targetProp.nearestKeyIndex(keyTime), snapshot);
+    }
+  } else {
+    try { targetProp.setValue(sourceProp.value); } catch (_) {}
+  }
+  try {
+    if (sourceProp.canSetExpression && sourceProp.expressionEnabled && sourceProp.expression) {
+      targetProp.expression = sourceProp.expression;
+      targetProp.expressionEnabled = true;
+    }
+  } catch (_) {}
+}
+
+function TNT_decomposeCopyTransform(sourceLayer, targetLayer) {
+  var sourceTransform = sourceLayer.property("ADBE Transform Group");
+  var targetTransform = targetLayer.property("ADBE Transform Group");
+  if (!sourceTransform || !targetTransform) return;
+
+  TNT_decomposeCopyTransformProperty(
+    sourceTransform.property("ADBE Anchor Point"),
+    targetTransform.property("ADBE Anchor Point")
+  );
+
+  var sourcePosition = sourceTransform.property("ADBE Position");
+  var targetPosition = targetTransform.property("ADBE Position");
+  var separated = false;
+  try { separated = !!sourcePosition.dimensionsSeparated; } catch (_) {}
+  try { targetPosition.dimensionsSeparated = separated; } catch (_) {}
+  if (separated) {
+    TNT_decomposeCopyTransformProperty(sourceTransform.property("ADBE Position_0"), targetTransform.property("ADBE Position_0"));
+    TNT_decomposeCopyTransformProperty(sourceTransform.property("ADBE Position_1"), targetTransform.property("ADBE Position_1"));
+  } else {
+    TNT_decomposeCopyTransformProperty(sourcePosition, targetPosition);
+  }
+
+  TNT_decomposeCopyTransformProperty(sourceTransform.property("ADBE Scale"), targetTransform.property("ADBE Scale"));
+  TNT_decomposeCopyTransformProperty(sourceTransform.property("ADBE Rotate Z"), targetTransform.property("ADBE Rotate Z"));
+}
+
+function TNT_validateDecomposeLayer(parentComp, layer) {
+  var source = null;
+  try { source = layer.source; } catch (_) {}
+  if (!source || !(source instanceof CompItem)) return "Select precomposition layers only.";
+  try { if (layer.timeRemapEnabled) return layer.name + ": time remapping is not supported yet."; } catch (_) {}
+  try { if (layer.collapseTransformation) return layer.name + ": disable Collapse Transformations first."; } catch (_) {}
+  try { if (layer.threeDLayer) return layer.name + ": 3D precomp transforms are not supported yet."; } catch (_) {}
+  try { if (Number(layer.stretch) <= 0) return layer.name + ": reversed or zero stretch is not supported yet."; } catch (_) {}
+  try {
+    if (layer.blendingMode !== BlendingMode.NORMAL) return layer.name + ": set the precomp blend mode to Normal first.";
+  } catch (_) {}
+  try {
+    var masks = layer.property("ADBE Mask Parade");
+    if (masks && masks.numProperties > 0) return layer.name + ": move outer masks inside the precomp first.";
+  } catch (_) {}
+  try {
+    var effects = layer.property("ADBE Effect Parade");
+    if (effects && effects.numProperties > 0) return layer.name + ": move outer effects inside the precomp first.";
+  } catch (_) {}
+  try {
+    var opacity = layer.property("ADBE Transform Group").property("ADBE Opacity");
+    if ((opacity.numKeys && opacity.numKeys > 0) ||
+        (opacity.canSetExpression && opacity.expressionEnabled) ||
+        Math.abs(Number(opacity.value) - 100) > 0.0001) {
+      return layer.name + ": outer opacity must be a constant 100%.";
+    }
+  } catch (_) {}
+  if (TNT_decomposeOuterMatteIndex(parentComp, layer)) {
+    return layer.name + ": remove its parent-timeline track matte relationship first.";
+  }
+  for (var i = 1; i <= source.numLayers; i++) {
+    var child = source.layer(i);
+    try {
+      if (child instanceof CameraLayer || child instanceof LightLayer || child.threeDLayer) {
+        return layer.name + ": inner 3D, camera, and light layers are not supported yet.";
+      }
+    } catch (_) {}
+    if (TNT_decomposeHasUnsafeExpression(child)) {
+      return layer.name + ": an inner expression depends on its original comp or layer index.";
+    }
+  }
+  return "";
+}
+
+function TNT_decomposeOtherUses(sourceComp, targetLayerId) {
+  var uses = [];
+  if (!sourceComp || !app.project) return uses;
+  for (var itemIndex = 1; itemIndex <= app.project.numItems; itemIndex++) {
+    var item = app.project.item(itemIndex);
+    if (!(item instanceof CompItem)) continue;
+    for (var layerIndex = 1; layerIndex <= item.numLayers; layerIndex++) {
+      var layer = item.layer(layerIndex);
+      if (layer.id === targetLayerId) continue;
+      try {
+        if (layer.source === sourceComp) uses.push(item.name + " / " + layer.name);
+      } catch (_) {}
+    }
+  }
+  return uses;
+}
+
+function decomposeComp(deleteSourceComp) {
+  deleteSourceComp = (deleteSourceComp === true || deleteSourceComp === "true");
+  var parentComp = getComp();
+  if (!parentComp) throw new Error("No active composition.");
+  var parentCompId = parentComp.id;
+  var selected = parentComp.selectedLayers;
+  if (!selected || !selected.length) throw new Error("Select at least one precomposition layer.");
+  if (selected.length > 1) throw new Error("Select one precomposition layer so Decompose remains a single Undo step.");
+
+  var targetIds = [];
+  for (var s = 0; s < selected.length; s++) {
+    var validationError = TNT_validateDecomposeLayer(parentComp, selected[s]);
+    if (validationError) throw new Error(validationError);
+    if (deleteSourceComp) {
+      var otherUses = TNT_decomposeOtherUses(selected[s].source, selected[s].id);
+      if (otherUses.length) {
+        throw new Error(
+          selected[s].source.name + " is still used by " + otherUses.length +
+          " other layer" + (otherUses.length === 1 ? "" : "s") + ": " + otherUses.join(", ")
+        );
+      }
+    }
+    targetIds.push(selected[s].id);
+  }
+
+  var createdLayerIds = [];
+  var controllerStates = [];
+  var undoOpen = false;
+  for (var stateIndex = 0; stateIndex < targetIds.length; stateIndex++) {
+    var stateLayer = TNT_decomposeLayerById(targetIds[stateIndex]);
+    controllerStates.push({
+      id: stateLayer.id,
+      name: stateLayer.name,
+      enabled: stateLayer.enabled,
+      audioEnabled: (function() { try { return stateLayer.audioEnabled; } catch (_) { return null; } })(),
+      guideLayer: (function() { try { return stateLayer.guideLayer; } catch (_) { return null; } })(),
+      shy: stateLayer.shy,
+      locked: stateLayer.locked,
+      selected: stateLayer.selected
+    });
+  }
+  try {
+    var copyCommandId = app.findMenuCommandId("Copy");
+    var pasteCommandId = app.findMenuCommandId("Paste");
+    if (!copyCommandId || !pasteCommandId) throw new Error("After Effects Copy/Paste commands are unavailable.");
+
+    var extractedTotal = 0;
+    var report = [];
+    for (var t = 0; t < targetIds.length; t++) {
+      var controller = TNT_decomposeLayerById(targetIds[t]);
+      if (!controller) throw new Error("The selected precomp layer is no longer available.");
+      var sourceComp = controller.source;
+      var sourceCompName = sourceComp.name;
+      var sourceLayerCount = sourceComp.numLayers;
+      var controllerId = controller.id;
+      var controllerStartTime = Number(controller.startTime || 0);
+      var controllerInPoint = Number(controller.inPoint || 0);
+      var controllerOutPoint = Number(controller.outPoint || parentComp.duration);
+      var controllerStretch = Number(controller.stretch || 100);
+      var sourceStart = Number(sourceComp.displayStartTime || 0);
+      var timeScale = controllerStretch / 100;
+      var copies = [];
+      var parentIndices = [];
+      var lockStates = [];
+      var parentLayerIds = {};
+      var sourceSelectionStates = [];
+
+      for (var parentSnapshot = 1; parentSnapshot <= parentComp.numLayers; parentSnapshot++) {
+        parentLayerIds[String(parentComp.layer(parentSnapshot).id)] = true;
+      }
+
+      for (var snapshot = 1; snapshot <= sourceComp.numLayers; snapshot++) {
+        var sourceLayer = sourceComp.layer(snapshot);
+        parentIndices[snapshot] = TNT_layerParentIndex(sourceLayer);
+        try { lockStates[snapshot] = !!sourceLayer.locked; } catch (_) { lockStates[snapshot] = false; }
+        try { sourceSelectionStates[snapshot] = !!sourceLayer.selected; } catch (_) { sourceSelectionStates[snapshot] = false; }
+      }
+
+      sourceComp.openInViewer();
+      for (var selectSource = 1; selectSource <= sourceComp.numLayers; selectSource++) {
+        try { sourceComp.layer(selectSource).locked = false; } catch (_) {}
+        try { sourceComp.layer(selectSource).selected = true; } catch (_) {}
+      }
+      app.executeCommand(copyCommandId);
+      for (var restoreSource = 1; restoreSource <= sourceComp.numLayers; restoreSource++) {
+        try { sourceComp.layer(restoreSource).selected = sourceSelectionStates[restoreSource]; } catch (_) {}
+        try { sourceComp.layer(restoreSource).locked = lockStates[restoreSource]; } catch (_) {}
+      }
+
+      // Copy cannot run inside an AE undo group when the source contains
+      // parents or linked expressions. Paste can, so begin the one-step
+      // transaction only after the clipboard is ready.
+      app.beginUndoGroup("Decompose Precomp");
+      undoOpen = true;
+
+      parentComp.openInViewer();
+      for (var deselectParent = 1; deselectParent <= parentComp.numLayers; deselectParent++) {
+        try { parentComp.layer(deselectParent).selected = false; } catch (_) {}
+      }
+      controller = TNT_decomposeLayerById(controllerId);
+      if (!controller) throw new Error("The selected precomp layer disappeared before Paste.");
+      try { controller.locked = false; } catch (_) {}
+      try { controller.selected = true; } catch (_) {}
+      app.executeCommand(pasteCommandId);
+
+      var copiedCount = 0;
+      for (var copiedScan = 1; copiedScan <= parentComp.numLayers; copiedScan++) {
+        var copiedCandidate = parentComp.layer(copiedScan);
+        if (parentLayerIds[String(copiedCandidate.id)]) continue;
+        copiedCount++;
+        copies[copiedCount] = copiedCandidate.id;
+        createdLayerIds.push(copiedCandidate.id);
+      }
+      if (copiedCount !== sourceComp.numLayers) {
+        throw new Error("After Effects pasted " + copiedCount + " of " + sourceComp.numLayers + " layers.");
+      }
+
+      controller = TNT_decomposeLayerById(controllerId);
+      if (!controller) throw new Error("The selected precomp layer disappeared before creating its controller.");
+      var hierarchyControllerId = controllerId;
+      var controllerNull = null;
+      if (deleteSourceComp) {
+        controllerNull = parentComp.layers.addNull();
+        controllerNull.name = "#" + sourceCompName + " Null";
+        controllerNull.startTime = controllerStartTime;
+        controllerNull.inPoint = controllerInPoint;
+        controllerNull.outPoint = controllerOutPoint;
+        try { controllerNull.label = controller.label; } catch (_) {}
+        TNT_decomposeCopyTransform(controller, controllerNull);
+        controllerNull.moveBefore(controller);
+        hierarchyControllerId = controllerNull.id;
+        createdLayerIds.push(hierarchyControllerId);
+      } else {
+        try { controller.enabled = false; } catch (_) {}
+        try { controller.audioEnabled = false; } catch (_) {}
+      }
+
+      for (var adjust = 1; adjust <= sourceComp.numLayers; adjust++) {
+        var original = sourceComp.layer(adjust);
+        var copied = TNT_decomposeLayerById(copies[adjust]);
+        if (!copied) throw new Error("A pasted layer disappeared while adjusting timing.");
+        try { copied.locked = false; } catch (_) {}
+        copied.startTime = controllerStartTime + (original.startTime - sourceStart) * timeScale;
+        copied.stretch = Number(original.stretch || 100) * timeScale;
+        copied.inPoint = Math.max(controllerInPoint, controllerStartTime + (original.inPoint - sourceStart) * timeScale);
+        copied.outPoint = Math.min(controllerOutPoint, controllerStartTime + (original.outPoint - sourceStart) * timeScale);
+      }
+
+      var orderAnchorId = hierarchyControllerId;
+      for (var order = sourceComp.numLayers; order >= 1; order--) {
+        var orderedCopy = TNT_decomposeLayerById(copies[order]);
+        var orderAnchor = TNT_decomposeLayerById(orderAnchorId);
+        if (!orderedCopy || !orderAnchor) throw new Error("A copied layer disappeared while arranging the stack.");
+        if (orderedCopy.id !== orderAnchor.id && orderedCopy.index !== orderAnchor.index - 1) {
+          orderedCopy.moveBefore(orderAnchor);
+        }
+        orderAnchorId = orderedCopy.id;
+      }
+
+      for (var p = 1; p <= sourceComp.numLayers; p++) {
+        var childCopy = TNT_decomposeLayerById(copies[p]);
+        var copiedParent = parentIndices[p] ? TNT_decomposeLayerById(copies[parentIndices[p]]) : null;
+        var desiredParent = copiedParent || TNT_decomposeLayerById(hierarchyControllerId);
+        if (!childCopy || !desiredParent) throw new Error("A copied layer disappeared while restoring parenting.");
+        var currentParentId = 0;
+        try { currentParentId = childCopy.parent ? childCopy.parent.id : 0; } catch (_) {}
+        if (currentParentId !== desiredParent.id) childCopy.setParentWithJump(desiredParent);
+      }
+
+      controller = TNT_decomposeLayerById(targetIds[t]);
+      if (!controller) throw new Error("The selected precomp layer disappeared before finalizing.");
+      try { controller.locked = false; } catch (_) {}
+      if (deleteSourceComp) {
+        controller.remove();
+        try { controllerNull.selected = false; } catch (_) {}
+      } else {
+        try { controller.enabled = false; } catch (_) {}
+        try { controller.audioEnabled = false; } catch (_) {}
+        try { controller.selected = false; } catch (_) {}
+      }
+      for (var restore = 1; restore <= sourceComp.numLayers; restore++) {
+        var restoredCopy = TNT_decomposeLayerById(copies[restore]);
+        try { restoredCopy.locked = lockStates[restore]; } catch (_) {}
+        try { restoredCopy.selected = true; } catch (_) {}
+      }
+      extractedTotal += sourceLayerCount;
+      report.push(sourceCompName + " (" + sourceLayerCount + ")");
+      if (deleteSourceComp) sourceComp.remove();
+    }
+    app.endUndoGroup();
+    undoOpen = false;
+    TNT_restoreNativeCompById(parentCompId);
+    return "Decomposed " + targetIds.length + " precomp" + (targetIds.length === 1 ? "" : "s") +
+      ": " + extractedTotal + " layer" + (extractedTotal === 1 ? "" : "s") + " extracted" +
+      (deleteSourceComp ? " and source comp deleted" : "; original precomp retained as hidden controller") +
+      " — " + report.join(", ");
+  } catch (err) {
+    try {
+      if (sourceComp && sourceSelectionStates && lockStates) {
+        for (var restoreFailedSource = 1; restoreFailedSource <= sourceComp.numLayers; restoreFailedSource++) {
+          try { sourceComp.layer(restoreFailedSource).selected = sourceSelectionStates[restoreFailedSource]; } catch (_) {}
+          try { sourceComp.layer(restoreFailedSource).locked = lockStates[restoreFailedSource]; } catch (_) {}
+        }
+      }
+    } catch (_) {}
+    for (var removeIndex = createdLayerIds.length - 1; removeIndex >= 0; removeIndex--) {
+      var createdLayer = TNT_decomposeLayerById(createdLayerIds[removeIndex]);
+      try { createdLayer.locked = false; } catch (_) {}
+      try { createdLayer.remove(); } catch (_) {}
+    }
+    for (var restoreState = 0; restoreState < controllerStates.length; restoreState++) {
+      var saved = controllerStates[restoreState];
+      var savedLayer = TNT_decomposeLayerById(saved.id);
+      try { savedLayer.locked = false; } catch (_) {}
+      try { savedLayer.name = saved.name; } catch (_) {}
+      try { savedLayer.enabled = saved.enabled; } catch (_) {}
+      try { if (saved.audioEnabled !== null) savedLayer.audioEnabled = saved.audioEnabled; } catch (_) {}
+      try { if (saved.guideLayer !== null) savedLayer.guideLayer = saved.guideLayer; } catch (_) {}
+      try { savedLayer.shy = saved.shy; } catch (_) {}
+      try { savedLayer.selected = saved.selected; } catch (_) {}
+      try { savedLayer.locked = saved.locked; } catch (_) {}
+    }
+    if (undoOpen) {
+      try { app.endUndoGroup(); } catch (_) {}
+      undoOpen = false;
+    }
+    TNT_restoreNativeCompById(parentCompId);
+    throw err;
+  }
+}
+
+function decomposeCompAndDelete() {
+  return decomposeComp(true);
+}
 
 
 // ── fn/addArrowhead.jsx
@@ -10825,6 +11483,7 @@ function TNT_removeLayerStyleWithDeleteCommand(comp, layer, gMn) {
     var deleteId = 0;
     try { deleteId = app.findMenuCommandId("Delete"); } catch (_) {}
     if (!deleteId) deleteId = 20;
+    if (!TNT_prepareCompForNativeCommand(comp)) return false;
     app.executeCommand(deleteId);
     return !TNT_layerStyleExists(layer, gMn);
   } catch (_) {}
@@ -10843,6 +11502,7 @@ function TNT_clearLayerStyleWithMenuCommand(comp, layer, gMn) {
       } catch (_) {}
     }
     layer.selected = true;
+    if (!TNT_prepareCompForNativeCommand(comp)) return false;
     app.executeCommand(commandId);
     return !TNT_layerStyleIsEnabled(layer, gMn);
   } catch (_) {}
@@ -11468,10 +12128,6 @@ function TNT_runTntV3Command(functionName, args) {
       return TNT_jsonStringify({ ok: false, error: "TNT function not available: " + functionName });
     }
     if (!args || args.length === undefined) args = [];
-    try {
-      var activeComp = TNT_activeComp();
-      if (activeComp) activeComp.openInViewer();
-    } catch (_) {}
     var result = fn.apply(this, args);
     return TNT_jsonStringify({ ok: true, result: result === undefined ? "" : String(result) });
   } catch (err) {
@@ -11600,10 +12256,6 @@ function TNT_runAssistantGeneratedScript(source, label, revertAfterRun) {
     var safety = TNT_assistantScriptSafetyCheck(source);
     if (!safety.ok) return TNT_jsonStringify(safety);
     var beforeSnapshot = TNT_assistantStateSnapshot();
-    try {
-      var activeComp = TNT_activeComp();
-      if (activeComp) activeComp.openInViewer();
-    } catch (_) {}
     app.beginUndoGroup(label);
     undoOpen = true;
     var result = eval("(function () {\n" + source + "\n})()");

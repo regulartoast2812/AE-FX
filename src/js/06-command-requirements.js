@@ -106,36 +106,3 @@ const TNT_FUNCTION_REQUIREMENTS = {
   "trimToKeyframes": "layers",
 };
 
-// What a registry entry requires, or "" when nothing is known. tntFunction
-// commands look their host function up in the derived table; entries with a
-// panel-side action are not covered by the derivation, so they stay live.
-function tntEntryRequirement(entry) {
-  if (!entry) return "";
-  if (entry.requires) return String(entry.requires);
-  const fn = entry.tntFunction ? String(entry.tntFunction) : "";
-  return fn && TNT_FUNCTION_REQUIREMENTS[fn] ? TNT_FUNCTION_REQUIREMENTS[fn] : "";
-}
-
-// The cross-check: requirement against what is actually selected. Returns the
-// reason it cannot run, or "" when it can.
-function tntEntryUnmetRequirement(entry) {
-  const requirement = tntEntryRequirement(entry);
-  if (!requirement) return "";
-  if (requirement === "layers") {
-    return (state.selectedLayerIndices || []).length ? "" : "Needs a layer selected";
-  }
-  if (requirement === "keyframes") {
-    const keys = typeof selectedKeyframes !== "undefined" ? (selectedKeyframes || []) : [];
-    return keys.length ? "" : "Needs keyframes selected";
-  }
-  if (requirement === "masks") {
-    return (state.selectedLayerIndices || []).length ? "" : "Needs a layer with a mask";
-  }
-  return "";
-}
-
-const TNT_REQUIREMENT_LABELS = {
-  layers: "Layer",
-  keyframes: "Keys",
-  masks: "Mask"
-};

@@ -2028,9 +2028,7 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  /* 8, like every other label-to-control pair in this panel. This one was 5,
-     the single place the A panel broke its own spacing rule. */
-  gap: 8px;
+  gap: 5px;
   margin: 0;
   padding: 0;
 }
@@ -2567,3 +2565,4 @@ body.quick-panel-mode .layout-panel-head {
 #anchorModal .anchor-timing-sections .timing-pull-row > span:nth-of-type(2) {
   margin-left: auto;
 }
+

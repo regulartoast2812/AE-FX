@@ -163,21 +163,28 @@ working in a current browser.
 
 ## Panel spacing standard
 
-Measured off the A panel, which is the reference every other subpanel is
-matched to:
+Two gap values, and nothing else:
 
 - **4px** between controls inside one group (icon buttons in a row, presets)
 - **8px** between a label and its control, and between two labelled groups
   sharing a row
 - **5px** between sections, and between cards in a group
 
-Nothing else. Before adding a `gap`, use one of these three; a fourth value is
-how the T panel ended up with 4, 5, 6, 8 and 10 all at once and read as
-"beyond weird" spacing. The A panel itself broke the rule in one place -
-`Group:` sat at 5 - so check the reference before trusting it.
+`Group:` in the A panel sits at 5px and is correct as it is. Do not "fix" it.
 
-To verify, measure the rendered gaps rather than reading the CSS: several of
-these come from nested containers whose declared gap is not what lands.
+**Never add a fixed column to make labels or controls line up.** Both panels
+were made worse that way and the A panel change had to be reverted. A fixed
+cell stuffs dead space into every row that does not need the full width and
+stretches controls to fill it - the Text panel's Style select went from its
+natural 92px to 116px, and `Animate:`'s three 86px icons sat in a 116px cell.
+In the A panel each control simply sits beside its own label at a constant
+gap and the columns do not line up. That is correct.
+
+**Measure from the label's glyphs, not its box** - a Range over the text node.
+A label cell wider than its text reports the correct 8px while showing 17px on
+screen: `In` sat in a fixed 22px cell holding 10px of text, so it looked adrift
+while `Out`, which filled its cell, looked right. Both measured 8px by
+element box.
 
 ## Restarting the native listener
 

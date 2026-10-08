@@ -320,6 +320,9 @@ const TNT_V3_COMMANDS = [
     { name: "Text Anim In+Out Up", category: "Text", tntFunction: "applyTextAnimMaster", args: ["up", 3, true, true, false, 0.35, 0.35, "both"] },
     { name: "Text Bounce In Up", category: "Text", tntFunction: "applyTextAnimBounce", args: ["up", 3, true, true, false, 0.35, 0.35, "in"] }
   ] },
+  { name: "Split Text to Characters", category: "Text", tntFunction: "splitTextCharacters", does: "Split", targets: ["Text", "Layer"] },
+  { name: "Split Text to Words", category: "Text", tntFunction: "splitTextWords", does: "Split", targets: ["Text", "Layer"] },
+  { name: "Split Text to Lines", category: "Text", tntFunction: "splitTextLines", does: "Split", targets: ["Text", "Layer"] },
   { name: "Apply Wiggle FFX", category: "Effects", tntFunction: "applyWiggleFFX", args: [2, 20] },
   { name: "Apply Glow", category: "Effects", tntFunction: "applyGlow" },
   { name: "Apply Light Sweep", category: "Effects", tntFunction: "applyLightSweep", args: [{ inTime: 1, easeIn: 75, easeOut: 75 }] },
@@ -340,6 +343,8 @@ const TNT_V3_COMMANDS = [
   { name: "Parent to Last Selected Layer", category: "Layers", action: parentToLastSelectedLayer },
   { name: "Parent to Target Layer...", category: "Layers", action: promptParentToTargetLayer },
   { name: "Precompose Selected", category: "Layers", tntFunction: "precomposeSelected" },
+  { name: "Decompose Precomp", category: "Composition", tntFunction: "decomposeComp" },
+  { name: "Decompose + Delete Source", category: "Composition", tntFunction: "decomposeCompAndDelete" },
   { name: "Lock Selected", category: "Layers", tntFunction: "lockSelected" },
   { name: "Trim to Keyframes", category: "Layers", group: "Trim Layer", tntFunction: "trimToKeyframes" },
   { name: "Hide Selected", category: "Layers", tntFunction: "hideSelected" },
@@ -897,14 +902,31 @@ function declareUserShortcutKeyInterest(add, letters) {
 // Light, Shape, Text, or the source name for footage - and rides along in the
 // layer payload, so this costs no round trip.
 function tntSelectionSummary() {
-  const indices = (state.selectedLayerIndices || []).map(Number);
-  const layers = (state.layers || []).filter(layer => indices.indexOf(Number(layer.index || 0)) >= 0);
+  // A selection is addressed by layer index, and indices move whenever layers
+  // are reordered - which this tool does constantly. So validate rather than
+  // trust the arrays:
+  //
+  //  - repeats are collapsed. [1,1,1] used to count as three layers.
+  //  - a layer only matches on an index of its own. Number(layer.index || 0)
+  //    turned a layer carrying no index into index 0, which then matched any
+  //    selection containing 0.
+  //  - resolved says how many of them were actually found, so callers can tell
+  //    a complete picture from a partial one.
+  const selected = new Set();
+  (state.selectedLayerIndices || []).forEach(value => {
+    const index = Number(value);
+    if (Number.isFinite(index) && index > 0) selected.add(index);
+  });
+  const layers = (state.layers || []).filter(layer => {
+    const index = Number(layer && layer.index);
+    return Number.isFinite(index) && index > 0 && selected.has(index);
+  });
   const types = {};
   layers.forEach(layer => {
     const type = String(layer.type || "Layer");
     types[type] = (types[type] || 0) + 1;
   });
-  return { count: indices.length, resolved: layers.length, types };
+  return { count: selected.size, resolved: layers.length, types };
 }
 
 // "no selection" / "1 Text layer" / "3 layers - 2 Shape, 1 Text".
@@ -912,23 +934,30 @@ function tntSelectionSummary() {
 // The breakdown only appears when it says something the count does not: one
 // layer names its own type, and a uniform selection names it once rather than
 // listing it. Mixed selections are the case worth spelling out.
+//
+// It also only appears when every selected layer was found. A partial resolve
+// used to print a breakdown that did not add up to its own headline - "3 layers
+// - 1 Shape, 1 Text" - which is the normal state for a moment after any
+// reorder, while the panel's layer list is still behind the selection.
 function tntSelectionLabel() {
   const summary = tntSelectionSummary();
   if (!summary.count) return "no selection";
   const names = Object.keys(summary.types);
   const plural = summary.count === 1 ? "" : "s";
+  if (!names.length || summary.resolved !== summary.count) {
+    return `${summary.count} layer${plural}`;
+  }
   if (names.length === 1) {
     // "Layer" is the host's fallback when it cannot name the type, so repeating
     // it reads as "2 Layer layers".
     if (names[0] === "Layer") return `${summary.count} layer${plural}`;
     return `${summary.count} ${names[0]} layer${plural}`;
   }
-  if (!names.length) return `${summary.count} layer${plural}`;
   const breakdown = names
     .sort((a, b) => summary.types[b] - summary.types[a] || a.localeCompare(b))
     .map(name => `${summary.types[name]} ${name}`)
     .join(", ");
-  return `${summary.count} layer${plural} \u00b7 ${breakdown}`;
+  return `${summary.count} layer${plural} · ${breakdown}`;
 }
 
 // Colours per layer type, for the selection bar. Chosen to stay apart at a
@@ -1318,22 +1347,31 @@ async function ensureVendoredTntCommands(options = {}) {
 }
 
 async function runTntV3Command(command) {
-  if (!command || !command.tntFunction) return;
+  if (!command || !command.tntFunction) return false;
   suppressSyncUntil = Date.now() + 1200;
   const loaded = await ensureVendoredTntCommands();
   if (!loaded.ok) {
     statusEl.textContent = loaded.error || "Could not load panel commands.";
-    return;
+    if (QUICK_PANEL_MODE) {
+      const contextEl = document.getElementById("quickPanelContext");
+      if (contextEl) contextEl.textContent = statusEl.textContent;
+    }
+    return false;
   }
   const result = await aeCall("TNT_runTntV3Command", [command.tntFunction, command.args || []]);
   if (!result.ok) {
     statusEl.textContent = result.error || "Panel command failed.";
-    return;
+    if (QUICK_PANEL_MODE) {
+      const contextEl = document.getElementById("quickPanelContext");
+      if (contextEl) contextEl.textContent = statusEl.textContent;
+    }
+    return false;
   }
   statusEl.textContent = String(result.result || `${command.name} done`);
   closeFxConsole();
   await refreshLayers({ forceRender: true });
   focusPanel(2);
+  return true;
 }
 
 async function callTntV3Command(functionName, args = [], options = {}) {
@@ -2091,39 +2129,6 @@ const TNT_FUNCTION_REQUIREMENTS = {
   "trimToKeyframes": "layers",
 };
 
-// What a registry entry requires, or "" when nothing is known. tntFunction
-// commands look their host function up in the derived table; entries with a
-// panel-side action are not covered by the derivation, so they stay live.
-function tntEntryRequirement(entry) {
-  if (!entry) return "";
-  if (entry.requires) return String(entry.requires);
-  const fn = entry.tntFunction ? String(entry.tntFunction) : "";
-  return fn && TNT_FUNCTION_REQUIREMENTS[fn] ? TNT_FUNCTION_REQUIREMENTS[fn] : "";
-}
-
-// The cross-check: requirement against what is actually selected. Returns the
-// reason it cannot run, or "" when it can.
-function tntEntryUnmetRequirement(entry) {
-  const requirement = tntEntryRequirement(entry);
-  if (!requirement) return "";
-  if (requirement === "layers") {
-    return (state.selectedLayerIndices || []).length ? "" : "Needs a layer selected";
-  }
-  if (requirement === "keyframes") {
-    const keys = typeof selectedKeyframes !== "undefined" ? (selectedKeyframes || []) : [];
-    return keys.length ? "" : "Needs keyframes selected";
-  }
-  if (requirement === "masks") {
-    return (state.selectedLayerIndices || []).length ? "" : "Needs a layer with a mask";
-  }
-  return "";
-}
-
-const TNT_REQUIREMENT_LABELS = {
-  layers: "Layer",
-  keyframes: "Keys",
-  masks: "Mask"
-};
 // Words for commands that the command's own name does not use.
 //
 // The search is literal - a term either appears in the haystack or it does not
@@ -2194,6 +2199,57 @@ function tntEntryAliases(entry) {
   const own = entry.aliases ? String(entry.aliases) : "";
   const shared = TNT_COMMAND_ALIASES[String(entry.name || "")] || "";
   return own && shared ? `${own} ${shared}` : (own || shared);
+}
+
+// Moved here out of 06-command-requirements.js. That file is written whole by
+// scripts/derive-command-requirements.py, which emits the map and stops - so
+// these two lived below the generator's last line and would have been deleted
+// the next time anyone regenerated the requirements.
+
+// Badge text for the Functions list, next to a command whose requirement the
+// selection does not meet. Falls back to the raw requirement key.
+//
+// RECONSTRUCTED: this lived at the bottom of 06-command-requirements.js and was
+// lost when that file was truncated. The wording is a guess at the original.
+const TNT_REQUIREMENT_LABELS = {
+  layers: "Needs layers",
+  keyframes: "Needs keyframes",
+  masks: "Needs a mask"
+};
+
+// What a registry entry requires, or "" when nothing is known. tntFunction
+// commands look their host function up in the derived table; entries with a
+// panel-side action are not covered by the derivation, so they stay live.
+function tntEntryRequirement(entry) {
+  if (!entry) return "";
+  if (entry.requires) return String(entry.requires);
+  const fn = entry.tntFunction ? String(entry.tntFunction) : "";
+  return fn && TNT_FUNCTION_REQUIREMENTS[fn] ? TNT_FUNCTION_REQUIREMENTS[fn] : "";
+}
+
+// The cross-check: requirement against what is actually selected. Returns the
+// reason it cannot run, or "" when it can.
+function tntEntryUnmetRequirement(entry) {
+  const requirement = tntEntryRequirement(entry);
+  if (!requirement) return "";
+  // Counted through tntSelectionSummary rather than off the raw array, which
+  // keeps repeats and indices that no longer point at a layer. [1,1,1] read as
+  // three layers there, so a command could look runnable on a selection that
+  // was really one layer, or none.
+  const layerCount = typeof tntSelectionSummary === "function"
+    ? tntSelectionSummary().count
+    : (state.selectedLayerIndices || []).length;
+  if (requirement === "layers") {
+    return layerCount ? "" : "Needs a layer selected";
+  }
+  if (requirement === "keyframes") {
+    const keys = typeof selectedKeyframes !== "undefined" ? (selectedKeyframes || []) : [];
+    return keys.length ? "" : "Needs keyframes selected";
+  }
+  if (requirement === "masks") {
+    return layerCount ? "" : "Needs a layer with a mask";
+  }
+  return "";
 }
 function ensureLayerStyleDialog() {
   if (layerStyleDialogEl) return layerStyleDialogEl;
@@ -10880,13 +10936,6 @@ function ensureTextAnimationPanel() {
     if (event.target === textAnimationBackdropEl) hideTextAnimationPanel();
   });
   textAnimationBackdropEl.addEventListener("keydown", event => {
-    const toggle = event.target.closest && event.target.closest("[data-text-toggle]");
-    if (toggle && (event.key === " " || event.key === "Enter")) {
-      event.preventDefault();
-      event.stopPropagation();
-      if (!event.repeat) toggle.click();
-      return;
-    }
     if (event.key === "Escape") {
       event.preventDefault();
       hideTextAnimationPanel();
@@ -11818,11 +11867,24 @@ async function runCompositionPanelAction(action) {
     trim: { name: "Auto Trim Comp", tntFunction: "autoTrimComp", args: [false] },
     crop: { name: "Auto Crop Comps", tntFunction: "cropComp", args: [false, 0] },
     precompose: { name: "Pre-compose Selected", tntFunction: "precomposeSelected" },
+    decompose: { name: "Decompose Precomp", tntFunction: "decomposeComp" },
+    decomposeDelete: { name: "Decompose + Delete Source", tntFunction: "decomposeCompAndDelete" },
     render: { name: "Add to Render Queue", tntFunction: "addToRenderQueue" }
   };
   const command = commands[action];
   if (!command) return;
-  await runTntV3Command(command);
+  const result = await callTntV3Command(command.tntFunction, command.args || [], {
+    refresh: true,
+    status: false
+  });
+  if (!result || !result.ok) {
+    const message = result && result.error ? result.error : `${command.name} failed.`;
+    if (compositionErrorEl) compositionErrorEl.textContent = message;
+    statusEl.textContent = message;
+    return;
+  }
+  statusEl.textContent = String(result.result || `${command.name} done`);
+  hideCompositionPanel();
 }
 
 function closeActivePopup() {
@@ -12413,6 +12475,10 @@ function handleShortcut(event) {
   // Composition Tools here. Its listener cannot win on ordering (this handler is
   // registered on window first), so it is deferred to explicitly.
   if (typeof tnkOwnsKeyboard === "function" && tnkOwnsKeyboard()) return;
+  // Native buttons own Space and Enter. Let their normal click activation run
+  // before considering those keys as panel shortcuts (Space is playback).
+  const focusedButton = event.target && event.target.closest && event.target.closest("button");
+  if (focusedButton && (event.key === " " || event.key === "Spacebar" || event.key === "Enter")) return;
   // While a shortcut cell is listening, capture owns the keyboard. These handlers
   // are registered on window earlier in the bundle, so without this they consume
   // Escape and Delete before the capture listener ever sees them.
@@ -13066,17 +13132,17 @@ function quickPanelSurfaceFixedHeight(surface) {
   return 0;
 }
 
+// Every panel is sized by its own content, which is what the A panel has always
+// done. The per-panel minimums below were stale - the Text panel asked for 560
+// while its content is 239, so the window came out 321px taller than the panel.
+// The content sits at the top of that window and the window is centred
+// vertically, so an inflated minimum makes the panel ride high on screen. That
+// is why the Text panel sat over the toolbar while the A panel sat over the
+// timeline: not a position setting, a size one.
+//
+// A floor is still wanted so a panel that opens empty is not a sliver.
 function quickPanelSurfaceMinimumHeight(surface) {
-  if (!surface) return 260;
-  if (surface.classList.contains("quick-layer-menu-dialog")) return 520;
-  if (surface.classList.contains("effects-control-dialog") || surface.classList.contains("shapes-control-dialog")) return 520;
-  if (surface.classList.contains("layer-style-dialog") && !surface.classList.contains("mask-control-dialog")) return 620;
-  if (surface.classList.contains("ease-dialog")) return 620;
-  if (surface.classList.contains("mass-edit-dialog")) return 560;
-  if (surface.classList.contains("text-animation-dialog")) return 560;
-  if (surface.classList.contains("timing-order-layout")) return 420;
-  if (surface.classList.contains("timeline-command-dialog")) return 300;
-  return 180;
+  return surface ? 180 : 260;
 }
 
 function quickPanelNaturalHeight(surface) {
@@ -13897,8 +13963,11 @@ async function tntRunWithProgress(element, label, run) {
   // treated as the same running state.
   void element.offsetWidth;
   element.classList.add("tnt-running");
+  let succeeded = false;
   try {
-    return await run();
+    const result = await run();
+    succeeded = result !== false;
+    return result;
   } finally {
     const elapsed = Date.now() - started;
     // Hand the completion animation the width the fill actually reached, so a
@@ -13913,7 +13982,7 @@ async function tntRunWithProgress(element, label, run) {
     element.classList.remove("tnt-running");
     void element.offsetWidth;
     element.classList.add("tnt-run-done");
-    if (statusEl && label) statusEl.textContent = `${label} · ${tntFormatRunTime(elapsed)}`;
+    if (succeeded && statusEl && label) statusEl.textContent = `${label} · ${tntFormatRunTime(elapsed)}`;
     // Must outlast the 2s completion animation, or the fill is dropped mid-fade.
     // Re-renders in between re-apply the state, so this owns clearing it.
     tntRunClearTimer = setTimeout(() => {
@@ -15471,6 +15540,28 @@ const TNK_PARAM_FIELDS = [
 // needs its OWN icon - the shared action/target glyphs from the Functions list
 // would render half this panel as the same sparkle.
 const TNK_GROUPS = [
+  { title: "Motion", commands: [
+    { label: "Anim Up", icon: "arrow-up", key: "1",
+      desc: "Animates the layer in from above and out upward, using the bar's IN, OUT and easing values.",
+      command: "In+Out Up", shift: "In from Up", alt: "Out to Up" },
+    { label: "Anim Down", icon: "arrow-down", key: "2",
+      desc: "Animates the layer in from below and out downward, using the bar's IN, OUT and easing values.",
+      command: "In+Out Down", shift: "In from Down", alt: "Out to Down" },
+    { label: "Anim Left", icon: "arrow-left", key: "3",
+      desc: "Animates the layer in from the left and out leftward, using the bar's IN, OUT and easing values.",
+      command: "In+Out Left", shift: "In from Left", alt: "Out to Left" },
+    { label: "Anim Right", icon: "arrow-right", key: "4",
+      desc: "Animates the layer in from the right and out rightward, using the bar's IN, OUT and easing values.",
+      command: "In+Out Right", shift: "In from Right", alt: "Out to Right" },
+    { label: "Scale", icon: "scaling", desc: "Animates scale in and out, using the bar's IN, OUT and easing values.",
+      command: "Scale In+Out",
+      shift: "Scale In", alt: "Scale Out" },
+    { label: "Opacity", icon: "eye", desc: "Fades opacity in and out, using the bar's IN, OUT and easing values.",
+      command: "Opacity In+Out",
+      shift: "Opacity In", alt: "Opacity Out" },
+    { label: "Anticipation", icon: "undo-2", desc: "Opens the Anticipation palette in After Effects for building anticipation and follow-through.",
+      command: "Anticipation Tool" }
+  ] },
   { title: "Keys", commands: [
     { label: "Ease In / Out", icon: "spline", key: "e", desc: "Eases the selected keyframes in and out, using the EI and EO values from the bar.",
       command: "Ease In / Out" },
@@ -15537,28 +15628,6 @@ const TNK_GROUPS = [
       command: "Apply Dim + Desat" },
     { label: "Delete Effects", icon: "trash-2", desc: "Removes every effect from the selected layers.",
       command: "Delete All Effects" }
-  ] },
-  { title: "Motion", commands: [
-    { label: "Anim Up", icon: "arrow-up", key: "1",
-      desc: "Animates the layer in from above and out upward, using the bar's IN, OUT and easing values.",
-      command: "In+Out Up", shift: "In from Up", alt: "Out to Up" },
-    { label: "Anim Down", icon: "arrow-down", key: "2",
-      desc: "Animates the layer in from below and out downward, using the bar's IN, OUT and easing values.",
-      command: "In+Out Down", shift: "In from Down", alt: "Out to Down" },
-    { label: "Anim Left", icon: "arrow-left", key: "3",
-      desc: "Animates the layer in from the left and out leftward, using the bar's IN, OUT and easing values.",
-      command: "In+Out Left", shift: "In from Left", alt: "Out to Left" },
-    { label: "Anim Right", icon: "arrow-right", key: "4",
-      desc: "Animates the layer in from the right and out rightward, using the bar's IN, OUT and easing values.",
-      command: "In+Out Right", shift: "In from Right", alt: "Out to Right" },
-    { label: "Scale", icon: "scaling", desc: "Animates scale in and out, using the bar's IN, OUT and easing values.",
-      command: "Scale In+Out",
-      shift: "Scale In", alt: "Scale Out" },
-    { label: "Opacity", icon: "eye", desc: "Fades opacity in and out, using the bar's IN, OUT and easing values.",
-      command: "Opacity In+Out",
-      shift: "Opacity In", alt: "Opacity Out" },
-    { label: "Anticipation", icon: "undo-2", desc: "Opens the Anticipation palette in After Effects for building anticipation and follow-through.",
-      command: "Anticipation Tool" }
   ] },
   { title: "Timing", commands: [
     { label: "Trim to Playhead", icon: "arrow-right-to-line", desc: "Trims the in point of the selected layers to the playhead.",

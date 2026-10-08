@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>Timeline CEP</title>
-  <link rel="stylesheet" href="./css/style.css?v=150ef83db46b" />
+  <link rel="stylesheet" href="./css/style.css?v=d16dd2ea984c" />
 </head>
 <body>
   <section id="quickPanelShell" class="quick-panel-shell" aria-label="AE FX Quick Controls">
@@ -266,6 +266,14 @@
               <span class="composition-tool-icon icon-precompose" aria-hidden="true"></span>
               <span>Pre-compose Selected</span>
             </button>
+            <button type="button" class="composition-tool" data-composition-action="decompose" title="Extract selected precomposition layers into this timeline while preserving their placement">
+              <span class="composition-tool-icon icon-decompose" aria-hidden="true"></span>
+              <span>Decompose Precomp</span>
+            </button>
+            <button type="button" class="composition-tool composition-tool-destructive" data-composition-action="decomposeDelete" title="Extract the selected precomp, then delete its source composition from the project when it has no other uses">
+              <span class="composition-tool-icon icon-decompose" aria-hidden="true"></span>
+              <span>Decompose + Delete Source</span>
+            </button>
             <button type="button" class="composition-tool" data-composition-action="rename" title="Rename the active composition">
               <span class="composition-tool-icon icon-rename" aria-hidden="true"></span>
               <span>Rename Composition</span>
@@ -283,7 +291,6 @@
         <section class="composition-section composition-roadmap">
           <div class="composition-section-title">Planned</div>
           <div class="composition-roadmap-list">
-            <span>Decompose</span>
             <span>Duplicate Comps</span>
             <span>Batch Rename Comps</span>
             <span>Batch Scale Comps</span>
@@ -406,6 +413,6 @@
 
   <script src="./icons/lucide.js"></script>
   <script src="./js/CSInterface.js"></script>
-  <script src="./js/main.js?v=150ef83db46b"></script>
+  <script src="./js/main.js?v=d16dd2ea984c"></script>
 </body>
 </html>

@@ -113,13 +113,6 @@ function ensureTextAnimationPanel() {
     if (event.target === textAnimationBackdropEl) hideTextAnimationPanel();
   });
   textAnimationBackdropEl.addEventListener("keydown", event => {
-    const toggle = event.target.closest && event.target.closest("[data-text-toggle]");
-    if (toggle && (event.key === " " || event.key === "Enter")) {
-      event.preventDefault();
-      event.stopPropagation();
-      if (!event.repeat) toggle.click();
-      return;
-    }
     if (event.key === "Escape") {
       event.preventDefault();
       hideTextAnimationPanel();

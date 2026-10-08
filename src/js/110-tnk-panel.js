@@ -48,6 +48,28 @@ const TNK_PARAM_FIELDS = [
 // needs its OWN icon - the shared action/target glyphs from the Functions list
 // would render half this panel as the same sparkle.
 const TNK_GROUPS = [
+  { title: "Motion", commands: [
+    { label: "Anim Up", icon: "arrow-up", key: "1",
+      desc: "Animates the layer in from above and out upward, using the bar's IN, OUT and easing values.",
+      command: "In+Out Up", shift: "In from Up", alt: "Out to Up" },
+    { label: "Anim Down", icon: "arrow-down", key: "2",
+      desc: "Animates the layer in from below and out downward, using the bar's IN, OUT and easing values.",
+      command: "In+Out Down", shift: "In from Down", alt: "Out to Down" },
+    { label: "Anim Left", icon: "arrow-left", key: "3",
+      desc: "Animates the layer in from the left and out leftward, using the bar's IN, OUT and easing values.",
+      command: "In+Out Left", shift: "In from Left", alt: "Out to Left" },
+    { label: "Anim Right", icon: "arrow-right", key: "4",
+      desc: "Animates the layer in from the right and out rightward, using the bar's IN, OUT and easing values.",
+      command: "In+Out Right", shift: "In from Right", alt: "Out to Right" },
+    { label: "Scale", icon: "scaling", desc: "Animates scale in and out, using the bar's IN, OUT and easing values.",
+      command: "Scale In+Out",
+      shift: "Scale In", alt: "Scale Out" },
+    { label: "Opacity", icon: "eye", desc: "Fades opacity in and out, using the bar's IN, OUT and easing values.",
+      command: "Opacity In+Out",
+      shift: "Opacity In", alt: "Opacity Out" },
+    { label: "Anticipation", icon: "undo-2", desc: "Opens the Anticipation palette in After Effects for building anticipation and follow-through.",
+      command: "Anticipation Tool" }
+  ] },
   { title: "Keys", commands: [
     { label: "Ease In / Out", icon: "spline", key: "e", desc: "Eases the selected keyframes in and out, using the EI and EO values from the bar.",
       command: "Ease In / Out" },
@@ -114,28 +136,6 @@ const TNK_GROUPS = [
       command: "Apply Dim + Desat" },
     { label: "Delete Effects", icon: "trash-2", desc: "Removes every effect from the selected layers.",
       command: "Delete All Effects" }
-  ] },
-  { title: "Motion", commands: [
-    { label: "Anim Up", icon: "arrow-up", key: "1",
-      desc: "Animates the layer in from above and out upward, using the bar's IN, OUT and easing values.",
-      command: "In+Out Up", shift: "In from Up", alt: "Out to Up" },
-    { label: "Anim Down", icon: "arrow-down", key: "2",
-      desc: "Animates the layer in from below and out downward, using the bar's IN, OUT and easing values.",
-      command: "In+Out Down", shift: "In from Down", alt: "Out to Down" },
-    { label: "Anim Left", icon: "arrow-left", key: "3",
-      desc: "Animates the layer in from the left and out leftward, using the bar's IN, OUT and easing values.",
-      command: "In+Out Left", shift: "In from Left", alt: "Out to Left" },
-    { label: "Anim Right", icon: "arrow-right", key: "4",
-      desc: "Animates the layer in from the right and out rightward, using the bar's IN, OUT and easing values.",
-      command: "In+Out Right", shift: "In from Right", alt: "Out to Right" },
-    { label: "Scale", icon: "scaling", desc: "Animates scale in and out, using the bar's IN, OUT and easing values.",
-      command: "Scale In+Out",
-      shift: "Scale In", alt: "Scale Out" },
-    { label: "Opacity", icon: "eye", desc: "Fades opacity in and out, using the bar's IN, OUT and easing values.",
-      command: "Opacity In+Out",
-      shift: "Opacity In", alt: "Opacity Out" },
-    { label: "Anticipation", icon: "undo-2", desc: "Opens the Anticipation palette in After Effects for building anticipation and follow-through.",
-      command: "Anticipation Tool" }
   ] },
   { title: "Timing", commands: [
     { label: "Trim to Playhead", icon: "arrow-right-to-line", desc: "Trims the in point of the selected layers to the playhead.",

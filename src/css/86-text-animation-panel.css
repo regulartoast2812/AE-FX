@@ -266,7 +266,7 @@
 
 .text-animation-properties .text-animation-checks {
   display: flex;
-  gap: 4px;
+  gap: 6px;
 }
 
 /* Same inline label as Align to: / Direction: in the A panel. The column stays
@@ -281,12 +281,12 @@
 /* No container chrome. These were troughs - a bordered, filled box with 3px
    between transparent buttons - which is what made them read as one welded
    control. The A panel gives every button its own border and fill and spaces
-   them 4px apart, and nothing wraps them. */
+   them 6px apart, and nothing wraps them. */
 .text-animation-segmented {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
-  gap: 4px;
+  gap: 6px;
   padding: 0;
   border: 0;
   background: none;
@@ -366,7 +366,7 @@
 .text-animation-checks {
   display: grid;
   grid-template-columns: repeat(3, auto);
-  gap: 4px;
+  gap: 6px;
 }
 
 .text-animation-checks button {
@@ -416,8 +416,7 @@
 }
 
 .text-animation-times label {
-  display: grid;
-  grid-template-columns: 22px minmax(0, 1fr);
+  display: flex;
   align-items: center;
   gap: 8px;
   color: rgba(235,235,245,.66);
@@ -478,7 +477,7 @@
 .text-animation-preset-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
 }
 
 .text-animation-preset-grid button {
@@ -556,4 +555,27 @@
   margin: 0;
   -webkit-appearance: none;
   appearance: none;
+}
+
+
+/* Natural widths, like the A panel.
+   A fixed 116px first cell and a fixed 40px label cell forced dead space into
+   every row that did not need the full width - Animate's three icons are 86 in
+   a 116 cell - and stretched the Style select from its natural 92 to 116. The A
+   panel lets each control sit next to its own label at a constant gap and does
+   not try to line the columns up, which is the pattern to follow. */
+.text-animation-pair {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.text-animation-field {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.text-animation-style-select {
+  flex: 0 0 auto;
 }

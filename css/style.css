@@ -10921,9 +10921,7 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  /* 8, like every other label-to-control pair in this panel. This one was 5,
-     the single place the A panel broke its own spacing rule. */
-  gap: 8px;
+  gap: 5px;
   margin: 0;
   padding: 0;
 }
@@ -11460,6 +11458,7 @@ body.quick-panel-mode .layout-panel-head {
 #anchorModal .anchor-timing-sections .timing-pull-row > span:nth-of-type(2) {
   margin-left: auto;
 }
+
 /* v103: compact fixed layer-style panel with one-row navigation and filled sliders. */
 .layer-style-dialog:not(.mask-control-dialog) {
   display: grid !important;
@@ -15466,7 +15465,7 @@ body .ease-dialog-title {
 
 .text-animation-properties .text-animation-checks {
   display: flex;
-  gap: 4px;
+  gap: 6px;
 }
 
 /* Same inline label as Align to: / Direction: in the A panel. The column stays
@@ -15481,12 +15480,12 @@ body .ease-dialog-title {
 /* No container chrome. These were troughs - a bordered, filled box with 3px
    between transparent buttons - which is what made them read as one welded
    control. The A panel gives every button its own border and fill and spaces
-   them 4px apart, and nothing wraps them. */
+   them 6px apart, and nothing wraps them. */
 .text-animation-segmented {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
-  gap: 4px;
+  gap: 6px;
   padding: 0;
   border: 0;
   background: none;
@@ -15566,7 +15565,7 @@ body .ease-dialog-title {
 .text-animation-checks {
   display: grid;
   grid-template-columns: repeat(3, auto);
-  gap: 4px;
+  gap: 6px;
 }
 
 .text-animation-checks button {
@@ -15616,8 +15615,7 @@ body .ease-dialog-title {
 }
 
 .text-animation-times label {
-  display: grid;
-  grid-template-columns: 22px minmax(0, 1fr);
+  display: flex;
   align-items: center;
   gap: 8px;
   color: rgba(235,235,245,.66);
@@ -15678,7 +15676,7 @@ body .ease-dialog-title {
 .text-animation-preset-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
 }
 
 .text-animation-preset-grid button {
@@ -15756,6 +15754,29 @@ body .ease-dialog-title {
   margin: 0;
   -webkit-appearance: none;
   appearance: none;
+}
+
+
+/* Natural widths, like the A panel.
+   A fixed 116px first cell and a fixed 40px label cell forced dead space into
+   every row that did not need the full width - Animate's three icons are 86 in
+   a 116 cell - and stretched the Style select from its natural 92 to 116. The A
+   panel lets each control sit next to its own label at a constant gap and does
+   not try to line the columns up, which is the pattern to follow. */
+.text-animation-pair {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.text-animation-field {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.text-animation-style-select {
+  flex: 0 0 auto;
 }
 .timing-order-backdrop {
   display: none;
@@ -16786,6 +16807,19 @@ body .layer-selection-row {
   color: rgba(255,248,244,.96);
 }
 
+.composition-tool-destructive {
+  border-color: rgba(218, 92, 82, .2);
+}
+
+.composition-tool-destructive .composition-tool-icon {
+  color: #da5c52;
+}
+
+.composition-tool-destructive:hover {
+  border-color: rgba(218, 92, 82, .42);
+  background: rgba(218, 92, 82, .1);
+}
+
 .composition-tool-icon {
   position: relative;
   display: block;
@@ -16805,6 +16839,7 @@ body .layer-selection-row {
 .icon-trim::after,
 .icon-crop::after,
 .icon-precompose::after,
+.icon-decompose::after,
 .icon-rename::after,
 .icon-duration::after,
 .icon-render::after {
@@ -16833,6 +16868,17 @@ body .layer-selection-row {
   inset: 6px -1px -1px 6px;
   border: 1.5px solid currentColor;
   border-radius: 3px;
+}
+
+.icon-decompose::before {
+  inset: 5px 7px 5px 1px;
+}
+
+.icon-decompose::after {
+  inset: 1px 1px 9px 7px;
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+  box-shadow: 0 6px 0 -1px rgba(217,119,66,.72);
 }
 
 .icon-rename::after {

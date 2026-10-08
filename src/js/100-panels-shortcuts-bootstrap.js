@@ -185,11 +185,24 @@ async function runCompositionPanelAction(action) {
     trim: { name: "Auto Trim Comp", tntFunction: "autoTrimComp", args: [false] },
     crop: { name: "Auto Crop Comps", tntFunction: "cropComp", args: [false, 0] },
     precompose: { name: "Pre-compose Selected", tntFunction: "precomposeSelected" },
+    decompose: { name: "Decompose Precomp", tntFunction: "decomposeComp" },
+    decomposeDelete: { name: "Decompose + Delete Source", tntFunction: "decomposeCompAndDelete" },
     render: { name: "Add to Render Queue", tntFunction: "addToRenderQueue" }
   };
   const command = commands[action];
   if (!command) return;
-  await runTntV3Command(command);
+  const result = await callTntV3Command(command.tntFunction, command.args || [], {
+    refresh: true,
+    status: false
+  });
+  if (!result || !result.ok) {
+    const message = result && result.error ? result.error : `${command.name} failed.`;
+    if (compositionErrorEl) compositionErrorEl.textContent = message;
+    statusEl.textContent = message;
+    return;
+  }
+  statusEl.textContent = String(result.result || `${command.name} done`);
+  hideCompositionPanel();
 }
 
 function closeActivePopup() {
@@ -780,6 +793,10 @@ function handleShortcut(event) {
   // Composition Tools here. Its listener cannot win on ordering (this handler is
   // registered on window first), so it is deferred to explicitly.
   if (typeof tnkOwnsKeyboard === "function" && tnkOwnsKeyboard()) return;
+  // Native buttons own Space and Enter. Let their normal click activation run
+  // before considering those keys as panel shortcuts (Space is playback).
+  const focusedButton = event.target && event.target.closest && event.target.closest("button");
+  if (focusedButton && (event.key === " " || event.key === "Spacebar" || event.key === "Enter")) return;
   // While a shortcut cell is listening, capture owns the keyboard. These handlers
   // are registered on window earlier in the bundle, so without this they consume
   // Escape and Delete before the capture listener ever sees them.
@@ -1433,17 +1450,17 @@ function quickPanelSurfaceFixedHeight(surface) {
   return 0;
 }
 
+// Every panel is sized by its own content, which is what the A panel has always
+// done. The per-panel minimums below were stale - the Text panel asked for 560
+// while its content is 239, so the window came out 321px taller than the panel.
+// The content sits at the top of that window and the window is centred
+// vertically, so an inflated minimum makes the panel ride high on screen. That
+// is why the Text panel sat over the toolbar while the A panel sat over the
+// timeline: not a position setting, a size one.
+//
+// A floor is still wanted so a panel that opens empty is not a sliver.
 function quickPanelSurfaceMinimumHeight(surface) {
-  if (!surface) return 260;
-  if (surface.classList.contains("quick-layer-menu-dialog")) return 520;
-  if (surface.classList.contains("effects-control-dialog") || surface.classList.contains("shapes-control-dialog")) return 520;
-  if (surface.classList.contains("layer-style-dialog") && !surface.classList.contains("mask-control-dialog")) return 620;
-  if (surface.classList.contains("ease-dialog")) return 620;
-  if (surface.classList.contains("mass-edit-dialog")) return 560;
-  if (surface.classList.contains("text-animation-dialog")) return 560;
-  if (surface.classList.contains("timing-order-layout")) return 420;
-  if (surface.classList.contains("timeline-command-dialog")) return 300;
-  return 180;
+  return surface ? 180 : 260;
 }
 
 function quickPanelNaturalHeight(surface) {
@@ -2264,8 +2281,11 @@ async function tntRunWithProgress(element, label, run) {
   // treated as the same running state.
   void element.offsetWidth;
   element.classList.add("tnt-running");
+  let succeeded = false;
   try {
-    return await run();
+    const result = await run();
+    succeeded = result !== false;
+    return result;
   } finally {
     const elapsed = Date.now() - started;
     // Hand the completion animation the width the fill actually reached, so a
@@ -2280,7 +2300,7 @@ async function tntRunWithProgress(element, label, run) {
     element.classList.remove("tnt-running");
     void element.offsetWidth;
     element.classList.add("tnt-run-done");
-    if (statusEl && label) statusEl.textContent = `${label} · ${tntFormatRunTime(elapsed)}`;
+    if (succeeded && statusEl && label) statusEl.textContent = `${label} · ${tntFormatRunTime(elapsed)}`;
     // Must outlast the 2s completion animation, or the fill is dropped mid-fade.
     // Re-renders in between re-apply the state, so this owns clearing it.
     tntRunClearTimer = setTimeout(() => {
