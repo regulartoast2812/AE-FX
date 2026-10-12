@@ -16680,6 +16680,15 @@ body .ease-dialog-title {
 .tnk-tool[data-tnk-kind="marker"]     { --tnk-tool-color: #d9d06a; --tnk-tool-hover: #ece593; }
 
 /* The add button is not a tool and takes no kind. */
+
+/* The close-after-running toggle reads as held down when on. It is the only
+   stateful control in the header, so it has to show that at rest, not just on
+   hover. */
+.tnk-bar-btn.active {
+  border-color: rgba(233, 147, 96, .55);
+  background: rgba(233, 147, 96, .2);
+  color: #fff;
+}
 /* Keep the layer selector aligned with the final subpanel system overrides. */
 body .layer-selection-backdrop {
   background: transparent !important;

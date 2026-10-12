@@ -15721,6 +15721,28 @@ function tnkAddedForGroup(title) {
 }
 
 const TNK_PARAMS_KEY = "tnkParams.v1";
+const TNK_CLOSE_KEY = "tnkCloseAfterRun.v1";
+
+// Off by default: TNK is built for firing several tools in a row against one
+// selection, and closing after each would undo that. On, it behaves like a
+// one-shot launcher.
+let tnkCloseAfterRun = false;
+
+function tnkLoadCloseAfterRun() {
+  try { tnkCloseAfterRun = window.localStorage.getItem(TNK_CLOSE_KEY) === "1"; }
+  catch (_) { tnkCloseAfterRun = false; }
+}
+
+function tnkSaveCloseAfterRun() {
+  try { window.localStorage.setItem(TNK_CLOSE_KEY, tnkCloseAfterRun ? "1" : "0"); } catch (_) {}
+}
+
+function tnkSyncCloseToggle() {
+  const button = tnkBackdropEl && tnkBackdropEl.querySelector("[data-tnk-close-after]");
+  if (!button) return;
+  button.classList.toggle("active", tnkCloseAfterRun);
+  button.setAttribute("aria-pressed", String(tnkCloseAfterRun));
+}
 
 let tnkParams = Object.assign({}, TNK_PARAM_DEFAULTS);
 let tnkBackdropEl = null;
@@ -15866,6 +15888,7 @@ function ensureTnkPanel() {
     <section class="tnk-dialog" role="dialog" aria-modal="true" aria-label="TNK tools" tabindex="-1">
       <header class="tnk-head">
         <div class="tnk-title"><b>TNK</b><span>Tools</span><em class="tnk-count"></em><span class="tnk-selection" data-tnt-selection-compact></span></div>
+        <button type="button" class="tnk-bar-btn" data-tnk-close-after aria-pressed="false" data-icon="log-out" data-tooltip="Close After Running\nOn: the panel closes as soon as a tool finishes.\nOff: it stays open so you can fire several at one selection."></button>
         <button type="button" class="tnk-bar-btn" data-tnk-reset data-icon="ui.refresh" data-tooltip="Reset Parameters\nReturn every value in the bar to its default."></button>
       </header>
       <div class="tnk-global-bar">${tnkParamBarMarkup()}</div>
@@ -15889,6 +15912,17 @@ function ensureTnkPanel() {
 
   tnkBackdropEl.addEventListener("click", event => {
     if (event.target === tnkBackdropEl) { hideTnkPanel(); return; }
+    if (event.target.closest("[data-tnk-close-after]")) {
+      tnkCloseAfterRun = !tnkCloseAfterRun;
+      tnkSaveCloseAfterRun();
+      tnkSyncCloseToggle();
+      if (statusEl) {
+        statusEl.textContent = tnkCloseAfterRun
+          ? "TNK will close after each tool."
+          : "TNK will stay open after a tool runs.";
+      }
+      return;
+    }
     if (event.target.closest("[data-tnk-reset]")) {
       tnkParams = Object.assign({}, TNK_PARAM_DEFAULTS);
       tnkSaveParams();
@@ -15993,6 +16027,9 @@ async function tnkRunEntry(index, modifiers, button) {
   const withParams = Object.assign({}, entry, { args: tnkApplyParamsToArgs(entry.args) });
   const row = button || tnkToolRows().querySelector(`[data-tnk-index="${index}"]`);
   await tntRunWithProgress(row, entry.name, () => executeFxConsoleEntry(withParams));
+  // After the await: closing on the click would pull the panel out from under a
+  // command still running, and lose the progress it draws on the button.
+  if (tnkCloseAfterRun) hideTnkPanel();
 }
 
 // TNK's own keys, live while the panel is open. Skipped while a field has focus
@@ -16155,7 +16192,9 @@ function showTnkPanel() {
   }
   tnkLoadParams();
 tnkLoadCustom();
+  tnkLoadCloseAfterRun();
   tnkSyncParamInputs();
+  tnkSyncCloseToggle();
   tnkRender();
   if (typeof tntPaintSelectionReadouts === "function") tntPaintSelectionReadouts(panel);
   panel.classList.add("show");
@@ -16175,3 +16214,4 @@ function hideTnkPanel() {
 }
 
 tnkLoadParams();
+tnkLoadCloseAfterRun();
