@@ -15541,122 +15541,122 @@ const TNK_PARAM_FIELDS = [
 // would render half this panel as the same sparkle.
 const TNK_GROUPS = [
   { title: "Motion", commands: [
-    { label: "Anim Up", icon: "arrow-up", key: "1",
+    { label: "Anim Up", kind: "transform", icon: "arrow-up", key: "1",
       desc: "Animates the layer in from above and out upward, using the bar's IN, OUT and easing values.",
       command: "In+Out Up", shift: "In from Up", alt: "Out to Up" },
-    { label: "Anim Down", icon: "arrow-down", key: "2",
+    { label: "Anim Down", kind: "transform", icon: "arrow-down", key: "2",
       desc: "Animates the layer in from below and out downward, using the bar's IN, OUT and easing values.",
       command: "In+Out Down", shift: "In from Down", alt: "Out to Down" },
-    { label: "Anim Left", icon: "arrow-left", key: "3",
+    { label: "Anim Left", kind: "transform", icon: "arrow-left", key: "3",
       desc: "Animates the layer in from the left and out leftward, using the bar's IN, OUT and easing values.",
       command: "In+Out Left", shift: "In from Left", alt: "Out to Left" },
-    { label: "Anim Right", icon: "arrow-right", key: "4",
+    { label: "Anim Right", kind: "transform", icon: "arrow-right", key: "4",
       desc: "Animates the layer in from the right and out rightward, using the bar's IN, OUT and easing values.",
       command: "In+Out Right", shift: "In from Right", alt: "Out to Right" },
-    { label: "Scale", icon: "scaling", desc: "Animates scale in and out, using the bar's IN, OUT and easing values.",
+    { label: "Scale", kind: "transform", icon: "scaling", desc: "Animates scale in and out, using the bar's IN, OUT and easing values.",
       command: "Scale In+Out",
       shift: "Scale In", alt: "Scale Out" },
-    { label: "Opacity", icon: "eye", desc: "Fades opacity in and out, using the bar's IN, OUT and easing values.",
+    { label: "Opacity", kind: "transform", icon: "eye", desc: "Fades opacity in and out, using the bar's IN, OUT and easing values.",
       command: "Opacity In+Out",
       shift: "Opacity In", alt: "Opacity Out" },
-    { label: "Anticipation", icon: "undo-2", desc: "Opens the Anticipation palette in After Effects for building anticipation and follow-through.",
+    { label: "Anticipation", kind: "keyframe", icon: "undo-2", desc: "Opens the Anticipation palette in After Effects for building anticipation and follow-through.",
       command: "Anticipation Tool" }
   ] },
   { title: "Keys", commands: [
-    { label: "Ease In / Out", icon: "spline", key: "e", desc: "Eases the selected keyframes in and out, using the EI and EO values from the bar.",
+    { label: "Ease In / Out", kind: "keyframe", icon: "spline", key: "e", desc: "Eases the selected keyframes in and out, using the EI and EO values from the bar.",
       command: "Ease In / Out" },
-    { label: "Linear", icon: "trending-up", key: "l", desc: "Strips easing from the selected keyframes so they move at a constant speed.",
+    { label: "Linear", kind: "keyframe", icon: "trending-up", key: "l", desc: "Strips easing from the selected keyframes so they move at a constant speed.",
       command: "Linear Keyframes" },
-    { label: "Overshoot", icon: "waves", key: "o", desc: "Adds an overshoot expression that carries past the last keyframe and settles back.",
+    { label: "Overshoot", kind: "expression", icon: "waves", key: "o", desc: "Adds an overshoot expression that carries past the last keyframe and settles back.",
       command: "Overshoot Expression" },
-    { label: "Wiggle", icon: "activity", key: "w", desc: "Adds a wiggle expression driven by the bar's HZ frequency and AMP amount.",
+    { label: "Wiggle", kind: "expression", icon: "activity", key: "w", desc: "Adds a wiggle expression driven by the bar's HZ frequency and AMP amount.",
       command: "Wiggle Expression" },
-    { label: "Reverse", icon: "arrow-left-right", key: "r", desc: "Reverses the selected keyframes in time, so the animation plays backwards.",
+    { label: "Reverse", kind: "keyframe", icon: "arrow-left-right", key: "r", desc: "Reverses the selected keyframes in time, so the animation plays backwards.",
       command: "Reverse Keyframes" },
-    { label: "Clone", icon: "copy", key: "c", desc: "Copies the selected keyframes to the playhead, keeping their spacing and easing.",
+    { label: "Clone", kind: "keyframe", icon: "copy", key: "c", desc: "Copies the selected keyframes to the playhead, keeping their spacing and easing.",
       command: "Clone Keyframes",
       shift: "Clone Keyframes Flipped" },
-    { label: "Delete Keys", icon: "eraser", key: "z", desc: "Removes every keyframe from the selected layers, leaving the current values.",
+    { label: "Delete Keys", kind: "keyframe", icon: "eraser", key: "z", desc: "Removes every keyframe from the selected layers, leaving the current values.",
       command: "Delete All Keyframes" },
-    { label: "Align to Playhead", icon: "align-center-vertical", desc: "Shifts the whole keyframe group so its first key lands on the playhead.",
+    { label: "Align to Playhead", kind: "keyframe", icon: "align-center-vertical", desc: "Shifts the whole keyframe group so its first key lands on the playhead.",
       command: "Align Keys to Playhead" },
-    { label: "Clear Expressions", icon: "square-slash", desc: "Removes expressions from the selected properties, keeping their keyframes.",
+    { label: "Clear Expressions", kind: "expression", icon: "square-slash", desc: "Removes expressions from the selected properties, keeping their keyframes.",
       command: "Clear Expressions" }
   ] },
   { title: "Layers", commands: [
-    { label: "Stagger", icon: "align-start-vertical", key: "s", desc: "Offsets the selected layers in time by an amount you enter, one after another.",
+    { label: "Stagger", kind: "time", icon: "align-start-vertical", key: "s", desc: "Offsets the selected layers in time by an amount you enter, one after another.",
       command: "Stagger Layers..." },
-    { label: "Pull to Playhead", icon: "chevrons-left", key: "p",
+    { label: "Pull to Playhead", kind: "time", icon: "chevrons-left", key: "p",
       desc: "Moves the selected layers to the playhead as one group, keeping their spacing.",
       command: "Pull Layer Group to Playhead In Point",
       shift: "Pull Layer Group to Playhead Out Point" },
-    { label: "Focus", icon: "focus", key: "f", desc: "Solos the selected layers, or unsolos everything if they are already soloed.",
+    { label: "Focus", kind: "visibility", icon: "focus", key: "f", desc: "Solos the selected layers, or unsolos everything if they are already soloed.",
       command: "Solo Focus Toggle" },
-    { label: "Hide", icon: "ghost", key: "h", desc: "Hides the selected layers.",
+    { label: "Hide", kind: "visibility", icon: "ghost", key: "h", desc: "Hides the selected layers.",
       command: "Hide Selected",
       shift: "Show All Layers" },
-    { label: "Precompose", icon: "package", key: "`", desc: "Precomposes the selected layers into a new composition.",
+    { label: "Precompose", kind: "layer", icon: "package", key: "`", desc: "Precomposes the selected layers into a new composition.",
       command: "Precompose Selected" },
-    { label: "Lock", icon: "lock", desc: "Locks the selected layers so they cannot be edited or selected in the timeline.",
+    { label: "Lock", kind: "layer", icon: "lock", desc: "Locks the selected layers so they cannot be edited or selected in the timeline.",
       command: "Lock Selected" },
-    { label: "Duplicate", icon: "copy-plus", desc: "Duplicates the selected layers in place.",
+    { label: "Duplicate", kind: "layer", icon: "copy-plus", desc: "Duplicates the selected layers in place.",
       command: "Duplicate Selected Layers" },
-    { label: "Split", icon: "split", desc: "Splits the selected layers at the playhead into two layers.",
+    { label: "Split", kind: "layer", icon: "split", desc: "Splits the selected layers at the playhead into two layers.",
       command: "Split Selected Layers" },
-    { label: "Track Matte", icon: "layers-2",
+    { label: "Track Matte", kind: "layer", icon: "layers-2",
       desc: "Sets the layer above as an alpha track matte. Shift also parents it; Alt breaks an existing matte.",
       command: "Apply Alpha Track Matte", shift: "Apply Matte + Parent", alt: "Break Track Matte" },
-    { label: "Null", icon: "square-dashed", desc: "Creates a null at the centre of the composition.",
+    { label: "Null", kind: "layer", icon: "square-dashed", desc: "Creates a null at the centre of the composition.",
       command: "Create Null", shift: "Parent to Null" }
   ] },
   { title: "Effects", commands: [
-    { label: "Toggle Effects", icon: "toggle-left", key: "x", desc: "Switches the effects on the selected layers off, or back on.",
+    { label: "Toggle Effects", kind: "effect", icon: "toggle-left", key: "x", desc: "Switches the effects on the selected layers off, or back on.",
       command: "Toggle Effects",
       shift: "Copy Effects" },
-    { label: "Glow", icon: "sparkles", desc: "Adds a glow to the selected layers.",
+    { label: "Glow", kind: "effect", icon: "sparkles", desc: "Adds a glow to the selected layers.",
       command: "Apply Glow" },
-    { label: "Light Sweep", icon: "flashlight", desc: "Sweeps a band of light across the layer, timed by the bar's IN and easing values.",
+    { label: "Light Sweep", kind: "effect", icon: "flashlight", desc: "Sweeps a band of light across the layer, timed by the bar's IN and easing values.",
       command: "Apply Light Sweep" },
-    { label: "VHS", icon: "tv", desc: "Stacks a VHS-style degrade - chroma shift, noise and scanlines - on the selected layers.",
+    { label: "VHS", kind: "effect", icon: "tv", desc: "Stacks a VHS-style degrade - chroma shift, noise and scanlines - on the selected layers.",
       command: "Apply VHS" },
-    { label: "Blur", icon: "droplets", desc: "Blurs the selected layers in and out over the bar's IN and OUT times.",
+    { label: "Blur", kind: "effect", icon: "droplets", desc: "Blurs the selected layers in and out over the bar's IN and OUT times.",
       command: "Apply Blur In+Out",
       alt: "Apply Blur Out" },
-    { label: "Grain", icon: "grip", desc: "Adds film grain to the selected layers.",
+    { label: "Grain", kind: "effect", icon: "grip", desc: "Adds film grain to the selected layers.",
       command: "Apply Grain" },
-    { label: "Dim + Desat", icon: "sun-dim", desc: "Adds a Lumetri pass that darkens and drains colour, for pushing layers back.",
+    { label: "Dim + Desat", kind: "effect", icon: "sun-dim", desc: "Adds a Lumetri pass that darkens and drains colour, for pushing layers back.",
       command: "Apply Dim + Desat" },
-    { label: "Delete Effects", icon: "trash-2", desc: "Removes every effect from the selected layers.",
+    { label: "Delete Effects", kind: "effect", icon: "trash-2", desc: "Removes every effect from the selected layers.",
       command: "Delete All Effects" }
   ] },
   { title: "Timing", commands: [
-    { label: "Trim to Playhead", icon: "arrow-right-to-line", desc: "Trims the in point of the selected layers to the playhead.",
+    { label: "Trim to Playhead", kind: "time", icon: "arrow-right-to-line", desc: "Trims the in point of the selected layers to the playhead.",
       command: "Trim In to Playhead",
       shift: "Trim Out to Playhead" },
-    { label: "Trim to Keyframes", icon: "scissors", desc: "Trims each layer's in and out points to its first and last keyframe.",
+    { label: "Trim to Keyframes", kind: "time", icon: "scissors", desc: "Trims each layer's in and out points to its first and last keyframe.",
       command: "Trim to Keyframes" },
-    { label: "Snap to Playhead", icon: "chevrons-right", desc: "Moves each selected layer to the playhead independently, ignoring their spacing.",
+    { label: "Snap to Playhead", kind: "time", icon: "chevrons-right", desc: "Moves each selected layer to the playhead independently, ignoring their spacing.",
       command: "Snap Layers to Playhead In Point",
       shift: "Snap Layers to Playhead Out Point" },
-    { label: "Auto Trim Comp", icon: "crop", desc: "Shortens the composition to end at the last layer's out point.",
+    { label: "Auto Trim Comp", kind: "comp", icon: "crop", desc: "Shortens the composition to end at the last layer's out point.",
       command: "Auto Trim Comp" }
   ] },
   { title: "Text", commands: [
-    { label: "Set Text", icon: "type", desc: "Replaces the contents of the selected text layers.",
+    { label: "Set Text", kind: "text", icon: "type", desc: "Replaces the contents of the selected text layers.",
       command: "Set Text Content..." },
-    { label: "Find / Replace", icon: "replace", desc: "Finds and replaces text across the selection, the comp, or the whole project.",
+    { label: "Find / Replace", kind: "text", icon: "replace", desc: "Finds and replaces text across the selection, the comp, or the whole project.",
       command: "Find / Replace Text..." },
-    { label: "Remove Animator", icon: "list-x", desc: "Removes the in animator and its marker from the selected text layers.",
+    { label: "Remove Animator", kind: "text", icon: "list-x", desc: "Removes the in animator and its marker from the selected text layers.",
       command: "Text: Remove In Animator + Marker",
       shift: "Text: Remove Out Animator + Marker" }
   ] },
   { title: "Markers", commands: [
-    { label: "Add Marker", icon: "bookmark-plus", key: "m", desc: "Adds a marker at the playhead, with a comment you enter.",
+    { label: "Add Marker", kind: "marker", icon: "bookmark-plus", key: "m", desc: "Adds a marker at the playhead, with a comment you enter.",
       command: "Markers: Add Marker..." },
-    { label: "In Marker", icon: "flag", desc: "Sets the in marker on the selected layers at the playhead.",
+    { label: "In Marker", kind: "marker", icon: "flag", desc: "Sets the in marker on the selected layers at the playhead.",
       command: "Markers: Set In Marker",
       shift: "Markers: Set Out Marker" },
-    { label: "Remove Markers", icon: "flag-off", desc: "Removes the in and out markers from the selected layers.",
+    { label: "Remove Markers", kind: "marker", icon: "flag-off", desc: "Removes the in and out markers from the selected layers.",
       command: "Markers: Remove In/Out Markers" }
   ] }
 ];
@@ -15939,7 +15939,7 @@ function tnkKeyBadge(key) {
   return `<kbd class="tnk-key">${escapeHtml(key === "`" ? "\u0060" : key.toUpperCase())}</kbd>`;
 }
 
-function tnkToolMarkup(item, index, entryIndex) {
+function tnkToolMarkup(item, index, entryIndex, groupTitle) {
   const entry = entryIndex.get(item.command);
   const driven = entry && Array.isArray(entry.args) && entry.args.some(arg =>
     arg && typeof arg === "object" && !Array.isArray(arg) &&
@@ -15950,15 +15950,12 @@ function tnkToolMarkup(item, index, entryIndex) {
   // Headline, then one bulleted line per variation. The key goes in
   // data-tooltip-key so the tooltip can draw it as a chip rather than spell it
   // out mid-sentence.
-  // Cross-checked against the selection, like every other surface.
-  const unmet = typeof tntEntryUnmetRequirement === "function" ? tntEntryUnmetRequirement(entry) : "";
   const lines = [item.label];
-  if (unmet) lines.push(`- ${unmet}`);
   if (item.shift && entryIndex.has(item.shift)) lines.push(`- Shift: ${item.shift}`);
   if (item.alt && entryIndex.has(item.alt)) lines.push(`- Alt: ${item.alt}`);
   if (driven) lines.push("- Uses the bar parameters");
   return `
-    <button type="button" class="tnk-tool${driven ? " driven" : ""}${item.key ? " keyed" : ""}${unmet ? " unmet" : ""}" data-tnk-index="${index}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}"${item.desc ? ` data-tooltip-desc="${escapeHtml(item.desc)}"` : ""}${item.key ? ` data-tooltip-key="${escapeHtml(item.key === "`" ? "\u0060" : item.key.toUpperCase())}"` : ""}>
+    <button type="button" class="tnk-tool${item.key ? " keyed" : ""}" data-tnk-kind="${escapeHtml(String(item.kind || "").toLowerCase())}" data-tnk-index="${index}" aria-label="${escapeHtml(item.label)}" data-tooltip="${escapeHtml(lines.join("\n"))}"${item.desc ? ` data-tooltip-desc="${escapeHtml(item.desc)}"` : ""}${item.key ? ` data-tooltip-key="${escapeHtml(item.key === "`" ? "\u0060" : item.key.toUpperCase())}"` : ""}>
       ${tntIconSvg(item.icon, "tnk-tool-icon") || ""}
       ${tnkKeyBadge(item.key)}
     </button>
@@ -15974,7 +15971,7 @@ function tnkRender() {
     <section class="tnk-group">
       <h4>${escapeHtml(group.title)}</h4>
       <div class="tnk-group-tools">
-        ${group.entries.map(row => tnkToolMarkup(row.item, row.index, index)).join("")}
+        ${group.entries.map(row => tnkToolMarkup(row.item, row.index, index, group.title)).join("")}
         <button type="button" class="tnk-tool tnk-add" data-tnk-add="${escapeHtml(group.title)}" aria-label="Add a tool to ${escapeHtml(group.title)}" data-tooltip="Add a tool\n- Puts any command in ${escapeHtml(group.title)}">
           ${tntIconSvg("plus", "tnk-tool-icon") || ""}
         </button>

@@ -16492,10 +16492,6 @@ body .ease-dialog-title {
     rgba(13, 14, 15, .3);
 }
 
-/* A tool the bar can actually drive gets a marker, so it is obvious which
-   parameters are live for what. */
-.tnk-tool.driven { border-color: rgba(233, 147, 96, .5); }
-
 .tnk-empty {
   padding: 24px;
   color: rgba(228, 228, 234, .45);
@@ -16503,18 +16499,6 @@ body .ease-dialog-title {
   text-align: center;
 }
 
-/* Same cross-check as everywhere else: dim, not hidden, so the row of glyphs
-   keeps its shape and position - which is how this panel is read. */
-.tnk-tool.unmet {
-  opacity: .38;
-}
-
-/* The strip keeps its colour when the tool is unavailable - it says where the
-   command comes from, which does not change with the selection. It is the one
-   thing left at full strength on a dimmed button, so the row still scans. */
-.tnk-tool.unmet::before {
-  opacity: .55;
-}
 
 
 
@@ -16660,6 +16644,42 @@ body .ease-dialog-title {
 .tnk-title > em {
   flex: 0 0 auto;
 }
+
+.tnk-tool.tnk-add {
+  --tnk-tool-color: rgba(226, 227, 232, .45);
+  --tnk-tool-hover: rgba(245, 200, 168, .9);
+}
+
+/* --- Colour by what the tool touches ------------------------------------
+   Not by the group it sits in: a group is where a tool was filed, which is a
+   different question from what it acts on. Opacity and Anim Up both move the
+   transform; Overshoot and Wiggle both write an expression; Stagger and Trim
+   both move things in time - and those pairs live in different groups.
+
+   The glyph draws with currentColor, so this is one variable per button. Icon
+   only, like MoBar - the box stays neutral so the panel still reads as a strip
+   rather than a grid of coloured chips. Two values per kind rather than a
+   hover filter, which would lift the border and key badge with it. */
+.tnk-tool {
+  color: var(--tnk-tool-color, rgba(226, 227, 232, .7));
+}
+
+.tnk-tool:hover {
+  color: var(--tnk-tool-hover, rgba(245, 200, 168, .98));
+}
+
+.tnk-tool[data-tnk-kind="transform"]  { --tnk-tool-color: #7ba4e0; --tnk-tool-hover: #a8c6f2; }
+.tnk-tool[data-tnk-kind="keyframe"]   { --tnk-tool-color: #dcae5c; --tnk-tool-hover: #f0cb86; }
+.tnk-tool[data-tnk-kind="expression"] { --tnk-tool-color: #74c48e; --tnk-tool-hover: #9bdcae; }
+.tnk-tool[data-tnk-kind="visibility"] { --tnk-tool-color: #cf86b6; --tnk-tool-hover: #e5a9d1; }
+.tnk-tool[data-tnk-kind="layer"]      { --tnk-tool-color: #63c2c8; --tnk-tool-hover: #8adbe0; }
+.tnk-tool[data-tnk-kind="effect"]     { --tnk-tool-color: #9d8ade; --tnk-tool-hover: #bcadf0; }
+.tnk-tool[data-tnk-kind="time"]       { --tnk-tool-color: #e59368; --tnk-tool-hover: #f5b792; }
+.tnk-tool[data-tnk-kind="comp"]       { --tnk-tool-color: #92a0b0; --tnk-tool-hover: #b5c2d0; }
+.tnk-tool[data-tnk-kind="text"]       { --tnk-tool-color: #e3889e; --tnk-tool-hover: #f3adbf; }
+.tnk-tool[data-tnk-kind="marker"]     { --tnk-tool-color: #d9d06a; --tnk-tool-hover: #ece593; }
+
+/* The add button is not a tool and takes no kind. */
 /* Keep the layer selector aligned with the final subpanel system overrides. */
 body .layer-selection-backdrop {
   background: transparent !important;
