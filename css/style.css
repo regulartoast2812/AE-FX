@@ -16689,6 +16689,52 @@ body .ease-dialog-title {
   background: rgba(233, 147, 96, .2);
   color: #fff;
 }
+
+/* Close-after-running: a switch, not an icon button. A switch states which of
+   two positions it is in without needing a legend; the icon button only said
+   "pressed" by going warm, which is the same thing hover does here. */
+.tnk-switch {
+  position: relative;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 17px;
+  margin-left: 10px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .06);
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.tnk-switch-knob {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 13px;
+  height: 13px;
+  margin-top: -6.5px;
+  border-radius: 50%;
+  background: #f2f3f5;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+  transition: transform 140ms ease;
+}
+
+/* Warm, not the reference's green-to-blue: orange is this tool's accent for a
+   live setting, and a blue that means nothing is called out in the UI notes. */
+.tnk-switch.active {
+  border-color: rgba(233, 147, 96, .55);
+  background: linear-gradient(90deg, #e9a06a, #d5703a);
+}
+
+.tnk-switch.active .tnk-switch-knob {
+  transform: translateX(11px);
+}
+
+.tnk-switch:hover {
+  border-color: rgba(233, 147, 96, .5);
+}
 /* Keep the layer selector aligned with the final subpanel system overrides. */
 body .layer-selection-backdrop {
   background: transparent !important;

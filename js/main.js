@@ -15741,7 +15741,7 @@ function tnkSyncCloseToggle() {
   const button = tnkBackdropEl && tnkBackdropEl.querySelector("[data-tnk-close-after]");
   if (!button) return;
   button.classList.toggle("active", tnkCloseAfterRun);
-  button.setAttribute("aria-pressed", String(tnkCloseAfterRun));
+  button.setAttribute("aria-checked", String(tnkCloseAfterRun));
 }
 
 let tnkParams = Object.assign({}, TNK_PARAM_DEFAULTS);
@@ -15888,7 +15888,7 @@ function ensureTnkPanel() {
     <section class="tnk-dialog" role="dialog" aria-modal="true" aria-label="TNK tools" tabindex="-1">
       <header class="tnk-head">
         <div class="tnk-title"><b>TNK</b><span>Tools</span><em class="tnk-count"></em><span class="tnk-selection" data-tnt-selection-compact></span></div>
-        <button type="button" class="tnk-bar-btn" data-tnk-close-after aria-pressed="false" data-icon="log-out" data-tooltip="Close After Running\nOn: the panel closes as soon as a tool finishes.\nOff: it stays open so you can fire several at one selection."></button>
+        <button type="button" class="tnk-switch" data-tnk-close-after role="switch" aria-checked="false" aria-label="Close after running" data-tooltip="Close After Running\nOn: the panel closes as soon as a tool finishes.\nOff: it stays open so you can fire several at one selection."><span class="tnk-switch-knob"></span></button>
         <button type="button" class="tnk-bar-btn" data-tnk-reset data-icon="ui.refresh" data-tooltip="Reset Parameters\nReturn every value in the bar to its default."></button>
       </header>
       <div class="tnk-global-bar">${tnkParamBarMarkup()}</div>
