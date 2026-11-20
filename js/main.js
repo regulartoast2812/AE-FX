@@ -4666,6 +4666,17 @@ function bridgeHandleLine(line, socket, token) {
     return;
   }
 
+  // Edie (Creative Assist) asks by name rather than sending script: the same
+  // command list and the same run path as the palette and the Functions list.
+  const op = String((request && request.op) || "");
+  if (id && (op === "status" || op === "commands" || op === "run")) {
+    bridgeHandleOp(op, request).then(
+      reply => bridgeSend(socket, { id, result: JSON.stringify(reply) }),
+      e => bridgeSend(socket, { id, error: String(e && e.message || e) })
+    );
+    return;
+  }
+
   if (!id || !script) return;
 
   try {
@@ -4675,6 +4686,103 @@ function bridgeHandleLine(line, socket, token) {
   } catch (e) {
     bridgeSend(socket, { id, error: String(e) });
   }
+}
+
+// ---- Commands by name, for Edie ------------------------------------------------
+//
+//   -> {"id","token","op":"status"}            <- {ok, version, comp, layers, selected, commands, runs}
+//   -> {"id","token","op":"commands"}          <- {ok, commands:[{name, kind, category, shortcut, needs}]}
+//   -> {"id","token","op":"run","name":"…"}    <- {ok, name, ms, message}
+//
+// A command in a menu is named "Menu / Item" ("Label Layers / Red"). Runs go
+// through executeFxConsoleEntry, exactly as a click in the palette, on what is
+// selected in After Effects; AE's own undo still takes each one back.
+
+const TNT_BRIDGE_RUNS = [];
+let tntBridgeRunBusy = false;
+
+function bridgeKind(entry) {
+  if (entry.source === "native") return "AE effect";
+  if (entry.source === "assistant") return "Saved script";
+  if (entry.source === "custom") return "Custom";
+  return "Panel";
+}
+
+function bridgeCommandRows() {
+  const rows = [];
+  const add = (entry, path) => {
+    if (!entry || entry.groupParent) return;
+    const name = path ? `${path} / ${entry.name}` : String(entry.name || entry.matchName || "");
+    if (entry.children && entry.children.length && !entry.action && !entry.tntFunction) {
+      entry.children.forEach(child => add({
+        ...child, source: entry.source, type: child.action ? "command" : (child.children ? "tntMenu" : "tntCommand")
+      }, name));
+      return;
+    }
+    if (!name) return;
+    let needs = "";
+    try { needs = typeof tntEntryRequirement === "function" ? (TNT_REQUIREMENT_LABELS[tntEntryRequirement(entry)] || "") : ""; } catch (_) {}
+    let shortcut = "";
+    try { shortcut = typeof tntShortcutForEntry === "function" ? tntShortcutForEntry(entry) : (entry.shortcut || ""); } catch (_) { shortcut = entry.shortcut || ""; }
+    rows.push({ name, kind: bridgeKind(entry), category: String(entry.category || ""), shortcut: String(shortcut || ""), needs, entry });
+  };
+  FX_CONSOLE_COMMANDS.forEach(c => add({ ...c, source: "panel" }, ""));
+  (typeof getAssistantSavedFunctionCommands === "function" ? getAssistantSavedFunctionCommands() : []).forEach(c => add(c, ""));
+  TNT_V3_COMMANDS.forEach(c => add({ ...c, source: "custom", type: c.action ? "command" : (c.children ? "tntMenu" : "tntCommand") }, ""));
+  (fxConsoleEffects || []).forEach(e => add({ ...e, source: "native", type: "effect" }, ""));
+  return rows;
+}
+
+function bridgeFindCommand(rows, name) {
+  const key = String(name || "").trim().toLowerCase().replace(/\s*[\/›▸>]\s*/g, " / ");
+  if (!key) return null;
+  const exact = rows.filter(r => r.name.toLowerCase() === key);
+  if (exact.length) return exact[0];
+  // "Red" alone is ambiguous (layers, keyframes, markers); a unique last part is not.
+  const last = rows.filter(r => r.name.toLowerCase().split(" / ").pop() === key);
+  return last.length === 1 ? last[0] : null;
+}
+
+async function bridgeHandleOp(op, request) {
+  if (op === "status") {
+    return {
+      ok: true, version: typeof TNT_VERSION === "string" ? TNT_VERSION : "",
+      comp: state.comp ? String(state.comp.name || "") : "", layers: (state.layers || []).length,
+      selected: (state.selectedLayerIndices || []).length, busy: tntBridgeRunBusy,
+      commands: bridgeCommandRows().length, effectsLoaded: !!(fxConsoleEffects && fxConsoleEffects.length),
+      runs: TNT_BRIDGE_RUNS.slice(-20)
+    };
+  }
+  if (!fxConsoleEffects || !fxConsoleEffects.length) {
+    try { await loadFxConsoleEffects(); } catch (_) {}
+  }
+  const rows = bridgeCommandRows();
+  if (op === "commands") {
+    return { ok: true, commands: rows.map(r => ({ name: r.name, kind: r.kind, category: r.category, shortcut: r.shortcut, needs: r.needs })) };
+  }
+  const row = bridgeFindCommand(rows, request && request.name);
+  if (!row) return { ok: false, error: `No AE FX command is called "${String(request && request.name || "")}".` };
+  if (tntBridgeRunBusy) return { ok: false, error: "Another command is still running in After Effects." };
+  tntBridgeRunBusy = true;
+  const started = Date.now();
+  let ok = false, message = "";
+  try {
+    // The selection the command acts on is After Effects' own, read now.
+    try { await refreshLayers({ forceRender: true, skipSettledRefresh: true }); } catch (_) {}
+    if (statusEl) statusEl.textContent = "";
+    ok = (await executeFxConsoleEntry(row.entry)) !== false;
+    message = String(statusEl && statusEl.textContent || "").trim();
+    if (ok && /\b(fail|failed|error|could not|couldn't|no layers? selected|select )/i.test(message) && !/\bdone\b/i.test(message)) ok = false;
+  } catch (e) {
+    ok = false;
+    message = String(e && e.message || e);
+  } finally {
+    tntBridgeRunBusy = false;
+  }
+  const run = { time: new Date().toISOString(), outcome: ok ? "ok" : "failed", command: row.name, detail: message, ms: Date.now() - started };
+  TNT_BRIDGE_RUNS.push(run);
+  if (TNT_BRIDGE_RUNS.length > 50) TNT_BRIDGE_RUNS.shift();
+  return { ok, name: row.name, ms: run.ms, message };
 }
 
 function startNativeBridgeServer() {
@@ -14046,35 +14154,10 @@ if (settingsBtnEl) {
   });
 }
 const assistantRefreshFunctionsEl = document.getElementById("assistantRefreshFunctions");
-const assistantChatMessagesEl = document.getElementById("assistantChatMessages");
-const assistantChatInputEl = document.getElementById("assistantChatInput");
-const assistantChatSendEl = document.getElementById("assistantChatSend");
-const assistantHistoryMenuEl = document.getElementById("assistantHistoryMenu");
-const assistantDraftActionsEl = document.getElementById("assistantDraftActions");
-const assistantDraftStatusEl = document.getElementById("assistantDraftStatus");
-const assistantAutoTestDraftEl = document.getElementById("assistantAutoTestDraft");
-const assistantTestDraftEl = document.getElementById("assistantTestDraft");
-const assistantApplyDraftEl = document.getElementById("assistantApplyDraft");
-const assistantSaveDraftEl = document.getElementById("assistantSaveDraft");
-const assistantSaveModalEl = document.getElementById("assistantSaveModal");
-const assistantSaveNameEl = document.getElementById("assistantSaveName");
-const assistantSaveCategoryEl = document.getElementById("assistantSaveCategory");
-const assistantSaveErrorEl = document.getElementById("assistantSaveError");
-const assistantSaveCancelEl = document.getElementById("assistantSaveCancel");
-const assistantSaveApplyEl = document.getElementById("assistantSaveApply");
-const ASSISTANT_HISTORY_STORAGE_KEY = "tntAssistantChatSessions.v1";
 const ASSISTANT_SAVED_FUNCTIONS_STORAGE_KEY = "tntAssistantSavedFunctions.v1";
-const ASSISTANT_INITIAL_MESSAGE = "Connected to the local assistant bridge. It can read the current After Effects context and the panel function registry.";
-const ASSISTANT_AUTO_TEST_MAX_ATTEMPTS = 2;
 let assistantFunctionsParentEntry = null;
 let assistantFunctionSelectedIndex = 0;
-let assistantProvider = "claude";
-let assistantChatBusy = false;
-let assistantSessions = [];
-let assistantCurrentSessionId = "";
-let assistantLatestDraft = null;
 let assistantSavedFunctions = [];
-let assistantAutoTestBusy = false;
 let assistantFunctionBusy = false;
 let assistantFunctionLastPointerRunAt = 0;
 
@@ -14239,38 +14322,6 @@ function getAssistantSavedFunctionCommands() {
   }));
 }
 
-function assistantExtractScriptBlock(text) {
-  const value = String(text || "");
-  const fenced = [];
-  value.replace(/```([A-Za-z0-9_-]*)\s*\n([\s\S]*?)```/g, (match, lang, code) => {
-    const normalizedLang = String(lang || "").toLowerCase();
-    fenced.push({ lang: normalizedLang, code: String(code || "").trim() });
-    return match;
-  });
-  const preferred = fenced.find(block => /^(jsx|extendscript|javascript|js)$/.test(block.lang)) || fenced[0];
-  if (preferred && preferred.code) return preferred.code;
-  return "";
-}
-
-function assistantSetLatestDraft(source, originText = "") {
-  const cleanSource = String(source || "").trim();
-  assistantLatestDraft = cleanSource ? {
-    source: cleanSource,
-    suggestedName: assistantSessionTitleFromText(originText || "Assistant Function")
-  } : null;
-  renderAssistantDraftActions();
-}
-
-function renderAssistantDraftActions(message = "") {
-  if (!assistantDraftActionsEl) return;
-  const hasDraft = !!(assistantLatestDraft && assistantLatestDraft.source);
-  assistantDraftActionsEl.classList.toggle("show", hasDraft);
-  assistantDraftActionsEl.setAttribute("aria-hidden", hasDraft ? "false" : "true");
-  if (assistantDraftStatusEl) {
-    assistantDraftStatusEl.textContent = message || (hasDraft ? "Script draft ready" : "");
-  }
-}
-
 function assistantScriptSafetyCheck(source) {
   const code = String(source || "");
   const compact = code.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/[^\n]*/g, "");
@@ -14331,186 +14382,6 @@ function assistantVerificationText(result) {
   return parts.filter(Boolean).join("\n");
 }
 
-async function testAssistantDraft() {
-  if (!assistantLatestDraft || !assistantLatestDraft.source) {
-    renderAssistantDraftActions("No script draft found in the latest assistant reply.");
-    return;
-  }
-  renderAssistantDraftActions("Testing script in After Effects...");
-  if (assistantTestDraftEl) assistantTestDraftEl.disabled = true;
-  try {
-    const result = await runAssistantScriptSource(assistantLatestDraft.source, "Test Assistant Draft", { revertAfterRun: true });
-    renderAssistantDraftActions(result.ok ? "Test passed. Apply or Save when ready." : (assistantVerificationText(result) || "Test failed."));
-  } finally {
-    if (assistantTestDraftEl) assistantTestDraftEl.disabled = false;
-  }
-}
-
-function setAssistantDraftButtonsBusy(isBusy) {
-  if (assistantAutoTestDraftEl) assistantAutoTestDraftEl.disabled = !!isBusy;
-  if (assistantTestDraftEl) assistantTestDraftEl.disabled = !!isBusy;
-  if (assistantApplyDraftEl) assistantApplyDraftEl.disabled = !!isBusy;
-  if (assistantSaveDraftEl) assistantSaveDraftEl.disabled = !!isBusy;
-}
-
-async function applyAssistantDraft() {
-  if (!assistantLatestDraft || !assistantLatestDraft.source) {
-    renderAssistantDraftActions("No script draft found in the latest assistant reply.");
-    return;
-  }
-  renderAssistantDraftActions("Applying script in After Effects...");
-  setAssistantDraftButtonsBusy(true);
-  try {
-    const result = await runAssistantScriptSource(assistantLatestDraft.source, "Apply Assistant Draft", { revertAfterRun: false });
-    renderAssistantDraftActions(result.ok ? "Applied. Save it if you want it in Functions." : (result.error || "Apply failed."));
-  } finally {
-    setAssistantDraftButtonsBusy(false);
-  }
-}
-
-async function requestAssistantDraftRevision(errorText, failingSource, attempt) {
-  const prompt = [
-    assistantAeContextText(`${errorText}\n${failingSource}`),
-    "",
-    "Current assistant chat history for this session:",
-    assistantSessionTranscriptText({ limit: 18, maxCharsPerMessage: 2200 }),
-    "",
-    "The previous assistant-generated ExtendScript draft failed when tested inside After Effects.",
-    `Attempt: ${attempt}`,
-    "AE error:",
-    String(errorText || "Unknown error"),
-    "",
-    "Failing script:",
-    "```jsx",
-    String(failingSource || ""),
-    "```",
-    "",
-    assistantScriptingLibraryText(`${errorText}\n${failingSource}`),
-    "",
-    "Return a corrected version. Keep the answer compact and include exactly one executable jsx code block. The code block is the function body; the panel wraps it in an undo group.",
-    "The corrected script must verify its own result after applying it. For dash/stroke work, confirm actual Dash/Gap properties exist and have values; do not return success for an empty Dashes group or no-op."
-  ].filter(Boolean).join("\n");
-  try {
-    return await runAssistantPromptViaLocalServer(assistantProvider, prompt);
-  } catch (serverErr) {
-    try {
-      return await runAssistantPromptInCep(assistantProvider, prompt);
-    } catch (_) {
-      throw new Error(`Local assistant server is not reachable: ${String(serverErr && serverErr.message || serverErr)}.`);
-    }
-  }
-}
-
-async function autoTestAssistantDraft() {
-  if (!assistantLatestDraft || !assistantLatestDraft.source || assistantAutoTestBusy) {
-    renderAssistantDraftActions("No script draft found in the latest assistant reply.");
-    return;
-  }
-  assistantAutoTestBusy = true;
-  setAssistantDraftButtonsBusy(true);
-  setAssistantChatBusy(true);
-  let source = assistantLatestDraft.source;
-  try {
-    for (let attempt = 1; attempt <= ASSISTANT_AUTO_TEST_MAX_ATTEMPTS; attempt += 1) {
-      renderAssistantDraftActions(`Auto test ${attempt}/${ASSISTANT_AUTO_TEST_MAX_ATTEMPTS}...`);
-      const testResult = await runAssistantScriptSource(source, `Auto Test Draft ${attempt}`, { revertAfterRun: true });
-      if (testResult.ok) {
-        assistantSetLatestDraft(source, assistantLatestDraft.suggestedName || "Assistant Function");
-        renderAssistantDraftActions(`Auto test passed on attempt ${attempt}. Apply or Save when ready.`);
-        appendAssistantMessage(`Auto test passed on attempt ${attempt}. Test changes were reverted; use Apply to commit them.`, "system");
-        return;
-      }
-      const errorText = assistantVerificationText(testResult) || testResult.error || testResult.result || "Unknown script error.";
-      appendAssistantMessage(`Auto test ${attempt} failed:\n${errorText}`, "system");
-      if (attempt >= ASSISTANT_AUTO_TEST_MAX_ATTEMPTS) {
-        renderAssistantDraftActions(`Auto test stopped: ${errorText}`);
-        return;
-      }
-      renderAssistantDraftActions(`Refining after error ${attempt}/${ASSISTANT_AUTO_TEST_MAX_ATTEMPTS}...`);
-      const revision = await requestAssistantDraftRevision(errorText, source, attempt + 1);
-      const replyText = String(revision && revision.result || "").trim();
-      if (!revision || !revision.ok || !replyText) {
-        renderAssistantDraftActions("Refinement failed.");
-        appendAssistantMessage((revision && revision.error) || "Assistant refinement failed.", "system");
-        return;
-      }
-      appendAssistantMessage(replyText, "system");
-      const nextSource = assistantExtractScriptBlock(replyText);
-      if (!nextSource) {
-        renderAssistantDraftActions("Refinement did not include a jsx code block.");
-        return;
-      }
-      source = nextSource;
-      assistantSetLatestDraft(source, replyText);
-    }
-  } catch (err) {
-    const errorText = `Auto test error: ${String(err && err.message || err)}`;
-    renderAssistantDraftActions(errorText);
-    appendAssistantMessage(errorText, "system");
-  } finally {
-    assistantAutoTestBusy = false;
-    setAssistantDraftButtonsBusy(false);
-    setAssistantChatBusy(false);
-    if (assistantChatInputEl) assistantChatInputEl.focus();
-  }
-}
-
-function showAssistantSaveDialog() {
-  if (!assistantLatestDraft || !assistantLatestDraft.source || !assistantSaveModalEl) {
-    renderAssistantDraftActions("No script draft found to save.");
-    return;
-  }
-  if (assistantSaveNameEl) {
-    assistantSaveNameEl.value = assistantLatestDraft.suggestedName || "Assistant Function";
-    setTimeout(() => { try { assistantSaveNameEl.focus(); assistantSaveNameEl.select(); } catch (_) {} }, 0);
-  }
-  if (assistantSaveCategoryEl && !assistantSaveCategoryEl.value) assistantSaveCategoryEl.value = "Assistant";
-  if (assistantSaveErrorEl) assistantSaveErrorEl.textContent = "";
-  assistantSaveModalEl.classList.add("show");
-  assistantSaveModalEl.setAttribute("aria-hidden", "false");
-}
-
-function hideAssistantSaveDialog() {
-  if (!assistantSaveModalEl) return;
-  assistantSaveModalEl.classList.remove("show");
-  assistantSaveModalEl.setAttribute("aria-hidden", "true");
-}
-
-function saveAssistantDraftAsFunction() {
-  if (!assistantLatestDraft || !assistantLatestDraft.source) return;
-  const safety = assistantScriptSafetyCheck(assistantLatestDraft.source);
-  if (!safety.ok) {
-    if (assistantSaveErrorEl) assistantSaveErrorEl.textContent = safety.error;
-    renderAssistantDraftActions(safety.error);
-    return;
-  }
-  const name = String(assistantSaveNameEl && assistantSaveNameEl.value || "").trim();
-  const category = String(assistantSaveCategoryEl && assistantSaveCategoryEl.value || "Assistant").trim() || "Assistant";
-  if (!name) {
-    if (assistantSaveErrorEl) assistantSaveErrorEl.textContent = "Name the function first.";
-    return;
-  }
-  const now = new Date().toISOString();
-  assistantSavedFunctions.unshift({
-    id: `assistant-fn-${Date.now()}-${Math.round(Math.random() * 100000)}`,
-    name,
-    category,
-    source: assistantLatestDraft.source,
-    createdAt: now,
-    updatedAt: now
-  });
-  saveAssistantSavedFunctions();
-  hideAssistantSaveDialog();
-  renderAssistantFunctions();
-  renderAssistantDraftActions(`Saved "${name}" to Functions.`);
-  setAssistantTab("functions");
-  if (assistantFunctionSearchEl) {
-    assistantFunctionSearchEl.value = name;
-    assistantFunctionSelectedIndex = 0;
-    renderAssistantFunctions();
-  }
-}
-
 async function runAssistantSavedFunction(id) {
   if (!assistantSavedFunctions.length) loadAssistantSavedFunctions();
   const item = assistantSavedFunctions.find(fn => fn.id === id);
@@ -14559,538 +14430,11 @@ async function runAssistantFunction(index = assistantFunctionSelectedIndex) {
   }
 }
 
-function setAssistantTab(name) {
-  if (!assistantHubEl) return;
-  const selected = String(name || "functions");
-  assistantHubEl.querySelectorAll("[data-assistant-tab]").forEach(button => {
-    const active = button.dataset.assistantTab === selected;
-    button.classList.toggle("active", active);
-    button.setAttribute("aria-selected", active ? "true" : "false");
-  });
-  assistantHubEl.querySelectorAll("[data-assistant-panel]").forEach(panel => {
-    panel.classList.toggle("active", panel.dataset.assistantPanel === selected);
-  });
-  if (selected === "functions") renderAssistantFunctions();
-}
-
 function assistantStorageAvailable() {
   try {
     return !!window.localStorage;
   } catch (_) {
     return false;
-  }
-}
-
-function assistantSessionTitleFromText(text) {
-  const normalized = String(text || "").replace(/\s+/g, " ").trim();
-  if (!normalized) return "New session";
-  return normalized.length > 46 ? `${normalized.slice(0, 43)}...` : normalized;
-}
-
-function loadAssistantSessions() {
-  if (!assistantStorageAvailable()) {
-    assistantSessions = [];
-    return;
-  }
-  try {
-    const parsed = JSON.parse(window.localStorage.getItem(ASSISTANT_HISTORY_STORAGE_KEY) || "[]");
-    assistantSessions = Array.isArray(parsed) ? parsed.filter(session => session && session.id && Array.isArray(session.messages)) : [];
-  } catch (_) {
-    assistantSessions = [];
-  }
-}
-
-function saveAssistantSessions() {
-  if (!assistantStorageAvailable()) return;
-  try {
-    const capped = assistantSessions
-      .slice()
-      .sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")))
-      .slice(0, 40);
-    window.localStorage.setItem(ASSISTANT_HISTORY_STORAGE_KEY, JSON.stringify(capped));
-    assistantSessions = capped;
-  } catch (_) {}
-}
-
-function createAssistantSession() {
-  const now = new Date().toISOString();
-  const session = {
-    id: `session-${Date.now()}-${Math.round(Math.random() * 100000)}`,
-    title: "New session",
-    provider: assistantProvider,
-    createdAt: now,
-    updatedAt: now,
-    messages: [{ kind: "system", text: ASSISTANT_INITIAL_MESSAGE, at: now }]
-  };
-  assistantSessions.unshift(session);
-  assistantCurrentSessionId = session.id;
-  saveAssistantSessions();
-  return session;
-}
-
-function currentAssistantSession() {
-  return assistantSessions.find(session => session.id === assistantCurrentSessionId) || assistantSessions[0] || createAssistantSession();
-}
-
-function recordAssistantMessage(text, kind = "system") {
-  const session = currentAssistantSession();
-  const now = new Date().toISOString();
-  const cleanText = cleanAssistantOutput(text);
-  session.messages.push({ kind, text: cleanText, at: now });
-  session.provider = assistantProvider;
-  session.updatedAt = now;
-  if (kind === "user" && (!session.title || session.title === "New session")) {
-    session.title = assistantSessionTitleFromText(cleanText);
-  }
-  saveAssistantSessions();
-  renderAssistantHistoryMenu();
-}
-
-function renderAssistantSession(session = currentAssistantSession()) {
-  if (!assistantChatMessagesEl || !session) return;
-  assistantChatMessagesEl.innerHTML = "";
-  (session.messages || []).forEach(message => {
-    appendAssistantMessage(message.text, message.kind || "system", { persist: false });
-  });
-}
-
-function assistantHistoryDateLabel(value) {
-  const date = value ? new Date(value) : null;
-  if (!date || Number.isNaN(date.getTime())) return "";
-  return date.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
-}
-
-function renderAssistantHistoryMenu() {
-  if (!assistantHistoryMenuEl) return;
-  const sessions = assistantSessions
-    .slice()
-    .sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")));
-  if (!sessions.length) {
-    assistantHistoryMenuEl.innerHTML = `
-      <div class="assistant-history-empty">No saved chats yet.</div>
-      <button type="button" class="assistant-history-clear" data-assistant-clear-history>Clear chat history</button>`;
-    return;
-  }
-  assistantHistoryMenuEl.innerHTML = sessions.map(session => `
-    <button type="button" class="assistant-history-item${session.id === assistantCurrentSessionId ? " active" : ""}" data-assistant-session-id="${escapeHtml(session.id)}">
-      <strong>${escapeHtml(session.title || "New session")}</strong>
-      <span>${escapeHtml(providerLabel(session.provider || assistantProvider))} · ${escapeHtml(assistantHistoryDateLabel(session.updatedAt))} · ${(session.messages || []).length} messages</span>
-    </button>
-  `).join("") + `<button type="button" class="assistant-history-clear" data-assistant-clear-history>Clear chat history</button>`;
-}
-
-function clearAssistantHistory() {
-  assistantSessions = [];
-  assistantCurrentSessionId = "";
-  if (assistantStorageAvailable()) {
-    try { window.localStorage.removeItem(ASSISTANT_HISTORY_STORAGE_KEY); } catch (_) {}
-  }
-  const session = createAssistantSession();
-  renderAssistantSession(session);
-  renderAssistantHistoryMenu();
-  closeAssistantHistoryMenu();
-  if (assistantChatInputEl) assistantChatInputEl.focus();
-}
-
-function toggleAssistantHistoryMenu() {
-  if (!assistantHistoryMenuEl) return;
-  renderAssistantHistoryMenu();
-  const open = !assistantHistoryMenuEl.classList.contains("show");
-  assistantHistoryMenuEl.classList.toggle("show", open);
-  assistantHistoryMenuEl.setAttribute("aria-hidden", open ? "false" : "true");
-}
-
-function closeAssistantHistoryMenu() {
-  if (!assistantHistoryMenuEl) return;
-  assistantHistoryMenuEl.classList.remove("show");
-  assistantHistoryMenuEl.setAttribute("aria-hidden", "true");
-}
-
-function assistantSessionTranscriptText(options = {}) {
-  const session = currentAssistantSession();
-  const messages = (session && session.messages || [])
-    .filter(message => message && message.text && message.kind !== "system-internal")
-    .slice(-Number(options.limit || 18));
-  if (!messages.length) return "No prior chat messages in this session.";
-  return messages.map(message => {
-    const role = message.kind === "user" ? "User" : "Assistant";
-    const text = String(message.text || "")
-      .replace(/\s+$/g, "")
-      .slice(0, Number(options.maxCharsPerMessage || 2400));
-    return `${role}: ${text}`;
-  }).join("\n\n");
-}
-
-function appendAssistantMessage(text, kind = "system", options = {}) {
-  if (!assistantChatMessagesEl) return;
-  const cleanText = cleanAssistantOutput(text);
-  const message = document.createElement("div");
-  message.className = `assistant-message assistant-message-${kind}`;
-  if (kind === "user") {
-    message.textContent = cleanText;
-  } else {
-    renderAssistantMessageContent(message, cleanText);
-  }
-  assistantChatMessagesEl.appendChild(message);
-  assistantChatMessagesEl.scrollTop = assistantChatMessagesEl.scrollHeight;
-  if (options.persist !== false) recordAssistantMessage(cleanText, kind);
-  if (options.updateDraft !== false && kind !== "user") {
-    const draftSource = assistantExtractScriptBlock(cleanText);
-    if (draftSource) assistantSetLatestDraft(draftSource, cleanText);
-  }
-  return message;
-}
-
-function renderAssistantMessageContent(container, text) {
-  const value = String(text || "");
-  const pattern = /```([A-Za-z0-9_-]*)\s*\n([\s\S]*?)```/g;
-  let lastIndex = 0;
-  let match;
-  let rendered = false;
-  while ((match = pattern.exec(value))) {
-    const before = value.slice(lastIndex, match.index);
-    if (before.trim()) container.appendChild(assistantTextBlock(before));
-    const lang = String(match[1] || "jsx").trim() || "jsx";
-    const code = String(match[2] || "").replace(/\s+$/, "");
-    container.appendChild(assistantCodeBlock(code, lang));
-    lastIndex = pattern.lastIndex;
-    rendered = true;
-  }
-  const after = value.slice(lastIndex);
-  if (after.trim()) container.appendChild(assistantTextBlock(after));
-  if (!rendered && !container.childNodes.length) container.textContent = value;
-}
-
-function assistantTextBlock(text) {
-  const block = document.createElement("div");
-  block.className = "assistant-text-block";
-  block.textContent = String(text || "").trim();
-  return block;
-}
-
-function assistantCodeBlock(code, lang) {
-  const wrap = document.createElement("div");
-  wrap.className = "assistant-code-block";
-  const header = document.createElement("div");
-  header.className = "assistant-code-header";
-  header.textContent = String(lang || "code").toUpperCase();
-  const pre = document.createElement("pre");
-  const codeEl = document.createElement("code");
-  const normalizedLang = String(lang || "").toLowerCase();
-  if (/^(jsx|extendscript|javascript|js)$/.test(normalizedLang)) {
-    codeEl.innerHTML = assistantHighlightJavaScript(code);
-  } else {
-    codeEl.textContent = String(code || "");
-  }
-  pre.appendChild(codeEl);
-  wrap.appendChild(header);
-  wrap.appendChild(pre);
-  return wrap;
-}
-
-function assistantEscapeHtml(value) {
-  return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-function assistantHighlightJavaScript(code) {
-  const source = assistantEscapeHtml(code);
-  const placeholders = [];
-  const placeholderKey = index => {
-    let n = index + 1;
-    let key = "";
-    while (n > 0) {
-      n -= 1;
-      key = String.fromCharCode(65 + (n % 26)) + key;
-      n = Math.floor(n / 26);
-    }
-    return key;
-  };
-  const hold = (className, value) => {
-    const token = `\u0000${placeholderKey(placeholders.length)}\u0000`;
-    placeholders.push(`<span class="${className}">${value}</span>`);
-    return token;
-  };
-  let highlighted = source
-    .replace(/(\/\*[\s\S]*?\*\/|\/\/[^\n]*)/g, match => hold("code-comment", match))
-    .replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)/g, match => hold("code-string", match));
-  highlighted = highlighted
-    .replace(/\b(function|var|let|const|if|else|for|while|return|try|catch|finally|new|true|false|null|undefined|typeof|instanceof|continue|break|switch|case|default|throw)\b/g, '<span class="code-keyword">$1</span>')
-    .replace(/\b(app|CompItem|ShapeLayer|PropertyType|PropertyValueType|ADBE[A-Za-z0-9 _-]*)\b/g, '<span class="code-ae">$1</span>')
-    .replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="code-number">$1</span>');
-  return highlighted.replace(/\u0000([A-Z]+)\u0000/g, (_, key) => {
-    let index = 0;
-    for (let i = 0; i < key.length; i += 1) index = index * 26 + (key.charCodeAt(i) - 64);
-    return placeholders[index - 1] || "";
-  });
-}
-
-function cleanAssistantOutput(text) {
-  const lines = String(text || "").split(/\r?\n/);
-  const filtered = [];
-  let droppingClaudeStdinWarning = false;
-  lines.forEach(line => {
-    if (/^Warning: no stdin data received/i.test(line)) {
-      droppingClaudeStdinWarning = true;
-      return;
-    }
-    if (droppingClaudeStdinWarning && /^(without it|stdin explicitly:|If piping from)/i.test(line.trim())) return;
-    droppingClaudeStdinWarning = false;
-    filtered.push(line);
-  });
-  return filtered.join("\n").trim();
-}
-
-function setAssistantProvider(provider) {
-  assistantProvider = String(provider || "auto");
-  if (!assistantHubEl) return;
-  assistantHubEl.querySelectorAll("[data-assistant-provider]").forEach(button => {
-    const active = button.dataset.assistantProvider === assistantProvider;
-    button.classList.toggle("active", active);
-    button.setAttribute("aria-pressed", active ? "true" : "false");
-  });
-}
-
-function providerLabel(provider) {
-  const labels = { claude: "Claude", codex: "Codex", ollama: "Ollama", auto: "Auto" };
-  return labels[String(provider || "").toLowerCase()] || "Assistant";
-}
-
-function assistantNodeRequire(moduleName) {
-  try {
-    if (typeof require === "function") return require(moduleName);
-  } catch (_) {}
-  try {
-    if (window.cep_node && typeof window.cep_node.require === "function") return window.cep_node.require(moduleName);
-  } catch (_) {}
-  return null;
-}
-
-function selectedAssistantLayersForContext() {
-  const selected = new Set((state.selectedLayerIndices || []).map(Number));
-  const layers = (state.layers || []).filter(layer => selected.has(Number(layer.index || 0)));
-  return layers.length ? layers : (state.layers || []).slice(0, 12);
-}
-
-function assistantAeContextText(topicText = "") {
-  const comp = state.comp || null;
-  const functions = assistantFunctionInventoryForContext();
-  const selectedLayers = selectedAssistantLayersForContext().map(layer => ({
-    index: layer.index,
-    name: layer.name,
-    type: layer.type,
-    selected: !!layer.selected,
-    inPoint: layer.inPoint,
-    outPoint: layer.outPoint,
-    startTime: layer.startTime,
-    enabled: !!layer.enabled,
-    locked: !!layer.locked,
-    parentIndex: layer.parentIndex || 0,
-    trackMatteType: layer.trackMatteType || "",
-    effectNames: layer.effectNames || [],
-    propertyNames: layer.propertyNames || []
-  }));
-  const context = {
-    host: "Adobe After Effects 2026",
-    extension: "AE FX CEP panel",
-    extensionRoot: extensionRootPath(),
-    activeComp: comp ? {
-      id: comp.id,
-      name: comp.name,
-      width: comp.width,
-      height: comp.height,
-      duration: comp.duration,
-      frameRate: comp.frameRate,
-      time: comp.time,
-      numLayers: comp.numLayers,
-      selectedLayerIndices: state.selectedLayerIndices || []
-    } : null,
-    visibleProjectComps: (state.comps || []).slice(0, 40).map(item => ({
-      id: item.id,
-      name: item.name,
-      width: item.width,
-      height: item.height,
-      duration: item.duration,
-      numLayers: item.numLayers
-    })),
-    selectedOrSampleLayers: selectedLayers,
-    selectedKeyframes: (selectedKeyframes || []).slice(0, 80),
-    functionRegistry: functions
-  };
-  return [
-    "You are running inside Adobe After Effects 2026 through the AE FX CEP assistant panel.",
-    "You may use local CLI tools, MCP servers, and files available to this machine. The user expects After Effects scripting help and panel automation.",
-    "You can see the panel's current function registry in context.functionRegistry. When the user asks what functions the tool has, answer from that registry.",
-    "Safety mode is enabled for generated scripts. Do not use app.project.save/saveWithDialog, app.quit/exit, system.callSystem, File/Folder filesystem access, importFile/ImportOptions, renderQueue/outputModule, remove(), or executeCommand(). Generated scripts should only mutate the active comp, selected layers, and their properties for the requested task.",
-    "When the user asks you to recreate, build, make from scratch, or automate something in AE, break down the approach in 1-3 short bullets and include one executable ExtendScript code block tagged jsx. Keep the code inside the fenced code block only; the panel renders it as a code box and offers Auto Test, Test, and Save for that latest code block.",
-    "The jsx code block should be the body of a function executed inside After Effects. Use app.project.activeItem for the active comp, validate that it is a CompItem, and return a short result string. The panel wraps it in an undo group.",
-    "If the user asks to save a generated function, provide the jsx code block; the panel's Save button stores it in the assistant function library. Only patch extension source files when the user explicitly asks for a permanent built-in command.",
-    "Use the assistant scripting library notes below when they apply. They summarize local Adobe scripting guide match names and proven panel helper patterns:",
-    assistantScriptingLibraryText(topicText),
-    "Current AE read context follows as JSON. Treat it as live host context read from After Effects:",
-    JSON.stringify(context, null, 2)
-  ].join("\n");
-}
-
-function assistantScriptingLibraryText(topicText = "") {
-  const topic = String(topicText || "").toLowerCase();
-  const notes = [];
-  if (/dash|stroke|shape|adbe vector/.test(topic)) {
-    notes.push([
-      "AE SCRIPTING LIBRARY: Shape stroke dashes",
-      "- Local reference: after-effects-scripting-guide-master/docs/matchnames/layer/shapelayer.md#stroke-dashes.",
-      "- Shape stroke match name is ADBE Vector Graphic - Stroke. Stroke dash container is ADBE Vector Stroke Dashes.",
-      "- Dash props are ADBE Vector Stroke Dash 1 and ADBE Vector Stroke Gap 1. Add missing props with dashes.addProperty(matchName), then setValue(number).",
-      "- Existing Dashes containers may already report children; still set Dash 1 and Gap 1 values explicitly and verify by reading them back.",
-      "- Recursive traversal should start from layer.property(\"ADBE Root Vectors Group\") / Contents and look for ADBE Vector Graphic - Stroke or ADBE Vector Graphic - G-Stroke.",
-      "- Known-good shortcut in this extension: the host function addDashesToStroke() sets Dash 1 to 10 and Gap 1 to 6 on selected shape strokes. A generated script can call return addDashesToStroke(); when the panel JSX has loaded."
-    ].join("\n"));
-  }
-  if (/mask|track matte|matte/.test(topic)) {
-    notes.push([
-      "AE SCRIPTING LIBRARY: Masks and mattes",
-      "- Prefer match-name lookups over display names.",
-      "- Validate selected layers and comp with app.project.activeItem instanceof CompItem before mutating."
-    ].join("\n"));
-  }
-  return notes.join("\n\n");
-}
-
-function assistantFunctionInventoryForContext() {
-  const seen = new Set();
-  const flatten = (entry, parentName = "") => {
-    if (!entry) return [];
-    const source = fxConsoleSourceMeta(entry);
-    const tags = typeof fxConsoleEntryTags === "function" ? fxConsoleEntryTags(entry) : [{ label: source.label }];
-    const item = {
-      name: entry.name || entry.matchName || "Function",
-      category: entry.category || "",
-      shortcut: entry.shortcut || "",
-      source: source.label,
-      sourceDetail: source.detail,
-      tags: tags.map(tag => tag.label),
-      parent: parentName
-    };
-    const key = [item.name, item.category, item.shortcut, item.source, item.parent].join("\u0001");
-    const rows = [];
-    if (!seen.has(key)) {
-      seen.add(key);
-      rows.push(item);
-    }
-    (entry.children || []).forEach(child => {
-      rows.push(...flatten({ ...child, source: entry.source || child.source }, entry.name || parentName));
-    });
-    return rows;
-  };
-  return searchFxConsoleEntries("", null, 240).flatMap(entry => flatten(entry)).slice(0, 360);
-}
-
-function assistantPromptWithAeContext(userPrompt) {
-  return [
-    assistantAeContextText(userPrompt),
-    "Current assistant chat history for this session follows. Use it as conversation memory; when the user says 'try again', 'same thing', or references earlier errors, resolve that from this transcript:",
-    assistantSessionTranscriptText({ limit: 18, maxCharsPerMessage: 2800 }),
-    "Current user request:",
-    String(userPrompt || "")
-  ].join("\n\n");
-}
-
-async function runAssistantPromptViaLocalServer(provider, prompt) {
-  const response = await fetch("http://127.0.0.1:48739/run", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ provider: String(provider || "auto"), prompt: String(prompt || "") })
-  });
-  let payload = null;
-  try { payload = await response.json(); } catch (_) {}
-  if (!response.ok || !payload || !payload.ok) {
-    throw new Error((payload && payload.error) || `Assistant server failed (${response.status}).`);
-  }
-  return payload;
-}
-
-function runAssistantPromptInCep(provider, prompt) {
-  const fs = assistantNodeRequire("fs");
-  const os = assistantNodeRequire("os");
-  const path = assistantNodeRequire("path");
-  const childProcess = assistantNodeRequire("child_process");
-  if (!fs || !os || !path || !childProcess) {
-    return Promise.reject(new Error("CEP Node is not enabled yet. Reload the panel after the manifest update."));
-  }
-  return new Promise((resolve, reject) => {
-    const root = extensionRootPath();
-    const runner = path.join(root, "scripts", "assistant-runner.sh");
-    const promptFile = path.join(os.tmpdir(), `tnt-assistant-${Date.now()}-${Math.round(Math.random() * 100000)}.txt`);
-    try {
-      fs.writeFileSync(promptFile, prompt, "utf8");
-    } catch (err) {
-      reject(err);
-      return;
-    }
-    const env = Object.assign({}, typeof process !== "undefined" && process.env ? process.env : {}, {
-      TNT_ASSISTANT_MCP_CONFIG: path.join(root, "scripts", "assistant-mcp.json")
-    });
-    childProcess.execFile("/bin/bash", [runner, String(provider || "auto"), promptFile, root], {
-      cwd: root,
-      env,
-      maxBuffer: 1024 * 1024 * 16
-    }, (error, stdout, stderr) => {
-      try { fs.unlinkSync(promptFile); } catch (_) {}
-      const output = `${stdout || ""}${stderr ? `\n${stderr}` : ""}`.trim();
-      if (error) {
-        error.message = output || error.message;
-        reject(error);
-        return;
-      }
-      resolve({ ok: true, provider, result: output });
-    });
-  });
-}
-
-function setAssistantChatBusy(isBusy) {
-  assistantChatBusy = !!isBusy;
-  if (assistantChatSendEl) assistantChatSendEl.disabled = assistantChatBusy;
-  if (assistantChatInputEl) assistantChatInputEl.disabled = assistantChatBusy;
-}
-
-async function submitAssistantChat() {
-  if (!assistantChatInputEl || assistantChatBusy) return;
-  const value = assistantChatInputEl.value.trim();
-  if (!value) return;
-  assistantChatInputEl.value = "";
-  appendAssistantMessage(value, "user");
-  const thinkingEl = appendAssistantMessage(`${providerLabel(assistantProvider)} is thinking...`, "system", { persist: false });
-  setAssistantChatBusy(true);
-  try {
-    if (state.comp) await refreshLayers({ forceRender: false, skipSettledRefresh: true });
-    const prompt = assistantPromptWithAeContext(value);
-    let result = null;
-    try {
-      result = await runAssistantPromptViaLocalServer(assistantProvider, prompt);
-    } catch (serverErr) {
-      try {
-        result = await runAssistantPromptInCep(assistantProvider, prompt);
-      } catch (_) {
-        throw new Error(`Local assistant server is not reachable: ${String(serverErr && serverErr.message || serverErr)}.`);
-      }
-    }
-    if (result && result.ok) {
-      if (thinkingEl) thinkingEl.remove();
-      appendAssistantMessage(String(result.result || "").trim() || `${providerLabel(assistantProvider)} returned an empty response.`);
-    } else {
-      const errorText = (result && result.error) || "Assistant provider failed.";
-      if (thinkingEl) thinkingEl.textContent = errorText;
-      recordAssistantMessage(errorText);
-    }
-  } catch (err) {
-    const errorText = `Assistant error: ${String(err && err.message || err)}`;
-    if (thinkingEl) thinkingEl.textContent = errorText;
-    recordAssistantMessage(errorText);
-  } finally {
-    setAssistantChatBusy(false);
-    if (assistantChatInputEl) assistantChatInputEl.focus();
   }
 }
 
@@ -15143,52 +14487,6 @@ if (assistantFunctionListEl) {
 
 if (assistantHubEl) {
   assistantHubEl.addEventListener("click", event => {
-    const tab = event.target.closest && event.target.closest("[data-assistant-tab]");
-    if (tab) {
-      closeAssistantHistoryMenu();
-      setAssistantTab(tab.dataset.assistantTab);
-      return;
-    }
-    const historyButton = event.target.closest && event.target.closest("[data-assistant-history]");
-    if (historyButton) {
-      toggleAssistantHistoryMenu();
-      return;
-    }
-    const clearHistory = event.target.closest && event.target.closest("[data-assistant-clear-history]");
-    if (clearHistory) {
-      clearAssistantHistory();
-      return;
-    }
-    const historyItem = event.target.closest && event.target.closest("[data-assistant-session-id]");
-    if (historyItem) {
-      const session = assistantSessions.find(item => item.id === historyItem.dataset.assistantSessionId);
-      if (session) {
-        assistantCurrentSessionId = session.id;
-        if (session.provider) setAssistantProvider(session.provider);
-        renderAssistantSession(session);
-        renderAssistantHistoryMenu();
-        closeAssistantHistoryMenu();
-        if (assistantChatInputEl) assistantChatInputEl.focus();
-      }
-      return;
-    }
-    const provider = event.target.closest && event.target.closest("[data-assistant-provider]");
-    if (provider) {
-      setAssistantProvider(provider.dataset.assistantProvider);
-      currentAssistantSession().provider = assistantProvider;
-      saveAssistantSessions();
-      renderAssistantHistoryMenu();
-      return;
-    }
-    const newChat = event.target.closest && event.target.closest(".assistant-new-btn");
-    if (newChat && assistantChatMessagesEl) {
-      const session = createAssistantSession();
-      renderAssistantSession(session);
-      renderAssistantHistoryMenu();
-      closeAssistantHistoryMenu();
-      if (assistantChatInputEl) assistantChatInputEl.focus();
-      return;
-    }
     const card = event.target.closest && event.target.closest("[data-assistant-function-index]");
     if (card) {
       event.preventDefault();
@@ -15232,43 +14530,7 @@ if (assistantHubEl) {
       renderAssistantFunctions();
     });
   }
-  if (assistantChatSendEl) assistantChatSendEl.addEventListener("click", () => submitAssistantChat());
-  if (assistantAutoTestDraftEl) assistantAutoTestDraftEl.addEventListener("click", () => autoTestAssistantDraft());
-  if (assistantTestDraftEl) assistantTestDraftEl.addEventListener("click", () => testAssistantDraft());
-  if (assistantApplyDraftEl) assistantApplyDraftEl.addEventListener("click", () => applyAssistantDraft());
-  if (assistantSaveDraftEl) assistantSaveDraftEl.addEventListener("click", () => showAssistantSaveDialog());
-  if (assistantSaveCancelEl) assistantSaveCancelEl.addEventListener("click", () => hideAssistantSaveDialog());
-  if (assistantSaveApplyEl) assistantSaveApplyEl.addEventListener("click", () => saveAssistantDraftAsFunction());
-  if (assistantSaveModalEl) {
-    assistantSaveModalEl.addEventListener("mousedown", event => {
-      if (event.target === assistantSaveModalEl) hideAssistantSaveDialog();
-    });
-    assistantSaveModalEl.addEventListener("keydown", event => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        hideAssistantSaveDialog();
-      } else if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        saveAssistantDraftAsFunction();
-      }
-    });
-  }
-  if (assistantChatInputEl) {
-    assistantChatInputEl.addEventListener("keydown", event => {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        submitAssistantChat();
-      }
-    });
-  }
-  setAssistantProvider(assistantProvider);
-  loadAssistantSessions();
   loadAssistantSavedFunctions();
-  if (!assistantSessions.length) createAssistantSession();
-  assistantCurrentSessionId = currentAssistantSession().id;
-  renderAssistantSession(currentAssistantSession());
-  renderAssistantHistoryMenu();
-  renderAssistantDraftActions();
   renderAssistantFunctions();
 }
 if (compositionModalEl) {

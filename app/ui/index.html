@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:">
+<title>AE FX</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<main class="page">
+  <header class="head">
+    <span class="dot" id="dot"></span>
+    <div class="head-text">
+      <h1>AE FX</h1>
+      <p class="muted" id="statusLine">Looking for the AE FX panel…</p>
+    </div>
+    <button type="button" class="ghost" id="reload" title="Read the command list again from After Effects">Reload list</button>
+  </header>
+
+  <section class="card closed" id="closed" hidden>
+    <h2>Open the AE FX panel</h2>
+    <p class="muted">Edie runs AE FX's functions through its panel in After Effects. Open After Effects, choose <strong>Window ▸ Extensions ▸ AE FX</strong>, and keep the panel open (it can sit behind other panels).</p>
+    <p class="muted small" id="closedDetail"></p>
+  </section>
+
+  <section class="tools" id="tools" hidden>
+    <div class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="query" type="search" spellcheck="false" autocomplete="off" placeholder="Search functions and effects" aria-label="Search functions and effects">
+    </div>
+    <div class="kinds" id="kinds" role="tablist" aria-label="Kind"></div>
+    <div class="list" id="list" role="listbox" aria-label="Commands"></div>
+    <p class="muted small foot">Runs on what's selected in After Effects. <kbd>↑</kbd> <kbd>↓</kbd> to move, <kbd>Enter</kbd> to run; After Effects' own undo takes it back.</p>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

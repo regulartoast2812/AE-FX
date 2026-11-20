@@ -12370,32 +12370,3 @@ function TNT_writeQuickPanelScope(group) {
   }
 }
 
-
-function TNT_shellQuote(value) {
-  return "'" + String(value || "").replace(/'/g, "'\\''") + "'";
-}
-
-function TNT_runAssistantPrompt(provider, prompt, extensionRoot) {
-  try {
-    provider = String(provider || "auto");
-    prompt = String(prompt || "");
-    extensionRoot = String(extensionRoot || "");
-    if (!prompt) return TNT_jsonStringify({ ok: false, error: "Enter a message for the assistant." });
-    var runner = new File(extensionRoot + "/scripts/assistant-runner.sh");
-    if (!runner.exists) return TNT_jsonStringify({ ok: false, error: "Assistant runner not found." });
-    var promptFile = new File(Folder.temp.fsName + "/tnt-assistant-" + (new Date()).getTime() + ".txt");
-    promptFile.encoding = "UTF-8";
-    promptFile.open("w");
-    promptFile.write(prompt);
-    promptFile.close();
-    var cmd = "bash " + TNT_shellQuote(runner.fsName) + " " +
-      TNT_shellQuote(provider) + " " +
-      TNT_shellQuote(promptFile.fsName) + " " +
-      TNT_shellQuote(extensionRoot);
-    var output = system.callSystem(cmd);
-    try { promptFile.remove(); } catch (_) {}
-    return TNT_jsonStringify({ ok: true, provider: provider, result: String(output || "") });
-  } catch (err) {
-    return TNT_jsonStringify({ ok: false, error: String(err) });
-  }
-}

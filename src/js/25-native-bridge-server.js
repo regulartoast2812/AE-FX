@@ -107,6 +107,17 @@ function bridgeHandleLine(line, socket, token) {
     return;
   }
 
+  // Edie (Creative Assist) asks by name rather than sending script: the same
+  // command list and the same run path as the palette and the Functions list.
+  const op = String((request && request.op) || "");
+  if (id && (op === "status" || op === "commands" || op === "run")) {
+    bridgeHandleOp(op, request).then(
+      reply => bridgeSend(socket, { id, result: JSON.stringify(reply) }),
+      e => bridgeSend(socket, { id, error: String(e && e.message || e) })
+    );
+    return;
+  }
+
   if (!id || !script) return;
 
   try {
@@ -116,6 +127,103 @@ function bridgeHandleLine(line, socket, token) {
   } catch (e) {
     bridgeSend(socket, { id, error: String(e) });
   }
+}
+
+// ---- Commands by name, for Edie ------------------------------------------------
+//
+//   -> {"id","token","op":"status"}            <- {ok, version, comp, layers, selected, commands, runs}
+//   -> {"id","token","op":"commands"}          <- {ok, commands:[{name, kind, category, shortcut, needs}]}
+//   -> {"id","token","op":"run","name":"…"}    <- {ok, name, ms, message}
+//
+// A command in a menu is named "Menu / Item" ("Label Layers / Red"). Runs go
+// through executeFxConsoleEntry, exactly as a click in the palette, on what is
+// selected in After Effects; AE's own undo still takes each one back.
+
+const TNT_BRIDGE_RUNS = [];
+let tntBridgeRunBusy = false;
+
+function bridgeKind(entry) {
+  if (entry.source === "native") return "AE effect";
+  if (entry.source === "assistant") return "Saved script";
+  if (entry.source === "custom") return "Custom";
+  return "Panel";
+}
+
+function bridgeCommandRows() {
+  const rows = [];
+  const add = (entry, path) => {
+    if (!entry || entry.groupParent) return;
+    const name = path ? `${path} / ${entry.name}` : String(entry.name || entry.matchName || "");
+    if (entry.children && entry.children.length && !entry.action && !entry.tntFunction) {
+      entry.children.forEach(child => add({
+        ...child, source: entry.source, type: child.action ? "command" : (child.children ? "tntMenu" : "tntCommand")
+      }, name));
+      return;
+    }
+    if (!name) return;
+    let needs = "";
+    try { needs = typeof tntEntryRequirement === "function" ? (TNT_REQUIREMENT_LABELS[tntEntryRequirement(entry)] || "") : ""; } catch (_) {}
+    let shortcut = "";
+    try { shortcut = typeof tntShortcutForEntry === "function" ? tntShortcutForEntry(entry) : (entry.shortcut || ""); } catch (_) { shortcut = entry.shortcut || ""; }
+    rows.push({ name, kind: bridgeKind(entry), category: String(entry.category || ""), shortcut: String(shortcut || ""), needs, entry });
+  };
+  FX_CONSOLE_COMMANDS.forEach(c => add({ ...c, source: "panel" }, ""));
+  (typeof getAssistantSavedFunctionCommands === "function" ? getAssistantSavedFunctionCommands() : []).forEach(c => add(c, ""));
+  TNT_V3_COMMANDS.forEach(c => add({ ...c, source: "custom", type: c.action ? "command" : (c.children ? "tntMenu" : "tntCommand") }, ""));
+  (fxConsoleEffects || []).forEach(e => add({ ...e, source: "native", type: "effect" }, ""));
+  return rows;
+}
+
+function bridgeFindCommand(rows, name) {
+  const key = String(name || "").trim().toLowerCase().replace(/\s*[\/›▸>]\s*/g, " / ");
+  if (!key) return null;
+  const exact = rows.filter(r => r.name.toLowerCase() === key);
+  if (exact.length) return exact[0];
+  // "Red" alone is ambiguous (layers, keyframes, markers); a unique last part is not.
+  const last = rows.filter(r => r.name.toLowerCase().split(" / ").pop() === key);
+  return last.length === 1 ? last[0] : null;
+}
+
+async function bridgeHandleOp(op, request) {
+  if (op === "status") {
+    return {
+      ok: true, version: typeof TNT_VERSION === "string" ? TNT_VERSION : "",
+      comp: state.comp ? String(state.comp.name || "") : "", layers: (state.layers || []).length,
+      selected: (state.selectedLayerIndices || []).length, busy: tntBridgeRunBusy,
+      commands: bridgeCommandRows().length, effectsLoaded: !!(fxConsoleEffects && fxConsoleEffects.length),
+      runs: TNT_BRIDGE_RUNS.slice(-20)
+    };
+  }
+  if (!fxConsoleEffects || !fxConsoleEffects.length) {
+    try { await loadFxConsoleEffects(); } catch (_) {}
+  }
+  const rows = bridgeCommandRows();
+  if (op === "commands") {
+    return { ok: true, commands: rows.map(r => ({ name: r.name, kind: r.kind, category: r.category, shortcut: r.shortcut, needs: r.needs })) };
+  }
+  const row = bridgeFindCommand(rows, request && request.name);
+  if (!row) return { ok: false, error: `No AE FX command is called "${String(request && request.name || "")}".` };
+  if (tntBridgeRunBusy) return { ok: false, error: "Another command is still running in After Effects." };
+  tntBridgeRunBusy = true;
+  const started = Date.now();
+  let ok = false, message = "";
+  try {
+    // The selection the command acts on is After Effects' own, read now.
+    try { await refreshLayers({ forceRender: true, skipSettledRefresh: true }); } catch (_) {}
+    if (statusEl) statusEl.textContent = "";
+    ok = (await executeFxConsoleEntry(row.entry)) !== false;
+    message = String(statusEl && statusEl.textContent || "").trim();
+    if (ok && /\b(fail|failed|error|could not|couldn't|no layers? selected|select )/i.test(message) && !/\bdone\b/i.test(message)) ok = false;
+  } catch (e) {
+    ok = false;
+    message = String(e && e.message || e);
+  } finally {
+    tntBridgeRunBusy = false;
+  }
+  const run = { time: new Date().toISOString(), outcome: ok ? "ok" : "failed", command: row.name, detail: message, ms: Date.now() - started };
+  TNT_BRIDGE_RUNS.push(run);
+  if (TNT_BRIDGE_RUNS.length > 50) TNT_BRIDGE_RUNS.shift();
+  return { ok, name: row.name, ms: run.ms, message };
 }
 
 function startNativeBridgeServer() {

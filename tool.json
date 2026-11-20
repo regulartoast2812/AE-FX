@@ -1,0 +1,22 @@
+{
+  "id": "aefx",
+  "name": "AE FX",
+  "maker": "Crossian",
+  "version": "0.1.0",
+  "tagline": "Functions, effects and saved scripts for After Effects",
+  "about": "Runs AE FX's functions in After Effects on the layers and keyframes you have selected: easing, overshoot and wiggle, animate in and out, anchor points, labels, trims, snap, pull and stagger, adding layers, every AE effect and your saved scripts. Edie can find and run any of them while the AE FX panel is open.",
+  "category": "After Effects",
+  "platforms": ["darwin", "win32"],
+  "icon": "palette",
+  "color": "#9a7cf0",
+  "ui": "app/ui/index.html",
+  "service": "app/src/service.mjs",
+  "mcp": "app/src/mcp.mjs",
+  "repo": "https://github.com/regulartoast2812/AE-FX.git",
+  "install": {
+    "darwin": "~/Library/Application Support/Adobe/CEP/extensions/AE FX",
+    "win32": "%APPDATA%\\Adobe\\CEP\\extensions\\AE FX",
+    "cepDebug": true,
+    "after": "Open After Effects, then Window ▸ Extensions ▸ AE FX, and keep the panel open: Edie works through it."
+  }
+}
