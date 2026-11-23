@@ -574,11 +574,23 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         // The NSEvent global monitor duplicates the Carbon hot keys, so running both
         // fires every shortcut twice. It is also the only thing here that needs an
         // Accessibility grant, so it stays off unless Carbon registration failed.
-        var carbonHotKeysReady = registerGlobalHotKeys()
+        //
+        // The keys are held only while After Effects (or this panel) is in front:
+        // a Carbon hot key is taken from every app, so holding Ctrl+Space all the
+        // time ate Creative Assist's (Sage's) Ctrl+Space search and macOS's
+        // Ctrl+A/E/K/D/F/T/O text keys everywhere, until this helper quit. Each
+        // dev restart took them again. syncHotKeysToFrontmost() takes them when
+        // After Effects comes to the front and gives them back when it leaves.
+        var carbonHotKeysReady = true
+        var attempt = 0
+        if hotKeysWantedNow() {
+            carbonHotKeysReady = registerGlobalHotKeys()
+        } else {
+            tntLog("hotkeys: waiting for After Effects to come to the front (\(tntFrontmostDescription()) is)")
+        }
         // The kernel does not always release a departed owner's hot keys by the
         // time we ask. Retry briefly before falling back to the monitor that
         // needs an Accessibility grant.
-        var attempt = 0
         while !carbonHotKeysReady && attempt < 5 {
             attempt += 1
             usleep(120_000)
@@ -959,8 +971,37 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         }
     }
 
+    private func hotKeysWanted(for bundleIdentifier: String?) -> Bool {
+        let helperBundleIdentifier = Bundle.main.bundleIdentifier ?? ""
+        return bundleIdentifier == afterEffectsBundleIdentifier || bundleIdentifier == helperBundleIdentifier
+    }
+
+    private func hotKeysWantedNow() -> Bool {
+        hotKeysWanted(for: NSWorkspace.shared.frontmostApplication?.bundleIdentifier)
+    }
+
+    /// Takes the hot keys while After Effects or this panel is in front and gives
+    /// them back to every other app (see where they are first registered).
+    private func syncHotKeysToFrontmost(_ application: NSRunningApplication) {
+        if hotKeysWanted(for: application.bundleIdentifier) {
+            guard hotKeyRefs.isEmpty else { return }
+            if !registerGlobalHotKeys(quiet: true) {
+                // A departed owner can hold them for a moment; try once more.
+                unregisterGlobalHotKeys()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
+                    guard let self, self.hotKeyRefs.isEmpty, self.hotKeysWantedNow() else { return }
+                    self.registerGlobalHotKeys()
+                }
+            }
+        } else if !hotKeyRefs.isEmpty || hotKeyEventHandler != nil {
+            unregisterGlobalHotKeys()
+        }
+    }
+
     @discardableResult
-    private func registerGlobalHotKeys() -> Bool {
+    private func registerGlobalHotKeys(quiet: Bool = false) -> Bool {
+        // Taken again each time After Effects comes back, so start clean.
+        if hotKeyEventHandler != nil || !hotKeyRefs.isEmpty { unregisterGlobalHotKeys() }
         var eventType = EventTypeSpec(
             eventClass: OSType(kEventClassKeyboard),
             eventKind: UInt32(kEventHotKeyPressed)
@@ -1011,6 +1052,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             registerHotKey(keyCode: UInt32(entry.keyCode), modifiers: UInt32(controlKey), id: entry.id)
         }
         let registered = hotKeyRefs.count
+        if quiet && registered == requested.count { return true }
         if registered == requested.count {
             tntLog("hotkeys: registered all \(registered)")
         } else {
@@ -1111,6 +1153,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
                 return
             }
             let helperBundleIdentifier = Bundle.main.bundleIdentifier ?? ""
+            self?.syncHotKeysToFrontmost(application)
             if application.bundleIdentifier != afterEffectsBundleIdentifier &&
                application.bundleIdentifier != helperBundleIdentifier {
                 if self?.panel?.isVisible == true {
