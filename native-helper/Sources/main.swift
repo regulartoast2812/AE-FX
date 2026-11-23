@@ -456,6 +456,16 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
     private var visibilityTimer: Timer?
     private var activeBridgeExecutions = 0
     private var bridgeFocusGraceUntil = Date.distantPast
+    // After Effects sometimes takes focus back by itself just after a panel opens
+    // (seen 2026-11-24: four in a row, 3 s apart, "summoned then closes a few
+    // frames later"). A real click into After Effects comes with a mouse-down
+    // the global monitor below sees; AE taking focus on its own does not. Only
+    // the second kind is undone, and only a few times per open, so a tug of war
+    // can't flicker the panel forever.
+    private var outsideMouseDownMonitor: Any?
+    private var lastOutsideMouseDownAt = Date.distantPast
+    private var panelShownAt = Date.distantPast
+    private var focusTakenBackThisOpen = 0
     private let launchInBackground = CommandLine.arguments.contains("--background")
     private var loggedAccessibilitySkip = false
 
@@ -582,6 +592,13 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             startGlobalShortcutFallbackMonitor()
         }
         startApplicationVisibilityMonitor()
+        // Mouse-downs that go to other apps (global monitors never see our own).
+        // Mouse events need no Accessibility grant, unlike keys.
+        outsideMouseDownMonitor = NSEvent.addGlobalMonitorForEvents(
+            matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]
+        ) { [weak self] _ in
+            self?.lastOutsideMouseDownAt = Date()
+        }
         if !launchInBackground {
             showPanel()
         }
@@ -626,6 +643,9 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         if let rightClickFallbackMonitor {
             NSEvent.removeMonitor(rightClickFallbackMonitor)
         }
+        if let outsideMouseDownMonitor {
+            NSEvent.removeMonitor(outsideMouseDownMonitor)
+        }
         unregisterGlobalHotKeys()
         stopControlRightClickMonitor()
         workspaceObservers.forEach {
@@ -646,6 +666,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             context.duration = 0
             context.allowsImplicitAnimation = false
             if NSApp.isHidden { NSApp.unhide(nil) }
+            if !panel.isVisible {
+                panelShownAt = Date()
+                focusTakenBackThisOpen = 0
+            }
             NSApp.activate(ignoringOtherApps: true)
             if makeKey { panel.makeKeyAndOrderFront(nil) }
             panel.orderFrontRegardless()
@@ -1049,7 +1073,16 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
                 }
                 return
             }
-            tntLog("hide: lost focus to \(tntFrontmostDescription())")
+            let openFor = Int(Date().timeIntervalSince(self.panelShownAt) * 1000)
+            let frontmost = NSWorkspace.shared.frontmostApplication?.bundleIdentifier ?? ""
+            let clickedAway = Date().timeIntervalSince(self.lastOutsideMouseDownAt) < 0.6
+            if frontmost == afterEffectsBundleIdentifier && !clickedAway && self.focusTakenBackThisOpen < 3 {
+                self.focusTakenBackThisOpen += 1
+                tntLog("kept: After Effects took focus without a click \(openFor)ms after the panel opened; taking it back (\(self.focusTakenBackThisOpen)/3)")
+                self.restorePanelFocusAfterBridgeExecution()
+                return
+            }
+            tntLog("hide: lost focus to \(tntFrontmostDescription()) \(openFor)ms after the panel opened\(clickedAway ? ", after a click" : "")")
             panel.orderOut(nil)
         }
     }
