@@ -780,3 +780,34 @@ body.quick-panel-mode .quick-layer-menu-body .layer-menu-kicker,
   background: rgba(255, 154, 61, .52) !important;
   box-shadow: 0 0 0 2px rgba(255, 154, 61, .12) !important;
 }
+
+/* ---- Hairlines between search results ------------------------------------
+   (2026-11-24, asked for: "a line dividing the items cuz currently it's pretty
+   difficult to see"), as in Creative Assist's vault search: a 1px line in the
+   panel's line colour on top of each row that follows another row, inset to the
+   row's text. It is a background layer, so no row grows; ::before (source
+   stripe) and ::after (run fill) stay free. None over a list's or section's
+   first row (a heading or the column names are before it), none under its last.
+   A hovered or chosen row has neither its own line nor the one under it, so its
+   tint is never cut. A dimmed (unmet) row is drawn at about .45 opacity, so its
+   line is lighter by as much, to come out the same #3e3e38 as the others. */
+.assistant-function-card,
+.quick-panel-search-result {
+  --ca-divider: var(--ca-line);
+}
+
+.assistant-function-card.unmet {
+  --ca-divider: #5f5f54;
+}
+
+.quick-panel-search-result.unmet {
+  --ca-divider: #5b5b50;
+}
+
+.assistant-function-card:not(:hover):not(.active) + .assistant-function-card:not(:hover):not(.active) {
+  background: linear-gradient(var(--ca-divider), var(--ca-divider)) 12px 0 / calc(100% - 22px) 1px no-repeat border-box transparent !important;
+}
+
+.quick-panel-search-results .quick-panel-search-result:not(:hover):not(.active) + .quick-panel-search-result:not(:hover):not(.active) {
+  background: linear-gradient(var(--ca-divider), var(--ca-divider)) 8px 0 / calc(100% - 16px) 1px no-repeat border-box transparent;
+}
