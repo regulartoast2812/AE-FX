@@ -541,8 +541,14 @@ body.quick-panel-mode.native-win .quick-panel-shell {
   gap: 2px;
   height: 34px;
   margin: 0 -2px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
   border-bottom: 1px solid var(--ca-line);
+}
+
+.quick-search-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .quick-search-tabs[hidden],
@@ -554,10 +560,10 @@ body.quick-panel-mode.native-win .quick-panel-shell {
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   height: 26px;
   min-height: 0;
-  padding: 0 7px 0 8px;
+  padding: 0 6px 0 7px;
   border: 0;
   border-radius: 999px;
   background: transparent;
@@ -597,8 +603,8 @@ body.quick-panel-mode.native-win .quick-panel-shell {
 }
 
 .quick-search-tab .count {
-  min-width: 26px;
-  padding: 0 5px;
+  min-width: 18px;
+  padding: 0 4px;
   border-radius: 8px;
   background: rgba(62, 62, 56, .7);
   color: var(--ca-muted);
@@ -613,8 +619,11 @@ body.quick-panel-mode.native-win .quick-panel-shell {
   color: var(--ca-canvas);
 }
 
+/* Gives way first when the Types fill the row. */
 .quick-search-tabs-hint {
-  flex: none;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
   margin-left: auto;
   padding: 0 6px 0 8px;
   color: var(--ca-faint);
