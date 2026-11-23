@@ -464,6 +464,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
     // can't flicker the panel forever.
     private var outsideMouseDownMonitor: Any?
     private var lastOutsideMouseDownAt = Date.distantPast
+    private var lastOutsideMouseDownLocation = NSPoint.zero
     private var panelShownAt = Date.distantPast
     private var focusTakenBackThisOpen = 0
     private let launchInBackground = CommandLine.arguments.contains("--background")
@@ -598,6 +599,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]
         ) { [weak self] _ in
             self?.lastOutsideMouseDownAt = Date()
+            self?.lastOutsideMouseDownLocation = NSEvent.mouseLocation
         }
         if !launchInBackground {
             showPanel()
@@ -1052,6 +1054,15 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         )
     }
 
+    /// Where the last click that went to another app landed. "on the panel" means
+    /// the panel let a click through to After Effects underneath it.
+    private func describeClick(in panel: NSPanel) -> String {
+        let p = lastOutsideMouseDownLocation
+        let f = panel.frame
+        let place = f.contains(p) ? "ON the panel" : "outside the panel"
+        return " \(place) (at \(Int(p.x - f.minX)),\(Int(f.maxY - p.y)) from its top left, panel \(Int(f.width))x\(Int(f.height)))"
+    }
+
     private func scheduleDismissAfterResign() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) { [weak self] in
             guard
@@ -1082,7 +1093,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
                 self.restorePanelFocusAfterBridgeExecution()
                 return
             }
-            tntLog("hide: lost focus to \(tntFrontmostDescription()) \(openFor)ms after the panel opened\(clickedAway ? ", after a click" : "")")
+            tntLog("hide: lost focus to \(tntFrontmostDescription()) \(openFor)ms after the panel opened\(clickedAway ? ", after a click\(self.describeClick(in: panel))" : "")")
             panel.orderOut(nil)
         }
     }
