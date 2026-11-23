@@ -467,6 +467,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
     private var lastOutsideMouseDownLocation = NSPoint.zero
     private var panelShownAt = Date.distantPast
     private var focusTakenBackThisOpen = 0
+    private var buildReloadTimer: Timer?
     private let launchInBackground = CommandLine.arguments.contains("--background")
     private var loggedAccessibilitySkip = false
 
@@ -501,10 +502,15 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
 
         let panel = BorderlessPanel(
             contentRect: NSRect(origin: .zero, size: quickControlsLauncherSize),
-            styleMask: [.borderless, .fullSizeContentView],
+            // Non-activating: the panel takes the keyboard while After Effects
+            // stays the active app. Activating this helper made AE take
+            // activation back 0.5-2.6s later while it settled from an app
+            // switch, so the panel and the Timeline traded focus back and forth.
+            styleMask: [.borderless, .fullSizeContentView, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
+        panel.becomesKeyOnlyIfNeeded = false
         panel.delegate = self
         panel.isOpaque = false
         panel.backgroundColor = .clear
@@ -565,6 +571,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
 
         let quickPage = extensionRoot.appendingPathComponent("quick.html")
         webView.loadFileURL(quickPage, allowingReadAccessTo: extensionRoot)
+        startReloadingAfterBuilds(quickPage, extensionRoot: extensionRoot)
 
         if let frame = afterEffectsOverlayFrame(for: quickControlsLauncherSize) {
             panel.setFrame(frame, display: false)
@@ -666,6 +673,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             NSWorkspace.shared.notificationCenter.removeObserver($0)
         }
         visibilityTimer?.invalidate()
+        buildReloadTimer?.invalidate()
         activeAppDelegate = nil
     }
 
@@ -684,7 +692,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
                 panelShownAt = Date()
                 focusTakenBackThisOpen = 0
             }
-            NSApp.activate(ignoringOtherApps: true)
+            // No NSApp.activate: the panel is non-activating (see its creation).
             if makeKey { panel.makeKeyAndOrderFront(nil) }
             panel.orderFrontRegardless()
         }
@@ -1177,6 +1185,27 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
                 panel.orderOut(nil)
             }
         }
+    }
+
+    // scripts/build.sh rewrites quick.html, but the page was loaded once at
+    // launch, so the panel kept the old build until the helper was restarted.
+    // Reload when the file changes, only while the panel is hidden, so nothing
+    // you are typing into is thrown away.
+    private func startReloadingAfterBuilds(_ quickPage: URL, extensionRoot: URL) {
+        func stamp() -> Date? {
+            (try? FileManager.default.attributesOfItem(atPath: quickPage.path))?[.modificationDate] as? Date
+        }
+        var loaded = stamp()
+        let timer = Timer(timeInterval: 2, repeats: true) { [weak self] _ in
+            guard let self, let webView = self.webView else { return }
+            guard let now = stamp(), now != loaded else { return }
+            if let panel = self.panel, panel.isVisible { return }
+            loaded = now
+            tntLog("reload: quick.html changed (a new build); reloading the page")
+            webView.loadFileURL(quickPage, allowingReadAccessTo: extensionRoot)
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        buildReloadTimer = timer
     }
 
     private func extensionRootURL() -> URL? {
