@@ -20596,12 +20596,17 @@ body.quick-panel-mode .text-animation-dialog {
    (#ff9a3d, the Timeline stroke's colour, never violet or Sage's mint) and Edie
    in the header. Keep these tokens equal to PR FX client/styles.css :root.
    Loaded last; tokens first, then the few surfaces that hard-code their own
-   colours. See docs/ui-design-guide.md. */
+   colours. See docs/ui-design-guide.md.
+   v152 (2026-11-24): the palette's look, as PR FX's panel now wears it: one
+   flat #262624 canvas with hairlines instead of lighter grey blocks, and the
+   chosen tab, row or tile in a soft tint of its colour (16%) with that colour
+   on its text or icon. Quick Controls search has the palette's tabs and
+   coloured sections (renderQuickPanelSearchResults). */
 :root {
   --ca-desk: #1c1c1a;
   --ca-sidebar: #1f1e1d;
   --ca-canvas: #262624;
-  --ca-card: #2f2f2d;
+  --ca-card: #262624;
   --ca-menu: #2c2c2a;
   --ca-line: #3e3e38;
   --ca-line-soft: rgba(255, 255, 255, .06);
@@ -20609,11 +20614,11 @@ body.quick-panel-mode .text-animation-dialog {
   --ca-text: #eceae3;
   --ca-muted: #a3a096;
   --ca-faint: #6f6c64;
-  --ca-button: #3a3a37;
-  --ca-button-hover: #42423e;
+  --ca-button: #2f2f2d;
+  --ca-button-hover: #353532;
   --ca-accent: #ff9a3d;
   --ca-accent-text: #ffc48e;
-  --ca-accent-soft: rgba(255, 154, 61, .22);
+  --ca-accent-soft: rgba(255, 154, 61, .16);
   --ca-accent-faint: rgba(255, 154, 61, .10);
 
   --tnt-bg: var(--ca-desk);
@@ -20650,17 +20655,17 @@ body.quick-panel-mode .text-animation-dialog {
 
 html,
 body {
-  background: var(--ca-desk) !important;
+  background: var(--ca-canvas) !important;
   color: var(--ca-text) !important;
 }
 
 main#scrollArea,
 #scrollArea {
-  background-color: var(--ca-desk) !important;
+  background-color: var(--ca-canvas) !important;
 }
 
 header {
-  background: var(--ca-sidebar) !important;
+  background: var(--ca-canvas) !important;
   border-bottom: 1px solid var(--ca-line) !important;
   box-shadow: none !important;
   -webkit-backdrop-filter: none !important;
@@ -20694,7 +20699,7 @@ body .ease-dialog-title {
    with Edie, his name and the tool, a divider, then pill tabs. */
 .assistant-tabs {
   gap: 10px !important;
-  border: 0 !important;
+  border: 1px solid var(--ca-line) !important;
   border-radius: 10px !important;
   background: var(--ca-card) !important;
   box-shadow: none !important;
@@ -20755,9 +20760,10 @@ body .ease-dialog-title {
 }
 
 .assistant-tabs button.assistant-tab.active {
-  background: rgba(255, 255, 255, .085) !important;
-  border-color: rgba(255, 255, 255, .07) !important;
-  color: var(--ca-text) !important;
+  background: rgba(255, 154, 61, .15) !important;
+  border-color: transparent !important;
+  color: #ffb06b !important;
+  font-weight: 600 !important;
 }
 
 /* Narrow panel: Edie's name and the divider give way, as in PR FX. */
@@ -20977,11 +20983,11 @@ body.quick-panel-mode .quick-panel-shell,
 body.quick-panel-mode.native-win .quick-panel-shell {
   border: 1px solid var(--ca-line) !important;
   border-radius: 14px !important;
-  background: rgba(44, 44, 42, .94) !important;
+  background: rgba(38, 38, 36, .97) !important;
 }
 
 body.quick-panel-mode.native-win .quick-panel-shell {
-  background: rgba(44, 44, 42, .98) !important;
+  background: #262624 !important;
 }
 
 /* Edie sits at the start of the search row, as in PR FX's palette
@@ -21030,9 +21036,10 @@ body.quick-panel-mode.native-win .quick-panel-shell {
   box-shadow: 0 0 0 3px var(--ca-accent-faint);
 }
 
-/* Tiles are Creative Assist buttons: flat, no lift. */
+/* Tiles are flat chips on the canvas, a hairline round each, like the
+   palette's esc chip; hover lifts them a step, focus tints them orange. */
 .quick-panel-grid > button {
-  border: 1px solid transparent;
+  border: 1px solid var(--ca-line);
   border-radius: 10px;
   background: var(--ca-button);
   box-shadow: none;
@@ -21042,7 +21049,7 @@ body.quick-panel-mode.native-win .quick-panel-shell {
 
 .quick-panel-grid > button:hover {
   transform: none;
-  border-color: transparent;
+  border-color: var(--ca-line);
   background: var(--ca-button-hover);
 }
 
@@ -21113,6 +21120,184 @@ body.quick-panel-mode.native-win .quick-panel-shell {
 .quick-panel-refresh:hover {
   background: var(--ca-hover) !important;
   color: var(--ca-text) !important;
+}
+
+/* ---- Quick Controls search: PR FX's palette ---------------------------------
+   Tabs with counts (Tab cycles them), coloured section headings with a count,
+   flat rows whose chosen one is tinted in its kind's colour. --tab-rgb and
+   --kind-rgb come from the markup (QUICK_SEARCH_TABS / QUICK_SEARCH_KINDS). */
+.quick-search-tabs {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 34px;
+  margin: 0 -2px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--ca-line);
+}
+
+.quick-search-tabs[hidden],
+.quick-panel-shell:not(.searching) .quick-search-tabs {
+  display: none;
+}
+
+.quick-search-tab {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  min-height: 0;
+  padding: 0 7px 0 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ca-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.quick-search-tab:hover {
+  background: var(--ca-hover);
+  color: var(--ca-text);
+}
+
+.quick-search-tab.is-active {
+  background: rgb(var(--tab-rgb) / .15);
+  color: var(--ca-text);
+}
+
+.quick-search-tab.is-empty:not(.is-active) {
+  opacity: .45;
+}
+
+.quick-search-tab-icon {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.quick-search-tab.is-active .quick-search-tab-icon {
+  color: rgb(var(--tab-rgb));
+}
+
+.quick-search-tab .count {
+  min-width: 26px;
+  padding: 0 5px;
+  border-radius: 8px;
+  background: rgba(62, 62, 56, .7);
+  color: var(--ca-muted);
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.quick-search-tab.is-active .count {
+  background: rgb(var(--tab-rgb));
+  color: var(--ca-canvas);
+}
+
+.quick-search-tabs-hint {
+  flex: none;
+  margin-left: auto;
+  padding: 0 6px 0 8px;
+  color: var(--ca-faint);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.quick-panel-search-results,
+.quick-panel-shell.searching .quick-panel-search-results {
+  gap: 0;
+  padding: 0 0 4px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.quick-search-section {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding: 8px 8px 0;
+  color: rgb(var(--kind-rgb));
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.quick-search-section:first-child {
+  height: 24px;
+  padding-top: 2px;
+}
+
+.quick-search-section .count {
+  padding: 0 6px;
+  border-radius: 8px;
+  background: rgb(var(--kind-rgb) / .16);
+  font-size: 10px;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.quick-panel-search-results .quick-panel-search-result {
+  flex: none;
+  min-height: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ca-text);
+  font-size: 13px;
+}
+
+.quick-panel-search-results .quick-panel-search-result:hover {
+  border: 0;
+  background: var(--ca-hover);
+}
+
+.quick-panel-search-results .quick-panel-search-result.active {
+  border: 0;
+  background: rgb(var(--kind-rgb) / .16);
+}
+
+.quick-panel-search-results .quick-panel-search-result .assistant-function-icon,
+.quick-panel-search-results .quick-panel-search-result:hover .assistant-function-icon,
+.quick-panel-search-results .quick-panel-search-result.active .assistant-function-icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.8;
+  color: rgb(var(--kind-rgb));
+}
+
+.quick-panel-search-results .quick-panel-search-key {
+  border: 0;
+  border-radius: 5px;
+  background: rgba(62, 62, 56, .7);
+  color: var(--ca-muted);
+  font: 500 10.5px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.quick-panel-search-results .quick-panel-search-key.empty {
+  background: transparent;
+  color: var(--ca-faint);
+}
+
+.quick-panel-search-empty {
+  padding: 22px 16px;
+  text-align: center;
+  font-size: 12.5px;
 }
 
 /* ---- Section labels --------------------------------------------------------

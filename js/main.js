@@ -13229,6 +13229,7 @@ const QUICK_PANEL_CONTROL_SHORTCUTS = {
 const quickPanelShellEl = document.getElementById("quickPanelShell");
 const quickPanelSearchEl = document.getElementById("quickPanelSearch");
 const quickPanelSearchResultsEl = document.getElementById("quickPanelSearchResults");
+const quickPanelSearchTabsEl = document.getElementById("quickPanelSearchTabs");
 let quickPanelResizeTimer = null;
 let quickPanelLastSize = "";
 let quickPanelSearchParentEntry = null;
@@ -13460,9 +13461,167 @@ function prepareNativeQuickPanelForDirectSubpanel() {
   quickPanelLastSize = "";
 }
 
+// Tabs and sections laid out like PR FX's Ctrl+Space palette (client/palette-search.js):
+// tabs with counts, Tab cycles them, and the list is in coloured sections with
+// counts. All holds everything; the others are parts of it. Colours are PR FX's
+// palette hues: orange functions, purple saved scripts, blue automation, warm
+// orange effects, teal audio.
+const QUICK_SEARCH_TABS = [
+  { key: "all", label: "All", icon: "command", rgb: "255 154 61" },
+  { key: "functions", label: "Functions", icon: "zap", rgb: "255 154 61" },
+  { key: "automation", label: "Automation", icon: "workflow", rgb: "134 166 208" },
+  { key: "effects", label: "Effects", icon: "wand-sparkles", rgb: "212 162 106" },
+  { key: "audio", label: "Audio", icon: "audio-lines", rgb: "125 181 174" }
+];
+const QUICK_SEARCH_KINDS = [
+  { key: "functions", title: "Functions", rgb: "255 154 61" },
+  { key: "saved", title: "Saved scripts", rgb: "169 156 212" },
+  { key: "automation", title: "Automation", rgb: "134 166 208" },
+  { key: "effects", title: "Effects", rgb: "212 162 106" },
+  { key: "audio", title: "Audio effects", rgb: "125 181 174" }
+];
+let quickPanelSearchTab = "all";
+let quickPanelSearchLayoutCache = null;
+
+function quickSearchKind(entry) {
+  const source = String((entry && entry.source) || "");
+  if (source === "native" || (entry && entry.type === "effect")) {
+    return /^audio$/i.test(String(entry.category || "").trim()) ? "audio" : "effects";
+  }
+  if (source === "custom") return "automation";
+  if (source === "assistant") return "saved";
+  return "functions";
+}
+
+function quickSearchKindMeta(kind) {
+  return QUICK_SEARCH_KINDS.find(k => k.key === kind) || QUICK_SEARCH_KINDS[0];
+}
+
+function quickSearchTabHas(tab, kind) {
+  return tab === "all" || tab === kind || (tab === "functions" && kind === "saved");
+}
+
+// Where the typed text lands in the name: the start first, then a word start,
+// then anywhere; a hit only in tags or category comes last.
+function quickSearchScore(entry, query) {
+  const q = String(query || "").toLowerCase().trim();
+  if (!q) return 0;
+  const name = String(entry.name || entry.matchName || "").toLowerCase();
+  const at = name.indexOf(q);
+  if (at === 0) return 3;
+  if (at > 0) return /[a-z0-9]/.test(name.charAt(at - 1)) ? 1 : 2;
+  return 0;
+}
+
+function quickPanelSearchScope() {
+  if (!quickPanelSearchEl) return "";
+  if (quickPanelSearchParentEntry) return quickPanelSearchParentEntry.name || "Group";
+  const scope = parseFxConsoleScope(quickPanelSearchEl.value);
+  if (!scope.group) return "";
+  const match = String(quickPanelSearchEl.value).match(/^\s*\[([^\]]+)\]/);
+  return match ? match[1].trim() : scope.group;
+}
+
+// rows: { kind: "section", title, count, rgb } | { kind: "entry", entry, index, rgb }
+function quickPanelSearchLayout() {
+  if (!quickPanelSearchEl) return { tabs: null, rows: [], entries: [] };
+  const query = quickPanelSearchEl.value;
+  const scope = quickPanelSearchScope();
+  const rows = [];
+  const entries = [];
+  const push = (title, rgb, list) => {
+    if (!list.length) return;
+    rows.push({ kind: "section", title, count: list.length, rgb });
+    list.forEach(entry => {
+      rows.push({ kind: "entry", entry, index: entries.length, rgb: quickSearchKindMeta(quickSearchKind(entry)).rgb });
+      entries.push(entry);
+    });
+  };
+  if (scope) {
+    // Inside a group or a parent menu: one section named after it, no tabs.
+    const list = searchFxConsoleEntries(query, quickPanelSearchParentEntry, 400);
+    push(scope, list.length ? quickSearchKindMeta(quickSearchKind(list[0])).rgb : QUICK_SEARCH_KINDS[0].rgb, list);
+    return { tabs: null, rows, entries };
+  }
+  const typed = String(query || "").trim();
+  const all = searchFxConsoleEntries(query, null, 5000);
+  const counts = {};
+  QUICK_SEARCH_TABS.forEach(tab => { counts[tab.key] = 0; });
+  const kinds = new Map();
+  all.forEach(entry => {
+    const kind = quickSearchKind(entry);
+    kinds.set(entry, kind);
+    QUICK_SEARCH_TABS.forEach(tab => { if (quickSearchTabHas(tab.key, kind)) counts[tab.key] += 1; });
+  });
+  const tab = quickPanelSearchTab;
+  const inTab = all.filter(entry => quickSearchTabHas(tab, kinds.get(entry)));
+  const ranked = list => typed
+    ? list.map((entry, i) => ({ entry, i, score: quickSearchScore(entry, typed) }))
+      .sort((a, b) => b.score - a.score || a.i - b.i).map(x => x.entry)
+    : list;
+  if (tab === "all" || tab === "functions") {
+    // By kind, in the palette's order.
+    QUICK_SEARCH_KINDS.forEach(kind => {
+      push(kind.title, kind.rgb, ranked(inTab.filter(entry => kinds.get(entry) === kind.key)));
+    });
+  } else {
+    // One kind: its own categories, as After Effects names them (Blur & Sharpen,
+    // Distort...), alphabetically.
+    const meta = quickSearchKindMeta(tab);
+    const groups = new Map();
+    inTab.forEach(entry => {
+      const title = String(entry.category || "").trim() || meta.title;
+      if (!groups.has(title)) groups.set(title, []);
+      groups.get(title).push(entry);
+    });
+    Array.from(groups.keys()).sort((a, b) => a.localeCompare(b)).forEach(title => {
+      push(title, meta.rgb, ranked(groups.get(title)));
+    });
+  }
+  return { tabs: counts, rows, entries };
+}
+
+// The rendered layout, reused by the arrow keys and Enter so the index they
+// use is the row on screen. Rebuilt whenever what it was built from changed.
+function quickPanelSearchLayoutKey() {
+  return [quickPanelSearchEl ? quickPanelSearchEl.value : "", quickPanelSearchTab, quickPanelSearchParentEntry ? quickPanelSearchParentEntry.name : "", (fxConsoleEffects || []).length].join("\u0001");
+}
+
 function quickPanelSearchEntries() {
-  if (!quickPanelSearchEl) return [];
-  return searchFxConsoleEntries(quickPanelSearchEl.value, quickPanelSearchParentEntry, 12);
+  const key = quickPanelSearchLayoutKey();
+  if (!quickPanelSearchLayoutCache || quickPanelSearchLayoutCache.key !== key) {
+    quickPanelSearchLayoutCache = { key, ...quickPanelSearchLayout() };
+  }
+  return quickPanelSearchLayoutCache.entries;
+}
+
+function stepQuickPanelSearchTab(by) {
+  const keys = QUICK_SEARCH_TABS.map(tab => tab.key);
+  const at = Math.max(0, keys.indexOf(quickPanelSearchTab));
+  setQuickPanelSearchTab(keys[(at + by + keys.length) % keys.length]);
+}
+
+function setQuickPanelSearchTab(key) {
+  if (!QUICK_SEARCH_TABS.some(tab => tab.key === key)) return;
+  quickPanelSearchTab = key;
+  quickPanelSearchSelectedIndex = 0;
+  renderQuickPanelSearchResults();
+  if (quickPanelSearchResultsEl) quickPanelSearchResultsEl.scrollTop = 0;
+}
+
+function renderQuickPanelSearchTabs(counts) {
+  if (!quickPanelSearchTabsEl) return;
+  if (!counts) {
+    quickPanelSearchTabsEl.innerHTML = "";
+    quickPanelSearchTabsEl.hidden = true;
+    return;
+  }
+  quickPanelSearchTabsEl.hidden = false;
+  quickPanelSearchTabsEl.innerHTML = QUICK_SEARCH_TABS.map(tab => {
+    const active = tab.key === quickPanelSearchTab;
+    const count = counts[tab.key] || 0;
+    return `<button type="button" class="quick-search-tab${active ? " is-active" : ""}${count ? "" : " is-empty"}" role="tab" aria-selected="${active}" data-quick-search-tab="${tab.key}" style="--tab-rgb: ${tab.rgb}">${tntIconSvg(tab.icon, "quick-search-tab-icon")}<span>${escapeHtml(tab.label)}</span><span class="count">${count}</span></button>`;
+  }).join("") + `<span class="quick-search-tabs-hint">Tab to switch</span>`;
 }
 
 function tntTagChips(entry, limit) {
@@ -13475,28 +13634,43 @@ function tntTagChips(entry, limit) {
 
 function renderQuickPanelSearchResults() {
   if (!quickPanelShellEl || !quickPanelSearchResultsEl || !quickPanelSearchEl) return;
+  quickPanelSearchLayoutCache = null;
   const searching = !!quickPanelSearchEl.value.trim() || !!quickPanelSearchParentEntry;
   quickPanelShellEl.classList.toggle("searching", searching);
   if (!searching) {
     quickPanelSearchResultsEl.innerHTML = "";
+    renderQuickPanelSearchTabs(null);
     scheduleNativeQuickPanelResize(0);
     return;
   }
-  const entries = quickPanelSearchEntries();
+  const layout = { key: quickPanelSearchLayoutKey(), ...quickPanelSearchLayout() };
+  quickPanelSearchLayoutCache = layout;
+  renderQuickPanelSearchTabs(layout.tabs);
+  const entries = layout.entries;
   quickPanelSearchSelectedIndex = Math.max(0, Math.min(quickPanelSearchSelectedIndex, Math.max(0, entries.length - 1)));
   if (!entries.length) {
-    quickPanelSearchResultsEl.innerHTML = `<div class="quick-panel-search-empty">No matching commands or effects</div>`;
+    const tab = QUICK_SEARCH_TABS.find(t => t.key === quickPanelSearchTab);
+    const elsewhere = layout.tabs && layout.tabs.all > 0;
+    const note = elsewhere
+      ? `Nothing in ${escapeHtml(tab ? tab.label : "this tab")} is called that. Tab to look in the others.`
+      : "No matching commands or effects";
+    quickPanelSearchResultsEl.innerHTML = `<div class="quick-panel-search-empty">${note}</div>`;
     scheduleNativeQuickPanelResize(0);
     return;
   }
-  quickPanelSearchResultsEl.innerHTML = entries.map((entry, index) => {
+  quickPanelSearchResultsEl.innerHTML = layout.rows.map(row => {
+    if (row.kind === "section") {
+      return `<div class="quick-search-section" style="--kind-rgb: ${row.rgb}">${escapeHtml(row.title)}<span class="count">${row.count}</span></div>`;
+    }
+    const entry = row.entry;
+    const index = row.index;
     const shortcut = String(entry.shortcut || "").trim();
     const keyLabel = entry.children ? "Open" : (shortcut || "\u2014");
     // Same cross-check as the Functions list. This is the surface the tool is
     // actually used from, so dimming here is the point of having it at all.
     const unmet = typeof tntEntryUnmetRequirement === "function" ? tntEntryUnmetRequirement(entry) : "";
     return `
-      <button type="button" class="quick-panel-search-result${index === quickPanelSearchSelectedIndex ? " active" : ""}${unmet ? " unmet" : ""}${tntRunClassFor(entry)}" data-quick-search-index="${index}" data-fx-source="${tntSourceGroup(entry)}"${unmet ? ` data-tooltip="${escapeHtml(entry.name || "")}\n${escapeHtml(unmet)}"` : ""}${tntRunStyleFor(entry)}>
+      <button type="button" class="quick-panel-search-result${index === quickPanelSearchSelectedIndex ? " active" : ""}${unmet ? " unmet" : ""}${tntRunClassFor(entry)}" data-quick-search-index="${index}" data-fx-source="${tntSourceGroup(entry)}"${unmet ? ` data-tooltip="${escapeHtml(entry.name || "")}\n${escapeHtml(unmet)}"` : ""} style="--kind-rgb: ${row.rgb};${tntRunStyleFor(entry).replace(/^\s*style="|"\s*$/g, "")}">
         ${tntActionIconMarkup(entry)}
         <span class="quick-panel-search-name">${escapeHtml(entry.name || entry.matchName || "Effect")}</span>
         <span class="tnt-tags">${tntTagChips(entry, 2)}</span>
@@ -13525,6 +13699,7 @@ async function loadQuickPanelSearchEffects() {
 function resetQuickPanelSearch() {
   quickPanelSearchParentEntry = null;
   quickPanelSearchSelectedIndex = 0;
+  quickPanelSearchTab = "all";
   if (quickPanelSearchEl) {
     quickPanelSearchEl.value = "";
     quickPanelSearchEl.placeholder = "Search commands or effects";
@@ -13785,6 +13960,12 @@ if (quickPanelShellEl) {
       refreshQuickPanelState();
       return;
     }
+    const searchTab = event.target.closest && event.target.closest("[data-quick-search-tab]");
+    if (searchTab) {
+      setQuickPanelSearchTab(searchTab.dataset.quickSearchTab);
+      focusQuickPanelSearch(0);
+      return;
+    }
     const searchResult = event.target.closest && event.target.closest("[data-quick-search-index]");
     if (searchResult) {
       applyQuickPanelSearchEntry(Number(searchResult.dataset.quickSearchIndex || 0));
@@ -13801,6 +13982,12 @@ if (quickPanelShellEl) {
       renderQuickPanelSearchResults();
     });
     quickPanelSearchEl.addEventListener("keydown", event => {
+      if (event.key === "Tab" && !event.altKey && !event.metaKey && !event.ctrlKey &&
+          quickPanelShellEl.classList.contains("searching") && !quickPanelSearchScope()) {
+        event.preventDefault();
+        stepQuickPanelSearchTab(event.shiftKey ? -1 : 1);
+        return;
+      }
       const entries = quickPanelSearchEntries();
       if (event.key === "ArrowDown") {
         event.preventDefault();
