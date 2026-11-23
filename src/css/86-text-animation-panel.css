@@ -22,7 +22,7 @@
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  color: rgba(245,245,247,.88);
+  color: rgba(246, 244, 236,.88);
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
@@ -48,7 +48,7 @@
   font-weight: 500 !important;
   letter-spacing: 0 !important;
 }
-.text-animation-head .text-animation-count { color: rgba(235,235,245,.62); font-size: 11px; }
+.text-animation-head .text-animation-count { color: rgba(238, 236, 228,.62); font-size: 11px; }
 .text-animation-head .text-animation-close { margin-left: auto; }
 
 .text-animation-title {
@@ -78,7 +78,7 @@
   border: 1px solid rgba(255,255,255,.10);
   border-radius: 8px;
   background: rgba(255,255,255,.04);
-  color: rgba(235,235,245,.54);
+  color: rgba(238, 236, 228,.54);
   font-size: 8px;
   font-style: normal;
 }
@@ -93,13 +93,13 @@
   border: 1px solid rgba(255,255,255,.10);
   border-radius: var(--tnt-radius-control, 6px);
   background: rgba(255,255,255,.04);
-  color: rgba(235,235,245,.68);
+  color: rgba(238, 236, 228,.68);
   cursor: pointer;
 }
 
 .text-animation-close:hover {
-  border-color: rgba(217,119,66,.34);
-  background: rgba(217,119,66,.12);
+  border-color: rgba(255, 154, 61,.34);
+  background: rgba(255, 154, 61,.12);
   color: rgba(255,238,228,.95);
 }
 
@@ -123,7 +123,7 @@
   gap: 5px;
   min-width: 0;
   padding: 10px;
-  /* The exact card the A panel uses. This was rgba(17,18,18,.86) behind a 9px
+  /* The exact card the A panel uses. This was rgba(18, 18, 17,.86) behind a 9px
      blur - thin enough that whatever sits behind the overlay tints the panel,
      which is the same complaint the Layout sections had before they were given
      a real ground. Radius 12 and border .105 to match as well. */
@@ -131,7 +131,7 @@
   border-radius: 12px;
   background:
     linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.014) 40%, rgba(0,0,0,.16)),
-    rgba(20,21,23,.93);
+    rgba(21, 21, 20,.93);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.06),
     0 8px 24px rgba(0,0,0,.45);
@@ -154,15 +154,15 @@
    STAGGER. These were 11px/.88 semibold, which made the headings louder than
    the controls under them. */
 .text-animation-section-head strong {
-  color: rgba(235,235,245,.42);
+  color: rgba(238, 236, 228,.42);
   font-size: 9px;
   font-weight: 400;
   letter-spacing: .05em;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .text-animation-section-head span {
-  color: rgba(235,235,245,.48);
+  color: rgba(238, 236, 228,.48);
   font-size: 8px;
 }
 
@@ -200,7 +200,7 @@
   border: 1px solid rgba(255,255,255,.14);
   border-radius: 5px;
   background: rgba(255,255,255,.05);
-  color: rgba(235,235,245,.66);
+  color: rgba(238, 236, 228,.66);
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -209,8 +209,8 @@
 .text-animation-command-row button:hover:not(:disabled),
 .text-animation-preset-grid button:hover:not(:disabled),
 .text-animation-apply:hover:not(:disabled) {
-  border-color: rgba(217,119,66,.30);
-  background: rgba(217,119,66,.075);
+  border-color: rgba(255, 154, 61,.30);
+  background: rgba(255, 154, 61,.075);
   color: rgba(255,238,228,.95);
 }
 
@@ -225,7 +225,7 @@
 .text-animation-command-row span,
 .text-animation-preset-grid span {
   display: none;
-  color: rgba(235,235,245,.45);
+  color: rgba(238, 236, 228,.45);
   font-size: 7px;
 }
 
@@ -273,7 +273,7 @@
    a fixed width so the labels line up down the panel, which per-field auto
    widths would not do. */
 .text-animation-field > span {
-  color: rgba(235,235,245,.66);
+  color: rgba(238, 236, 228,.66);
   font-size: 11px;
   font-weight: 400;
 }
@@ -331,7 +331,7 @@
   border: 1px solid rgba(255,255,255,.14);
   border-radius: 5px;
   background: rgba(255,255,255,.05);
-  color: rgba(235,235,245,.5);
+  color: rgba(238, 236, 228,.5);
   font: inherit;
   font-size: 11px;
 }
@@ -348,18 +348,18 @@
 }
 
 .text-animation-segmented button.active {
-  border-color: rgba(217,119,66,.55);
-  background: rgba(217,119,66,.22);
+  border-color: rgba(255, 154, 61,.55);
+  background: rgba(255, 154, 61,.22);
   color: #fff;
 }
 
 .text-animation-segmented button:hover {
   background: rgba(255,255,255,.08);
-  color: rgba(245,245,247,.9);
+  color: rgba(246, 244, 236,.9);
 }
 
 .text-animation-segmented button.active:hover {
-  background: rgba(217,119,66,.30);
+  background: rgba(255, 154, 61,.30);
   color: #fff;
 }
 
@@ -383,28 +383,28 @@
   border: 1px solid rgba(255,255,255,.14);
   border-radius: 5px;
   background: rgba(255,255,255,.05);
-  color: rgba(235,235,245,.5);
+  color: rgba(238, 236, 228,.5);
   font-size: 11px;
   cursor: pointer;
 }
 
 .text-animation-checks button:hover {
   background: rgba(255,255,255,.08);
-  color: rgba(245,245,247,.9);
+  color: rgba(246, 244, 236,.9);
 }
 
 .text-animation-checks button.active {
-  border-color: rgba(217,119,66,.55);
-  background: rgba(217,119,66,.22);
+  border-color: rgba(255, 154, 61,.55);
+  background: rgba(255, 154, 61,.22);
   color: #fff;
 }
 
 .text-animation-checks button.active:hover {
-  background: rgba(217,119,66,.30);
+  background: rgba(255, 154, 61,.30);
 }
 
 .text-animation-checks button:focus-visible {
-  outline: 1px solid #d97742;
+  outline: 1px solid #ff9a3d;
   outline-offset: 2px;
 }
 
@@ -419,7 +419,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: rgba(235,235,245,.66);
+  color: rgba(238, 236, 228,.66);
   font-size: 11px;
 }
 
@@ -438,7 +438,7 @@
   /* The A panel's number fields sit slightly raised on the card; this one was a
      sunken near-black well, which read as a different control family. */
   background: rgba(255,255,255,.07);
-  color: rgba(245,245,247,.94);
+  color: rgba(246, 244, 236,.94);
   font: inherit;
   font-size: 11px;
 }
@@ -449,8 +449,8 @@
   gap: 6px;
   min-height: 26px;
   justify-content: center;
-  border-color: rgba(217,119,66,.24);
-  background: rgba(217,119,66,.12);
+  border-color: rgba(255, 154, 61,.24);
+  background: rgba(255, 154, 61,.12);
   text-align: center;
 }
 
@@ -512,7 +512,7 @@
 }
 
 .text-animation-pair-label {
-  color: rgba(235,235,245,.66);
+  color: rgba(238, 236, 228,.66);
   font-size: 11px;
   white-space: nowrap;
 }
@@ -533,7 +533,7 @@
   border: 1px solid rgba(255,255,255,.14);
   border-radius: 5px;
   background: rgba(255,255,255,.05);
-  color: rgba(245,245,247,.86);
+  color: rgba(246, 244, 236,.86);
   font: inherit;
   font-size: 11px;
 }

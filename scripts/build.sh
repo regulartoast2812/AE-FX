@@ -44,6 +44,7 @@ css_sources=(
   src/css/88-tnk-panel.css
   src/css/90-command-panels.css
   src/css/95-quick-panel.css
+  src/css/99-ca-look.css
 )
 
 # The manifest is the single source of truth for the version. Stamping it into

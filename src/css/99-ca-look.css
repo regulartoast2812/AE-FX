@@ -1,0 +1,588 @@
+/* v151 (2026-11-23): Edie's look, the same as PR FX.
+   AE FX is one of Edie's tools, so the panel wears PR FX's theme: Creative
+   Assist's warm greys, system type and quiet list rows, PR FX's orange accent
+   (#ff9a3d, the Timeline stroke's colour, never violet or Sage's mint) and Edie
+   in the header. Keep these tokens equal to PR FX client/styles.css :root.
+   Loaded last; tokens first, then the few surfaces that hard-code their own
+   colours. See docs/ui-design-guide.md. */
+:root {
+  --ca-desk: #1c1c1a;
+  --ca-sidebar: #1f1e1d;
+  --ca-canvas: #262624;
+  --ca-card: #2f2f2d;
+  --ca-menu: #2c2c2a;
+  --ca-line: #3e3e38;
+  --ca-line-soft: rgba(255, 255, 255, .06);
+  --ca-hover: rgba(255, 255, 255, .06);
+  --ca-text: #eceae3;
+  --ca-muted: #a3a096;
+  --ca-faint: #6f6c64;
+  --ca-button: #3a3a37;
+  --ca-button-hover: #42423e;
+  --ca-accent: #ff9a3d;
+  --ca-accent-text: #ffc48e;
+  --ca-accent-soft: rgba(255, 154, 61, .22);
+  --ca-accent-faint: rgba(255, 154, 61, .10);
+
+  --tnt-bg: var(--ca-desk);
+  --tnt-surface: rgba(44, 44, 42, .96);
+  --tnt-surface-solid: var(--ca-menu);
+  --tnt-surface-soft: rgba(255, 255, 255, .045);
+  --tnt-surface-hover: var(--ca-hover);
+  --tnt-surface-active: rgba(255, 255, 255, .1);
+  --tnt-border: var(--ca-line);
+  --tnt-border-soft: var(--ca-line-soft);
+  --tnt-text: var(--ca-text);
+  --tnt-text-soft: var(--ca-muted);
+  --tnt-text-dim: var(--ca-faint);
+  --tnt-warm-reflect: transparent;
+  --tnt-accent: var(--ca-accent);
+  --tnt-accent-soft: var(--ca-accent-soft);
+  --tnt-accent-glow: var(--ca-accent-faint);
+  --tnt-shadow: 0 8px 30px rgba(0, 0, 0, .45);
+  /* One type family, as in Creative Assist: hierarchy comes from size and weight. */
+  --tnt-font-header: var(--tnt-font-main);
+
+  --ae-bg: var(--ca-desk);
+  --ae-panel: var(--ca-sidebar);
+  --ae-panel-raised: var(--ca-canvas);
+  --ae-row: #21211f;
+  --ae-row-alt: #1e1e1c;
+  --ae-row-hover: #2a2a28;
+  --ae-property-row: #1d1d1b;
+  --ae-border: rgba(255, 255, 255, .09);
+  --ae-border-soft: var(--ca-line-soft);
+  --ae-text: var(--ca-text);
+  --ae-text-dim: var(--ca-muted);
+}
+
+html,
+body {
+  background: var(--ca-desk) !important;
+  color: var(--ca-text) !important;
+}
+
+main#scrollArea,
+#scrollArea {
+  background-color: var(--ca-desk) !important;
+}
+
+header {
+  background: var(--ca-sidebar) !important;
+  border-bottom: 1px solid var(--ca-line) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Titles: Creative Assist's sans at 600, one size per level. */
+body .dialog-title,
+body .layer-style-dialog-title,
+body .ease-dialog-title,
+body .timeline-command-dialog-title {
+  font-family: var(--tnt-font-main) !important;
+  font-weight: 600 !important;
+  color: var(--ca-text) !important;
+}
+
+body .layer-style-dialog-title,
+body .ease-dialog-title {
+  font-size: 15px !important;
+}
+
+/* ---- Functions (the docked catalogue) -------------------------------------- */
+#assistantHub.assistant-hub {
+  padding: 12px !important;
+  gap: 10px !important;
+  background: var(--ca-canvas) !important;
+  color: var(--ca-text) !important;
+}
+
+/* The tab row is PR FX's toolbar (client/styles.css .panel-toolbar): one card
+   with Edie, his name and the tool, a divider, then pill tabs. */
+.assistant-tabs {
+  gap: 10px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  background: var(--ca-card) !important;
+  box-shadow: none !important;
+  padding: 7px 10px !important;
+  min-height: 46px !important;
+}
+
+.assistant-tabs .brand-face {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
+.assistant-brand {
+  flex: none;
+  min-width: 0;
+  font-family: var(--tnt-font-main);
+}
+
+.assistant-brand-name {
+  color: var(--ca-text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.assistant-brand-sub {
+  margin-top: 1px;
+  color: var(--ca-muted);
+  font-size: 10.5px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.assistant-brand-sep {
+  flex: none;
+  width: 1px;
+  height: 26px;
+  margin: 0 2px;
+  background: var(--ca-line);
+}
+
+/* Matched to `.assistant-tabs button` so the pill wins over it. */
+.assistant-tabs button.assistant-tab {
+  height: auto;
+  padding: 5px 11px;
+  border: 1px solid transparent !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  font: 500 12.5px/1.45 var(--tnt-font-main) !important;
+  color: var(--ca-muted) !important;
+}
+
+.assistant-tabs button.assistant-tab:hover {
+  background: rgba(255, 255, 255, .05) !important;
+  color: var(--ca-text) !important;
+}
+
+.assistant-tabs button.assistant-tab.active {
+  background: rgba(255, 255, 255, .085) !important;
+  border-color: rgba(255, 255, 255, .07) !important;
+  color: var(--ca-text) !important;
+}
+
+/* Narrow panel: Edie's name and the divider give way, as in PR FX. */
+@media (max-width: 420px) {
+  .assistant-brand,
+  .assistant-brand-sep {
+    display: none;
+  }
+}
+
+.assistant-tabs .tnt-action-btn,
+.assistant-tabs .settings-btn {
+  border: 1px solid var(--ca-line) !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--ca-muted) !important;
+}
+
+.assistant-tabs .tnt-action-btn:hover,
+.assistant-tabs .settings-btn:hover {
+  border-color: var(--ca-line) !important;
+  background: var(--ca-hover) !important;
+  color: var(--ca-text) !important;
+}
+
+/* One card holds the filters and the list, like Creative Assist's lists. */
+#assistantHub .assistant-panel {
+  border: 1px solid var(--ca-line) !important;
+  border-radius: 10px !important;
+  background: var(--ca-card) !important;
+}
+
+.assistant-function-filters {
+  gap: 8px;
+  padding: 10px;
+  border-bottom: 1px solid var(--ca-line);
+}
+
+.assistant-function-search input {
+  height: 30px !important;
+  border: 1px solid var(--ca-line) !important;
+  border-radius: 8px !important;
+  background: var(--ca-canvas) !important;
+  box-shadow: none !important;
+  color: var(--ca-text) !important;
+}
+
+.assistant-function-search input::placeholder {
+  color: var(--ca-faint);
+}
+
+.assistant-function-search input:focus {
+  border-color: var(--ca-accent) !important;
+  box-shadow: 0 0 0 3px var(--ca-accent-faint) !important;
+}
+
+.assistant-function-count {
+  color: var(--ca-faint);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.assistant-filter-type {
+  color: var(--ca-muted);
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.assistant-filter-type select {
+  height: 26px;
+  border-color: var(--ca-line);
+  background: var(--ca-canvas);
+  color: var(--ca-text);
+  font-size: 12px;
+}
+
+.assistant-filter-seg {
+  border-color: var(--ca-line);
+  background: var(--ca-canvas);
+}
+
+.assistant-filter-seg button {
+  color: var(--ca-muted);
+  font-size: 12px;
+}
+
+.assistant-filter-seg button:hover {
+  color: var(--ca-text);
+}
+
+.assistant-filter-seg button.active {
+  background: var(--ca-accent-soft);
+  color: var(--ca-text);
+}
+
+.assistant-function-list {
+  gap: 1px;
+  padding: 4px;
+}
+
+/* Column names in sentence case, muted, at the body's small size. */
+.assistant-function-columns {
+  padding: 6px 10px 6px 12px;
+  border-color: transparent;
+  background: var(--ca-card);
+  color: var(--ca-faint);
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+/* Rows are list rows: no border, no glass, no lift, no source stripe. */
+.assistant-function-card {
+  border: 1px solid transparent !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--ca-text);
+  padding: 6px 10px 6px 12px;
+  transition: background-color 120ms ease;
+}
+
+.assistant-function-card:hover {
+  transform: none;
+  border-color: transparent !important;
+  background: var(--ca-hover) !important;
+}
+
+.assistant-function-card.active {
+  border-color: transparent !important;
+  background: var(--ca-accent-soft) !important;
+}
+
+.assistant-function-card:focus-visible {
+  outline: 2px solid var(--ca-accent);
+  outline-offset: -2px;
+}
+
+.assistant-function-card[data-fx-source]::before {
+  display: none;
+}
+
+.assistant-function-card strong {
+  font-size: 13px;
+  font-weight: 500 !important;
+  color: var(--ca-text);
+}
+
+.assistant-function-card.unmet strong {
+  color: var(--ca-muted);
+}
+
+.assistant-function-icon {
+  color: var(--ca-faint);
+}
+
+.assistant-function-card:hover .assistant-function-icon,
+.assistant-function-card.active .assistant-function-icon {
+  color: var(--ca-accent-text);
+}
+
+.assistant-function-needs {
+  color: var(--ca-muted);
+  font-size: 11px;
+}
+
+/* Tags: quiet grey chips; only the animation target keeps its keyframe purple. */
+.tnt-tag {
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  padding: 1px 7px;
+}
+
+.tnt-tag-action,
+.tnt-tag-target {
+  border-color: transparent;
+  background: rgba(255, 255, 255, .06);
+  color: var(--ca-muted);
+}
+
+.tnt-tag-action {
+  color: var(--ca-text);
+}
+
+/* Shortcut keys look like Creative Assist's kbd. */
+body .assistant-function-key {
+  border: 1px solid var(--ca-line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--ca-canvas);
+  color: var(--ca-muted);
+  font-size: 11px;
+}
+
+.assistant-function-key.empty {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ca-faint);
+}
+
+.assistant-function-key.custom {
+  border-color: rgba(255, 154, 61, .45);
+  background: var(--ca-accent-faint);
+  color: var(--ca-accent-text);
+}
+
+.assistant-message {
+  color: var(--ca-muted);
+}
+
+/* ---- Quick Controls (Ctrl+Space) ------------------------------------------
+   Creative Assist's menu surface: one flat warm grey, one line, one shadow.
+   It floats over the comp, so it stays a touch translucent with the blur. */
+body.quick-panel-mode .quick-panel-shell,
+body.quick-panel-mode.native-win .quick-panel-shell {
+  border: 1px solid var(--ca-line) !important;
+  border-radius: 14px !important;
+  background: rgba(44, 44, 42, .94) !important;
+}
+
+body.quick-panel-mode.native-win .quick-panel-shell {
+  background: rgba(44, 44, 42, .98) !important;
+}
+
+/* Edie sits at the start of the search row, as in PR FX's palette
+   (#palette-character); he takes the magnifier's place. */
+.quick-panel-search-wrap {
+  gap: 10px;
+}
+
+.quick-panel-character {
+  display: inline-flex;
+  flex: none;
+  width: 32px;
+  height: 32px;
+}
+
+.quick-panel-character .brand-face {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
+.quick-panel-search-wrap .quick-panel-search-icon {
+  display: none;
+}
+
+.quick-panel-search-wrap .quick-panel-search {
+  flex: 1;
+  min-width: 0;
+  padding-left: 12px;
+}
+
+.quick-panel-search {
+  border: 1px solid var(--ca-line);
+  border-radius: 8px;
+  background: var(--ca-canvas);
+  box-shadow: none;
+  color: var(--ca-text);
+}
+
+.quick-panel-search::placeholder {
+  color: var(--ca-faint);
+}
+
+.quick-panel-search:focus {
+  border-color: var(--ca-accent);
+  box-shadow: 0 0 0 3px var(--ca-accent-faint);
+}
+
+/* Tiles are Creative Assist buttons: flat, no lift. */
+.quick-panel-grid > button {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--ca-button);
+  box-shadow: none;
+  color: var(--ca-text);
+  transition: background-color 120ms ease;
+}
+
+.quick-panel-grid > button:hover {
+  transform: none;
+  border-color: transparent;
+  background: var(--ca-button-hover);
+}
+
+.quick-panel-grid > button:focus-visible {
+  outline: 2px solid var(--ca-accent);
+  outline-offset: 1px;
+}
+
+.quick-panel-icon {
+  color: var(--ca-muted);
+  opacity: 1;
+}
+
+.quick-panel-name {
+  color: var(--ca-text);
+  font-size: 12px;
+}
+
+.quick-panel-grid > button > kbd,
+.quick-panel-search-key {
+  border: 1px solid var(--ca-line);
+  background: transparent;
+  box-shadow: none;
+  color: var(--ca-faint);
+  font-weight: 500;
+}
+
+.quick-panel-grid > button:hover > kbd {
+  border-color: var(--ca-line);
+  color: var(--ca-muted);
+}
+
+.quick-panel-status p,
+.quick-panel-hint {
+  color: var(--ca-muted);
+}
+
+.quick-panel-search-result {
+  border-bottom-color: var(--ca-line-soft);
+  color: var(--ca-text);
+}
+
+.quick-panel-search-result:hover {
+  background: var(--ca-hover);
+}
+
+.quick-panel-search-result.active {
+  background: var(--ca-accent-soft);
+}
+
+.quick-panel-search-result[data-fx-source]::before {
+  display: none;
+}
+
+.quick-panel-search-detail,
+.quick-panel-search-empty {
+  color: var(--ca-muted);
+}
+
+.quick-panel-refresh {
+  border: 1px solid var(--ca-line) !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--ca-muted) !important;
+}
+
+.quick-panel-refresh:hover {
+  background: var(--ca-hover) !important;
+  color: var(--ca-text) !important;
+}
+
+/* ---- Section labels --------------------------------------------------------
+   These were small uppercase labels with wide tracking. In sentence case they
+   read as Creative Assist's small muted labels: no tracking, 11px. */
+.tnk-group h4,
+.tnk-param label,
+.layer-menu-kicker,
+.layer-menu-section-title,
+body.quick-panel-mode .quick-layer-menu-body .layer-menu-kicker,
+.layout-panel-name,
+.text-animation-section-head strong,
+.mass-edit-source label > span,
+.mass-edit-property-grid label > span,
+.mass-edit-section-title {
+  letter-spacing: 0 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: var(--ca-muted) !important;
+}
+
+/* Mass Edit's fields use the panel's body size, not the browser's 16px. */
+.mass-edit-dialog select,
+.mass-edit-dialog input {
+  font-size: 12px;
+  border-color: var(--ca-line);
+  background: var(--ca-canvas);
+  color: var(--ca-text);
+}
+
+.mass-edit-dialog select:focus,
+.mass-edit-dialog input:focus {
+  outline: none;
+  border-color: var(--ca-accent);
+  box-shadow: 0 0 0 3px var(--ca-accent-faint);
+}
+
+.mass-edit-target-summary {
+  color: var(--ca-muted);
+  font-size: 12px;
+}
+
+.mass-edit-apply-value {
+  border-color: rgba(255, 154, 61, .45);
+  background: var(--ca-accent-faint);
+  color: var(--ca-accent-text);
+}
+
+/* Timeline mode identity: Edit is the accent orange so it never reads like
+   Keyframes' deep purple next to it. */
+#keyframeModeBtn[data-mode="edit"],
+#keyframeModeBtn:not(.active) {
+  border-color: rgba(255, 154, 61, .54) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 154, 61, .20), rgba(255, 154, 61, .07)),
+    rgba(15, 15, 14, .76) !important;
+  box-shadow: 0 0 0 1px rgba(255, 154, 61, .10) !important;
+}
+
+#keyframeModeBtn[data-mode="edit"]::before,
+#keyframeModeBtn:not(.active)::before {
+  border-color: rgba(255, 224, 204, .92) !important;
+  background: rgba(255, 154, 61, .52) !important;
+  box-shadow: 0 0 0 2px rgba(255, 154, 61, .12) !important;
+}

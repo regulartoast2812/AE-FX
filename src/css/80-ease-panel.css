@@ -13,11 +13,11 @@
   border-radius: var(--tnt-radius-panel, 16px) !important;
   background:
     linear-gradient(135deg, rgba(255,255,255,.065), rgba(255,255,255,.022) 34%, rgba(0,0,0,.18)),
-    rgba(18,19,20,.80) !important;
+    rgba(19, 19, 18,.80) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.07),
     0 24px 58px rgba(0,0,0,.42) !important;
-  color: rgba(245,245,247,.88) !important;
+  color: rgba(246, 244, 236,.88) !important;
   overflow: hidden !important;
   -webkit-backdrop-filter: blur(22px) saturate(118%) !important;
   backdrop-filter: blur(22px) saturate(118%) !important;
@@ -57,7 +57,7 @@
   border: 1px solid rgba(255,255,255,.16) !important;
   border-radius: 7px !important;
   background: rgba(255,255,255,.060) !important;
-  color: rgba(245,245,247,.92) !important;
+  color: rgba(246, 244, 236,.92) !important;
   font-size: 12px !important;
   font-weight: 760 !important;
   line-height: 1 !important;
@@ -65,7 +65,7 @@
 
 .ease-dialog-subtitle {
   margin-top: 5px !important;
-  color: rgba(235,235,245,.46) !important;
+  color: rgba(238, 236, 228,.46) !important;
   font-size: 12px !important;
   font-weight: 430 !important;
 }
@@ -87,7 +87,7 @@
   border-radius: var(--tnt-radius-node, 12px) !important;
   background:
     linear-gradient(135deg, rgba(255,255,255,.040), rgba(255,255,255,.014) 46%, rgba(0,0,0,.10)),
-    rgba(8,9,10,.42) !important;
+    rgba(9, 9, 9,.42) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.035),
     0 8px 22px rgba(0,0,0,.18) !important;
@@ -105,18 +105,18 @@
   background:
     linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px),
-    rgba(8,10,12,.58) !important;
+    rgba(10, 10, 10,.58) !important;
   background-size: 42px 42px, 42px 42px, auto !important;
 }
 
 .ease-grid {
-  stroke: rgba(235,235,245,.18) !important;
+  stroke: rgba(238, 236, 228,.18) !important;
   stroke-width: 1 !important;
 }
 
 .ease-curve,
 .ease-handle-line {
-  stroke: rgba(232,132,74,.94) !important;
+  stroke: rgba(255, 169, 84,.94) !important;
   stroke-width: 3 !important;
   stroke-linecap: round !important;
   fill: none !important;
@@ -129,10 +129,10 @@
 
 .ease-point {
   r: 6px !important;
-  fill: rgba(232,132,74,.96) !important;
+  fill: rgba(255, 169, 84,.96) !important;
   stroke: rgba(255,255,255,.84) !important;
   stroke-width: 2 !important;
-  filter: drop-shadow(0 0 12px rgba(232,132,74,.26)) !important;
+  filter: drop-shadow(0 0 12px rgba(255, 169, 84,.26)) !important;
 }
 
 .ease-controls {
@@ -155,14 +155,14 @@
 }
 
 .ease-control span {
-  color: rgba(235,235,245,.54) !important;
+  color: rgba(238, 236, 228,.54) !important;
   font-size: 11px !important;
   font-weight: 450 !important;
   letter-spacing: 0 !important;
 }
 
 .ease-control em {
-  color: rgba(245,245,247,.70) !important;
+  color: rgba(246, 244, 236,.70) !important;
   font-size: 11px !important;
   font-style: normal !important;
   text-align: right !important;
@@ -172,7 +172,7 @@
   width: 100% !important;
   height: 16px !important;
   margin: 0 !important;
-  accent-color: rgba(232,132,74,.90) !important;
+  accent-color: rgba(255, 169, 84,.90) !important;
   background: transparent !important;
 }
 
@@ -181,7 +181,7 @@
   border: 0 !important;
   border-radius: 999px !important;
   background:
-    linear-gradient(90deg, rgba(232,132,74,.82) 0%, rgba(232,132,74,.82) var(--range-fill, 0%), rgba(255,255,255,.13) var(--range-fill, 0%), rgba(255,255,255,.13) 100%) !important;
+    linear-gradient(90deg, rgba(255, 169, 84,.82) 0%, rgba(255, 169, 84,.82) var(--range-fill, 0%), rgba(255,255,255,.13) var(--range-fill, 0%), rgba(255,255,255,.13) 100%) !important;
 }
 
 .ease-control input[type="range"]::-webkit-slider-thumb {
@@ -190,8 +190,8 @@
   margin-top: -5px !important;
   border: 1px solid rgba(255,255,255,.42) !important;
   border-radius: 50% !important;
-  background: rgba(232,132,74,.96) !important;
-  box-shadow: 0 0 0 3px rgba(232,132,74,.13), 0 1px 2px rgba(0,0,0,.48) !important;
+  background: rgba(255, 169, 84,.96) !important;
+  box-shadow: 0 0 0 3px rgba(255, 169, 84,.13), 0 1px 2px rgba(0,0,0,.48) !important;
 }
 
 .ease-presets {
@@ -213,7 +213,7 @@
   border: 1px solid rgba(255,255,255,.105) !important;
   border-radius: var(--tnt-radius-control, 8px) !important;
   background: rgba(255,255,255,.045) !important;
-  color: rgba(245,245,247,.78) !important;
+  color: rgba(246, 244, 236,.78) !important;
   font-size: 13px !important;
   font-weight: 460 !important;
   text-align: left !important;
@@ -223,8 +223,8 @@
 
 .ease-presets button:hover {
   transform: scale(1.025) !important;
-  border-color: rgba(232,132,74,.32) !important;
-  background: rgba(232,132,74,.10) !important;
+  border-color: rgba(255, 169, 84,.32) !important;
+  background: rgba(255, 169, 84,.10) !important;
   color: rgba(255,244,237,.94) !important;
 }
 
@@ -241,7 +241,7 @@
 }
 
 .ease-presets button path {
-  stroke: rgba(232,132,74,.94) !important;
+  stroke: rgba(255, 169, 84,.94) !important;
   stroke-width: 3 !important;
   stroke-linecap: round !important;
   fill: none !important;
@@ -270,7 +270,7 @@
   border: 1px solid rgba(255,255,255,.12) !important;
   border-radius: var(--tnt-radius-control, 8px) !important;
   background: rgba(255,255,255,.055) !important;
-  color: rgba(245,245,247,.78) !important;
+  color: rgba(246, 244, 236,.78) !important;
   font-size: 12px !important;
   font-weight: 480 !important;
   transform-origin: center !important;
@@ -284,14 +284,14 @@
 }
 
 .ease-actions button.primary {
-  border-color: rgba(232,132,74,.40) !important;
-  background: rgba(232,132,74,.13) !important;
+  border-color: rgba(255, 169, 84,.40) !important;
+  background: rgba(255, 169, 84,.13) !important;
   color: rgba(255,236,224,.94) !important;
 }
 
 .ease-actions button.primary:hover {
-  border-color: rgba(232,132,74,.56) !important;
-  background: rgba(232,132,74,.19) !important;
+  border-color: rgba(255, 169, 84,.56) !important;
+  background: rgba(255, 169, 84,.19) !important;
 }
 
 @media (max-width: 760px) {
@@ -367,7 +367,7 @@
 .ease-point {
   r: 5px !important;
   stroke-width: 1.5px !important;
-  filter: drop-shadow(0 0 8px rgba(232,132,74,.22)) !important;
+  filter: drop-shadow(0 0 8px rgba(255, 169, 84,.22)) !important;
 }
 
 .ease-controls {
@@ -396,15 +396,15 @@
 .ease-control input[type="range"]::-webkit-slider-runnable-track {
   height: 1.5px !important;
   background:
-    linear-gradient(90deg, rgba(198,199,203,.52) 0%, rgba(198,199,203,.52) var(--range-fill, 0%), rgba(255,255,255,.105) var(--range-fill, 0%), rgba(255,255,255,.105) 100%) !important;
+    linear-gradient(90deg, rgba(200, 198, 192,.52) 0%, rgba(200, 198, 192,.52) var(--range-fill, 0%), rgba(255,255,255,.105) var(--range-fill, 0%), rgba(255,255,255,.105) 100%) !important;
 }
 
 .ease-control input[type="range"]::-webkit-slider-thumb {
   width: 9px !important;
   height: 9px !important;
   margin-top: -3.75px !important;
-  border: 1px solid rgba(220,221,225,.64) !important;
-  background: rgba(58,59,61,.96) !important;
+  border: 1px solid rgba(222, 220, 213,.64) !important;
+  background: rgba(59, 59, 57,.96) !important;
   box-shadow: 0 0 0 2px rgba(255,255,255,.055), 0 1px 2px rgba(0,0,0,.50) !important;
 }
 
@@ -571,7 +571,7 @@
   border-radius: var(--tnt-radius-node, 12px) !important;
   background:
     linear-gradient(135deg, rgba(255,255,255,.040), rgba(255,255,255,.014) 46%, rgba(0,0,0,.10)),
-    rgba(8,9,10,.42) !important;
+    rgba(9, 9, 9,.42) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.035),
     0 8px 22px rgba(0,0,0,.18) !important;
@@ -602,7 +602,7 @@
   border: 1px solid rgba(255,255,255,.095) !important;
   border-radius: var(--tnt-radius-control, 8px) !important;
   background: rgba(255,255,255,.040) !important;
-  color: rgba(245,245,247,.74) !important;
+  color: rgba(246, 244, 236,.74) !important;
   font: inherit !important;
   font-size: 9px !important;
   font-weight: 520 !important;
@@ -614,8 +614,8 @@
 
 .ease-tools button:hover {
   transform: scale(1.045) !important;
-  border-color: rgba(232,132,74,.34) !important;
-  background: rgba(232,132,74,.10) !important;
+  border-color: rgba(255, 169, 84,.34) !important;
+  background: rgba(255, 169, 84,.10) !important;
   color: rgba(255,244,237,.94) !important;
   box-shadow: 0 7px 18px rgba(0,0,0,.20) !important;
 }
@@ -629,7 +629,7 @@
 
 .ease-tools path {
   fill: none !important;
-  stroke: rgba(232,132,74,.94) !important;
+  stroke: rgba(255, 169, 84,.94) !important;
   stroke-width: 2 !important;
   stroke-linecap: round !important;
   stroke-linejoin: round !important;
@@ -657,12 +657,12 @@
 }
 
 .ease-box-edge-strong {
-  stroke: rgba(235,235,245,.26) !important;
+  stroke: rgba(238, 236, 228,.26) !important;
   stroke-width: 1.2px !important;
 }
 
 .ease-box-edge-weak {
-  stroke: rgba(235,235,245,.105) !important;
+  stroke: rgba(238, 236, 228,.105) !important;
   stroke-width: 1px !important;
 }
 
@@ -681,14 +681,14 @@
 
 .ease-presets button[data-preset="linear"],
 .ease-presets button[data-preset="easy"] {
-  border-color: rgba(232,132,74,.18) !important;
-  background: rgba(232,132,74,.055) !important;
+  border-color: rgba(255, 169, 84,.18) !important;
+  background: rgba(255, 169, 84,.055) !important;
 }
 
 .ease-presets button[data-preset="linear"]:hover,
 .ease-presets button[data-preset="easy"]:hover {
-  border-color: rgba(232,132,74,.34) !important;
-  background: rgba(232,132,74,.115) !important;
+  border-color: rgba(255, 169, 84,.34) !important;
+  background: rgba(255, 169, 84,.115) !important;
 }
 
 /* v127: Ease presets belong to the graph column and handles can overshoot the plot. */
@@ -740,18 +740,18 @@
 }
 
 .ease-tools button[data-ease-tool="overshoot"] {
-  border-color: rgba(232,132,74,.30) !important;
-  background: rgba(232,132,74,.090) !important;
+  border-color: rgba(255, 169, 84,.30) !important;
+  background: rgba(255, 169, 84,.090) !important;
   color: rgba(255,224,204,.92) !important;
 }
 
 .ease-tools button[data-ease-tool="overshoot"]:hover {
-  border-color: rgba(232,132,74,.48) !important;
-  background: rgba(232,132,74,.150) !important;
+  border-color: rgba(255, 169, 84,.48) !important;
+  background: rgba(255, 169, 84,.150) !important;
 }
 
 .ease-tools button[data-ease-tool="overshoot"] path {
-  stroke: rgba(232,132,74,.96) !important;
+  stroke: rgba(255, 169, 84,.96) !important;
 }
 
 .ease-tools button[data-ease-tool="wiggle"] {
@@ -1142,10 +1142,10 @@
   background:
     linear-gradient(
       90deg,
-      rgba(232, 132, 74, .92) 0%,
-      rgba(232, 132, 74, .92) var(--range-fill, 0%),
-      #34363a var(--range-fill, 0%),
-      #34363a 100%
+      rgba(255, 169, 84, .92) 0%,
+      rgba(255, 169, 84, .92) var(--range-fill, 0%),
+      #373735 var(--range-fill, 0%),
+      #373735 100%
     ) !important;
 }
 
@@ -1157,11 +1157,11 @@
   width: 12px !important;
   height: 12px !important;
   margin-top: -5px !important;
-  border: 1px solid rgba(255, 181, 139, .9) !important;
+  border: 1px solid rgba(255, 213, 172, .9) !important;
   border-radius: 50% !important;
-  background: #e8844a !important;
+  background: #ffa954 !important;
   box-shadow:
-    0 0 0 2px rgba(232, 132, 74, .13),
+    0 0 0 2px rgba(255, 169, 84, .13),
     0 1px 2px rgba(0, 0, 0, .5) !important;
   box-sizing: border-box !important;
 }
@@ -1173,9 +1173,9 @@
 .ease-control input[type="range"]:hover::-webkit-slider-thumb,
 .ease-control input[type="range"]:focus::-webkit-slider-thumb {
   border-color: rgba(255, 205, 176, .98) !important;
-  background: #f0925a !important;
+  background: #ffb66c !important;
   box-shadow:
-    0 0 0 3px rgba(232, 132, 74, .18),
+    0 0 0 3px rgba(255, 169, 84, .18),
     0 1px 3px rgba(0, 0, 0, .55) !important;
 }
 
@@ -1185,7 +1185,7 @@
   height: 2px !important;
   border: 0 !important;
   border-radius: 999px !important;
-  background: #34363a !important;
+  background: #373735 !important;
 }
 
 .layer-style-prop input[type="range"]::-moz-range-progress,
@@ -1193,7 +1193,7 @@
 .ease-control input[type="range"]::-moz-range-progress {
   height: 2px !important;
   border-radius: 999px !important;
-  background: rgba(232, 132, 74, .92) !important;
+  background: rgba(255, 169, 84, .92) !important;
 }
 
 .layer-style-prop input[type="range"]::-moz-range-thumb,
@@ -1201,10 +1201,10 @@
 .ease-control input[type="range"]::-moz-range-thumb {
   width: 12px !important;
   height: 12px !important;
-  border: 1px solid rgba(255, 181, 139, .9) !important;
+  border: 1px solid rgba(255, 213, 172, .9) !important;
   border-radius: 50% !important;
-  background: #e8844a !important;
-  box-shadow: 0 0 0 2px rgba(232, 132, 74, .13) !important;
+  background: #ffa954 !important;
+  box-shadow: 0 0 0 2px rgba(255, 169, 84, .13) !important;
 }
 
 /* v133: enforce identical slider geometry against older panel-specific rules. */
@@ -1230,10 +1230,10 @@ body .ease-dialog .ease-control input[type="range"]::-webkit-slider-runnable-tra
   background:
     linear-gradient(
       90deg,
-      #e8844a 0%,
-      #e8844a var(--range-fill, 0%),
-      #34363a var(--range-fill, 0%),
-      #34363a 100%
+      #ffa954 0%,
+      #ffa954 var(--range-fill, 0%),
+      #373735 var(--range-fill, 0%),
+      #373735 100%
     ) !important;
 }
 
@@ -1247,11 +1247,11 @@ body .ease-dialog .ease-control input[type="range"]::-webkit-slider-thumb {
   height: 12px !important;
   min-height: 12px !important;
   margin-top: -5px !important;
-  border: 1px solid #ffb58b !important;
+  border: 1px solid #ffd5ac !important;
   border-radius: 50% !important;
-  background: #e8844a !important;
+  background: #ffa954 !important;
   box-shadow:
-    0 0 0 2px rgba(232, 132, 74, .13),
+    0 0 0 2px rgba(255, 169, 84, .13),
     0 1px 2px rgba(0, 0, 0, .5) !important;
   box-sizing: border-box !important;
 }
@@ -1264,8 +1264,8 @@ body .ease-dialog .ease-control input[type="range"]:hover::-webkit-slider-thumb,
 body .ease-dialog .ease-control input[type="range"]:focus::-webkit-slider-thumb {
   width: 12px !important;
   height: 12px !important;
-  border-color: #ffcdb0 !important;
-  background: #f0925a !important;
+  border-color: #ffe8d1 !important;
+  background: #ffb66c !important;
 }
 
 /* v134: graph camera controls keep extreme ease handles reachable. */
@@ -1285,7 +1285,7 @@ body .ease-dialog .ease-control input[type="range"]:focus::-webkit-slider-thumb 
   padding: 2px !important;
   border: 1px solid rgba(255, 255, 255, .11) !important;
   border-radius: 7px !important;
-  background: rgba(20, 21, 23, .78) !important;
+  background: rgba(21, 21, 20, .78) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, .04),
     0 3px 10px rgba(0, 0, 0, .28) !important;
@@ -1302,7 +1302,7 @@ body .ease-dialog .ease-control input[type="range"]:focus::-webkit-slider-thumb 
   border: 0 !important;
   border-radius: 5px !important;
   background: transparent !important;
-  color: rgba(235, 235, 245, .72) !important;
+  color: rgba(238, 236, 228, .72) !important;
   font-size: 12px !important;
   line-height: 22px !important;
   text-align: center !important;
@@ -1311,18 +1311,18 @@ body .ease-dialog .ease-control input[type="range"]:focus::-webkit-slider-thumb 
 }
 
 .ease-graph-zoom button:hover:not(:disabled) {
-  color: #ffd0b5 !important;
-  background: rgba(232, 132, 74, .14) !important;
+  color: #ffead6 !important;
+  background: rgba(255, 169, 84, .14) !important;
   transform: scale(1.06) !important;
 }
 
 .ease-graph-zoom button:disabled {
-  color: rgba(235, 235, 245, .24) !important;
+  color: rgba(238, 236, 228, .24) !important;
   cursor: default !important;
 }
 
 .ease-graph-zoom-value {
-  color: rgba(245, 245, 247, .78) !important;
+  color: rgba(246, 244, 236, .78) !important;
   font-size: 9px !important;
   font-variant-numeric: tabular-nums !important;
 }

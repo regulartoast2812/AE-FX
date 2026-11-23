@@ -32,9 +32,9 @@
   justify-content: center !important;
   width: 24px !important;
   height: 22px !important;
-  border: 1px solid rgba(217,119,66,.32) !important;
+  border: 1px solid rgba(255, 154, 61,.32) !important;
   border-radius: var(--tnt-radius-control) !important;
-  background: rgba(217,119,66,.13) !important;
+  background: rgba(255, 154, 61,.13) !important;
   color: rgba(255,226,207,.92) !important;
   font-size: 12px !important;
   font-weight: 500 !important;
@@ -110,7 +110,7 @@
   height: 30px !important;
   display: flex !important;
   align-items: center !important;
-  color: rgba(235,235,245,.42) !important;
+  color: rgba(238, 236, 228,.42) !important;
   font-size: 11px !important;
 }
 
@@ -132,16 +132,16 @@
   background:
     linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)),
     rgba(0,0,0,.24) !important;
-  color: rgba(245,245,247,.92) !important;
+  color: rgba(246, 244, 236,.92) !important;
   font-size: 12px !important;
   outline: none !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.04) !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form input:focus {
-  border-color: rgba(217,119,66,.55) !important;
+  border-color: rgba(255, 154, 61,.55) !important;
   box-shadow:
-    0 0 0 2px rgba(217,119,66,.14),
+    0 0 0 2px rgba(255, 154, 61,.14),
     inset 0 1px 0 rgba(255,255,255,.06) !important;
 }
 
@@ -167,15 +167,15 @@
   background:
     linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.018)),
     rgba(0,0,0,.20) !important;
-  color: rgba(245,245,247,.90) !important;
+  color: rgba(246, 244, 236,.90) !important;
   text-align: left !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.035) !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button:hover {
-  border-color: rgba(217,119,66,.32) !important;
+  border-color: rgba(255, 154, 61,.32) !important;
   background:
-    linear-gradient(180deg, rgba(255,255,255,.075), rgba(217,119,66,.05)),
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(255, 154, 61,.05)),
     rgba(0,0,0,.22) !important;
 }
 
@@ -193,7 +193,7 @@
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button em {
-  color: rgba(235,235,245,.44) !important;
+  color: rgba(238, 236, 228,.44) !important;
   font-size: 9px !important;
   font-style: normal !important;
   line-height: 9px !important;
@@ -212,7 +212,7 @@
   width: 5px !important;
   height: 18px !important;
   border-radius: 999px !important;
-  background: var(--preset-color, #777) !important;
+  background: var(--preset-color, #777672) !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-header-add-row {
@@ -253,7 +253,7 @@
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-edit-panel::-webkit-scrollbar-thumb,
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-node-props::-webkit-scrollbar-thumb {
   border-radius: 999px !important;
-  background: rgba(217,119,66,.38) !important;
+  background: rgba(255, 154, 61,.38) !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button {
@@ -332,7 +332,7 @@
   height: 18px !important;
   border-radius: 999px !important;
   background:
-    linear-gradient(90deg, rgba(217,119,66,.72) 0%, rgba(217,119,66,.72) var(--range-fill, 0%), rgba(255,255,255,.075) var(--range-fill, 0%), rgba(255,255,255,.075) 100%) !important;
+    linear-gradient(90deg, rgba(255, 154, 61,.72) 0%, rgba(255, 154, 61,.72) var(--range-fill, 0%), rgba(255,255,255,.075) var(--range-fill, 0%), rgba(255,255,255,.075) 100%) !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]::-webkit-slider-runnable-track {
@@ -346,10 +346,10 @@
   height: 14px !important;
   margin-top: -5px !important;
   border-radius: 999px !important;
-  border-color: rgba(217,119,66,.74) !important;
+  border-color: rgba(255, 154, 61,.74) !important;
   background: rgba(52,33,23,.96) !important;
   box-shadow:
-    0 0 0 3px rgba(217,119,66,.20),
+    0 0 0 3px rgba(255, 154, 61,.20),
     0 1px 3px rgba(0,0,0,.55) !important;
 }
 
@@ -557,7 +557,7 @@ header .comp-select {
   border: 0 !important;
   border-radius: 999px !important;
   background:
-    linear-gradient(90deg, rgba(217,119,66,.72) 0%, rgba(217,119,66,.72) var(--range-fill, 0%), rgba(255,255,255,.090) var(--range-fill, 0%), rgba(255,255,255,.090) 100%) !important;
+    linear-gradient(90deg, rgba(255, 154, 61,.72) 0%, rgba(255, 154, 61,.72) var(--range-fill, 0%), rgba(255,255,255,.090) var(--range-fill, 0%), rgba(255,255,255,.090) 100%) !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]::-webkit-slider-thumb {
@@ -565,9 +565,9 @@ header .comp-select {
   height: 12px !important;
   margin-top: -4px !important;
   border-radius: 999px !important;
-  border: 1px solid rgba(217,119,66,.70) !important;
+  border: 1px solid rgba(255, 154, 61,.70) !important;
   background: rgba(40,28,22,.96) !important;
-  box-shadow: 0 0 0 2px rgba(217,119,66,.16) !important;
+  box-shadow: 0 0 0 2px rgba(255, 154, 61,.16) !important;
 }
 
 /* v105: neutral style controls; no colored sliders. */
@@ -580,7 +580,7 @@ header .comp-select {
   height: 18px !important;
   border-color: rgba(255,255,255,.14) !important;
   background: rgba(255,255,255,.070) !important;
-  color: rgba(245,245,247,.90) !important;
+  color: rgba(246, 244, 236,.90) !important;
   font-size: 11px !important;
   font-weight: 700 !important;
   transform: translateY(0) !important;
@@ -603,7 +603,7 @@ header .comp-select {
   width: 12px !important;
   height: 12px !important;
   border-radius: 999px !important;
-  background: rgba(235,235,245,.78) !important;
+  background: rgba(238, 236, 228,.78) !important;
   box-shadow: 0 1px 2px rgba(0,0,0,.45) !important;
 }
 
@@ -614,7 +614,7 @@ header .comp-select {
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle.on span {
   left: 15px !important;
-  background: rgba(245,255,248,.96) !important;
+  background: rgba(249, 247, 239,.96) !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"] {
@@ -627,15 +627,15 @@ header .comp-select {
   border: 0 !important;
   border-radius: 999px !important;
   background:
-    linear-gradient(90deg, rgba(198,199,203,.52) 0%, rgba(198,199,203,.52) var(--range-fill, 0%), rgba(255,255,255,.105) var(--range-fill, 0%), rgba(255,255,255,.105) 100%) !important;
+    linear-gradient(90deg, rgba(200, 198, 192,.52) 0%, rgba(200, 198, 192,.52) var(--range-fill, 0%), rgba(255,255,255,.105) var(--range-fill, 0%), rgba(255,255,255,.105) 100%) !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]::-webkit-slider-thumb {
   width: 10px !important;
   height: 10px !important;
   margin-top: -4px !important;
-  border: 1px solid rgba(220,221,225,.64) !important;
-  background: rgba(58,59,61,.96) !important;
+  border: 1px solid rgba(222, 220, 213,.64) !important;
+  background: rgba(59, 59, 57,.96) !important;
   box-shadow:
     0 0 0 2px rgba(255,255,255,.060),
     0 1px 2px rgba(0,0,0,.55) !important;
@@ -647,8 +647,8 @@ header .comp-select {
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]:hover::-webkit-slider-thumb,
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-prop input[type="range"]:focus::-webkit-slider-thumb {
-  border-color: rgba(238,239,242,.74) !important;
-  background: rgba(68,69,72,.98) !important;
+  border-color: rgba(240, 238, 230,.74) !important;
+  background: rgba(70, 69, 67,.98) !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-prop select {
@@ -660,16 +660,16 @@ header .comp-select {
   padding: 0 24px 0 9px !important;
   border: 1px solid rgba(255,255,255,.13) !important;
   border-radius: var(--tnt-radius-control) !important;
-  background-color: rgba(10,10,10,.55) !important;
+  background-color: rgba(10, 10, 10,.55) !important;
   background-image:
-    linear-gradient(45deg, transparent 50%, rgba(235,235,245,.78) 50%),
-    linear-gradient(135deg, rgba(235,235,245,.78) 50%, transparent 50%) !important;
+    linear-gradient(45deg, transparent 50%, rgba(238, 236, 228,.78) 50%),
+    linear-gradient(135deg, rgba(238, 236, 228,.78) 50%, transparent 50%) !important;
   background-position:
     calc(100% - 13px) 9px,
     calc(100% - 8px) 9px !important;
   background-size: 5px 5px, 5px 5px !important;
   background-repeat: no-repeat !important;
-  color: rgba(245,245,247,.92) !important;
+  color: rgba(246, 244, 236,.92) !important;
   outline: none !important;
   appearance: none !important;
   -webkit-appearance: none !important;
@@ -707,7 +707,7 @@ header .comp-select {
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-header-add-row::-webkit-scrollbar-thumb,
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-edit-panel::-webkit-scrollbar-thumb,
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-node-props::-webkit-scrollbar-thumb {
-  background: rgba(185,187,192,.32) !important;
+  background: rgba(188, 186, 180,.32) !important;
   border: 0 !important;
   border-radius: 999px !important;
 }
@@ -715,7 +715,7 @@ header .comp-select {
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-header-add-row::-webkit-scrollbar-thumb:hover,
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-edit-panel::-webkit-scrollbar-thumb:hover,
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-node-props::-webkit-scrollbar-thumb:hover {
-  background: rgba(210,212,216,.42) !important;
+  background: rgba(213, 211, 204,.42) !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-toggle {
@@ -813,9 +813,9 @@ header .comp-select {
   border: 1px solid rgba(255,255,255,.24);
   border-radius: calc(var(--tnt-radius-panel) + 3px);
   box-shadow:
-    0 0 0 10px rgba(217,119,66,.18),
-    0 0 0 24px rgba(217,119,66,.105),
-    0 0 52px 18px rgba(217,119,66,.34),
+    0 0 0 10px rgba(255, 154, 61,.18),
+    0 0 0 24px rgba(255, 154, 61,.105),
+    0 0 52px 18px rgba(255, 154, 61,.34),
     inset 0 1px 0 rgba(255,255,255,.12);
   animation: styleNodeFocusPulse 1.25s ease-out forwards;
 }
@@ -936,20 +936,20 @@ header .comp-select {
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.is-added,
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.all-have {
   transform: scale(1) !important;
-  border-color: var(--style-color, #d97742) !important;
+  border-color: var(--style-color, #ff9a3d) !important;
   background:
-    linear-gradient(0deg, rgba(18,18,18,.70), rgba(18,18,18,.70)),
-    var(--style-color, #d97742) !important;
+    linear-gradient(0deg, rgba(18, 18, 17,.70), rgba(18, 18, 17,.70)),
+    var(--style-color, #ff9a3d) !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.is-added:hover:not(:disabled),
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.all-have:hover:not(:disabled) {
   transform: scale(1.035) !important;
   filter: brightness(1.12) saturate(1.08) !important;
-  border-color: var(--style-color, #d97742) !important;
+  border-color: var(--style-color, #ff9a3d) !important;
   background:
-    linear-gradient(0deg, rgba(12,12,12,.58), rgba(12,12,12,.58)),
-    var(--style-color, #d97742) !important;
+    linear-gradient(0deg, rgba(12, 12, 12,.58), rgba(12, 12, 12,.58)),
+    var(--style-color, #ff9a3d) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.12),
     0 0 0 1px rgba(255,255,255,.035),
@@ -960,7 +960,7 @@ header .comp-select {
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.all-have::before,
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.is-added:hover::before,
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-add-button.all-have:hover::before {
-  background: var(--style-color, #d97742) !important;
+  background: var(--style-color, #ff9a3d) !important;
   box-shadow: 0 0 8px rgba(255,255,255,.16) !important;
 }
 
@@ -1002,13 +1002,13 @@ header .comp-select {
   border-color: rgba(255,255,255,.12) !important;
   background:
     linear-gradient(180deg, rgba(255,255,255,.058), rgba(255,255,255,.022)),
-    rgba(13,13,13,.58) !important;
-  color: rgba(245,245,247,.82) !important;
+    rgba(13, 13, 12,.58) !important;
+  color: rgba(246, 244, 236,.82) !important;
 }
 
 #keyframeModeBtn[data-mode="edit"]::before,
 #keyframeModeBtn:not(.active)::before {
-  border-color: rgba(230,230,235,.70) !important;
+  border-color: rgba(232, 230, 223,.70) !important;
   background: rgba(255,255,255,.035) !important;
   border-radius: 2px !important;
   transform: rotate(45deg) !important;
@@ -1016,24 +1016,24 @@ header .comp-select {
 
 #keyframeModeBtn[data-mode="keyframe"],
 #keyframeModeBtn.active {
-  border-color: rgba(232,132,74,.58) !important;
+  border-color: rgba(255, 169, 84,.58) !important;
   background:
-    linear-gradient(180deg, rgba(232,132,74,.24), rgba(232,132,74,.075)),
-    rgba(18,14,12,.78) !important;
+    linear-gradient(180deg, rgba(255, 169, 84,.24), rgba(255, 169, 84,.075)),
+    rgba(15, 15, 14,.78) !important;
   color: rgba(255,239,228,.96) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.09),
-    0 0 0 1px rgba(232,132,74,.12),
+    0 0 0 1px rgba(255, 169, 84,.12),
     0 6px 16px rgba(0,0,0,.20) !important;
 }
 
 #keyframeModeBtn[data-mode="keyframe"]::before,
 #keyframeModeBtn.active::before {
   border-color: rgba(255,222,199,.94) !important;
-  background: rgba(232,132,74,.56) !important;
+  background: rgba(255, 169, 84,.56) !important;
   box-shadow:
-    0 0 0 2px rgba(232,132,74,.14),
-    0 0 10px rgba(232,132,74,.22) !important;
+    0 0 0 2px rgba(255, 169, 84,.14),
+    0 0 10px rgba(255, 169, 84,.22) !important;
   border-radius: 2px !important;
   transform: rotate(45deg) !important;
 }
@@ -1045,7 +1045,7 @@ header .comp-select {
 
 .clip,
 .keyframe-focus-clip {
-  color: rgba(245,245,247,.88) !important;
+  color: rgba(246, 244, 236,.88) !important;
   border: 1px solid rgba(255,255,255,.145) !important;
   border-radius: var(--tnt-radius-layer, 4px) !important;
   background-image:
@@ -1113,7 +1113,7 @@ header .comp-select {
   background:
     linear-gradient(180deg, rgba(255,255,255,.070), rgba(255,255,255,.020)),
     rgba(0,0,0,.26) !important;
-  color: rgba(245,245,247,.72) !important;
+  color: rgba(246, 244, 236,.72) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.055) !important;
 }
 
@@ -1134,24 +1134,24 @@ header .comp-select {
 /* v112: both timeline modes have explicit color identity. */
 #keyframeModeBtn[data-mode="edit"],
 #keyframeModeBtn:not(.active) {
-  border-color: rgba(232,132,74,.54) !important;
+  border-color: rgba(255, 169, 84,.54) !important;
   background:
-    linear-gradient(180deg, rgba(232,132,74,.22), rgba(232,132,74,.070)),
-    rgba(18,14,12,.76) !important;
+    linear-gradient(180deg, rgba(255, 169, 84,.22), rgba(255, 169, 84,.070)),
+    rgba(15, 15, 14,.76) !important;
   color: rgba(255,239,228,.95) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.085),
-    0 0 0 1px rgba(232,132,74,.10),
+    0 0 0 1px rgba(255, 169, 84,.10),
     0 6px 16px rgba(0,0,0,.18) !important;
 }
 
 #keyframeModeBtn[data-mode="edit"]::before,
 #keyframeModeBtn:not(.active)::before {
   border-color: rgba(255,224,204,.92) !important;
-  background: rgba(232,132,74,.52) !important;
+  background: rgba(255, 169, 84,.52) !important;
   box-shadow:
-    0 0 0 2px rgba(232,132,74,.12),
-    0 0 10px rgba(232,132,74,.18) !important;
+    0 0 0 2px rgba(255, 169, 84,.12),
+    0 0 10px rgba(255, 169, 84,.18) !important;
 }
 
 #keyframeModeBtn[data-mode="keyframe"],
@@ -1159,7 +1159,7 @@ header .comp-select {
   border-color: rgba(118,92,226,.60) !important;
   background:
     linear-gradient(180deg, rgba(118,92,226,.30), rgba(118,92,226,.090)),
-    rgba(15,13,24,.80) !important;
+    rgba(17, 17, 16,.80) !important;
   color: rgba(238,233,255,.97) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.085),
@@ -1205,7 +1205,7 @@ header .comp-select {
   border: 1px solid rgba(255,255,255,.105) !important;
   border-radius: 999px !important;
   background: rgba(255,255,255,.055) !important;
-  color: rgba(235,235,245,.58) !important;
+  color: rgba(238, 236, 228,.58) !important;
   font-size: 11px !important;
   font-style: normal !important;
   font-weight: 500 !important;
@@ -1232,8 +1232,8 @@ header .comp-select {
   overflow-y: auto !important;
   border: 1px solid rgba(255,255,255,.115) !important;
   border-radius: var(--tnt-radius-panel, 12px) !important;
-  background: rgba(18,18,19,.66) !important;
-  color: rgba(245,245,247,.90) !important;
+  background: rgba(18, 18, 17,.66) !important;
+  color: rgba(246, 244, 236,.90) !important;
   box-shadow:
     0 20px 58px rgba(0,0,0,.50),
     inset 0 1px 0 rgba(255,255,255,.075),
@@ -1246,7 +1246,7 @@ header .comp-select {
   background:
     linear-gradient(135deg, rgba(255,255,255,.070), transparent 36%),
     radial-gradient(ellipse 70% 42% at 50% 0%, rgba(255,255,255,.045), transparent 66%),
-    radial-gradient(ellipse 36% 22% at 58% 15%, rgba(217,119,66,.075), transparent 72%) !important;
+    radial-gradient(ellipse 36% 22% at 58% 15%, rgba(255, 154, 61,.075), transparent 72%) !important;
   opacity: 1 !important;
 }
 
@@ -1258,7 +1258,7 @@ header .comp-select {
 .layer-menu.open::-webkit-scrollbar-thumb {
   border: 2px solid transparent !important;
   border-radius: 999px !important;
-  background: rgba(235,235,245,.24) !important;
+  background: rgba(238, 236, 228,.24) !important;
   background-clip: padding-box !important;
 }
 
@@ -1303,7 +1303,7 @@ header .comp-select {
 
 .layer-menu-context em {
   margin-top: 1px !important;
-  color: rgba(235,235,245,.46) !important;
+  color: rgba(238, 236, 228,.46) !important;
   font-size: 10px !important;
   font-style: normal !important;
   line-height: 12px !important;
@@ -1325,7 +1325,7 @@ header .comp-select {
   border-left: 3px solid var(--context-color) !important;
   border-radius: 999px !important;
   background: rgba(255,255,255,.048) !important;
-  color: rgba(245,245,247,.68) !important;
+  color: rgba(246, 244, 236,.68) !important;
   font-size: 9px !important;
   font-weight: 560 !important;
   line-height: 15px !important;
@@ -1352,12 +1352,12 @@ header .comp-select {
   display: block !important;
   margin: 6px 7px 4px !important;
   padding: 0 !important;
-  color: rgba(235,235,245,.42) !important;
+  color: rgba(238, 236, 228,.42) !important;
   font-size: 9px !important;
   font-weight: 650 !important;
   letter-spacing: 0 !important;
   line-height: 11px !important;
-  text-transform: uppercase !important;
+  text-transform: none !important;
 }
 
 .layer-menu-swatches {
@@ -1400,7 +1400,7 @@ header .comp-select {
   border: 0 !important;
   border-radius: var(--tnt-radius-node, 7px) !important;
   background: transparent !important;
-  color: rgba(245,245,247,.88) !important;
+  color: rgba(246, 244, 236,.88) !important;
   font-size: 12px !important;
   font-weight: 430 !important;
   line-height: 1 !important;
@@ -1432,7 +1432,7 @@ header .comp-select {
   display: block !important;
   justify-self: end !important;
   max-width: 154px !important;
-  color: rgba(235,235,245,.42) !important;
+  color: rgba(238, 236, 228,.42) !important;
   font-size: 10px !important;
   font-style: normal !important;
   font-weight: 420 !important;
@@ -1448,7 +1448,7 @@ header .comp-select {
 
 .layer-menu .menu-row:hover em,
 .layer-menu .menu-row:hover .menu-shortcut {
-  color: rgba(245,245,247,.64) !important;
+  color: rgba(246, 244, 236,.64) !important;
 }
 
 .layer-menu .menu-row:active {
@@ -1561,8 +1561,8 @@ body.keyframe-mode .track-label {
 }
 
 .filter-btn.relation-filter.active {
-  border-color: rgba(217,119,66,.38) !important;
-  background: rgba(217,119,66,.15) !important;
+  border-color: rgba(255, 154, 61,.38) !important;
+  background: rgba(255, 154, 61,.15) !important;
   color: rgba(255,232,218,.96) !important;
 }
 
@@ -1591,15 +1591,15 @@ body.keyframe-mode .track-label {
 #keyframeModeBtn[data-mode="edit"],
 #keyframeModeBtn:not(.active) {
   background:
-    linear-gradient(180deg, rgba(232,132,74,.175), rgba(232,132,74,.072)),
-    rgba(18,14,12,.76) !important;
+    linear-gradient(180deg, rgba(255, 169, 84,.175), rgba(255, 169, 84,.072)),
+    rgba(15, 15, 14,.76) !important;
 }
 
 #keyframeModeBtn[data-mode="keyframe"],
 #keyframeModeBtn.active {
   background:
     linear-gradient(180deg, rgba(118,92,226,.235), rgba(118,92,226,.082)),
-    rgba(15,13,24,.80) !important;
+    rgba(17, 17, 16,.80) !important;
 }
 
 /* v118: multiline tooltips and color-coded filter groups. */
@@ -1609,8 +1609,8 @@ body.keyframe-mode .track-label {
   padding: 8px 10px !important;
   border-color: rgba(255,255,255,.13) !important;
   border-radius: var(--tnt-radius-node, 7px) !important;
-  background: rgba(15,16,18,.90) !important;
-  color: rgba(245,245,247,.90) !important;
+  background: rgba(16, 16, 15,.90) !important;
+  color: rgba(246, 244, 236,.90) !important;
   font-size: 11px !important;
   line-height: 14px !important;
   white-space: normal !important;
@@ -1647,7 +1647,7 @@ body.keyframe-mode .track-label {
 }
 
 .filter-btn.filter-group-animation {
-  border-color: rgba(217,119,66,.28) !important;
+  border-color: rgba(255, 154, 61,.28) !important;
   color: rgba(255,218,194,.82) !important;
 }
 
@@ -1674,8 +1674,8 @@ body.keyframe-mode .track-label {
 }
 
 .filter-btn.filter-group-animation.active {
-  border-color: rgba(217,119,66,.44) !important;
-  background: rgba(217,119,66,.14) !important;
+  border-color: rgba(255, 154, 61,.44) !important;
+  background: rgba(255, 154, 61,.14) !important;
   color: rgba(255,232,218,.98) !important;
 }
 
@@ -1707,7 +1707,7 @@ body.keyframe-mode .keyframe-property-row > .track-label,
   top: 1px !important;
   width: 5px !important;
   height: 5px !important;
-  border: 1px solid rgba(202,206,214,.34) !important;
+  border: 1px solid rgba(207, 205, 199,.34) !important;
   background: rgba(148,156,168,.42) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.10),
@@ -1720,8 +1720,8 @@ body.keyframe-mode .keyframe-property-row > .track-label,
 }
 
 .property-row-icon.both::before {
-  border-color: rgba(217,119,66,.60) !important;
-  background: rgba(217,119,66,.70) !important;
+  border-color: rgba(255, 154, 61,.60) !important;
+  background: rgba(255, 154, 61,.70) !important;
 }
 
 .property-lane-name {
@@ -1754,12 +1754,12 @@ body.keyframe-mode .time-ruler-wrap.top-ruler {
 .time-ruler-wrap .tick-section,
 .time-ruler-wrap .tick-time,
 .time-ruler-wrap .tick-frame {
-  color: rgba(245,245,247,.82) !important;
+  color: rgba(246, 244, 236,.82) !important;
   text-shadow: none !important;
 }
 
 .time-ruler-wrap .tick-frame {
-  color: rgba(245,245,247,.52) !important;
+  color: rgba(246, 244, 236,.52) !important;
 }
 
 body.keyframe-mode .property-track-label,
@@ -1871,7 +1871,7 @@ body.keyframe-mode .property-label-text,
   background:
     linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)),
     rgba(0,0,0,.28) !important;
-  color: rgba(245,245,247,.82) !important;
+  color: rgba(246, 244, 236,.82) !important;
   font-size: 11px !important;
   font-weight: 500 !important;
   line-height: 1 !important;
@@ -1882,9 +1882,9 @@ body.keyframe-mode .property-label-text,
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form button.primary {
-  border-color: rgba(217,119,66,.42) !important;
+  border-color: rgba(255, 154, 61,.42) !important;
   background:
-    linear-gradient(180deg, rgba(217,119,66,.34), rgba(217,119,66,.16)),
+    linear-gradient(180deg, rgba(255, 154, 61,.34), rgba(255, 154, 61,.16)),
     rgba(0,0,0,.28) !important;
   color: rgba(255,232,218,.95) !important;
 }
@@ -1895,7 +1895,7 @@ body.keyframe-mode .property-label-text,
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form button.primary:hover {
-  border-color: rgba(217,119,66,.64) !important;
+  border-color: rgba(255, 154, 61,.64) !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-save-form button:disabled,
@@ -1909,7 +1909,7 @@ body.keyframe-mode .property-label-text,
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
-  color: rgba(235,235,245,.48) !important;
+  color: rgba(238, 236, 228,.48) !important;
   font-size: 10px !important;
 }
 
@@ -1927,20 +1927,20 @@ body.keyframe-mode .property-label-text,
   width: 244px !important;
   height: 58px !important;
   padding: 8px 10px 8px 12px !important;
-  border-color: rgba(217,119,66,.28) !important;
+  border-color: rgba(255, 154, 61,.28) !important;
   border-radius: 8px !important;
   background:
-    radial-gradient(circle at 18% 0%, rgba(217,119,66,.16), transparent 52%),
+    radial-gradient(circle at 18% 0%, rgba(255, 154, 61,.16), transparent 52%),
     linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.018)),
-    rgba(12,12,13,.36) !important;
+    rgba(12, 12, 12,.36) !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-button:hover {
-  border-color: rgba(217,119,66,.52) !important;
+  border-color: rgba(255, 154, 61,.52) !important;
   background:
-    radial-gradient(circle at 18% 0%, rgba(217,119,66,.23), transparent 56%),
-    linear-gradient(180deg, rgba(255,255,255,.09), rgba(217,119,66,.035)),
-    rgba(12,12,13,.42) !important;
+    radial-gradient(circle at 18% 0%, rgba(255, 154, 61,.23), transparent 56%),
+    linear-gradient(180deg, rgba(255,255,255,.09), rgba(255, 154, 61,.035)),
+    rgba(12, 12, 12,.42) !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-meta {
@@ -1959,14 +1959,14 @@ body.keyframe-mode .property-label-text,
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-meta strong {
-  color: rgba(245,245,247,.92) !important;
+  color: rgba(246, 244, 236,.92) !important;
   font-size: 14px !important;
   font-weight: 500 !important;
   line-height: 18px !important;
 }
 
 .layer-style-dialog:not(.mask-control-dialog) .layer-style-preset-meta em {
-  color: rgba(235,235,245,.48) !important;
+  color: rgba(238, 236, 228,.48) !important;
   font-size: 11px !important;
   font-style: normal !important;
   line-height: 14px !important;
@@ -1982,7 +1982,7 @@ body.keyframe-mode .property-label-text,
   height: 42px !important;
   border-radius: 6px !important;
   background:
-    linear-gradient(180deg, rgba(255,255,255,.98), rgba(245,238,240,.96)) !important;
+    linear-gradient(180deg, rgba(255,255,255,.98), rgba(241, 239, 231,.96)) !important;
   box-shadow:
     inset 0 0 0 1px rgba(255,255,255,.74),
     0 1px 2px rgba(0,0,0,.32) !important;
@@ -2020,10 +2020,10 @@ body.keyframe-mode .property-label-text,
   height: 14px;
   place-items: center;
   padding: 0 3px;
-  border: 1px solid rgba(233, 147, 96, .45);
+  border: 1px solid rgba(255, 181, 107, .45);
   border-radius: 4px;
-  background: #201c1a;
-  color: rgba(240, 176, 137, .95);
+  background: #1d1d1c;
+  color: rgba(255, 206, 155, .95);
   font-family: inherit;
   font-size: 9px;
   font-weight: 700;
@@ -2034,7 +2034,7 @@ body.keyframe-mode .property-label-text,
 .panel-tooltip-line.bullet {
   position: relative !important;
   padding-left: 11px !important;
-  color: rgba(245, 245, 247, .72) !important;
+  color: rgba(246, 244, 236, .72) !important;
   white-space: normal !important;
 }
 
@@ -2046,14 +2046,14 @@ body.keyframe-mode .property-label-text,
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: rgba(233, 147, 96, .75);
+  background: rgba(255, 181, 107, .75);
 }
 
 /* What the tool does. Italic and indented to the bullets' text column, so it
    reads as prose about the headline rather than as another option. */
 .panel-tooltip-line.desc {
   margin: 2px 0 5px !important;
-  color: rgba(245, 245, 247, .62) !important;
+  color: rgba(246, 244, 236, .62) !important;
   font-style: italic !important;
   line-height: 15px !important;
   white-space: normal !important;
@@ -2065,7 +2065,7 @@ body.keyframe-mode .property-label-text,
   margin-left: 8px;
   padding-left: 9px;
   border-left: 1px solid rgba(255, 255, 255, .12);
-  color: rgba(228, 228, 234, .4);
+  color: rgba(230, 228, 221, .4);
   font-size: 10.5px;
   font-style: normal;
   white-space: nowrap;

@@ -52,7 +52,7 @@ This guide keeps future work compact and consistent for the `AE FX` CEP project.
 ## UI Direction
 
 - Overall style: graphite glass, semi-transparent dark surfaces, compact Apple-like proportions.
-- Accent: Claude-like orange for edit/primary warm actions; deep purple for keyframe state.
+- Edie's look, the same as PR FX (2026-11-23): warm greys, PR FX's orange `#ff9a3d` for edit/primary warm actions, deep purple for keyframe state, Edie in the Functions toolbar and Quick Controls search row. See `src/css/99-ca-look.css` and `docs/ui-design-guide.md`.
 - Avoid loud blue unless it is functionally meaningful.
 - Surfaces should feel darker and more transparent, not flat medium gray.
 - Corner radius should be proportional to element height, not random.

@@ -37,7 +37,7 @@
 
 .tnt-card-title em {
   overflow: hidden;
-  color: rgba(228, 228, 234, .45);
+  color: rgba(230, 228, 221, .45);
   font-size: 11px;
   font-style: normal;
   text-overflow: ellipsis;
@@ -61,7 +61,7 @@
 
 .tnt-selection-detail {
   margin-top: 9px;
-  color: rgba(228, 228, 234, .45);
+  color: rgba(230, 228, 221, .45);
   font-size: 11.5px;
 }
 
@@ -81,7 +81,7 @@
   border: 1px solid rgba(255, 255, 255, .1);
   border-radius: 6px;
   background: rgba(255, 255, 255, .035);
-  color: rgba(245, 245, 247, .82);
+  color: rgba(246, 244, 236, .82);
   font-size: 11px;
   font-weight: 500;
 }

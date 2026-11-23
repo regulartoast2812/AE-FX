@@ -1,4 +1,5 @@
-/* Creative Assist palette: one sheet, light and dark (the host's look wins, see app.js). */
+/* Creative Assist palette: one sheet, light and dark (the host's look wins, see app.js).
+   AE FX wears Edie's look, the same as PR FX's page: orange accent. */
 :root {
   --canvas: #f1f0ec; --card: #fbfaf7; --line: #dcd9d0; --text: #23221f; --muted: #6b6860; --faint: #9a968c;
   --accent: #c2650f; --accent-soft: rgba(194,101,15,.12); --good: #2f8f5b; --wait: #b08a12; --danger: #c8442f;
@@ -25,7 +26,7 @@ html, body { margin: 0; height: 100%; }
 body { background: var(--canvas); color: var(--text); font: 13px/1.45 -apple-system, "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
 button, input { font: inherit; color: inherit; }
 [hidden] { display: none !important; }
-h1 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -.01em; }
+h1 { font-size: 20px; font-weight: 600; margin: 0; letter-spacing: -.01em; }
 h2 { font-size: 14px; font-weight: 600; margin: 0 0 6px; }
 p { margin: 0; }
 .muted { color: var(--muted); } .small { font-size: 12px; }

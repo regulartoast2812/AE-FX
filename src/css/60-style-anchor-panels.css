@@ -10,8 +10,8 @@
   max-height: calc(100vh - 92px) !important;
   border-color: rgba(255,255,255,.18) !important;
   background:
-    linear-gradient(145deg, rgba(70,70,72,.70), rgba(42,43,45,.68)),
-    rgba(45,46,48,.72) !important;
+    linear-gradient(145deg, rgba(71, 70, 68,.70), rgba(43, 43, 41,.68)),
+    rgba(46, 46, 44,.72) !important;
   box-shadow:
     0 26px 72px rgba(0,0,0,.44),
     inset 0 1px 0 rgba(255,255,255,.10),
@@ -23,7 +23,7 @@
   background:
     linear-gradient(135deg, rgba(255,255,255,.10), transparent 38%),
     radial-gradient(ellipse 62% 36% at 44% 0%, rgba(255,255,255,.07), transparent 68%),
-    radial-gradient(ellipse 42% 28% at 58% 12%, rgba(217,119,66,.10), transparent 72%) !important;
+    radial-gradient(ellipse 42% 28% at 58% 12%, rgba(255, 154, 61,.10), transparent 72%) !important;
 }
 
 .layer-style-dialog-head {
@@ -45,13 +45,13 @@
   display: block !important;
   margin-top: 5px !important;
   font-size: 11px !important;
-  color: rgba(235,235,245,.46) !important;
+  color: rgba(238, 236, 228,.46) !important;
 }
 
 .layer-style-close {
   background: rgba(255,255,255,.075) !important;
   border-color: rgba(255,255,255,.16) !important;
-  color: rgba(245,245,247,.82) !important;
+  color: rgba(246, 244, 236,.82) !important;
 }
 
 .layer-style-close:hover {
@@ -79,7 +79,7 @@
 
 .layer-style-section-title {
   margin: 0 0 8px !important;
-  color: rgba(235,235,245,.52) !important;
+  color: rgba(238, 236, 228,.52) !important;
   font-size: 10px !important;
   font-weight: 700 !important;
   letter-spacing: 0 !important;
@@ -105,7 +105,7 @@
 }
 
 .layer-style-header-add-row.empty span {
-  color: rgba(235,235,245,.48) !important;
+  color: rgba(238, 236, 228,.48) !important;
 }
 
 .layer-style-add-button {
@@ -113,7 +113,7 @@
   height: 34px !important;
   min-width: 34px !important;
   min-height: 34px !important;
-  border-color: var(--style-color, #777) !important;
+  border-color: var(--style-color, #777672) !important;
   border-radius: 8px !important;
   background:
     linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.035)),
@@ -122,7 +122,7 @@
   line-height: 32px !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.12),
-    inset 0 -3px 0 var(--style-color, #777),
+    inset 0 -3px 0 var(--style-color, #777672),
     0 7px 18px rgba(0,0,0,.16) !important;
 }
 
@@ -135,7 +135,7 @@
 
 .layer-style-add-button.drag-adding {
   background:
-    linear-gradient(180deg, rgba(217,119,66,.34), rgba(217,119,66,.18)),
+    linear-gradient(180deg, rgba(255, 154, 61,.34), rgba(255, 154, 61,.18)),
     rgba(255,255,255,.10) !important;
   transform: translateY(1px) !important;
 }
@@ -162,7 +162,7 @@
   border-radius: var(--tnt-radius-panel) !important;
   background:
     linear-gradient(180deg, rgba(255,255,255,.070), rgba(255,255,255,.038)),
-    rgba(36,37,39,.46) !important;
+    rgba(37, 37, 36,.46) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.075),
     0 12px 30px rgba(0,0,0,.18) !important;
@@ -211,12 +211,12 @@
   top: 3px !important;
   width: 14px !important;
   height: 14px !important;
-  background: rgba(235,235,245,.66) !important;
+  background: rgba(238, 236, 228,.66) !important;
 }
 
 .layer-style-toggle.on {
-  border-color: rgba(217,119,66,.42) !important;
-  background: rgba(217,119,66,.26) !important;
+  border-color: rgba(255, 154, 61,.42) !important;
+  background: rgba(255, 154, 61,.26) !important;
 }
 
 .layer-style-toggle.on span {
@@ -248,7 +248,7 @@
   grid-template-columns: 72px minmax(72px, 1fr) 52px !important;
   min-height: 28px !important;
   gap: 8px !important;
-  color: rgba(235,235,245,.68) !important;
+  color: rgba(238, 236, 228,.68) !important;
 }
 
 .layer-style-prop.inline {
@@ -256,7 +256,7 @@
 }
 
 .layer-style-prop span {
-  color: rgba(235,235,245,.62) !important;
+  color: rgba(238, 236, 228,.62) !important;
   font-size: 11px !important;
 }
 
@@ -285,9 +285,9 @@
 }
 
 .layer-style-prop input[type="range"]::-webkit-slider-thumb {
-  border-color: rgba(217,119,66,.62) !important;
-  background: rgba(217,119,66,.34) !important;
-  box-shadow: 0 0 0 3px rgba(217,119,66,.12) !important;
+  border-color: rgba(255, 154, 61,.62) !important;
+  background: rgba(255, 154, 61,.34) !important;
+  box-shadow: 0 0 0 3px rgba(255, 154, 61,.12) !important;
 }
 
 .layer-style-dialog-actions {
@@ -309,8 +309,8 @@
 }
 
 .layer-style-dialog-actions button.primary {
-  border-color: rgba(217,119,66,.36) !important;
-  background: rgba(217,119,66,.16) !important;
+  border-color: rgba(255, 154, 61,.36) !important;
+  background: rgba(255, 154, 61,.16) !important;
 }
 
 .layer-style-dialog-actions button.danger {
@@ -324,15 +324,15 @@
   border: 1px solid rgba(255,255,255,.10) !important;
   border-radius: var(--tnt-radius-panel) !important;
   background: rgba(255,255,255,.045) !important;
-  color: rgba(235,235,245,.55) !important;
+  color: rgba(238, 236, 228,.55) !important;
 }
 
 /* v93: darker transparent layer style glass. Less gray fill, more smoky depth. */
 .layer-style-dialog {
   border-color: rgba(255,255,255,.13) !important;
   background:
-    linear-gradient(145deg, rgba(38,39,38,.52), rgba(23,24,23,.58)),
-    rgba(22,23,23,.54) !important;
+    linear-gradient(145deg, rgba(38, 38, 36,.52), rgba(23, 23, 22,.58)),
+    rgba(23, 23, 22,.54) !important;
   box-shadow:
     0 30px 82px rgba(0,0,0,.52),
     inset 0 1px 0 rgba(255,255,255,.065),
@@ -343,7 +343,7 @@
   background:
     linear-gradient(135deg, rgba(255,255,255,.055), transparent 36%),
     radial-gradient(ellipse 60% 34% at 42% 0%, rgba(255,255,255,.035), transparent 70%),
-    radial-gradient(ellipse 34% 22% at 58% 12%, rgba(217,119,66,.055), transparent 74%) !important;
+    radial-gradient(ellipse 34% 22% at 58% 12%, rgba(255, 154, 61,.055), transparent 74%) !important;
 }
 
 .layer-style-dialog-head {
@@ -357,7 +357,7 @@
 
 .layer-style-dialog-subtitle,
 .layer-style-section-title {
-  color: rgba(235,235,245,.42) !important;
+  color: rgba(238, 236, 228,.42) !important;
 }
 
 .layer-style-close,
@@ -382,14 +382,14 @@
 }
 
 .layer-style-add-button {
-  border-color: var(--style-color, #777) !important;
+  border-color: var(--style-color, #777672) !important;
   background:
     linear-gradient(180deg, rgba(255,255,255,.060), rgba(255,255,255,.016)),
     rgba(0,0,0,.24) !important;
-  color: rgba(245,245,247,.88) !important;
+  color: rgba(246, 244, 236,.88) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.060),
-    inset 0 -3px 0 var(--style-color, #777),
+    inset 0 -3px 0 var(--style-color, #777672),
     0 7px 18px rgba(0,0,0,.22) !important;
 }
 
@@ -401,7 +401,7 @@
 
 .layer-style-add-button.drag-adding {
   background:
-    linear-gradient(180deg, rgba(217,119,66,.24), rgba(217,119,66,.105)),
+    linear-gradient(180deg, rgba(255, 154, 61,.24), rgba(255, 154, 61,.105)),
     rgba(0,0,0,.18) !important;
 }
 
@@ -409,7 +409,7 @@
   border-color: rgba(255,255,255,.095) !important;
   background:
     linear-gradient(180deg, rgba(255,255,255,.040), rgba(255,255,255,.014)),
-    rgba(15,16,16,.34) !important;
+    rgba(16, 16, 15,.34) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.045),
     0 14px 32px rgba(0,0,0,.24) !important;
@@ -420,11 +420,11 @@
 }
 
 .layer-style-node-head strong {
-  color: rgba(245,245,247,.88) !important;
+  color: rgba(246, 244, 236,.88) !important;
 }
 
 .layer-style-prop span {
-  color: rgba(235,235,245,.52) !important;
+  color: rgba(238, 236, 228,.52) !important;
 }
 
 .layer-style-prop input[type="number"],
@@ -455,8 +455,8 @@
 }
 
 .layer-style-dialog-actions button.primary {
-  border-color: rgba(217,119,66,.30) !important;
-  background: rgba(217,119,66,.11) !important;
+  border-color: rgba(255, 154, 61,.30) !important;
+  background: rgba(255, 154, 61,.11) !important;
 }
 
 .layer-style-dialog-actions button.danger {
@@ -476,8 +476,8 @@
   padding: 22px !important;
   border-color: rgba(255,255,255,.14) !important;
   background:
-    linear-gradient(145deg, rgba(38,39,38,.58), rgba(23,24,23,.62)),
-    rgba(22,23,23,.58) !important;
+    linear-gradient(145deg, rgba(38, 38, 36,.58), rgba(23, 23, 22,.62)),
+    rgba(23, 23, 22,.58) !important;
   box-shadow:
     0 26px 70px rgba(0,0,0,.48),
     inset 0 1px 0 rgba(255,255,255,.065) !important;
@@ -494,7 +494,7 @@
   margin: 0 0 18px !important;
   font-size: 12px !important;
   line-height: 1.25 !important;
-  color: rgba(235,235,245,.58) !important;
+  color: rgba(238, 236, 228,.58) !important;
 }
 
 .anchor-panel {
@@ -510,10 +510,10 @@
 
 .anchor-section-title {
   margin: 0 0 10px;
-  color: rgba(235,235,245,.42);
+  color: rgba(238, 236, 228,.42);
   font-size: 10px;
   font-weight: 700;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .anchor-grid {
@@ -535,7 +535,7 @@
 
 .anchor-cell::after {
   inset: 15px !important;
-  background: rgba(245,245,247,.78) !important;
+  background: rgba(246, 244, 236,.78) !important;
 }
 
 .anchor-cell:hover {
@@ -544,8 +544,8 @@
 }
 
 .anchor-cell.active {
-  border-color: rgba(217,119,66,.52) !important;
-  background: rgba(217,119,66,.16) !important;
+  border-color: rgba(255, 154, 61,.52) !important;
+  background: rgba(255, 154, 61,.16) !important;
 }
 
 .anchor-cell.active::after {
@@ -555,7 +555,7 @@
 .anchor-option {
   gap: 9px !important;
   margin: 16px 0 0 !important;
-  color: rgba(235,235,245,.76) !important;
+  color: rgba(238, 236, 228,.76) !important;
   font-size: 12px !important;
 }
 
@@ -576,7 +576,7 @@
   border: 1px solid rgba(255,255,255,.12);
   border-radius: var(--tnt-radius-control);
   background: rgba(0,0,0,.26);
-  color: rgba(245,245,247,.84);
+  color: rgba(246, 244, 236,.84);
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
@@ -584,8 +584,8 @@
 }
 
 .anchor-align-btn:hover {
-  border-color: rgba(217,119,66,.36);
-  background: rgba(217,119,66,.13);
+  border-color: rgba(255, 154, 61,.36);
+  background: rgba(255, 154, 61,.13);
   color: #fff;
 }
 
@@ -710,7 +710,7 @@
   border-radius: var(--tnt-radius-panel) !important;
   background:
     linear-gradient(180deg, rgba(255,255,255,.040), rgba(255,255,255,.014)),
-    rgba(17,18,18,.56) !important;
+    rgba(18, 18, 17,.56) !important;
   box-shadow:
     0 18px 44px rgba(0,0,0,.36),
     inset 0 1px 0 rgba(255,255,255,.045) !important;
@@ -774,7 +774,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 11px;
-  color: rgba(235,235,245,.66);
+  color: rgba(238, 236, 228,.66);
   font-size: 11px;
   white-space: nowrap;
 }
@@ -785,7 +785,7 @@
   border: 1px solid rgba(255,255,255,.08);
   border-radius: var(--tnt-radius-control);
   background: rgba(255,255,255,.055);
-  color: rgba(235,235,245,.48);
+  color: rgba(238, 236, 228,.48);
   padding: 0 22px 0 8px;
   font-size: 11px;
 }
@@ -812,12 +812,12 @@
   width: 26px !important;
   height: 26px !important;
   padding: 0;
-  color: rgba(235, 235, 245, .5);
+  color: rgba(238, 236, 228, .5);
   font-size: 0;
 }
 
 .anchor-align-btn:hover {
-  color: rgba(245, 245, 247, .88);
+  color: rgba(246, 244, 236, .88);
 }
 
 /* Icons come from the Lucide registry, painted by data-icon. They were
@@ -970,7 +970,7 @@ body:not(.quick-panel-mode) #anchorModal.show {
   border: 0 !important;
   border-radius: 0 !important;
   background: transparent !important;
-  color: rgba(235,235,245,.66) !important;
+  color: rgba(238, 236, 228,.66) !important;
   line-height: 20px !important;
   box-shadow: none !important;
 }
@@ -983,7 +983,7 @@ body:not(.quick-panel-mode) #anchorModal.show {
   width: 4px;
   height: 8px;
   border-radius: 2px;
-  background: var(--style-color, rgba(235,235,245,.45));
+  background: var(--style-color, rgba(238, 236, 228,.45));
   opacity: .72;
 }
 
@@ -991,7 +991,7 @@ body:not(.quick-panel-mode) #anchorModal.show {
 .layer-style-add-button.drag-adding {
   border: 0 !important;
   background: transparent !important;
-  color: rgba(245,245,247,.94) !important;
+  color: rgba(246, 244, 236,.94) !important;
   box-shadow: none !important;
   transform: none !important;
 }
@@ -1023,8 +1023,8 @@ body:not(.quick-panel-mode) #anchorModal.show {
 }
 
 .comp-select-item.active {
-  border-color: rgba(217,119,66,.34) !important;
-  background: rgba(217,119,66,.16) !important;
+  border-color: rgba(255, 154, 61,.34) !important;
+  background: rgba(255, 154, 61,.16) !important;
   color: rgba(255,255,255,.96) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
 }
@@ -1072,7 +1072,7 @@ body:not(.quick-panel-mode) #anchorModal.show {
   border: 1px solid rgba(255,255,255,.095) !important;
   border-radius: var(--tnt-radius-control) !important;
   background: rgba(0,0,0,.18) !important;
-  color: rgba(235,235,245,.66) !important;
+  color: rgba(238, 236, 228,.66) !important;
   line-height: 22px !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.030) !important;
 }
@@ -1088,18 +1088,18 @@ body:not(.quick-panel-mode) #anchorModal.show {
 .layer-style-add-button.drag-adding {
   border-color: rgba(255,255,255,.16) !important;
   background: rgba(255,255,255,.055) !important;
-  color: rgba(245,245,247,.92) !important;
+  color: rgba(246, 244, 236,.92) !important;
 }
 
 .layer-style-add-button.is-added {
-  border-color: rgba(217,119,66,.30) !important;
-  background: rgba(217,119,66,.105) !important;
+  border-color: rgba(255, 154, 61,.30) !important;
+  background: rgba(255, 154, 61,.105) !important;
   color: rgba(255,236,224,.90) !important;
 }
 
 .layer-style-add-button.is-added::before {
   opacity: 1 !important;
-  box-shadow: 0 0 8px var(--style-color, rgba(217,119,66,.4));
+  box-shadow: 0 0 8px var(--style-color, rgba(255, 154, 61,.4));
 }
 
 .layer-style-add-button.some-have {
@@ -1121,9 +1121,9 @@ body:not(.quick-panel-mode) #anchorModal.show {
 
 @keyframes styleNodeFlash {
   0% {
-    border-color: rgba(217,119,66,.70);
+    border-color: rgba(255, 154, 61,.70);
     box-shadow:
-      0 0 0 2px rgba(217,119,66,.24),
+      0 0 0 2px rgba(255, 154, 61,.24),
       0 16px 36px rgba(0,0,0,.28),
       inset 0 1px 0 rgba(255,255,255,.08);
   }
@@ -1181,11 +1181,11 @@ header,
   width: 100% !important;
   height: 100% !important;
   padding: 0 28px 0 20px !important;
-  border: 1px solid rgba(217,119,66,.58) !important;
+  border: 1px solid rgba(255, 154, 61,.58) !important;
   border-radius: inherit !important;
   outline: none !important;
-  background: rgba(28, 23, 21, .96) !important;
-  color: rgba(245,245,247,.94) !important;
+  background: rgba(24, 24, 23, .96) !important;
+  color: rgba(246, 244, 236,.94) !important;
   font: inherit !important;
   font-size: 13px !important;
   line-height: 1 !important;
@@ -1193,7 +1193,7 @@ header,
 }
 
 .comp-select-search::placeholder {
-  color: rgba(245,245,247,.82) !important;
+  color: rgba(246, 244, 236,.82) !important;
 }
 
 .comp-select.open .comp-select-search {
@@ -1226,7 +1226,7 @@ header,
 
 .comp-select-empty {
   padding: 14px 18px !important;
-  color: rgba(235,235,245,.48) !important;
+  color: rgba(238, 236, 228,.48) !important;
   font-size: 12px !important;
 }
 
@@ -1248,8 +1248,8 @@ header,
   border-radius: var(--tnt-radius-control) !important;
   background:
     linear-gradient(180deg, rgba(255,255,255,.060), rgba(255,255,255,.025)),
-    rgba(13,13,13,.54) !important;
-  color: rgba(245,245,247,.84) !important;
+    rgba(13, 13, 12,.54) !important;
+  color: rgba(246, 244, 236,.84) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.055),
     0 6px 14px rgba(0,0,0,.18) !important;
@@ -1258,18 +1258,18 @@ header,
 
 #durationBtn:hover,
 #keyframeModeBtn:hover {
-  border-color: rgba(217,119,66,.34) !important;
+  border-color: rgba(255, 154, 61,.34) !important;
   background:
     linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.030)),
-    rgba(30,24,20,.66) !important;
+    rgba(25, 25, 24,.66) !important;
   color: rgba(255,245,238,.94) !important;
 }
 
 #keyframeModeBtn.active {
-  border-color: rgba(217,119,66,.48) !important;
+  border-color: rgba(255, 154, 61,.48) !important;
   background:
-    linear-gradient(180deg, rgba(217,119,66,.26), rgba(217,119,66,.10)),
-    rgba(19,15,12,.72) !important;
+    linear-gradient(180deg, rgba(255, 154, 61,.26), rgba(255, 154, 61,.10)),
+    rgba(15, 15, 14,.72) !important;
   color: rgba(255,241,232,.96) !important;
 }
 
@@ -1315,7 +1315,7 @@ header,
 #keyframeModeBtn.active::before {
   border-radius: 3px;
   border-color: rgba(255,226,207,.92);
-  background: rgba(217,119,66,.34);
+  background: rgba(255, 154, 61,.34);
   transform: rotate(0deg);
 }
 
@@ -1390,7 +1390,7 @@ body.keyframe-mode .track-label {
   border-radius: var(--tnt-radius-panel);
   background:
     linear-gradient(180deg, rgba(255,255,255,.060), rgba(255,255,255,.025)),
-    rgba(12,12,14,.72);
+    rgba(13, 13, 12,.72);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.055),
     0 12px 28px rgba(0,0,0,.24);
@@ -1405,13 +1405,13 @@ body.keyframe-mode .track-label {
 }
 
 .mask-control-mass-head strong {
-  color: rgba(245,245,247,.92);
+  color: rgba(246, 244, 236,.92);
   font-size: 12px;
   font-weight: 500;
 }
 
 .mask-control-mass-head span {
-  color: rgba(235,235,245,.54);
+  color: rgba(238, 236, 228,.54);
   font-size: 10px;
 }
 
@@ -1444,7 +1444,7 @@ body.keyframe-mode .track-label {
 
 .mask-control-mass-panel .mask-control-prop > span,
 .mask-control-mass-panel .mask-control-prop-group-head span {
-  color: rgba(235,235,245,.62);
+  color: rgba(238, 236, 228,.62);
   font-size: 10px;
 }
 
@@ -1464,9 +1464,9 @@ body.keyframe-mode .track-label {
   height: 22px;
   min-width: 48px;
   padding: 0 9px;
-  border: 1px solid rgba(217,119,66,.26);
+  border: 1px solid rgba(255, 154, 61,.26);
   border-radius: var(--tnt-radius-control);
-  background: rgba(217,119,66,.12);
+  background: rgba(255, 154, 61,.12);
   color: rgba(255,226,207,.90);
   font-size: 10px;
   line-height: 20px;
@@ -1475,8 +1475,8 @@ body.keyframe-mode .track-label {
 }
 
 .mask-control-mass-panel button[data-mask-bulk-apply]:hover {
-  border-color: rgba(217,119,66,.46);
-  background: rgba(217,119,66,.20);
+  border-color: rgba(255, 154, 61,.46);
+  background: rgba(255, 154, 61,.20);
   color: rgba(255,244,236,.96);
 }
 
@@ -1484,10 +1484,10 @@ body.keyframe-mode .track-label {
 .panel-tooltip.rail-tooltip {
   z-index: 18000 !important;
   min-width: 178px !important;
-  border-color: rgba(217,119,66,.22) !important;
+  border-color: rgba(255, 154, 61,.22) !important;
   box-shadow:
     0 16px 34px rgba(0,0,0,.48),
-    inset 3px 0 0 rgba(217,119,66,.54),
+    inset 3px 0 0 rgba(255, 154, 61,.54),
     inset 0 1px 0 rgba(255,255,255,.06) !important;
 }
 
@@ -1575,7 +1575,7 @@ body.keyframe-mode .track-label {
 }
 
 .mask-control-group-node .mask-control-node-head em {
-  color: rgba(235,235,245,.48) !important;
+  color: rgba(238, 236, 228,.48) !important;
 }
 
 .mask-control-pair input[type="text"][data-mask-control-kind="number"] {
@@ -1588,7 +1588,7 @@ body.keyframe-mode .track-label {
   background:
     linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)),
     rgba(0,0,0,.28) !important;
-  color: rgba(235,235,245,.82) !important;
+  color: rgba(238, 236, 228,.82) !important;
   font-family: inherit !important;
   font-size: 11px !important;
   text-align: center !important;
@@ -1596,8 +1596,8 @@ body.keyframe-mode .track-label {
 }
 
 .mask-control-pair input[type="text"][data-mask-control-kind="number"]:focus {
-  border-color: rgba(217,119,66,.55) !important;
-  box-shadow: 0 0 0 2px rgba(217,119,66,.13) !important;
+  border-color: rgba(255, 154, 61,.55) !important;
+  box-shadow: 0 0 0 2px rgba(255, 154, 61,.13) !important;
 }
 
 /* v125: effects and shapes subpanels share the compact grouped node language. */
@@ -1617,7 +1617,7 @@ body.keyframe-mode .track-label {
 .shapes-control-add-row {
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 14px !important;
-  background: rgba(20, 20, 20, 0.42) !important;
+  background: rgba(20, 20, 19, 0.42) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
   padding: 12px !important;
 }
@@ -1629,15 +1629,15 @@ body.keyframe-mode .track-label {
   border: 1px solid rgba(255, 255, 255, 0.13) !important;
   border-radius: 9px !important;
   background: rgba(12, 12, 12, 0.52) !important;
-  color: rgba(245, 245, 245, 0.92) !important;
+  color: rgba(245, 243, 235, 0.92) !important;
   font: 14px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
   outline: none !important;
   padding: 0 12px !important;
 }
 
 .effects-control-search:focus {
-  border-color: rgba(217,119,66,.55) !important;
-  box-shadow: 0 0 0 2px rgba(217,119,66,.13) !important;
+  border-color: rgba(255, 154, 61,.55) !important;
+  box-shadow: 0 0 0 2px rgba(255, 154, 61,.13) !important;
 }
 
 .effects-control-results {
@@ -1653,8 +1653,8 @@ body.keyframe-mode .track-label {
 .shapes-control-add-row button {
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 9px !important;
-  background: rgba(36, 36, 36, 0.7) !important;
-  color: rgba(244, 244, 244, 0.9) !important;
+  background: rgba(36, 36, 35, 0.7) !important;
+  color: rgba(244, 242, 234, 0.9) !important;
   cursor: pointer !important;
   min-height: 36px !important;
   text-align: left !important;
@@ -1679,14 +1679,14 @@ body.keyframe-mode .track-label {
 }
 
 .effects-control-result em {
-  color: rgba(220, 220, 220, 0.5) !important;
+  color: rgba(220, 218, 211, 0.5) !important;
   font-size: 11px !important;
   font-style: normal !important;
 }
 
 .effects-control-result:hover,
 .shapes-control-add-row button:hover {
-  border-color: rgba(217,119,66,.48) !important;
+  border-color: rgba(255, 154, 61,.48) !important;
   background: rgba(61, 44, 36, 0.72) !important;
 }
 
@@ -1740,7 +1740,7 @@ body.keyframe-mode .track-label {
 /* Tab flips the align target; the flash is what tells you it happened, since
    the eye is on the align buttons rather than the dropdown. */
 @keyframes tntAlignTargetFlash {
-  from { border-color: rgba(233, 147, 96, .85); background: rgba(213, 111, 58, .22); }
+  from { border-color: rgba(255, 181, 107, .85); background: rgba(252, 146, 52, .22); }
   to   { border-color: rgba(255, 255, 255, .16); background: rgba(0, 0, 0, .26); }
 }
 
@@ -1754,7 +1754,7 @@ body.keyframe-mode .track-label {
    The shared .tnt-card-head component stays available for the A/O merge. */
 .anchor-section-title em {
   margin-left: 6px;
-  color: rgba(235, 235, 245, .3);
+  color: rgba(238, 236, 228, .3);
   font-size: 9px;
   font-style: normal;
   font-weight: 600;
@@ -1811,7 +1811,7 @@ body.keyframe-mode .track-label {
 body:not(.quick-panel-mode) .anchor-dialog.layout-dialog {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .012) 40%, rgba(0, 0, 0, .12)),
-    #1c1d1f !important;
+    #1d1d1c !important;
 }
 
 body.quick-panel-mode .anchor-dialog.layout-dialog {
@@ -1870,8 +1870,8 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
   font-size: 9px !important;
   font-weight: 700 !important;
   letter-spacing: .02em;
-  text-transform: uppercase;
-  color: rgba(235, 235, 245, .42);
+  text-transform: none;
+  color: rgba(238, 236, 228, .42);
 }
 
 .anchor-timing-sections .timing-order-title b {
@@ -1900,8 +1900,8 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
 .anchor-timing-sections .timing-order-field > span {
   font-size: 9.5px;
   letter-spacing: .05em;
-  text-transform: uppercase;
-  color: rgba(235, 235, 245, .34);
+  text-transform: none;
+  color: rgba(238, 236, 228, .34);
 }
 
 /* Icon buttons, the same 26px square the align grid uses. */
@@ -1923,19 +1923,19 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
   border: 1px solid rgba(255, 255, 255, .12);
   border-radius: var(--tnt-radius-control, 7px);
   background: rgba(0, 0, 0, .26);
-  color: rgba(235, 235, 245, .5);
+  color: rgba(238, 236, 228, .5);
   font-size: 0;
 }
 
 .anchor-timing-sections .timing-execute-actions > button:hover:not(:disabled) {
-  border-color: rgba(217, 119, 66, .36);
-  background: rgba(217, 119, 66, .13);
+  border-color: rgba(255, 154, 61, .36);
+  background: rgba(255, 154, 61, .13);
   color: #fff;
 }
 
 .anchor-timing-sections .timing-execute-actions > button.active {
-  border-color: rgba(217, 119, 66, .5);
-  background: rgba(217, 119, 66, .2);
+  border-color: rgba(255, 154, 61, .5);
+  background: rgba(255, 154, 61, .2);
   color: #fff;
 }
 
@@ -1980,7 +1980,7 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
 .anchor-timing-sections .timing-order-card {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .014) 40%, rgba(0, 0, 0, .16)),
-    rgba(20, 21, 23, .93) !important;
+    rgba(21, 21, 20, .93) !important;
   border-color: rgba(255, 255, 255, .105) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, .06),
@@ -2036,10 +2036,10 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
 .anchor-timing-sections .timing-group-control > span {
   position: static;
   margin: 0;
-  color: rgba(235, 235, 245, .34);
+  color: rgba(238, 236, 228, .34);
   font-size: 9px;
   letter-spacing: .05em;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .anchor-timing-sections .timing-amount-input,
@@ -2049,7 +2049,7 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
   border: 1px solid rgba(255, 255, 255, .14);
   border-radius: var(--tnt-radius-control, 7px);
   background: rgba(255, 255, 255, .05);
-  color: #ededee;
+  color: #edebe4;
   font: inherit;
   font-size: 11px;
   text-align: center;
@@ -2103,7 +2103,7 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
 .anchor-timing-sections .timing-live-status,
 .anchor-timing-sections .timing-order-error {
   font-size: 9.5px;
-  color: rgba(235, 235, 245, .3);
+  color: rgba(238, 236, 228, .3);
 }
 
 /* The three sections were stretching to the tallest of them - a flex row
@@ -2137,7 +2137,7 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
   border-radius: 0 !important;
   background: none !important;
   margin-left: 6px;
-  color: rgba(235, 235, 245, .3) !important;
+  color: rgba(238, 236, 228, .3) !important;
   font-size: 9px !important;
   font-weight: 600 !important;
   letter-spacing: 0 !important;
@@ -2162,15 +2162,15 @@ body.quick-panel-mode .anchor-dialog.layout-dialog {
 }
 
 .layout-panel-name {
-  color: rgba(245, 245, 247, .82);
+  color: rgba(246, 244, 236, .82);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .08em;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .layout-panel-count {
-  color: rgba(235, 235, 245, .34);
+  color: rgba(238, 236, 228, .34);
   font-size: 10px;
   font-style: normal;
 }
@@ -2191,7 +2191,7 @@ body.quick-panel-mode .layout-panel-head {
 .anchor-timing-sections .timing-order-field > span {
   font-size: 9px !important;
   font-weight: 400 !important;
-  color: rgba(235, 235, 245, .3) !important;
+  color: rgba(238, 236, 228, .3) !important;
 }
 
 /* Layer Order drew a rule between its two button rows. Anchor and align have no
@@ -2211,7 +2211,7 @@ body.quick-panel-mode .layout-panel-head {
   font-weight: 500;
   letter-spacing: .01em;
   text-transform: none;
-  color: rgba(245, 245, 247, .92);
+  color: rgba(246, 244, 236, .92);
 }
 
 .layout-panel-count {
@@ -2226,13 +2226,13 @@ body.quick-panel-mode .layout-panel-head {
   font-weight: 500 !important;
   letter-spacing: .01em !important;
   text-transform: none !important;
-  color: rgba(245, 245, 247, .92) !important;
+  color: rgba(246, 244, 236, .92) !important;
 }
 
 #anchorModal .layout-panel-count {
   font-size: 10.5px !important;
   font-style: normal !important;
-  color: rgba(235, 235, 245, .34) !important;
+  color: rgba(238, 236, 228, .34) !important;
 }
 
 /* Selects match the align panel's, which is the pattern the whole group now
@@ -2247,7 +2247,7 @@ body.quick-panel-mode .layout-panel-head {
   border: 1px solid rgba(255, 255, 255, .14);
   border-radius: var(--tnt-radius-control, 7px);
   background: rgba(255, 255, 255, .05);
-  color: rgba(245, 245, 247, .86);
+  color: rgba(246, 244, 236, .86);
   font: inherit;
   font-size: 11px;
 }
@@ -2283,8 +2283,8 @@ body.quick-panel-mode .layout-panel-head {
    which mode it was in. */
 .anchor-timing-sections .timing-execute-actions > button.active,
 .anchor-timing-sections .timing-execute-actions > button[aria-pressed="true"] {
-  border-color: rgba(217, 119, 66, .55) !important;
-  background: rgba(217, 119, 66, .22) !important;
+  border-color: rgba(255, 154, 61, .55) !important;
+  background: rgba(255, 154, 61, .22) !important;
   color: #fff !important;
 }
 
@@ -2370,7 +2370,7 @@ body.quick-panel-mode .layout-panel-head {
 
 /* The count was at .34 against the panel's own dark fill and read as absent. */
 #anchorModal .layout-panel-count {
-  color: rgba(235, 235, 245, .62) !important;
+  color: rgba(238, 236, 228, .62) !important;
   font-size: 11px !important;
 }
 
@@ -2392,7 +2392,7 @@ body.quick-panel-mode .layout-panel-head {
   letter-spacing: 0 !important;
   text-transform: none !important;
   white-space: nowrap;
-  color: rgba(235, 235, 245, .66) !important;
+  color: rgba(238, 236, 228, .66) !important;
 }
 
 #anchorModal .anchor-timing-sections .order-direction-field .timing-direction-select {
@@ -2442,7 +2442,7 @@ body.quick-panel-mode .layout-panel-head {
   font-size: 11px;
   letter-spacing: 0;
   text-transform: none;
-  color: rgba(235, 235, 245, .66);
+  color: rgba(238, 236, 228, .66);
 }
 
 /* The docked panel spans an odd last button across its 2-column grid. In the
@@ -2502,7 +2502,7 @@ body.quick-panel-mode .layout-panel-head {
 #anchorModal .anchor-align-target select {
   border-color: rgba(255, 255, 255, .14);
   background: rgba(255, 255, 255, .05);
-  color: rgba(245, 245, 247, .86);
+  color: rgba(246, 244, 236, .86);
 }
 
 /* Layer Order's ten buttons were one undifferentiated block. They are three
@@ -2523,7 +2523,7 @@ body.quick-panel-mode .layout-panel-head {
   letter-spacing: 0 !important;
   text-transform: none !important;
   white-space: nowrap;
-  color: rgba(235, 235, 245, .66) !important;
+  color: rgba(238, 236, 228, .66) !important;
 }
 
 #anchorModal .anchor-timing-sections .order-group-field .timing-execute-actions {
@@ -2545,7 +2545,7 @@ body.quick-panel-mode .layout-panel-head {
 #anchorModal .anchor-timing-sections .timing-pull-choices > span {
   font-size: 11px;
   white-space: nowrap;
-  color: rgba(235, 235, 245, .66);
+  color: rgba(238, 236, 228, .66);
 }
 
 #anchorModal .anchor-timing-sections .timing-pull-row .timing-execute-actions {

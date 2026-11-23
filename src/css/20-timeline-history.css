@@ -14,25 +14,25 @@
   align-items: center;
   gap: 4px;
   padding-top: 46px;
-  background: linear-gradient(90deg, rgba(25,25,25,1), rgba(31,31,31,.98));
-  border-right: 1px solid #484848;
+  background: linear-gradient(90deg, rgba(25, 25, 24,1), rgba(31, 31, 30,.98));
+  border-right: 1px solid #484745;
   box-shadow: 4px 0 10px rgba(0,0,0,.22);
 }
 .filter-btn {
   width: 22px;
   height: 22px;
   padding: 0;
-  border: 1px solid #4a4a4a;
+  border: 1px solid #4a4947;
   border-radius: 4px;
-  background: #2c2c2c;
-  color: #cfcfcf;
+  background: #2c2c2a;
+  color: #cfcdc7;
   font-size: 10px;
   line-height: 20px;
   font-weight: 800;
   text-align: center;
   cursor: pointer;
 }
-.filter-btn:hover { background: #383838; border-color: #626262; color: #fff; }
+.filter-btn:hover { background: #383836; border-color: #62615e; color: #fff; }
 .filter-btn.active {
   background: #255f94;
   border-color: #69b6ff;
@@ -56,9 +56,9 @@
   display: none;
   width: 238px;
   padding: 6px;
-  border: 1px solid #424242;
+  border: 1px solid #42413f;
   border-radius: 5px;
-  background: #1b1b1b;
+  background: #1b1b1a;
   box-shadow: 0 10px 26px rgba(0,0,0,.55);
 }
 .settings-menu.open {
@@ -66,17 +66,17 @@
 }
 .settings-menu-title {
   padding: 5px 7px 7px;
-  color: #f0f0f0;
+  color: #f0eee6;
   font-size: 12px;
   font-weight: 600;
 }
 .settings-menu-section {
   margin: 5px 0 3px;
   padding: 5px 7px 3px;
-  border-top: 1px solid #303030;
-  color: #888;
+  border-top: 1px solid #30302e;
+  color: #888783;
   font-size: 10px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 .settings-menu-row {
   display: grid;
@@ -89,11 +89,11 @@
   border: 0;
   border-radius: 4px;
   background: transparent;
-  color: #d6d6d6;
+  color: #d6d4cd;
   text-align: left;
 }
 .settings-menu-row:hover {
-  background: #303030;
+  background: #30302e;
   color: #fff;
 }
 .settings-menu-row span {
@@ -103,7 +103,7 @@
   font-size: 12px;
 }
 .settings-menu-row em {
-  color: #8d8d8d;
+  color: #8d8c87;
   font-size: 10px;
   font-style: normal;
 }
@@ -111,7 +111,7 @@
   width: 22px;
   height: 12px;
   border-radius: 999px;
-  background: #3a3a3a;
+  background: #3a3a38;
   position: relative;
 }
 .settings-menu-row b::after {
@@ -122,7 +122,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #8a8a8a;
+  background: #8a8984;
   transition: left .12s, background .12s;
 }
 .settings-menu-row b.on {
@@ -134,7 +134,7 @@
 }
 .settings-menu-info {
   padding: 6px 7px 5px;
-  color: #9a9a9a;
+  color: #9a9994;
   font-size: 11px;
   line-height: 1.4;
 }
@@ -155,9 +155,9 @@
   width: min(520px, calc(100vw - 32px));
   max-height: calc(100vh - 96px);
   overflow: hidden;
-  border: 1px solid #414141;
+  border: 1px solid #41403e;
   border-radius: 6px;
-  background: #191919;
+  background: #191918;
   box-shadow: 0 18px 44px rgba(0,0,0,.62);
 }
 .shortcut-rundown-head {
@@ -165,26 +165,26 @@
   justify-content: space-between;
   gap: 16px;
   padding: 12px 14px;
-  border-bottom: 1px solid #343434;
-  background: #101010;
+  border-bottom: 1px solid #343432;
+  background: #10100f;
 }
 .shortcut-rundown-title {
-  color: #f0f0f0;
+  color: #f0eee6;
   font-size: 13px;
   font-weight: 600;
 }
 .shortcut-rundown-subtitle {
-  color: #8f8f8f;
+  color: #8f8e89;
   font-size: 11px;
   margin-top: 4px;
 }
 .shortcut-rundown-close {
   width: 24px;
   height: 24px;
-  border: 1px solid #3f3f3f;
+  border: 1px solid #3f3e3c;
   border-radius: 4px;
-  background: #252525;
-  color: #d6d6d6;
+  background: #252524;
+  color: #d6d4cd;
 }
 .shortcut-rundown-body {
   max-height: min(560px, calc(100vh - 170px));
@@ -199,20 +199,20 @@
   min-height: 28px;
   padding: 4px 8px;
   border-radius: 4px;
-  color: #d6d6d6;
+  color: #d6d4cd;
   font-size: 12px;
 }
 .shortcut-row:nth-child(even) {
-  background: #202020;
+  background: #20201f;
 }
 .shortcut-row kbd {
   justify-self: start;
   min-width: 34px;
   padding: 3px 6px;
-  border: 1px solid #3f3f3f;
+  border: 1px solid #3f3e3c;
   border-radius: 4px;
-  background: #101010;
-  color: #f0f0f0;
+  background: #10100f;
+  color: #f0eee6;
   font: inherit;
   font-size: 11px;
 }
@@ -232,12 +232,12 @@
   /* content starts after the combined gutter via JS LEFT_GUTTER = 102px */
 }
 .layer-menu button[data-action^="placeholder"] {
-  color: #aaa;
+  color: #aaa9a3;
   font-style: italic;
 }
 .layer-menu button[data-action^="placeholder"]:hover {
-  background: #444;
-  color: #ddd;
+  background: #444341;
+  color: #dddbd4;
 }
 body.marker-moving, body.marker-moving * { cursor: grabbing !important; }
 /* v25 correction: filter column is an overlay, not layout flow, so ruler math stays exact. */
@@ -282,14 +282,14 @@ body.marker-moving, body.marker-moving * { cursor: grabbing !important; }
   width: 392px;
   min-width: 392px;
   padding: 0;
-  background: #2b2b2b;
-  border: 1px solid #3d3d3d;
+  background: #2b2b29;
+  border: 1px solid #3d3d3b;
   border-radius: 3px;
   box-shadow: 0 18px 38px rgba(0,0,0,.55);
   overflow: hidden;
   z-index: 5000;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-  color: #e8e8e8;
+  color: #e8e6df;
   pointer-events: auto !important;
 }
 .layer-menu-section {
@@ -297,10 +297,10 @@ body.marker-moving, body.marker-moving * { cursor: grabbing !important; }
 }
 .layer-menu-kicker {
   margin-bottom: 8px;
-  color: #9f9f9f;
+  color: #9f9e99;
   font-size: 11px;
   letter-spacing: .65px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 .layer-menu-swatches {
   display: grid;
@@ -335,7 +335,7 @@ body.marker-moving, body.marker-moving * { cursor: grabbing !important; }
   border: 0;
   border-radius: 0;
   background: transparent;
-  color: #eeeeee;
+  color: #eeece4;
   font-size: 12px;
   line-height: 30px;
   text-align: left;
@@ -347,22 +347,22 @@ body.marker-moving, body.marker-moving * { cursor: grabbing !important; }
   text-overflow: ellipsis;
 }
 .layer-menu .menu-row em {
-  color: #777;
+  color: #777672;
   font-style: normal;
   font-size: 12px;
   white-space: nowrap;
 }
 .layer-menu .menu-row:hover {
-  background: #3a3a3a;
+  background: #3a3a38;
   color: #ffffff;
 }
 .layer-menu .menu-row:hover em {
-  color: #a5a5a5;
+  color: #a5a49e;
 }
 .layer-menu-separator {
   height: 1px;
   margin: 3px 0;
-  background: #505050;
+  background: #504f4d;
 }
 .layer-menu button[data-action="labelGroup"] em {
   color: #666f86;
@@ -430,7 +430,7 @@ body.marker-moving, body.marker-moving * { cursor: grabbing !important; }
   height: 0 !important;
   border-left: 6px solid transparent !important;
   border-right: 6px solid transparent !important;
-  border-top: 8px solid var(--marker-color, #b8b8b8) !important;
+  border-top: 8px solid var(--marker-color, #b8b7b1) !important;
   background: transparent !important;
   border-radius: 0 !important;
   transform: translateX(-50%) !important;
@@ -439,7 +439,7 @@ body.marker-moving, body.marker-moving * { cursor: grabbing !important; }
 }
 .bottom-ruler .marker-rail .marker::before {
   border-top: 0 !important;
-  border-bottom: 8px solid var(--marker-color, #b8b8b8) !important;
+  border-bottom: 8px solid var(--marker-color, #b8b7b1) !important;
 }
 
 /* Duration marker handles: no glow, no scale animation, just follow mouse visually. */
@@ -519,8 +519,8 @@ body.marker-resizing .layer-marker-half-end.is-dragging {
   width: 72px;
   z-index: 75;
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(31,31,31,1), rgba(36,36,36,.98));
-  border-right: 1px solid #4a4a4a;
+  background: linear-gradient(90deg, rgba(31, 31, 30,1), rgba(36, 36, 35,.98));
+  border-right: 1px solid #4a4947;
   box-shadow: 4px 0 10px rgba(0,0,0,.18);
 }
 .track-label,
@@ -530,8 +530,8 @@ body.marker-resizing .layer-marker-half-end.is-dragging {
 .layer-menu.open {
   width: 336px !important;
   min-width: 336px !important;
-  background: #202020 !important;
-  border-color: #353535 !important;
+  background: #20201f !important;
+  border-color: #353533 !important;
   box-shadow: 0 14px 30px rgba(0,0,0,.62) !important;
   font-size: 11px !important;
   max-height: calc(100vh - 16px) !important;
@@ -542,7 +542,7 @@ body.marker-resizing .layer-marker-half-end.is-dragging {
   width: 100%;
   height: 4px;
   min-height: 4px;
-  background: #333;
+  background: #333331;
 }
 .layer-menu-context-strip span {
   display: block;
@@ -555,12 +555,12 @@ body.marker-resizing .layer-marker-half-end.is-dragging {
   grid-template-columns: minmax(0, 1fr);
   gap: 6px;
   padding: 9px 10px 8px;
-  border-bottom: 1px solid #343434;
-  background: #242424;
+  border-bottom: 1px solid #343432;
+  background: #242423;
 }
 .layer-menu-context strong {
   display: block;
-  color: #f2f2f2;
+  color: #f2f0e8;
   font-size: 12px;
   font-weight: 650;
   line-height: 16px;
@@ -568,7 +568,7 @@ body.marker-resizing .layer-marker-half-end.is-dragging {
 .layer-menu-context em {
   display: block;
   margin-top: 1px;
-  color: #8a8a8a;
+  color: #8a8984;
   font-size: 10px;
   font-style: normal;
   line-height: 13px;
@@ -585,27 +585,27 @@ body.marker-resizing .layer-marker-half-end.is-dragging {
   padding: 0 6px;
   border-left: 3px solid var(--context-color);
   border-radius: 3px;
-  background: #303030;
-  color: #c9c9c9;
+  background: #30302e;
+  color: #c9c7c1;
   font-size: 9px;
   font-weight: 600;
   line-height: 16px;
 }
 .layer-menu-section-title {
   padding: 7px 10px 3px;
-  color: #858585;
+  color: #858480;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: .55px;
   line-height: 12px;
-  text-transform: uppercase;
+  text-transform: none;
 }
 .layer-menu-section { padding: 8px 10px 6px !important; }
 .layer-menu-kicker {
   margin-bottom: 6px !important;
   font-size: 10px !important;
   letter-spacing: .55px !important;
-  color: #8e8e8e !important;
+  color: #8e8d88 !important;
 }
 .layer-menu-swatches {
   grid-template-columns: repeat(13, 16px) !important;
@@ -624,9 +624,9 @@ body.marker-resizing .layer-marker-half-end.is-dragging {
   grid-template-columns: minmax(0, 1fr) auto !important;
   gap: 10px !important;
 }
-.layer-menu .menu-row em { font-size: 10px !important; color: #6f6f6f !important; }
-.layer-menu .menu-row:hover { background: #303030 !important; }
-.layer-menu-separator { margin: 2px 0 !important; background: #3e3e3e !important; }
+.layer-menu .menu-row em { font-size: 10px !important; color: #6f6e6b !important; }
+.layer-menu .menu-row:hover { background: #30302e !important; }
+.layer-menu-separator { margin: 2px 0 !important; background: #3e3e3c !important; }
 
 /* v31 marker handle/cursor hardening + ruler/marker rail layout
    Rule: visible marker art never owns pointer events; one stable invisible hit zone owns hover/drag. */
@@ -651,7 +651,7 @@ body.marker-resizing .layer-marker-half-end.is-dragging {
 .marker-rail {
   height: 24px !important;
   overflow: visible !important;
-  background: #1b1b1b !important;
+  background: #1b1b1a !important;
   border-top: 1px solid rgba(255,255,255,.09) !important;
   border-bottom: 1px solid rgba(255,255,255,.08) !important;
 }
@@ -710,7 +710,7 @@ body.marker-moving * { cursor: grabbing !important; }
   top: 16px !important;
   width: 1px !important;
   height: 24px !important;
-  background: var(--marker-color, #b8b8b8) !important;
+  background: var(--marker-color, #b8b7b1) !important;
   opacity: .75 !important;
   transform: translateX(-.5px) !important;
   pointer-events: none !important;
@@ -861,7 +861,7 @@ body.marker-dragging-out .layer-marker-half-end::before {
   width: 2px !important;
   height: 18px !important;
   border: 0 !important;
-  background: #f1f1f1 !important;
+  background: #f1efe7 !important;
   border-radius: 1px !important;
   transform: translateX(-50%) !important;
   box-shadow: 0 1px 1px rgba(0,0,0,.75) !important;
@@ -948,7 +948,7 @@ body.playhead-scrubbing * {
   height: 0 !important;
   border-left: 6px solid transparent !important;
   border-right: 6px solid transparent !important;
-  border-top: 8px solid var(--marker-color, #b8b8b8) !important;
+  border-top: 8px solid var(--marker-color, #b8b7b1) !important;
   border-bottom: 0 !important;
   background: transparent !important;
   border-radius: 0 !important;
@@ -979,7 +979,7 @@ body.playhead-scrubbing * {
   width: 1px !important;
   height: 24px !important;
   border: 0 !important;
-  background: var(--marker-color, #f1f1f1) !important;
+  background: var(--marker-color, #f1efe7) !important;
   border-radius: 1px !important;
   transform: translateX(-50%) !important;
   box-shadow: 0 1px 1px rgba(0,0,0,.75) !important;
@@ -1058,8 +1058,8 @@ main { padding-bottom: 56px !important; }
 .bottom-ruler {
   height: 54px !important;
   min-height: 54px !important;
-  background: linear-gradient(to bottom, #1d1d1d, #181818) !important;
-  border-top: 1px solid #3f3f3f !important;
+  background: linear-gradient(to bottom, #1d1d1c, #181817) !important;
+  border-top: 1px solid #3f3e3c !important;
   box-shadow: 0 -5px 12px rgba(0,0,0,.28) !important;
   overflow: hidden !important;
   z-index: 80 !important;
@@ -1067,7 +1067,7 @@ main { padding-bottom: 56px !important; }
 .bottom-ruler::before {
   height: 54px !important;
   margin-bottom: -54px !important;
-  background: linear-gradient(90deg, rgba(24,24,24,1), rgba(30,30,30,.98)) !important;
+  background: linear-gradient(90deg, rgba(24, 24, 23,1), rgba(30, 30, 29,.98)) !important;
 }
 .bottom-ruler #timeDisplay { height: 54px !important; }
 .bottom-ruler #bottomRuler {
@@ -1079,7 +1079,7 @@ main { padding-bottom: 56px !important; }
   height: 18px !important;
   line-height: 16px !important;
   font-size: 9px !important;
-  color: rgba(220,220,220,.72) !important;
+  color: rgba(220, 218, 211,.72) !important;
   border-left-color: rgba(255,255,255,.18) !important;
 }
 .bottom-ruler .tick-minor {
@@ -1157,7 +1157,7 @@ main { padding-bottom: 56px !important; }
   height: 0 !important;
   border-left: 9px solid transparent !important;
   border-right: 9px solid transparent !important;
-  border-top: 14px solid var(--marker-color, #b8b8b8) !important;
+  border-top: 14px solid var(--marker-color, #b8b7b1) !important;
   background: transparent !important;
   border-radius: 0 !important;
   transform: translateX(-50%) !important;
@@ -1242,7 +1242,7 @@ main { padding-bottom: 56px !important; }
   height: 0 !important;
   border-left: 7px solid transparent !important;
   border-right: 7px solid transparent !important;
-  border-top: 12px solid var(--marker-color, #b8b8b8) !important;
+  border-top: 12px solid var(--marker-color, #b8b7b1) !important;
   background: transparent !important;
   border-radius: 0 !important;
   transform: translateX(-50%) !important;
@@ -1342,13 +1342,13 @@ body.keyframe-mode .keyframe-property-row.has-expression,
 .keyframe-property-row.has-expression .track-label,
 body.keyframe-mode .keyframe-property-row.has-expression .track-label,
 .edit-property-row.has-expression .track-label {
-  background: linear-gradient(90deg, #202020, #252525) !important;
+  background: linear-gradient(90deg, #20201f, #252524) !important;
 }
 .keyframe-property-row.has-expression .property-label-text {
   color: #aeb6c2 !important;
 }
 .keyframe-property-row.has-expression .property-lane-name {
-  color: #c7c7c7 !important;
+  color: #c7c5bf !important;
 }
 .property-expression-zone {
   position: absolute;
@@ -1368,15 +1368,15 @@ body.keyframe-mode .keyframe-property-row.has-expression .track-label,
 #timeDisplay,
 #scrollArea::after,
 .filter-column {
-  background: linear-gradient(90deg, #202020, #252525) !important;
+  background: linear-gradient(90deg, #20201f, #252524) !important;
   border-color: var(--ae-border) !important;
 }
 .tick {
-  color: #c7c7c7 !important;
-  border-left-color: #494949 !important;
+  color: #c7c5bf !important;
+  border-left-color: #494846 !important;
 }
 .tick-minor {
-  border-left-color: #393939 !important;
+  border-left-color: #393937 !important;
 }
 #playhead::before {
   border-top-color: var(--ae-blue) !important;
@@ -1394,13 +1394,13 @@ body.keyframe-mode .keyframe-property-row.has-expression,
 .keyframe-property-row.has-expression .track-label,
 body.keyframe-mode .keyframe-property-row.has-expression .track-label,
 .edit-property-row.has-expression .track-label {
-  background: linear-gradient(90deg, #202020, #252525) !important;
+  background: linear-gradient(90deg, #20201f, #252524) !important;
 }
 .keyframe-property-row.has-expression .property-label-text {
   color: #aeb6c2 !important;
 }
 .keyframe-property-row.has-expression .property-lane-name {
-  color: #c7c7c7 !important;
+  color: #c7c5bf !important;
 }
 .property-expression-zone {
   position: absolute !important;
@@ -1574,15 +1574,15 @@ body.keyframe-mode .keyframe-property-row,
 #timeDisplay,
 #scrollArea::after,
 .filter-column {
-  background: linear-gradient(90deg, #202020, #252525) !important;
+  background: linear-gradient(90deg, #20201f, #252524) !important;
   border-color: var(--ae-border) !important;
 }
 .tick {
-  color: #c7c7c7 !important;
-  border-left-color: #494949 !important;
+  color: #c7c5bf !important;
+  border-left-color: #494846 !important;
 }
 .tick-minor {
-  border-left-color: #393939 !important;
+  border-left-color: #393937 !important;
 }
 #playhead::before {
   border-top-color: var(--ae-blue) !important;
@@ -1594,17 +1594,17 @@ body.keyframe-mode .keyframe-property-row,
 /* v61: tighter native AE panel color pass. Keep these at EOF so older
    experimental timeline styles do not reintroduce mismatched luminance. */
 :root {
-  --ae-bg: #1f1f1f;
-  --ae-panel: #232323;
-  --ae-panel-raised: #292929;
-  --ae-row: #252525;
-  --ae-row-alt: #222222;
-  --ae-row-hover: #2b2b2b;
-  --ae-property-row: #202020;
-  --ae-border: #383838;
-  --ae-border-soft: #303030;
-  --ae-text: #d8d8d8;
-  --ae-text-dim: #9b9b9b;
+  --ae-bg: #1f1f1e;
+  --ae-panel: #232322;
+  --ae-panel-raised: #292927;
+  --ae-row: #252524;
+  --ae-row-alt: #222221;
+  --ae-row-hover: #2b2b29;
+  --ae-property-row: #20201f;
+  --ae-border: #383836;
+  --ae-border-soft: #30302e;
+  --ae-text: #d8d6cf;
+  --ae-text-dim: #9b9a95;
   --ae-blue: #5aa7f2;
 }
 body,
@@ -1646,15 +1646,15 @@ body.keyframe-mode .keyframe-property-row.has-expression,
 #timeDisplay,
 #scrollArea::after,
 .filter-column {
-  background: linear-gradient(90deg, #202020, #252525) !important;
+  background: linear-gradient(90deg, #20201f, #252524) !important;
   border-color: var(--ae-border) !important;
 }
 .tick {
-  color: #c7c7c7 !important;
-  border-left-color: #494949 !important;
+  color: #c7c5bf !important;
+  border-left-color: #494846 !important;
 }
 .tick-minor {
-  border-left-color: #393939 !important;
+  border-left-color: #393937 !important;
 }
 #timeDisplay,
 #playhead {
@@ -1668,7 +1668,7 @@ body.keyframe-mode .keyframe-property-row.has-expression,
 }
 .comp-select-menu,
 .layer-menu.open {
-  background: #1b1b1b !important;
+  background: #1b1b1a !important;
   border-color: var(--ae-border) !important;
 }
 #keyframeModeBtn.active,
@@ -1694,7 +1694,7 @@ body.keyframe-mode .keyframe-property-row.has-expression,
 .platform-badge.mac {
   background:
     radial-gradient(circle at 28% 18%, rgba(255,255,255,.34), transparent 30%),
-    linear-gradient(135deg, #f6f7fb 0%, #cfd6df 24%, #7f8ea3 52%, #3a4252 100%) !important;
+    linear-gradient(135deg, #f8f6ee 0%, #cfd6df 24%, #7f8ea3 52%, #3a4252 100%) !important;
 }
 .platform-badge.windows {
   background:
@@ -1784,7 +1784,7 @@ body.keyframe-mode .keyframe-property-row.has-expression,
 
 .layer-menu .marker-menu-title {
   overflow: hidden;
-  color: #d6d6d6;
+  color: #d6d4cd;
   font-size: 11px;
   line-height: 16px;
   white-space: nowrap;
@@ -1797,18 +1797,18 @@ body.keyframe-mode .keyframe-property-row.has-expression,
   display: grid;
   gap: 4px;
   margin-top: 8px;
-  color: #9d9d9d;
+  color: #9d9c97;
   font-size: 10px;
 }
 .marker-editor-field input,
 .marker-editor-field textarea {
   width: 100%;
   box-sizing: border-box;
-  border: 1px solid #424242;
+  border: 1px solid #42413f;
   border-radius: 3px;
   outline: none;
-  background: #151515;
-  color: #e2e2e2;
+  background: #151514;
+  color: #e2e0d9;
   font: inherit;
 }
 .marker-editor-field input {
@@ -1829,7 +1829,7 @@ body.keyframe-mode .keyframe-property-row.has-expression,
   align-items: center;
   gap: 7px;
   margin-top: 8px;
-  color: #cfcfcf;
+  color: #cfcdc7;
   font-size: 11px;
 }
 .marker-editor-toggle input {
@@ -2060,8 +2060,8 @@ main#scrollArea {
   bottom: 0;
   z-index: 120;
   height: 14px;
-  border-top: 1px solid #353535;
-  background: #171717;
+  border-top: 1px solid #353533;
+  background: #171716;
   cursor: default;
 }
 .horizontal-scrollbar.disabled {
@@ -2073,15 +2073,15 @@ main#scrollArea {
   top: 2px;
   height: 9px;
   min-width: 36px;
-  border: 1px solid #5a5a5a;
+  border: 1px solid #5a5956;
   border-radius: 5px;
-  background: #3d3d3d;
+  background: #3d3d3b;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
   cursor: ew-resize;
 }
 .horizontal-scroll-thumb:hover {
-  background: #4b4b4b;
-  border-color: #707070;
+  background: #4b4a48;
+  border-color: #706f6c;
 }
 
 /* v48: square label swatches and marker editor controls. */
@@ -2108,9 +2108,9 @@ main#scrollArea {
   min-width: 24px !important;
   height: 24px !important;
   padding: 0 !important;
-  border: 1px solid #424242 !important;
+  border: 1px solid #42413f !important;
   border-radius: 3px !important;
-  background: #242424 !important;
+  background: #242423 !important;
 }
 .marker-duration-reset::before {
   content: "";
@@ -2118,11 +2118,11 @@ main#scrollArea {
   width: 8px;
   height: 8px;
   margin: 7px auto 0;
-  border: 1px solid #cfcfcf;
+  border: 1px solid #cfcdc7;
   border-radius: 1px;
 }
 .marker-duration-reset:hover {
-  background: #303030 !important;
+  background: #30302e !important;
   border-color: #5b80a8 !important;
 }
 
@@ -2264,10 +2264,10 @@ body.show-frame-checkers .track::before {
   background-image:
     repeating-linear-gradient(
       90deg,
-      rgba(8,8,8,.9) 0,
-      rgba(8,8,8,.9) var(--frame-width, 16px),
-      rgba(42,42,42,.64) var(--frame-width, 16px),
-      rgba(42,42,42,.64) calc(var(--frame-width, 16px) * 2)
+      rgba(8, 8, 8,.9) 0,
+      rgba(8, 8, 8,.9) var(--frame-width, 16px),
+      rgba(42, 42, 40,.64) var(--frame-width, 16px),
+      rgba(42, 42, 40,.64) calc(var(--frame-width, 16px) * 2)
     ) !important;
   background-size: calc(var(--frame-width, 16px) * 2) 22px !important;
   background-position: 0 0 !important;
@@ -2366,7 +2366,7 @@ body.show-frame-checkers .track:nth-child(even)::before {
   height: 6px;
   z-index: 35;
   pointer-events: none;
-  background: var(--keyframe-color, #cfcfcf);
+  background: var(--keyframe-color, #cfcdc7);
   border: 1px solid rgba(255,255,255,.42);
   box-shadow: 0 1px 1px rgba(0,0,0,.65);
   transform: translate(-50%, -50%) rotate(45deg);

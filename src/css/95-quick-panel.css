@@ -43,8 +43,8 @@ body.quick-panel-mode .quick-panel-shell {
   background:
     linear-gradient(145deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .015) 38%, rgba(255, 255, 255, .045)),
     radial-gradient(ellipse 70% 54% at 18% 0%, rgba(255, 255, 255, .1), transparent 68%),
-    radial-gradient(ellipse 48% 38% at 86% 12%, rgba(213, 111, 58, .12), transparent 72%),
-    rgba(22, 23, 24, .8);
+    radial-gradient(ellipse 48% 38% at 86% 12%, rgba(252, 146, 52, .12), transparent 72%),
+    rgba(23, 23, 22, .8);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, .12),
     inset 0 -1px 0 rgba(0, 0, 0, .35);
@@ -71,7 +71,7 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
 .quick-panel-status p,
 .quick-panel-hint {
   margin: 0;
-  color: rgba(235, 235, 240, .67);
+  color: rgba(237, 235, 228, .67);
   font-size: 12px;
 }
 
@@ -115,24 +115,24 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
   border: 1px solid rgba(255, 255, 255, .16);
   border-radius: 10px;
   outline: 0;
-  background: rgba(8, 9, 10, .42);
+  background: rgba(9, 9, 9, .42);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, .06),
     0 6px 18px rgba(0, 0, 0, .12);
-  color: #ededee;
+  color: #edebe4;
   font: inherit;
   font-size: 13px;
 }
 
 .quick-panel-search:focus {
-  border-color: rgba(225, 128, 73, .62);
+  border-color: rgba(255, 164, 76, .62);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, .07),
-    0 0 0 2px rgba(213, 111, 58, .13);
+    0 0 0 2px rgba(252, 146, 52, .13);
 }
 
 .quick-panel-search::placeholder {
-  color: rgba(226, 226, 230, .45);
+  color: rgba(227, 225, 218, .45);
 }
 
 .quick-panel-search-icon {
@@ -141,7 +141,7 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
   z-index: 1;
   width: 11px;
   height: 11px;
-  border: 1.5px solid rgba(225, 225, 228, .62);
+  border: 1.5px solid rgba(226, 224, 217, .62);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -154,7 +154,7 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
   width: 6px;
   height: 1.5px;
   border-radius: 1px;
-  background: rgba(225, 225, 228, .62);
+  background: rgba(226, 224, 217, .62);
   transform: rotate(45deg);
 }
 
@@ -165,7 +165,7 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
   border: 1px solid rgba(255, 255, 255, .13);
   border-radius: 6px;
   background: rgba(255, 255, 255, .055);
-  color: rgba(232, 232, 235, .52);
+  color: rgba(233, 231, 224, .52);
   font-family: inherit;
   font-size: 10px;
   font-weight: 500;
@@ -178,7 +178,7 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
   overflow-y: auto;
   border: 1px solid rgba(255, 255, 255, .12);
   border-radius: 10px;
-  background: rgba(8, 9, 10, .3);
+  background: rgba(9, 9, 9, .3);
 }
 
 .quick-panel-shell.searching .quick-panel-search-results {
@@ -204,7 +204,7 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
   border-bottom: 1px solid rgba(255, 255, 255, .065);
   border-radius: 0;
   background: transparent;
-  color: #dedee1;
+  color: #dfddd6;
   text-align: left;
   cursor: pointer;
 }
@@ -215,15 +215,15 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
 
 .quick-panel-search-result:hover,
 .quick-panel-search-result.active {
-  background: rgba(213, 111, 58, .14);
+  background: rgba(252, 146, 52, .14);
 }
 
 .quick-panel-search-source {
-  color: rgba(229, 145, 96, .9);
+  color: rgba(255, 179, 103, .9);
   font-size: 10px;
   font-style: normal;
   font-weight: 650;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .quick-panel-search-name {
@@ -235,7 +235,7 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
 
 .quick-panel-search-detail,
 .quick-panel-search-empty {
-  color: rgba(224, 224, 228, .48);
+  color: rgba(225, 223, 216, .48);
   font-size: 10px;
   font-style: normal;
 }
@@ -272,11 +272,11 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
   border-radius: 8px;
   background:
     linear-gradient(145deg, rgba(255, 255, 255, .085), rgba(255, 255, 255, .025)),
-    rgba(13, 14, 15, .28);
+    rgba(14, 14, 13, .28);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, .08),
     0 5px 14px rgba(0, 0, 0, .14);
-  color: #d5d6d9;
+  color: #d7d5ce;
   font-size: 10.5px;
   cursor: pointer;
   transition: transform 120ms ease, background-color 120ms ease, border-color 120ms ease;
@@ -293,19 +293,19 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
 
 .quick-panel-grid::-webkit-scrollbar-thumb {
   border-radius: 999px;
-  background: rgba(225, 225, 230, .22);
+  background: rgba(227, 225, 218, .22);
 }
 
 .quick-panel-grid::-webkit-scrollbar-thumb:hover {
-  background: rgba(225, 225, 230, .34);
+  background: rgba(227, 225, 218, .34);
 }
 
 .quick-panel-grid > button:hover {
   transform: scale(1.025);
-  border-color: rgba(233, 147, 96, .5);
+  border-color: rgba(255, 181, 107, .5);
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, .11), rgba(213, 111, 58, .07)),
-    rgba(13, 14, 15, .32);
+    linear-gradient(145deg, rgba(255, 255, 255, .11), rgba(252, 146, 52, .07)),
+    rgba(14, 14, 13, .32);
 }
 
 .quick-panel-grid kbd {
@@ -319,7 +319,7 @@ body.quick-panel-mode.quick-subpanel-open .quick-panel-shell {
   border-radius: 6px;
   background: rgba(255, 255, 255, .085);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08);
-  color: #efeff0;
+  color: #efede5;
   font-family: inherit;
   font-size: 9.5px;
   font-weight: 700;
@@ -482,7 +482,7 @@ body.quick-panel-mode .quick-layer-menu-dialog {
   border-radius: var(--tnt-radius-panel, 12px);
   background:
     linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.015) 40%, rgba(255,255,255,.04)),
-    rgba(18,18,19,.74);
+    rgba(18, 18, 17,.74);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.1),
     0 18px 50px rgba(0,0,0,.32);
@@ -508,7 +508,7 @@ body.quick-panel-mode .quick-layer-menu-body .layer-menu-context {
   border-radius: 10px;
   background:
     linear-gradient(145deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .018)),
-    rgba(18, 18, 19, .42);
+    rgba(18, 18, 17, .42);
 }
 
 body.quick-panel-mode .quick-layer-menu-body .layer-menu-section,
@@ -541,7 +541,7 @@ body.quick-panel-mode .quick-layer-menu-body .menu-row {
   border: 0 !important;
   border-radius: 7px !important;
   background: transparent !important;
-  color: rgba(244, 244, 246, .88) !important;
+  color: rgba(245, 243, 235, .88) !important;
   box-shadow: none !important;
   font: 13px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
   text-align: left !important;
@@ -563,7 +563,7 @@ body.quick-panel-mode .quick-layer-menu-body .menu-row span {
 body.quick-panel-mode .quick-layer-menu-body .menu-row em,
 body.quick-panel-mode .quick-layer-menu-body .menu-row .menu-shortcut {
   min-width: 0 !important;
-  color: rgba(230, 230, 235, .46) !important;
+  color: rgba(232, 230, 223, .46) !important;
   font-size: 12px !important;
   font-style: normal !important;
   white-space: nowrap !important;
@@ -571,7 +571,7 @@ body.quick-panel-mode .quick-layer-menu-body .menu-row .menu-shortcut {
 
 body.quick-panel-mode .quick-layer-menu-body .menu-row:hover em,
 body.quick-panel-mode .quick-layer-menu-body .menu-row:hover .menu-shortcut {
-  color: rgba(244, 244, 246, .68) !important;
+  color: rgba(245, 243, 235, .68) !important;
 }
 
 body.quick-panel-mode .quick-layer-menu-body .layer-menu-separator {
@@ -584,11 +584,11 @@ body.quick-panel-mode .quick-layer-menu-body .layer-menu-separator {
 body.quick-panel-mode .quick-layer-menu-body .layer-menu-section-title,
 body.quick-panel-mode .quick-layer-menu-body .layer-menu-kicker {
   padding: 9px 10px 4px;
-  color: rgba(235, 235, 245, .48);
+  color: rgba(238, 236, 228, .48);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: .08em;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 body.quick-panel-mode .quick-layer-menu-body::-webkit-scrollbar {
@@ -597,7 +597,7 @@ body.quick-panel-mode .quick-layer-menu-body::-webkit-scrollbar {
 
 body.quick-panel-mode .quick-layer-menu-body::-webkit-scrollbar-thumb {
   border-radius: 999px;
-  background: rgba(225,225,230,.24);
+  background: rgba(227, 225, 218,.24);
 }
 
 body.quick-panel-mode .layer-menu.open {
@@ -620,7 +620,7 @@ body.quick-panel-mode .layer-menu.open::-webkit-scrollbar {
 
 body.quick-panel-mode .layer-menu.open::-webkit-scrollbar-thumb {
   border-radius: 999px !important;
-  background: rgba(225,225,230,.24) !important;
+  background: rgba(227, 225, 218,.24) !important;
 }
 
 body.quick-panel-mode .quick-layer-menu-empty {
@@ -628,12 +628,12 @@ body.quick-panel-mode .quick-layer-menu-empty {
   place-items: center;
   gap: 8px;
   min-height: 180px;
-  color: rgba(235,235,245,.62);
+  color: rgba(238, 236, 228,.62);
   text-align: center;
 }
 
 body.quick-panel-mode .quick-layer-menu-empty strong {
-  color: rgba(246,246,248,.9);
+  color: rgba(247, 245, 237,.9);
   font-size: 16px;
 }
 
@@ -658,7 +658,7 @@ body.quick-panel-mode .mass-edit-dialog,
 body.quick-panel-mode .text-animation-dialog,
 body.quick-panel-mode .timing-order-layout,
 body.quick-panel-mode .layer-menu.open {
-  background-color: rgba(20, 20, 22, .78) !important;
+  background-color: rgba(21, 21, 20, .78) !important;
   -webkit-backdrop-filter: blur(9px) saturate(112%) !important;
   backdrop-filter: blur(9px) saturate(112%) !important;
   transform: translateZ(0);
@@ -746,7 +746,7 @@ body.quick-panel-mode .timing-order-layout {
   stroke-width: 1.4;
   stroke-linecap: round;
   stroke-linejoin: round;
-  color: rgba(226, 227, 232, .82);
+  color: rgba(228, 226, 219, .82);
   opacity: .9;
 }
 
@@ -755,7 +755,7 @@ body.quick-panel-mode .timing-order-layout {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #d9dade;
+  color: #dbd9d2;
   font-size: 11px;
   line-height: 1.1;
 }
@@ -766,7 +766,7 @@ body.quick-panel-mode .timing-order-layout {
   border: 1px solid rgba(255, 255, 255, .12);
   border-radius: 5px;
   background: rgba(255, 255, 255, .05);
-  color: rgba(228, 228, 234, .58);
+  color: rgba(230, 228, 221, .58);
   font-family: inherit;
   font-size: 9.5px;
   letter-spacing: .01em;
@@ -774,12 +774,12 @@ body.quick-panel-mode .timing-order-layout {
 }
 
 .quick-panel-grid > button:hover .quick-panel-icon {
-  color: rgba(240, 176, 137, .95);
+  color: rgba(255, 206, 155, .95);
   opacity: 1;
 }
 
 .quick-panel-grid > button:hover > kbd {
-  border-color: rgba(213, 111, 58, .3);
+  border-color: rgba(252, 146, 52, .3);
   color: rgba(238, 200, 178, .8);
 }
 
@@ -804,7 +804,7 @@ body.quick-panel-mode .timing-order-layout {
   border: 1px solid rgba(255, 255, 255, .1);
   border-radius: 4px;
   background: rgba(255, 255, 255, .045);
-  color: rgba(228, 228, 234, .5);
+  color: rgba(230, 228, 221, .5);
   font-size: 8.5px;
   line-height: 1.35;
 }
@@ -834,12 +834,12 @@ body.quick-panel-mode .timing-order-layout {
   stroke-width: 1.4;
   stroke-linecap: round;
   stroke-linejoin: round;
-  color: rgba(226, 227, 232, .6);
+  color: rgba(228, 226, 219, .6);
 }
 
 .quick-panel-search-result:hover .assistant-function-icon,
 .quick-panel-search-result.active .assistant-function-icon {
-  color: rgba(240, 176, 137, .95);
+  color: rgba(255, 206, 155, .95);
 }
 
 .quick-panel-search-result .quick-panel-search-name {
@@ -863,7 +863,7 @@ body.quick-panel-mode .timing-order-layout {
   border: 1px solid rgba(255, 255, 255, .12);
   border-radius: 5px;
   background: rgba(255, 255, 255, .05);
-  color: rgba(232, 232, 238, .7);
+  color: rgba(234, 232, 225, .7);
   font-family: inherit;
   font-size: 9.5px;
   white-space: nowrap;
@@ -872,7 +872,7 @@ body.quick-panel-mode .timing-order-layout {
 .quick-panel-search-key.empty {
   border-color: transparent;
   background: transparent;
-  color: rgba(228, 228, 234, .28);
+  color: rgba(230, 228, 221, .28);
 }
 
 /* v135: search rows are glass too.
@@ -886,7 +886,7 @@ body.quick-panel-mode .timing-order-layout {
   gap: 5px;
   padding: 5px;
   border-color: rgba(255, 255, 255, .07);
-  background: rgba(8, 9, 10, .18);
+  background: rgba(9, 9, 9, .18);
 }
 
 .quick-panel-search-result {
@@ -894,16 +894,16 @@ body.quick-panel-mode .timing-order-layout {
   border-radius: 8px;
   background:
     linear-gradient(145deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .02)),
-    rgba(13, 14, 15, .26);
+    rgba(14, 14, 13, .26);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07);
 }
 
 .quick-panel-search-result:hover,
 .quick-panel-search-result.active {
-  border-color: rgba(233, 147, 96, .5);
+  border-color: rgba(255, 181, 107, .5);
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, .1), rgba(213, 111, 58, .09)),
-    rgba(13, 14, 15, .3);
+    linear-gradient(145deg, rgba(255, 255, 255, .1), rgba(252, 146, 52, .09)),
+    rgba(14, 14, 13, .3);
 }
 
 
@@ -923,11 +923,11 @@ body.quick-panel-mode .timing-order-layout {
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  color: rgba(226, 227, 232, .72);
+  color: rgba(228, 226, 219, .72);
 }
 
 .quick-panel-refresh:hover .tnt-action-icon {
-  color: rgba(240, 176, 137, .95);
+  color: rgba(255, 206, 155, .95);
 }
 
 
@@ -979,8 +979,8 @@ body.quick-panel-mode.native-win .quick-panel-shell {
   background:
     linear-gradient(145deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .012) 38%, rgba(255, 255, 255, .035)),
     radial-gradient(ellipse 70% 54% at 18% 0%, rgba(255, 255, 255, .07), transparent 68%),
-    radial-gradient(ellipse 48% 38% at 86% 12%, rgba(213, 111, 58, .1), transparent 72%),
-    rgba(22, 23, 24, .93) !important;
+    radial-gradient(ellipse 48% 38% at 86% 12%, rgba(252, 146, 52, .1), transparent 72%),
+    rgba(23, 23, 22, .93) !important;
 }
 
 body.quick-panel-mode.native-win .quick-layer-menu-dialog,
@@ -994,7 +994,7 @@ body.quick-panel-mode.native-win .ease-dialog,
 body.quick-panel-mode.native-win .mass-edit-dialog,
 body.quick-panel-mode.native-win .text-animation-dialog,
 body.quick-panel-mode.native-win .layer-menu.open {
-  background-color: rgba(20, 20, 22, .94) !important;
+  background-color: rgba(21, 21, 20, .94) !important;
 }
 
 /* The anchor and timing-order wrappers are bare frames on purpose (v97) - the
@@ -1035,19 +1035,19 @@ body.quick-panel-mode.native-win *::after {
 body.quick-panel-mode.native-win {
   color-scheme: dark;
   scrollbar-width: thin;
-  scrollbar-color: rgba(225, 225, 230, .26) transparent;
+  scrollbar-color: rgba(227, 225, 218, .26) transparent;
 }
 
 
 /* v129: the bare-wrapper layouts float their own cards directly over the
    timeline, with no shell behind them. Their surfaces are tuned for macOS, where
-   backdrop-filter blurs whatever is underneath - at rgba(17,18,18,.56) the blur
+   backdrop-filter blurs whatever is underneath - at rgba(18, 18, 17,.56) the blur
    is doing most of the work of making them readable. With no blur available here
    that alpha just shows the comp through the card. Raise it so the cards read as
    surfaces on their own, matching the opacity used for the dialogs above. */
 body.quick-panel-mode.native-win .anchor-section,
 body.quick-panel-mode.native-win .timing-order-section {
-  background-color: rgba(20, 20, 22, .95) !important;
+  background-color: rgba(21, 21, 20, .95) !important;
 }
 
 
@@ -1143,5 +1143,5 @@ body.quick-panel-mode .text-animation-dialog {
    so, since the list looks identical either way. */
 .quick-panel-shell.picking .quick-panel-search-row,
 .quick-panel-shell.picking input[type="text"] {
-  border-color: rgba(233, 147, 96, .6);
+  border-color: rgba(255, 181, 107, .6);
 }

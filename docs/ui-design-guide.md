@@ -152,16 +152,16 @@ Bad examples:
 - Avoid one-note palettes dominated by a single hue.
 - Do not use decorative gradient blobs or abstract background effects.
 - Avoid purple gradients and background grids in the main timeline workspace.
-- The main accent should be a restrained Claude-style orange. Keep cyan reserved for track matte links and green reserved for parent links.
+- Since v151 the panel wears Edie's look, the same as PR FX (`src/css/99-ca-look.css`, loaded last): Creative Assist's warm greys (desk `#1c1c1a`, sidebar `#1f1e1d`, canvas `#262624`, card `#2f2f2d`, menu `#2c2c2a`, line `#3e3e38`, text `#eceae3`, muted `#a3a096`, faint `#6f6c64`) and PR FX's orange accent `#ff9a3d` (the Timeline stroke's colour). Keep the tokens equal to PR FX `client/styles.css` `:root`. Neutral greys are warm, never blue-grey. Put new colours in the `--ca-*` tokens rather than hard-coding them. Keep cyan reserved for track matte links and green reserved for parent links.
+- Edie leads the docked panel and Quick Controls as in PR FX: the Functions row is PR FX's toolbar card (Edie 32px, "Edie" over "After Effects tools", a divider, grey pill tabs), and Quick Controls' search row starts with Edie in place of the magnifier. His SVG is copied from PR FX `client/index.html` (the header copy, facing right); when his art changes there, copy it into both places in `index.html`.
+- The Timeline's Edit mode is the accent orange, so it never reads like Keyframes' deep purple.
 - Relationship colors are reserved: cyan for track matte, green for parent.
 
 ## Typography
 
 - Use small, dense labels in panels and nodes.
-- Use the editorial serif header stack `"Ivory LL Web", "IvoryLLWeb-Light", "Iowan Old Style", Baskerville, Georgia, serif` for panel and dialog headers. Ivory may only be bundled when properly licensed; `Iowan Old Style` is the built-in macOS fallback.
-- Editorial serif headers need slightly more size than equivalent sans-serif labels because their light strokes have less visual mass. Use about `16px` for standard headers and `17px` for primary tool-panel titles.
-- Keep body text and working controls in the system sans-serif stack. The serif is for hierarchy, not property labels, values, menus, or dense timeline rows.
-- Use uppercase labels only for compact property names or status text.
+- One family, as in Creative Assist: the system sans-serif stack for everything. Headers get their hierarchy from size and weight (600), not from a serif; `--tnt-font-header` points at the main font. Dialog titles are `15px`.
+- Sentence case everywhere: no uppercase labels. Section labels are `11px`, weight 600, muted; secondary text is muted or faint, never pure white.
 - Keep letter spacing at `0`.
 - Do not scale type with viewport width.
 - Ensure long layer/property names truncate with ellipsis instead of wrapping into controls.
@@ -291,11 +291,11 @@ Before adding a new control:
 
 - Text animation settings pair Style/Mode and Move/By in two columns, with shared full-width property and duration rows. Use 26px fixed-height buttons and 5px row gaps; the desktop Animation surface is 400px wide. Keep its header's flex selector more specific than the shared section heading rule. Short preset labels retain full descriptions in tooltips.
 
-- The Text Animation group has an unpainted serif group title, one selection count, and a close control above independent Functions and Animation surfaces. Keep the native quick-panel wrapper transparent too, overriding the shared dialog glass in `95-quick-panel.css`.
+- The Text Animation group has an unpainted group title, one selection count, and a close control above independent Functions and Animation surfaces. Keep the native quick-panel wrapper transparent too, overriding the shared dialog glass in `95-quick-panel.css`.
 
 ### Panel Group Philosophy
 
-- Start with the operation and its scope: one unframed serif title and one accurate selection summary per group. Never repeat selection badges inside each surface.
+- Start with the operation and its scope: one unframed title and one accurate selection summary per group. Never repeat selection badges inside each surface.
 - Separate working groups by purpose, not arbitrary widget counts. Each surface owns its background; the enclosing group has no fill, border, or blur.
 - Use 26px square icons for recognizable commands and spatial modes, with shared tooltips and accessible names. Keep words for choices whose icons would need guessing, such as Characters/Words/Lines or named presets. Independent icon properties use a single toggle button with highlighted on and neutral off states plus aria-pressed; never add a checkbox beside the same icon. Use numeric inputs for exact values.
 - Settings precede a deliberate Apply command. Presets are a compact bottom row of immediate actions; do not let preset descriptions become permanent body copy.
