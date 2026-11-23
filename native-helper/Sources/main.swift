@@ -4,6 +4,12 @@ import ApplicationServices
 
 // Written to ~/.ae-fx-quick-controls/helper.log. The app has no window and no
 // console, so a failed hotkey otherwise leaves nothing to read.
+/// Who is in front right now, for the hide log: "name (bundle id)".
+func tntFrontmostDescription() -> String {
+    guard let app = NSWorkspace.shared.frontmostApplication else { return "nothing" }
+    return "\(app.localizedName ?? "?") (\(app.bundleIdentifier ?? "no bundle id"))"
+}
+
 func tntLog(_ message: String) {
     let directory = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent(".ae-fx-quick-controls")
@@ -372,6 +378,7 @@ private final class WindowBridge: NSObject, WKScriptMessageHandler {
         }
         let action = payload["action"] as? String ?? "resize"
         if action == "close" {
+            if panel.isVisible { tntLog("hide: the page asked to close") }
             panel.orderOut(nil)
             return
         }
@@ -680,6 +687,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
         showingControlName = controlName ?? "launcher"
         let openingSize = lastSizeByControl[showingControlName] ?? quickControlsLauncherSize
         guard let panel, let frame = afterEffectsOverlayFrame(for: openingSize) else {
+            tntLog("hide: summoned but no After Effects window was found to sit over")
             panel?.orderOut(nil)
             return
         }
@@ -1041,6 +1049,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
                 }
                 return
             }
+            tntLog("hide: lost focus to \(tntFrontmostDescription())")
             panel.orderOut(nil)
         }
     }
@@ -1060,6 +1069,9 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             let helperBundleIdentifier = Bundle.main.bundleIdentifier ?? ""
             if application.bundleIdentifier != afterEffectsBundleIdentifier &&
                application.bundleIdentifier != helperBundleIdentifier {
+                if self?.panel?.isVisible == true {
+                    tntLog("hide: \(application.localizedName ?? "?") (\(application.bundleIdentifier ?? "no bundle id")) came to the front")
+                }
                 self?.panel?.orderOut(nil)
             }
         }
@@ -1072,6 +1084,9 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelega
             let allowed = frontmostBundleIdentifier == afterEffectsBundleIdentifier ||
                 frontmostBundleIdentifier == helperBundleIdentifier
             if !allowed || afterEffectsWindowFrame() == nil {
+                tntLog(allowed
+                    ? "hide: After Effects' main window was not found on screen"
+                    : "hide: \(tntFrontmostDescription()) is in front")
                 panel.orderOut(nil)
             }
         }
