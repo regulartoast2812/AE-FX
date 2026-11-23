@@ -2913,7 +2913,7 @@ if (horizontalScrollBarEl) horizontalScrollBarEl.addEventListener("mousedown", b
 window.addEventListener("resize", () => { if (!userZoomed) render(); updateHorizontalScrollBar(); });
 if (keyframeModeBtnEl) keyframeModeBtnEl.addEventListener("click", toggleTimelineMode);
 registerPanelKeyEventsInterest();
-if (!QUICK_PANEL_MODE) {
+if (!QUICK_PANEL_MODE && !ENGINE_MODE) {
   cs.addEventListener("com.tnt.timeline.nativeSelection", handleNativeSelectionSync);
 }
 renderPlatformBadge();
@@ -2945,7 +2945,11 @@ if (QUICK_PANEL_MODE) {
     window.addEventListener("transitionend", () => scheduleNativeQuickPanelHitShapes(), true);
   }
   refreshQuickPanelState();
-  } else {
+} else if (ENGINE_MODE) {
+  // Hidden: no timeline to draw, so no sync loop, selection monitor or edit
+  // watch. Bridge requests refresh what they need when they run.
+  startAeFxEngine();
+} else {
   // Initial read, then a lightweight focused/hovered fingerprint watch.
   // Full timeline refresh still only happens when the host fingerprint changes.
   refreshLayers({ forceRender: true, skipSettledRefresh: true }).then(() => {

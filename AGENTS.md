@@ -233,7 +233,7 @@ substitute. It fails when:
   unless it is listed in `KNOWN_GAPS` with a reason;
 - a helper still maps a hotkey to a control the panel no longer offers, or
   offers a control a helper has no hotkey for;
-- `index.html` / `quick.html` carry a `?v=` stamp that does not match the hash
+- `index.html` / `quick.html` / `engine.html` carry a `?v=` stamp that does not match the hash
   of the built bundles.
 
 That last one is how the tool broke on Windows: the `?v=` was a hand-written

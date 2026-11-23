@@ -3,6 +3,10 @@ const TNT_VERSION = "0.1.0";
 
 const cs = new CSInterface();
 const QUICK_PANEL_MODE = /(?:^|\/)quick\.html(?:$|[?#])/i.test(String(window.location.href || ""));
+// engine.html is the hidden extension (com.tnk.ae.fx.engine) that starts with
+// After Effects: it serves the bridge and starts Quick Controls, so shortcuts work
+// before anyone opens the AE FX panel. It never draws or polls the timeline.
+const ENGINE_MODE = /(?:^|\/)engine\.html(?:$|[?#])/i.test(String(window.location.href || ""));
 const timelineEl = document.getElementById("timeline");
 const rulerEl = document.getElementById("ruler");
 const rulerWrapEl = document.getElementById("rulerWrap");
@@ -4611,7 +4615,7 @@ function bridgeWriteDiscoveryFile(port, token) {
     try { fs.unlinkSync(file); } catch (_) {}
     fs.writeFileSync(
       file,
-      JSON.stringify({ port, token, pid: (typeof process !== "undefined" ? process.pid : 0) }),
+      JSON.stringify({ port, token, pid: (typeof process !== "undefined" ? process.pid : 0), role: ENGINE_MODE ? "engine" : "panel" }),
       { mode: 0o600 }
     );
     try { fs.chmodSync(file, 0o600); } catch (_) {}
@@ -4622,12 +4626,30 @@ function bridgeWriteDiscoveryFile(port, token) {
   }
 }
 
-function bridgeRemoveDiscoveryFile() {
+function bridgeReadDiscoveryFile() {
+  const fs = bridgeRequire("fs");
+  const os = bridgeRequire("os");
+  const path = bridgeRequire("path");
+  if (!fs || !os || !path) return null;
+  try { return JSON.parse(fs.readFileSync(bridgeDiscoveryPath(os, path), "utf8")); } catch (_) { return null; }
+}
+
+// Only ever removes our own file. The panel and the hidden engine both serve a
+// bridge; whichever published last owns the file, and closing the panel must not
+// take down the engine's.
+function bridgeRemoveDiscoveryFile(token) {
   const fs = bridgeRequire("fs");
   const os = bridgeRequire("os");
   const path = bridgeRequire("path");
   if (!fs || !os || !path) return;
+  const current = bridgeReadDiscoveryFile();
+  if (token && current && current.token !== token) return;
   try { fs.unlinkSync(bridgeDiscoveryPath(os, path)); } catch (_) {}
+}
+
+function bridgeProcessAlive(pid) {
+  if (!(Number(pid) > 0) || typeof process === "undefined" || typeof process.kill !== "function") return false;
+  try { process.kill(Number(pid), 0); return true; } catch (e) { return !!(e && e.code === "EPERM"); }
 }
 
 function bridgeCreateToken() {
@@ -4845,9 +4867,22 @@ function startNativeBridgeServer() {
   }
 
   window.addEventListener("beforeunload", () => {
-    bridgeRemoveDiscoveryFile();
+    bridgeRemoveDiscoveryFile(token);
     try { server.close(); } catch (_) {}
   });
+
+  // The engine outlives the panel. When the panel closes it removes its file (or
+  // After Effects died and left a stale one), so publish ours again; the helper
+  // and Edie read the file on every request.
+  if (ENGINE_MODE) {
+    setInterval(() => {
+      if (!server.listening) return;
+      const current = bridgeReadDiscoveryFile();
+      if (current && current.token === token) return;
+      if (current && bridgeProcessAlive(current.pid)) return;
+      bridgeWriteDiscoveryFile(port, token);
+    }, 2000);
+  }
 
   return server;
 }
@@ -4862,6 +4897,35 @@ function bridgeSetStatus(state, message) {
 }
 
 const tntBridgeServer = startNativeBridgeServer();
+
+// ---- Hidden engine ------------------------------------------------------------
+//
+// Started by After Effects itself (manifest StartOn ApplicationInitialized), so the
+// Quick Controls hot keys work from launch, not only after the AE FX panel has
+// been opened once. It loads timeline.jsx if nothing has, and starts the helper if
+// it is not running. It does not restart a running helper: that would drop the
+// overlay someone is using.
+async function startAeFxEngine() {
+  document.title = "AE FX engine";
+  const loaded = await new Promise(resolve => cs.evalScript("typeof TNT_launchNativeQuickControls", resolve));
+  if (loaded === "function") jsxLoaded = true;
+  else await loadJSX();
+
+  const childProcess = settingsNodeRequire("child_process");
+  const fs = settingsNodeRequire("fs");
+  const path = settingsNodeRequire("path");
+  const root = nativeListenerExtensionRoot();
+  if (!childProcess || !fs || !path || !root) return;
+  const mac = isMacPlatform();
+  if (nativeListenerProcessActive(childProcess, mac)) return;
+  if (mac) {
+    installMacNativeListener(childProcess, root);
+    return;
+  }
+  // Windows: start it if it is built; building needs the panel's Start Listener.
+  const exe = path.join(root, "native-helper-win", "bin", "Release", "net8.0-windows", "AEFXQuickControls.exe");
+  if (fs.existsSync(exe)) installWindowsNativeListener(fs, path, childProcess, root);
+}
 // Version and update check.
 //
 // TNT_VERSION is stamped into the bundle by scripts/build.sh from
@@ -5020,7 +5084,7 @@ function tntRenderUpdateBanner() {
   `;
 }
 
-if (!QUICK_PANEL_MODE) {
+if (!QUICK_PANEL_MODE && !ENGINE_MODE) {
   // Let the panel finish loading before touching the network.
   setTimeout(() => { tntCheckForUpdate(); }, 4000);
 }
@@ -14703,7 +14767,7 @@ if (horizontalScrollBarEl) horizontalScrollBarEl.addEventListener("mousedown", b
 window.addEventListener("resize", () => { if (!userZoomed) render(); updateHorizontalScrollBar(); });
 if (keyframeModeBtnEl) keyframeModeBtnEl.addEventListener("click", toggleTimelineMode);
 registerPanelKeyEventsInterest();
-if (!QUICK_PANEL_MODE) {
+if (!QUICK_PANEL_MODE && !ENGINE_MODE) {
   cs.addEventListener("com.tnt.timeline.nativeSelection", handleNativeSelectionSync);
 }
 renderPlatformBadge();
@@ -14735,7 +14799,11 @@ if (QUICK_PANEL_MODE) {
     window.addEventListener("transitionend", () => scheduleNativeQuickPanelHitShapes(), true);
   }
   refreshQuickPanelState();
-  } else {
+} else if (ENGINE_MODE) {
+  // Hidden: no timeline to draw, so no sync loop, selection monitor or edit
+  // watch. Bridge requests refresh what they need when they run.
+  startAeFxEngine();
+} else {
   // Initial read, then a lightweight focused/hovered fingerprint watch.
   // Full timeline refresh still only happens when the host fingerprint changes.
   refreshLayers({ forceRender: true, skipSettledRefresh: true }).then(() => {

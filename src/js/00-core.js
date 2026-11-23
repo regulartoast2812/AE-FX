@@ -1,5 +1,9 @@
 const cs = new CSInterface();
 const QUICK_PANEL_MODE = /(?:^|\/)quick\.html(?:$|[?#])/i.test(String(window.location.href || ""));
+// engine.html is the hidden extension (com.tnk.ae.fx.engine) that starts with
+// After Effects: it serves the bridge and starts Quick Controls, so shortcuts work
+// before anyone opens the AE FX panel. It never draws or polls the timeline.
+const ENGINE_MODE = /(?:^|\/)engine\.html(?:$|[?#])/i.test(String(window.location.href || ""));
 const timelineEl = document.getElementById("timeline");
 const rulerEl = document.getElementById("ruler");
 const rulerWrapEl = document.getElementById("rulerWrap");

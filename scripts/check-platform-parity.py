@@ -120,7 +120,7 @@ def check_asset_stamp(problems):
             return
         digest.update(path.read_bytes())
     expected = digest.hexdigest()[:12]
-    for page in ("index.html", "quick.html"):
+    for page in ("index.html", "quick.html", "engine.html"):
         found = set(re.findall(r'(?:main\.js|style\.css)\?v=([0-9a-zA-Z._-]+)', read(page)))
         if found != {expected}:
             problems.append(

@@ -2,6 +2,7 @@
 <ExtensionManifest Version="7.0" ExtensionBundleId="com.tnk.ae.fx" ExtensionBundleVersion="0.1.0" ExtensionBundleName="AE FX">
   <ExtensionList>
     <Extension Id="com.tnk.ae.fx.panel" Version="0.1.0" />
+    <Extension Id="com.tnk.ae.fx.engine" Version="0.1.0" />
   </ExtensionList>
   <ExecutionEnvironment>
     <HostList>
@@ -42,6 +43,40 @@
               <Width>560</Width>
               <Height>220</Height>
             </MinSize>
+          </Geometry>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+    <!-- Hidden engine. Starts with After Effects, unseen, so Quick Controls'
+         shortcuts and Edie work without opening the AE FX panel first: it
+         serves the bridge and starts the helper (src/js/25-native-bridge-server.js,
+         startAeFxEngine). Same bundle as the panel, in engine.html. No
+         ScriptPath: it loads timeline.jsx only when nothing has. -->
+    <Extension Id="com.tnk.ae.fx.engine">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./engine.html</MainPath>
+          <CEFCommandLine>
+            <Parameter>--allow-file-access</Parameter>
+            <Parameter>--allow-file-access-from-files</Parameter>
+            <Parameter>--enable-nodejs</Parameter>
+            <Parameter>--mixed-context</Parameter>
+          </CEFCommandLine>
+        </Resources>
+        <Lifecycle>
+          <AutoVisible>false</AutoVisible>
+          <StartOn>
+            <Event>com.adobe.csxs.events.ApplicationInitialized</Event>
+            <Event>applicationActivate</Event>
+          </StartOn>
+        </Lifecycle>
+        <UI>
+          <Type>Custom</Type>
+          <Geometry>
+            <Size>
+              <Width>100</Width>
+              <Height>100</Height>
+            </Size>
           </Geometry>
         </UI>
       </DispatchInfo>

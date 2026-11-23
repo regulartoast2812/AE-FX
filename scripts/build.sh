@@ -96,7 +96,9 @@ tmp_html="$(mktemp "${TMPDIR:-/tmp}/ae-panel-html.XXXXXX")"
 sed -E "s#(main\.js|style\.css)\?v=[0-9a-zA-Z._-]+#\1?v=${asset_stamp}#g" index.html > "$tmp_html"
 mv "$tmp_html" index.html
 cp index.html quick.html
+# The hidden engine extension (com.tnk.ae.fx.engine) runs the same bundle.
+cp index.html engine.html
 
 echo "built: js/main.js (${#js_sources[@]} modules, v${panel_version})"
 echo "built: css/style.css (${#css_sources[@]} modules)"
-echo "built: quick.html (assets stamped ?v=${asset_stamp})"
+echo "built: quick.html, engine.html (assets stamped ?v=${asset_stamp})"

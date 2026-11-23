@@ -1,0 +1,370 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Timeline CEP</title>
+  <link rel="stylesheet" href="./css/style.css?v=46378bd3b5c5" />
+</head>
+<body>
+  <section id="quickPanelShell" class="quick-panel-shell" aria-label="AE FX Quick Controls">
+    <div class="quick-panel-status">
+      <p id="quickPanelContext">Reading active composition...</p>
+      <button id="quickPanelRefresh" class="quick-panel-refresh" type="button" title="Refresh native selection" aria-label="Refresh native selection" data-icon="ui.refresh"></button>
+    </div>
+    <div class="quick-panel-search-wrap">
+      <span class="quick-panel-character" aria-hidden="true"><svg class="brand-face" viewBox="0 0 32 32" width="32" height="32" shape-rendering="crispEdges" aria-hidden="true"><rect x="15" y="6" width="1" height="1" fill="#ef5a30"/><rect x="12" y="7" width="4" height="1" fill="#ef5a30"/><rect x="6" y="8" width="1" height="1" fill="#ef5a30"/><rect x="9" y="8" width="1" height="1" fill="#ef5a30"/><rect x="10" y="8" width="1" height="1" fill="#b02a1c"/><rect x="11" y="8" width="4" height="1" fill="#ef5a30"/><rect x="7" y="9" width="16" height="1" fill="#ef5a30"/><rect x="6" y="10" width="1" height="1" fill="#ef5a30"/><rect x="7" y="10" width="1" height="1" fill="#b02a1c"/><rect x="8" y="10" width="1" height="1" fill="#ef5a30"/><rect x="9" y="10" width="1" height="1" fill="#b02a1c"/><rect x="10" y="10" width="2" height="1" fill="#ef5a30"/><rect x="12" y="10" width="2" height="1" fill="#b02a1c"/><rect x="14" y="10" width="7" height="1" fill="#ef5a30"/><rect x="6" y="11" width="2" height="1" fill="#b02a1c"/><rect x="8" y="11" width="1" height="1" fill="#ef5a30"/><rect x="9" y="11" width="3" height="1" fill="#b02a1c"/><rect x="12" y="11" width="6" height="1" fill="#ef5a30"/><rect x="5" y="12" width="1" height="1" fill="#ef5a30"/><rect x="6" y="12" width="3" height="1" fill="#b02a1c"/><rect x="9" y="12" width="1" height="1" fill="#ef5a30"/><rect x="10" y="12" width="4" height="1" fill="#b02a1c"/><rect x="14" y="12" width="2" height="1" fill="#ef5a30"/><rect x="16" y="12" width="1" height="1" fill="#b02a1c"/><rect x="17" y="12" width="1" height="1" fill="#faa046"/><rect x="30" y="12" width="2" height="1" fill="#f0f0f0"/><rect x="4" y="13" width="1" height="1" fill="#faa046"/><rect x="5" y="13" width="4" height="1" fill="#b02a1c"/><rect x="9" y="13" width="1" height="1" fill="#ef5a30"/><rect x="10" y="13" width="6" height="1" fill="#b02a1c"/><rect x="16" y="13" width="2" height="1" fill="#ef5a30"/><rect x="18" y="13" width="1" height="1" fill="#b02a1c"/><rect x="19" y="13" width="1" height="1" fill="#faa046"/><rect x="30" y="13" width="2" height="1" fill="#f0f0f0"/><rect x="4" y="14" width="5" height="1" fill="#b02a1c"/><rect x="9" y="14" width="1" height="1" fill="#ef5a30"/><rect x="10" y="14" width="8" height="1" fill="#b02a1c"/><rect x="18" y="14" width="1" height="1" fill="#ef5a30"/><rect x="19" y="14" width="1" height="1" fill="#b02a1c"/><rect x="26" y="14" width="2" height="1" fill="#f0f0f0"/><rect x="28" y="14" width="2" height="1" fill="#5f5f6c"/><rect x="2" y="15" width="2" height="1" fill="#faa046"/><rect x="4" y="15" width="2" height="1" fill="#b02a1c"/><rect x="6" y="15" width="2" height="1" fill="#faa046"/><rect x="8" y="15" width="4" height="1" fill="#b02a1c"/><rect x="12" y="15" width="2" height="1" fill="#faa046"/><rect x="14" y="15" width="8" height="1" fill="#b02a1c"/><rect x="26" y="15" width="2" height="1" fill="#f0f0f0"/><rect x="28" y="15" width="2" height="1" fill="#5f5f6c"/><rect x="2" y="16" width="6" height="1" fill="#faa046"/><rect x="8" y="16" width="4" height="1" fill="#b02a1c"/><rect x="12" y="16" width="7" height="1" fill="#faa046"/><rect x="19" y="16" width="4" height="1" fill="#b02a1c"/><rect x="24" y="16" width="2" height="1" fill="#f0f0f0"/><rect x="26" y="16" width="2" height="1" fill="#5f5f6c"/><rect x="2" y="17" width="20" height="1" fill="#faa046"/><rect x="24" y="17" width="2" height="1" fill="#f0f0f0"/><rect x="26" y="17" width="2" height="1" fill="#5f5f6c"/><rect x="2" y="18" width="20" height="1" fill="#faa046"/><rect x="22" y="18" width="2" height="1" fill="#f0f0f0"/><rect x="24" y="18" width="2" height="1" fill="#5f5f6c"/><rect x="2" y="19" width="7" height="1" fill="#faa046"/><rect x="9" y="19" width="1" height="1" fill="#b8692c"/><rect x="10" y="19" width="2" height="1" fill="#19191c"/><rect x="12" y="19" width="4" height="1" fill="#faa046"/><rect x="16" y="19" width="1" height="1" fill="#b8692c"/><rect x="17" y="19" width="2" height="1" fill="#19191c"/><rect x="19" y="19" width="3" height="1" fill="#faa046"/><rect x="22" y="19" width="2" height="1" fill="#f0f0f0"/><rect x="24" y="19" width="2" height="1" fill="#5f5f6c"/><rect x="2" y="20" width="7" height="1" fill="#faa046"/><rect x="9" y="20" width="3" height="1" fill="#19191c"/><rect x="12" y="20" width="4" height="1" fill="#faa046"/><rect x="16" y="20" width="3" height="1" fill="#19191c"/><rect x="19" y="20" width="3" height="1" fill="#faa046"/><rect x="22" y="20" width="10" height="1" fill="#5f5f6c"/><rect x="2" y="21" width="2" height="1" fill="#faa046"/><rect x="4" y="21" width="1" height="1" fill="#e8607a"/><rect x="5" y="21" width="1" height="1" fill="#faa046"/><rect x="6" y="21" width="1" height="1" fill="#e8607a"/><rect x="7" y="21" width="1" height="1" fill="#faa046"/><rect x="8" y="21" width="1" height="1" fill="#e8607a"/><rect x="9" y="21" width="3" height="1" fill="#19191c"/><rect x="12" y="21" width="4" height="1" fill="#faa046"/><rect x="16" y="21" width="3" height="1" fill="#19191c"/><rect x="19" y="21" width="1" height="1" fill="#e8607a"/><rect x="20" y="21" width="1" height="1" fill="#faa046"/><rect x="21" y="21" width="1" height="1" fill="#e8607a"/><rect x="22" y="21" width="10" height="1" fill="#5f5f6c"/><rect x="2" y="22" width="2" height="1" fill="#faa046"/><rect x="4" y="22" width="1" height="1" fill="#e8607a"/><rect x="5" y="22" width="1" height="1" fill="#faa046"/><rect x="6" y="22" width="1" height="1" fill="#e8607a"/><rect x="7" y="22" width="1" height="1" fill="#faa046"/><rect x="8" y="22" width="1" height="1" fill="#e8607a"/><rect x="9" y="22" width="8" height="1" fill="#faa046"/><rect x="17" y="22" width="1" height="1" fill="#e8607a"/><rect x="18" y="22" width="1" height="1" fill="#faa046"/><rect x="19" y="22" width="1" height="1" fill="#e8607a"/><rect x="20" y="22" width="1" height="1" fill="#faa046"/><rect x="21" y="22" width="1" height="1" fill="#e8607a"/><rect x="22" y="22" width="2" height="1" fill="#5f5f6c"/><rect x="24" y="22" width="6" height="1" fill="#f0f0f0"/><rect x="30" y="22" width="2" height="1" fill="#5f5f6c"/><rect x="1" y="23" width="2" height="1" fill="#cd8339"/><rect x="3" y="23" width="1" height="1" fill="#faa046"/><rect x="4" y="23" width="1" height="1" fill="#e8607a"/><rect x="5" y="23" width="1" height="1" fill="#faa046"/><rect x="6" y="23" width="1" height="1" fill="#e8607a"/><rect x="7" y="23" width="1" height="1" fill="#faa046"/><rect x="8" y="23" width="1" height="1" fill="#e8607a"/><rect x="9" y="23" width="2" height="1" fill="#faa046"/><rect x="11" y="23" width="1" height="1" fill="#19191c"/><rect x="12" y="23" width="4" height="1" fill="#faa046"/><rect x="16" y="23" width="1" height="1" fill="#19191c"/><rect x="17" y="23" width="1" height="1" fill="#e8607a"/><rect x="18" y="23" width="1" height="1" fill="#faa046"/><rect x="19" y="23" width="1" height="1" fill="#e8607a"/><rect x="20" y="23" width="1" height="1" fill="#faa046"/><rect x="21" y="23" width="1" height="1" fill="#e8607a"/><rect x="22" y="23" width="2" height="1" fill="#5f5f6c"/><rect x="24" y="23" width="6" height="1" fill="#f0f0f0"/><rect x="30" y="23" width="2" height="1" fill="#5f5f6c"/><rect x="0" y="24" width="4" height="1" fill="#cd8339"/><rect x="4" y="24" width="7" height="1" fill="#faa046"/><rect x="11" y="24" width="6" height="1" fill="#19191c"/><rect x="17" y="24" width="5" height="1" fill="#faa046"/><rect x="22" y="24" width="10" height="1" fill="#5f5f6c"/><rect x="0" y="25" width="4" height="1" fill="#cd8339"/><rect x="4" y="25" width="8" height="1" fill="#faa046"/><rect x="12" y="25" width="4" height="1" fill="#19191c"/><rect x="16" y="25" width="6" height="1" fill="#faa046"/><rect x="22" y="25" width="2" height="1" fill="#cd8339"/><rect x="24" y="25" width="8" height="1" fill="#5f5f6c"/><rect x="1" y="26" width="2" height="1" fill="#cd8339"/><rect x="3" y="26" width="18" height="1" fill="#faa046"/><rect x="21" y="26" width="4" height="1" fill="#cd8339"/><rect x="25" y="26" width="3" height="1" fill="#f0f0f0"/><rect x="28" y="26" width="4" height="1" fill="#5f5f6c"/><rect x="4" y="27" width="16" height="1" fill="#faa046"/><rect x="21" y="27" width="4" height="1" fill="#cd8339"/><rect x="25" y="27" width="3" height="1" fill="#f0f0f0"/><rect x="28" y="27" width="4" height="1" fill="#5f5f6c"/><rect x="4" y="28" width="16" height="1" fill="#faa046"/><rect x="22" y="28" width="2" height="1" fill="#cd8339"/><rect x="24" y="28" width="8" height="1" fill="#5f5f6c"/><rect x="6" y="29" width="12" height="1" fill="#faa046"/><rect x="22" y="29" width="10" height="1" fill="#5f5f6c"/><rect x="6" y="30" width="3" height="1" fill="#cd8339"/><rect x="15" y="30" width="3" height="1" fill="#cd8339"/><rect x="6" y="31" width="3" height="1" fill="#cd8339"/><rect x="15" y="31" width="3" height="1" fill="#cd8339"/></svg></span>
+      <span class="quick-panel-search-icon" aria-hidden="true"></span>
+      <input id="quickPanelSearch" class="quick-panel-search" type="text" spellcheck="false" autocomplete="off" placeholder="Search commands or effects" aria-label="Search commands or effects">
+      <kbd class="quick-panel-search-key">Enter</kbd>
+    </div>
+    <div id="quickPanelSearchResults" class="quick-panel-search-results" aria-live="polite"></div>
+    <div class="quick-panel-grid">
+      <button type="button" data-quick-panel="anchor" data-tooltip="Layout\nShortcut: Ctrl+A\nAnchor, align, distribute, stagger, layer order and pull/snap." data-icon="panel.anchor"><span class="quick-panel-name">Layout</span><kbd>Ctrl+A</kbd></button>
+      <button type="button" data-quick-panel="composition" data-tooltip="Composition\nShortcut: Ctrl+C\nOpen composition-level utilities." data-icon="panel.composition"><span class="quick-panel-name">Comp</span><kbd>Ctrl+C</kbd></button>
+      <button type="button" data-quick-panel="rename-comp" data-tooltip="Rename Composition\nRename the active composition directly." data-icon="panel.rename-comp"><span class="quick-panel-name">Rename Comp</span><kbd>RN</kbd></button>
+      <button type="button" data-quick-panel="ease" data-tooltip="Ease Editor\nShortcut: Ctrl+E\nEdit selected native keyframes." data-icon="panel.ease"><span class="quick-panel-name">Ease</span><kbd>Ctrl+E</kbd></button>
+      <button type="button" data-quick-panel="mask" data-tooltip="Mask Control\nShortcut: Ctrl+F\nEdit masks on selected layers." data-icon="panel.mask"><span class="quick-panel-name">Mask</span><kbd>Ctrl+F</kbd></button>
+      <button type="button" data-quick-panel="effects" data-tooltip="Effects Control\nSearch, apply, toggle, and delete effects on selected layers." data-icon="panel.effects"><span class="quick-panel-name">Effects</span><kbd>FX</kbd></button>
+      <button type="button" data-quick-panel="shapes" data-tooltip="Shape Control\nInspect selected shape contents and add common shape items." data-icon="panel.shapes"><span class="quick-panel-name">Shapes</span><kbd>SH</kbd></button>
+      <button type="button" data-quick-panel="styles" data-tooltip="Layer Styles\nShortcut: Ctrl+S\nAdd and edit styles on selected layers." data-icon="panel.styles"><span class="quick-panel-name">Styles</span><kbd>Ctrl+S</kbd></button>
+      <button type="button" data-quick-panel="layer-menu" data-tooltip="Layer Menu\nOpen the selected-layer right-click menu from Quick Controls." data-icon="panel.layer-menu"><span class="quick-panel-name">Layer Menu</span><kbd>RC</kbd></button>
+      <button type="button" data-quick-panel="mass-edit" data-tooltip="Mass Edit\nShortcut: Ctrl+M\nCopy, wrangle, and edit properties across selected layers." data-icon="panel.mass-edit"><span class="quick-panel-name">Mass Edit</span><kbd>Ctrl+M</kbd></button>
+      <button type="button" data-quick-panel="text-animation" data-tooltip="Text Animation\nShortcut: Ctrl+T\nBuild text animators and manage selected text layers." data-icon="panel.text-animation"><span class="quick-panel-name">Text Anim</span><kbd>Ctrl+T</kbd></button>
+      <button type="button" data-quick-panel="tnk" data-tooltip="TNK Tools\nShortcut: Ctrl+D\nGlobal parameter bar feeding every tool, TNK v3 style." data-icon="panel.tnk"><span class="quick-panel-name">TNK</span><kbd>Ctrl+D</kbd></button>
+    </div>
+    <p class="quick-panel-hint">Uses the current native Timeline or Composition selection.</p>
+  </section>
+  <header>
+    <div class="status-row">
+      <div id="platformBadge" class="platform-badge" aria-label="Platform"></div>
+      <div id="compSelect" class="comp-select" title="Composition">
+        <button id="compSelectButton" class="comp-select-button" type="button">No active comp</button>
+        <input id="compSelectSearch" class="comp-select-search" type="text" spellcheck="false" autocomplete="off" aria-label="Search compositions">
+        <div id="compSelectMenu" class="comp-select-menu" aria-hidden="true"></div>
+      </div>
+      <span id="status">Open a comp.</span>
+      <button id="durationBtn" title="Set comp duration">Set Length</button>
+      <button id="keyframeModeBtn" title="Toggle keyframe focus mode">Keyframes</button>
+    </div>
+  </header>
+
+  <div id="durationModal" class="modal-backdrop" aria-hidden="true">
+    <div class="duration-dialog">
+      <div class="dialog-title">Set Composition Duration</div>
+      <div class="dialog-subtitle">Seconds, mm:ss, or hh:mm:ss</div>
+      <input id="durationInput" type="text" spellcheck="false" />
+      <div id="durationError" class="dialog-error"></div>
+      <div class="dialog-actions">
+        <button id="durationCancel" class="dialog-btn">Cancel</button>
+        <button id="durationApply" class="dialog-btn primary">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="expressionModal" class="modal-backdrop" aria-hidden="true">
+    <div class="duration-dialog expression-dialog">
+      <div id="expressionTitle" class="dialog-title">Expression</div>
+      <div id="expressionSubtitle" class="dialog-subtitle">Alt-click a property row to edit</div>
+      <textarea id="expressionInput" spellcheck="false"></textarea>
+      <div id="expressionError" class="dialog-error"></div>
+      <div class="dialog-actions">
+        <button id="expressionDisable" class="dialog-btn">Disable</button>
+        <button id="expressionCancel" class="dialog-btn">Cancel</button>
+        <button id="expressionApply" class="dialog-btn primary">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="anchorModal" class="modal-backdrop" aria-hidden="true">
+    <div class="duration-dialog anchor-dialog">
+      <div class="dialog-title">Anchor Point</div>
+      <div class="dialog-subtitle">Pick where the selected layer anchor should sit</div>
+      <div class="layout-panel-head">
+        <span class="layout-panel-name">Layout</span>
+        <em class="layout-panel-count" data-tnt-selection></em>
+      </div>
+      <div class="anchor-panel">
+        <div class="anchor-section">
+          <div class="anchor-section-title">Anchor</div>
+          <div id="anchorGrid" class="anchor-grid" role="group" aria-label="Anchor point position">
+            <button type="button" class="anchor-cell" data-point="TL" title="Top left"></button>
+            <button type="button" class="anchor-cell" data-point="TC" title="Top center"></button>
+            <button type="button" class="anchor-cell" data-point="TR" title="Top right"></button>
+            <button type="button" class="anchor-cell" data-point="ML" title="Middle left"></button>
+            <button type="button" class="anchor-cell active" data-point="C" title="Center"></button>
+            <button type="button" class="anchor-cell" data-point="MR" title="Middle right"></button>
+            <button type="button" class="anchor-cell" data-point="BL" title="Bottom left"></button>
+            <button type="button" class="anchor-cell" data-point="BC" title="Bottom center"></button>
+            <button type="button" class="anchor-cell" data-point="BR" title="Bottom right"></button>
+          </div>
+          <label class="anchor-option">
+            <input id="anchorUseMasks" type="checkbox" checked>
+            <span>Use mask bounds</span>
+          </label>
+        </div>
+        <div class="anchor-section anchor-align-section">
+          <div class="anchor-section-title">Align</div>
+          <label class="anchor-align-target">
+            <span>Align to:</span>
+            <select id="anchorAlignTarget" aria-label="Align layers to">
+              <option value="selection">Selection</option>
+              <option value="comp">Composition</option>
+            </select>
+          </label>
+          <div id="anchorAlignGrid" class="anchor-align-grid" role="group" aria-label="Align selected layers">
+            <button type="button" class="anchor-align-btn align-left" data-align="left" data-icon="align-start-vertical" title="Align left"></button>
+            <button type="button" class="anchor-align-btn align-hcenter" data-align="hcenter" data-icon="align-center-vertical" title="Align horizontal center"></button>
+            <button type="button" class="anchor-align-btn align-right" data-align="right" data-icon="align-end-vertical" title="Align right"></button>
+            <button type="button" class="anchor-align-btn align-top" data-align="top" data-icon="align-start-horizontal" title="Align top"></button>
+            <button type="button" class="anchor-align-btn align-vcenter" data-align="vcenter" data-icon="align-center-horizontal" title="Align vertical center"></button>
+            <button type="button" class="anchor-align-btn align-bottom" data-align="bottom" data-icon="align-end-horizontal" title="Align bottom"></button>
+          </div>
+          <div class="anchor-section-title anchor-distribute-title">Distribute Layers</div>
+          <div id="anchorDistributeGrid" class="anchor-align-grid anchor-distribute-grid" role="group" aria-label="Distribute selected layers">
+            <button type="button" class="anchor-align-btn dist-top" data-align="dist-top" data-icon="align-vertical-distribute-start" title="Distribute top edges"></button>
+            <button type="button" class="anchor-align-btn dist-vcenter" data-align="dist-vcenter" data-icon="align-vertical-distribute-center" title="Distribute vertical centers"></button>
+            <button type="button" class="anchor-align-btn dist-bottom" data-align="dist-bottom" data-icon="align-vertical-distribute-end" title="Distribute bottom edges"></button>
+            <button type="button" class="anchor-align-btn dist-left" data-align="dist-left" data-icon="align-horizontal-distribute-start" title="Distribute left edges"></button>
+            <button type="button" class="anchor-align-btn dist-hcenter" data-align="dist-hcenter" data-icon="align-horizontal-distribute-center" title="Distribute horizontal centers"></button>
+            <button type="button" class="anchor-align-btn dist-right" data-align="dist-right" data-icon="align-horizontal-distribute-end" title="Distribute right edges"></button>
+          </div>
+          <label class="anchor-option anchor-align-option">
+            <input id="anchorIgnoreParent" type="checkbox">
+            <span>Ignore parenting</span>
+          </label>
+        </div>
+        <div id="anchorTimingSections" class="anchor-timing-sections">
+        <div class="timing-column">
+<section class="timing-order-card timing-stagger-card">
+          <header class="timing-order-head">
+            <div class="tnt-card-title timing-order-title"><b>ST</b><span>Stagger</span></div>
+          </header>
+          <div class="timing-order-body">
+            <div class="timing-inline-row"><div class="timing-execute-actions" role="group" aria-label="Choose stagger direction">
+              <button type="button" data-stagger-execute="asc" data-icon="arrow-up-narrow-wide" data-tooltip="Bottom Up\nUse the bottom selected layer as the first layer, then stagger upward."><strong>Bottom up</strong><span>Stagger upward</span></button>
+              <button type="button" data-stagger-execute="desc" data-icon="arrow-down-wide-narrow" data-tooltip="Top Down\nUse the top selected layer as the first layer, then stagger downward."><strong>Top down</strong><span>Stagger downward</span></button>
+              <button type="button" data-stagger-execute="random" data-icon="shuffle" data-tooltip="Random Stagger\nShuffle the selected layers once, then use the slider to set the offset."><strong>Random</strong><span>Shuffle timing</span></button>
+            </div>
+              <label class="timing-group-control" data-tooltip="Group Size\nRepeat offsets inside groups. 1 staggers every selected layer in one run."><span>Group:</span><input class="timing-group-input" type="number" min="1" step="1" value="1"></label>
+              </div>
+            <div class="timing-order-field">
+              <span>Offset / gap</span>
+              <div class="timing-amount-row">
+                <input class="timing-amount-range" type="range" min="0" max="60" step="1" value="0" data-tooltip="Apply Stagger\nChoose a direction above, then drag to apply the offset from the original layer positions.">
+                <input class="timing-amount-input" type="number" min="0" step="1" value="0" data-tooltip="Exact Offset\nEnter an exact amount. The selected stagger direction applies from the original layer positions.">
+                <select class="timing-unit-select" data-tooltip="Unit\nMeasure the offset in composition frames or in seconds.">
+                  <option value="frames">Frames</option>
+                  <option value="seconds">Secs</option>
+                </select>
+              </div>
+              <div class="timing-live-status">Choose a direction, then move the slider to apply.</div>
+            </div>
+          </div>
+          <div class="timing-order-error"></div>
+        </section>
+<section class="timing-order-card timing-snap-pull-card">
+          <header class="timing-order-head">
+            <div class="tnt-card-title timing-order-title"><b>SP</b><span>Pull / Snap</span></div>
+          </header>
+          <div class="timing-order-body">
+            <div class="timing-order-field">
+              <span>Pull</span>
+              <div class="timing-inline-row timing-pull-choices">
+                <span>Move:</span>
+                <select class="timing-pull-mode" data-tooltip="What to move\nThe selected layers, or the selected keyframes.">
+                  <option value="layers">Layers</option>
+                  <option value="keys">Keyframes</option>
+                </select>
+              </div>
+              <div class="timing-inline-row timing-pull-row">
+                <span>Pull:</span>
+                <div class="timing-execute-actions" role="group" aria-label="Pull to playhead">
+                  <button type="button" data-pull-run="in" data-icon="arrow-right-from-line" data-tooltip="Pull In\nMove to the playhead by the in point, keeping the selection's relative spacing.\nWith Keyframes: the layer's keys travel as a group, anchored by the first."></button>
+                  <button type="button" data-pull-run="out" data-icon="arrow-left-from-line" data-tooltip="Pull Out\nMove to the playhead by the out point, keeping the selection's relative spacing.\nWith Keyframes: the layer's keys travel as a group, anchored by the last."></button>
+                </div>
+                <span>Snap:</span>
+                <div class="timing-execute-actions" role="group" aria-label="Snap to playhead">
+                  <button type="button" data-snap-run="in" data-icon="align-horizontal-justify-start" data-tooltip="Snap In\nMove every selected layer's in point onto the playhead individually.\nWith Keyframes: each property's first key lands on the playhead."></button>
+                  <button type="button" data-snap-run="out" data-icon="align-horizontal-justify-end" data-tooltip="Snap Out\nMove every selected layer's out point onto the playhead individually.\nWith Keyframes: each property's last key lands on the playhead."></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="timing-order-error"></div>
+        </section>
+</div>
+
+        <section class="timing-order-card layer-order-card">
+          <header class="timing-order-head">
+            <div class="tnt-card-title timing-order-title"><b>OR</b><span>Layer Order</span></div>
+          </header>
+          <div class="timing-order-body">
+            <div class="timing-order-field order-direction-field">
+              <span>Direction:</span>
+              <select class="timing-direction-select" data-tooltip="Direction\nAscending puts the smallest value at the bottom of the selected stack.">
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
+            </div>
+            <div class="timing-order-field order-group-field">
+              <span>Timing:</span>
+              <div class="timing-execute-actions order-sort-actions" role="group" aria-label="Sort selected layers by timing">
+                <button type="button" data-order-sort="in" data-icon="chevrons-left" data-tooltip="By In Point\nSort selected layers by in point."><strong>In point</strong><span>Layer start</span></button>
+                <button type="button" data-order-sort="out" data-icon="chevrons-right" data-tooltip="By Out Point\nSort selected layers by out point."><strong>Out point</strong><span>Layer end</span></button>
+                <button type="button" data-order-sort="firstKey" data-icon="skip-back" data-tooltip="Earliest Keyframe\nSort by each layer's earliest keyframe. Layers with no keys use their in point."><strong>First key</strong><span>Earliest key</span></button>
+                <button type="button" data-order-sort="lastKey" data-icon="skip-forward" data-tooltip="Last Keyframe\nSort by each layer's latest keyframe. Layers with no keys use their in point."><strong>Last key</strong><span>Latest key</span></button>
+              </div>
+            </div>
+            <div class="timing-order-field order-group-field">
+              <span>Position:</span>
+              <div class="timing-execute-actions order-sort-actions" role="group" aria-label="Sort selected layers by position">
+                <button type="button" data-order-sort="x" data-icon="move-horizontal" data-tooltip="By X Position\nSort selected layers by Position X at the current time."><strong>X position</strong><span>Left to right</span></button>
+                <button type="button" data-order-sort="y" data-icon="move-vertical" data-tooltip="By Y Position\nSort selected layers by Position Y at the current time."><strong>Y position</strong><span>Top to bottom</span></button>
+                <button type="button" data-order-sort="distance" data-icon="ruler" data-tooltip="By Distance\nSort selected layers by how far each one sits from the last layer in the selection, measured at the current time."><strong>Distance</strong><span>From last selected</span></button>
+              </div>
+            </div>
+            <div class="timing-order-field order-group-field">
+              <span>Stack:</span>
+              <div class="timing-execute-actions order-stack-actions" role="group" aria-label="Reorder the selected stack">
+                <button type="button" data-order-stack="top" data-icon="arrow-up-to-line" data-tooltip="Send to Top\nMove the selected layers to the top of the composition stack while preserving their order."><strong>Send to top</strong><span>Top of layer stack</span></button>
+                <button type="button" data-order-stack="bottom" data-icon="arrow-down-to-line" data-tooltip="Send to Bottom\nMove the selected layers to the bottom of the composition stack while preserving their order."><strong>Send to bottom</strong><span>Bottom of layer stack</span></button>
+                <button type="button" data-order-stack="reverse" data-icon="flip-vertical-2" data-tooltip="Reverse Layer Order  (R)\nReverse the selected layers inside their current stack slots. The unselected layers do not move."><strong>Reverse</strong><span>Reverse selected stack</span></button>
+                <button type="button" data-order-sort="random" data-icon="shuffle" data-tooltip="Randomize\nShuffle selected layers and move the shuffled selection to the top of the stack."><strong>Random</strong><span>Shuffle stack</span></button>
+              </div>
+            </div>
+          <div class="timing-order-error"></div>
+        </section>
+
+        
+        </div>
+      </div>
+      <div id="anchorError" class="dialog-error"></div>
+    </div>
+  </div>
+
+  <div id="compositionModal" class="modal-backdrop composition-backdrop" aria-hidden="true">
+    <div class="composition-dialog" role="dialog" aria-modal="true" aria-labelledby="compositionTitle">
+      <div class="composition-head">
+        <div class="composition-title-wrap">
+          <b class="subpanel-shortcut-badge">C</b>
+          <div id="compositionTitle" class="composition-title">Composition</div>
+          <span id="compositionName" class="composition-name">No active comp</span>
+        </div>
+      </div>
+      <div class="composition-body">
+        <section class="composition-section">
+          <div class="composition-section-title">Current Composition</div>
+          <div class="composition-tool-grid">
+            <button type="button" class="composition-tool" data-composition-action="trim" title="Trim the active composition to the latest layer out point">
+              <span class="composition-tool-icon icon-trim" aria-hidden="true"></span>
+              <span>Auto Trim Comp</span>
+            </button>
+            <button type="button" class="composition-tool" data-composition-action="crop" title="Crop selected precomposition layers to their visible content">
+              <span class="composition-tool-icon icon-crop" aria-hidden="true"></span>
+              <span>Auto Crop Comps</span>
+            </button>
+            <button type="button" class="composition-tool" data-composition-action="precompose" title="Move selected layers into a new precomposition">
+              <span class="composition-tool-icon icon-precompose" aria-hidden="true"></span>
+              <span>Pre-compose Selected</span>
+            </button>
+            <button type="button" class="composition-tool" data-composition-action="decompose" title="Extract selected precomposition layers into this timeline while preserving their placement">
+              <span class="composition-tool-icon icon-decompose" aria-hidden="true"></span>
+              <span>Decompose Precomp</span>
+            </button>
+            <button type="button" class="composition-tool composition-tool-destructive" data-composition-action="decomposeDelete" title="Extract the selected precomp, then delete its source composition from the project when it has no other uses">
+              <span class="composition-tool-icon icon-decompose" aria-hidden="true"></span>
+              <span>Decompose + Delete Source</span>
+            </button>
+            <button type="button" class="composition-tool" data-composition-action="rename" title="Rename the active composition">
+              <span class="composition-tool-icon icon-rename" aria-hidden="true"></span>
+              <span>Rename Composition</span>
+            </button>
+            <button type="button" class="composition-tool" data-composition-action="duration" title="Set the active composition duration">
+              <span class="composition-tool-icon icon-duration" aria-hidden="true"></span>
+              <span>Set Composition Length</span>
+            </button>
+            <button type="button" class="composition-tool" data-composition-action="render" title="Add the active composition to the render queue">
+              <span class="composition-tool-icon icon-render" aria-hidden="true"></span>
+              <span>Add to Render Queue</span>
+            </button>
+          </div>
+        </section>
+        <section class="composition-section composition-roadmap">
+          <div class="composition-section-title">Planned</div>
+          <div class="composition-roadmap-list">
+            <span>Duplicate Comps</span>
+            <span>Batch Rename Comps</span>
+            <span>Batch Scale Comps</span>
+            <span>Batch Resize Canvas</span>
+            <span>Batch Comp Settings</span>
+            <span>Batch Color Replace</span>
+            <span>Export Comps as New Projects</span>
+          </div>
+        </section>
+      </div>
+      <div id="compositionError" class="composition-error"></div>
+    </div>
+  </div>
+
+  <main id="scrollArea">
+    <section id="assistantHub" class="assistant-hub" aria-label="Assistant Hub">
+      <div class="assistant-tabs" role="tablist" aria-label="Assistant workspace">
+        <!-- Edie, as in PR FX's toolbar (client/index.html): same art, facing right. -->
+        <svg class="brand-face" viewBox="0 0 32 32" width="32" height="32" shape-rendering="crispEdges" aria-hidden="true"><rect x="15" y="6" width="1" height="1" fill="#ef5a30"/><rect x="12" y="7" width="4" height="1" fill="#ef5a30"/><rect x="6" y="8" width="1" height="1" fill="#ef5a30"/><rect x="9" y="8" width="1" height="1" fill="#ef5a30"/><rect x="10" y="8" width="1" height="1" fill="#b02a1c"/><rect x="11" y="8" width="4" height="1" fill="#ef5a30"/><rect x="7" y="9" width="16" height="1" fill="#ef5a30"/><rect x="6" y="10" width="1" height="1" fill="#ef5a30"/><rect x="7" y="10" width="1" height="1" fill="#b02a1c"/><rect x="8" y="10" width="1" height="1" fill="#ef5a30"/><rect x="9" y="10" width="1" height="1" fill="#b02a1c"/><rect x="10" y="10" width="2" height="1" fill="#ef5a30"/><rect x="12" y="10" width="2" height="1" fill="#b02a1c"/><rect x="14" y="10" width="7" height="1" fill="#ef5a30"/><rect x="6" y="11" width="2" height="1" fill="#b02a1c"/><rect x="8" y="11" width="1" height="1" fill="#ef5a30"/><rect x="9" y="11" width="3" height="1" fill="#b02a1c"/><rect x="12" y="11" width="6" height="1" fill="#ef5a30"/><rect x="5" y="12" width="1" height="1" fill="#ef5a30"/><rect x="6" y="12" width="3" height="1" fill="#b02a1c"/><rect x="9" y="12" width="1" height="1" fill="#ef5a30"/><rect x="10" y="12" width="4" height="1" fill="#b02a1c"/><rect x="14" y="12" width="2" height="1" fill="#ef5a30"/><rect x="16" y="12" width="1" height="1" fill="#b02a1c"/><rect x="17" y="12" width="1" height="1" fill="#faa046"/><rect x="30" y="12" width="2" height="1" fill="#f0f0f0"/><rect x="4" y="13" width="1" height="1" fill="#faa046"/><rect x="5" y="13" width="4" height="1" fill="#b02a1c"/><rect x="9" y="13" width="1" height="1" fill="#ef5a30"/><rect x="10" y="13" width="6" height="1" fill="#b02a1c"/><rect x="16" y="13" width="2" height="1" fill="#ef5a30"/><rect x="18" y="13" width="1" height="1" fill="#b02a1c"/><rect x="19" y="13" width="1" height="1" fill="#faa046"/><rect x="30" y="13" width="2" height="1" fill="#f0f0f0"/><rect x="4" y="14" width="5" height="1" fill="#b02a1c"/><rect x="9" y="14" width="1" height="1" fill="#ef5a30"/><rect x="10" y="14" width="8" height="1" fill="#b02a1c"/><rect x="18" y="14" width="1" height="1" fill="#ef5a30"/><rect x="19" y="14" width="1" height="1" fill="#b02a1c"/><rect x="26" y="14" width="2" height="1" fill="#f0f0f0"/><rect x="28" y="14" width="2" height="1" fill="#5f5f6c"/><rect x="2" y="15" width="2" height="1" fill="#faa046"/><rect x="4" y="15" width="2" height="1" fill="#b02a1c"/><rect x="6" y="15" width="2" height="1" fill="#faa046"/><rect x="8" y="15" width="4" height="1" fill="#b02a1c"/><rect x="12" y="15" width="2" height="1" fill="#faa046"/><rect x="14" y="15" width="8" height="1" fill="#b02a1c"/><rect x="26" y="15" width="2" height="1" fill="#f0f0f0"/><rect x="28" y="15" width="2" height="1" fill="#5f5f6c"/><rect x="2" y="16" width="6" height="1" fill="#faa046"/><rect x="8" y="16" width="4" height="1" fill="#b02a1c"/><rect x="12" y="16" width="7" height="1" fill="#faa046"/><rect x="19" y="16" width="4" height="1" fill="#b02a1c"/><rect x="24" y="16" width="2" height="1" fill="#f0f0f0"/><rect x="26" y="16" width="2" height="1" fill="#5f5f6c"/><rect x="2" y="17" width="20" height="1" fill="#faa046"/><rect x="24" y="17" width="2" height="1" fill="#f0f0f0"/><rect x="26" y="17" width="2" height="1" fill="#5f5f6c"/><rect x="2" y="18" width="20" height="1" fill="#faa046"/><rect x="22" y="18" width="2" height="1" fill="#f0f0f0"/><rect x="24" y="18" width="2" height="1" fill="#5f5f6c"/><rect x="2" y="19" width="7" height="1" fill="#faa046"/><rect x="9" y="19" width="1" height="1" fill="#b8692c"/><rect x="10" y="19" width="2" height="1" fill="#19191c"/><rect x="12" y="19" width="4" height="1" fill="#faa046"/><rect x="16" y="19" width="1" height="1" fill="#b8692c"/><rect x="17" y="19" width="2" height="1" fill="#19191c"/><rect x="19" y="19" width="3" height="1" fill="#faa046"/><rect x="22" y="19" width="2" height="1" fill="#f0f0f0"/><rect x="24" y="19" width="2" height="1" fill="#5f5f6c"/><rect x="2" y="20" width="7" height="1" fill="#faa046"/><rect x="9" y="20" width="3" height="1" fill="#19191c"/><rect x="12" y="20" width="4" height="1" fill="#faa046"/><rect x="16" y="20" width="3" height="1" fill="#19191c"/><rect x="19" y="20" width="3" height="1" fill="#faa046"/><rect x="22" y="20" width="10" height="1" fill="#5f5f6c"/><rect x="2" y="21" width="2" height="1" fill="#faa046"/><rect x="4" y="21" width="1" height="1" fill="#e8607a"/><rect x="5" y="21" width="1" height="1" fill="#faa046"/><rect x="6" y="21" width="1" height="1" fill="#e8607a"/><rect x="7" y="21" width="1" height="1" fill="#faa046"/><rect x="8" y="21" width="1" height="1" fill="#e8607a"/><rect x="9" y="21" width="3" height="1" fill="#19191c"/><rect x="12" y="21" width="4" height="1" fill="#faa046"/><rect x="16" y="21" width="3" height="1" fill="#19191c"/><rect x="19" y="21" width="1" height="1" fill="#e8607a"/><rect x="20" y="21" width="1" height="1" fill="#faa046"/><rect x="21" y="21" width="1" height="1" fill="#e8607a"/><rect x="22" y="21" width="10" height="1" fill="#5f5f6c"/><rect x="2" y="22" width="2" height="1" fill="#faa046"/><rect x="4" y="22" width="1" height="1" fill="#e8607a"/><rect x="5" y="22" width="1" height="1" fill="#faa046"/><rect x="6" y="22" width="1" height="1" fill="#e8607a"/><rect x="7" y="22" width="1" height="1" fill="#faa046"/><rect x="8" y="22" width="1" height="1" fill="#e8607a"/><rect x="9" y="22" width="8" height="1" fill="#faa046"/><rect x="17" y="22" width="1" height="1" fill="#e8607a"/><rect x="18" y="22" width="1" height="1" fill="#faa046"/><rect x="19" y="22" width="1" height="1" fill="#e8607a"/><rect x="20" y="22" width="1" height="1" fill="#faa046"/><rect x="21" y="22" width="1" height="1" fill="#e8607a"/><rect x="22" y="22" width="2" height="1" fill="#5f5f6c"/><rect x="24" y="22" width="6" height="1" fill="#f0f0f0"/><rect x="30" y="22" width="2" height="1" fill="#5f5f6c"/><rect x="1" y="23" width="2" height="1" fill="#cd8339"/><rect x="3" y="23" width="1" height="1" fill="#faa046"/><rect x="4" y="23" width="1" height="1" fill="#e8607a"/><rect x="5" y="23" width="1" height="1" fill="#faa046"/><rect x="6" y="23" width="1" height="1" fill="#e8607a"/><rect x="7" y="23" width="1" height="1" fill="#faa046"/><rect x="8" y="23" width="1" height="1" fill="#e8607a"/><rect x="9" y="23" width="2" height="1" fill="#faa046"/><rect x="11" y="23" width="1" height="1" fill="#19191c"/><rect x="12" y="23" width="4" height="1" fill="#faa046"/><rect x="16" y="23" width="1" height="1" fill="#19191c"/><rect x="17" y="23" width="1" height="1" fill="#e8607a"/><rect x="18" y="23" width="1" height="1" fill="#faa046"/><rect x="19" y="23" width="1" height="1" fill="#e8607a"/><rect x="20" y="23" width="1" height="1" fill="#faa046"/><rect x="21" y="23" width="1" height="1" fill="#e8607a"/><rect x="22" y="23" width="2" height="1" fill="#5f5f6c"/><rect x="24" y="23" width="6" height="1" fill="#f0f0f0"/><rect x="30" y="23" width="2" height="1" fill="#5f5f6c"/><rect x="0" y="24" width="4" height="1" fill="#cd8339"/><rect x="4" y="24" width="7" height="1" fill="#faa046"/><rect x="11" y="24" width="6" height="1" fill="#19191c"/><rect x="17" y="24" width="5" height="1" fill="#faa046"/><rect x="22" y="24" width="10" height="1" fill="#5f5f6c"/><rect x="0" y="25" width="4" height="1" fill="#cd8339"/><rect x="4" y="25" width="8" height="1" fill="#faa046"/><rect x="12" y="25" width="4" height="1" fill="#19191c"/><rect x="16" y="25" width="6" height="1" fill="#faa046"/><rect x="22" y="25" width="2" height="1" fill="#cd8339"/><rect x="24" y="25" width="8" height="1" fill="#5f5f6c"/><rect x="1" y="26" width="2" height="1" fill="#cd8339"/><rect x="3" y="26" width="18" height="1" fill="#faa046"/><rect x="21" y="26" width="4" height="1" fill="#cd8339"/><rect x="25" y="26" width="3" height="1" fill="#f0f0f0"/><rect x="28" y="26" width="4" height="1" fill="#5f5f6c"/><rect x="4" y="27" width="16" height="1" fill="#faa046"/><rect x="21" y="27" width="4" height="1" fill="#cd8339"/><rect x="25" y="27" width="3" height="1" fill="#f0f0f0"/><rect x="28" y="27" width="4" height="1" fill="#5f5f6c"/><rect x="4" y="28" width="16" height="1" fill="#faa046"/><rect x="22" y="28" width="2" height="1" fill="#cd8339"/><rect x="24" y="28" width="8" height="1" fill="#5f5f6c"/><rect x="6" y="29" width="12" height="1" fill="#faa046"/><rect x="22" y="29" width="10" height="1" fill="#5f5f6c"/><rect x="6" y="30" width="3" height="1" fill="#cd8339"/><rect x="15" y="30" width="3" height="1" fill="#cd8339"/><rect x="6" y="31" width="3" height="1" fill="#cd8339"/><rect x="15" y="31" width="3" height="1" fill="#cd8339"/></svg>
+        <div class="assistant-brand"><div class="assistant-brand-name">Edie</div><div class="assistant-brand-sub">After Effects tools</div></div>
+        <span class="assistant-brand-sep" aria-hidden="true"></span>
+        <button id="assistantFunctionsTab" class="assistant-tab active" type="button" role="tab" aria-selected="true" data-assistant-tab="functions">Functions</button>
+        <div class="assistant-tab-actions">
+          <button id="assistantRefreshFunctions" class="tnt-action-btn" type="button" title="Refresh functions" aria-label="Refresh functions" data-icon="ui.refresh"></button>
+          <button id="settingsBtn" class="settings-btn tnt-action-btn" type="button" title="Settings" aria-label="Settings" data-icon="ui.settings"></button>
+        </div>
+      </div>
+      <div id="assistantFunctionsPanel" class="assistant-panel active" role="tabpanel" aria-labelledby="assistantFunctionsTab" data-assistant-panel="functions">
+        <div class="assistant-function-filters">
+          <div class="assistant-function-search">
+            <input id="assistantFunctionSearch" type="text" spellcheck="false" autocomplete="off" placeholder="Search functions" aria-label="Search functions">
+            <span id="assistantFunctionCount" class="assistant-function-count">0 commands</span>
+          </div>
+          <div class="assistant-filter-row">
+            <label class="assistant-filter-type">
+              <span>Type</span>
+              <select id="assistantFilterType" aria-label="Filter by type">
+                <option value="all">All types</option>
+                <option value="native">AE Effect</option>
+                <option value="panel">Panel</option>
+                <option value="custom">Custom</option>
+              </select>
+            </label>
+            <div class="assistant-filter-seg" id="assistantFilterKey" role="group" aria-label="Filter by shortcut">
+              <button type="button" class="active" data-key-filter="all">All</button>
+              <button type="button" data-key-filter="assigned">Assigned</button>
+              <button type="button" data-key-filter="unassigned">Unassigned</button>
+            </div>
+          </div>
+        </div>
+        <div id="assistantFunctionList" class="assistant-function-list"></div>
+      </div>
+    </section>
+    <div id="rulerWrap" class="time-ruler-wrap top-ruler">
+      <span id="timeDisplay">0:00:00</span>
+      <div id="ruler"></div>
+      <div id="topMarkerRail" class="marker-rail"></div>
+      <div id="playhead"></div>
+    </div>
+    <div id="timeline"></div>
+    <div id="selectionBox"></div>
+    <div id="layerMenu" class="layer-menu" aria-hidden="true"></div>
+  </main>
+  <div id="horizontalScrollBar" class="horizontal-scrollbar" aria-hidden="true">
+    <div id="horizontalScrollThumb" class="horizontal-scroll-thumb"></div>
+  </div>
+  <button id="activeFilterNotice" class="active-filter-notice" type="button" aria-hidden="true">
+    <span class="active-filter-notice-label">Filter active</span>
+    <span class="active-filter-notice-action">Turn off</span>
+  </button>
+
+  <script src="./icons/lucide.js"></script>
+  <script src="./js/CSInterface.js"></script>
+  <script src="./js/main.js?v=46378bd3b5c5"></script>
+</body>
+</html>

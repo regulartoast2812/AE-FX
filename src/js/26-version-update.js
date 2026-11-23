@@ -156,7 +156,7 @@ function tntRenderUpdateBanner() {
   `;
 }
 
-if (!QUICK_PANEL_MODE) {
+if (!QUICK_PANEL_MODE && !ENGINE_MODE) {
   // Let the panel finish loading before touching the network.
   setTimeout(() => { tntCheckForUpdate(); }, 4000);
 }

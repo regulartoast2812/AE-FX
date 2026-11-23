@@ -68,6 +68,18 @@ instance through AppleScript `DoScript`, so the existing JSX host functions stay
 canonical and no local polling server is required. The helper owns the OS-level
 summon shortcuts, currently `Ctrl+Space` and `Ctrl+K`, so those keys work while
 After Effects or the helper is frontmost.
+# Hidden Engine
+
+`engine.html` is generated from `index.html` too and is the hidden CEP
+extension `com.tnk.ae.fx.engine` (CSXS/manifest.xml). It starts with After
+Effects (`ApplicationInitialized`), never shows, and in `ENGINE_MODE`
+(src/js/00-core.js) only serves the bridge and starts the Quick Controls
+helper if it is not running (`startAeFxEngine`, src/js/25-native-bridge-server.js).
+So the shortcuts, Edie and Creative Assist work before anyone opens the AE FX
+panel. It does not poll the timeline or check for updates. While the panel is
+open its own bridge owns `bridge.json`; each removes only its own file, and the
+engine republishes within 2 s when the file is gone or its owner's pid is dead.
+
 # Quick Controls Entry
 
 `quick.html` is generated from `index.html` during `scripts/build.sh` and is
