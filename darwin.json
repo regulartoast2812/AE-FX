@@ -1,6 +1,6 @@
 {
   "os": "darwin",
-  "checkedAt": "2026-11-24T14:19:04.934Z",
+  "checkedAt": "2026-11-25T03:12:49.459Z",
   "app": "0.1.0",
   "tool": {
     "version": "0.1.0",
@@ -16,8 +16,8 @@
       "state": "Ready"
     },
     "agent:gemini": {
-      "tone": "wait",
-      "state": "Ready · talk only"
+      "tone": "off",
+      "state": "Checking…"
     },
     "agent:local": {
       "tone": "wait",
@@ -29,7 +29,7 @@
     },
     "tool:aefx": {
       "tone": "good",
-      "state": "Comp 1 · nothing selected"
+      "state": "Design test 2b · 1 selected"
     }
   }
 }
