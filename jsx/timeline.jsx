@@ -6887,6 +6887,140 @@ function applyGrain() {
 }
 
 
+// ── Long Shadow
+// A flat long shadow that runs out from the graphic in one direction, made on
+// the layer itself so it follows any later edit or animation of the layer:
+//   Grow Bounds   room for the shadow outside the layer's own box
+//   Fill          the layer in the shadow colour
+//   Transform     turn it so the shadow's direction lies along x
+//   Minimax       Maximum, horizontal only: smear it Length/2 both ways
+//   Transform     turn it back and move it Length/2 along the direction,
+//                 so the smear starts at the graphic and runs Length out
+//   CC Composite  the graphic itself back in front of its shadow
+// Four controls drive it by expression: Direction (0° up, clockwise, as Drop
+// Shadow; 135° is down-right), Length (comp pixels), Color, Opacity. The
+// expressions undo the layer's own rotation and scale (and its parents', via
+// toCompVec), so the shadow keeps its direction and length on screen.
+var LONG_SHADOW_PREFIX = "Long Shadow";
+
+function _longShadowParam(effect, matchName, displayName) {
+  var p = null;
+  try { p = effect.property(matchName); } catch (_) {}
+  if (!p && displayName) { try { p = effect.property(displayName); } catch (_) {} }
+  if (!p) throw new Error("No " + displayName + " on " + effect.name);
+  return p;
+}
+
+function _longShadowAdd(layer, matchName, name) {
+  var fx = layer.property("ADBE Effect Parade");
+  var effect = fx.addProperty(matchName);
+  if (!effect) throw new Error("After Effects has no " + matchName + " effect");
+  effect.name = name;
+  return effect;
+}
+
+function _longShadowLayerIssue(layer) {
+  if (!layer) return "not a layer";
+  if (layer instanceof CameraLayer || layer instanceof LightLayer) return "a camera or light";
+  if (layer.nullLayer) return "a null";
+  if (layer.adjustmentLayer) return "an adjustment layer";
+  if (!layer.hasVideo) return "audio only";
+  if (layer.locked) return "locked";
+  try { if (layer.property("ADBE Effect Parade").property(LONG_SHADOW_PREFIX + " Direction")) return "already has one"; } catch (_) {}
+  return "";
+}
+
+function applyLongShadow(options) {
+  var layers = getSelectedLayers(); if (!layers.length) return "No layers selected";
+  options = options || {};
+  var comp = getComp();
+  var direction = (options.direction === undefined) ? 135 : Number(options.direction);
+  var length = (options.length === undefined) ? Math.round(Math.max(comp.width, comp.height) * 0.5) : Number(options.length);
+  var color = options.color || [0, 0, 0];
+  var opacity = (options.opacity === undefined) ? 40 : Number(options.opacity);
+
+  // Effects on most layers work in the layer's own pixels. The layer and its
+  // parents turn them by r and scale them by sx, sy; the comp direction is
+  // carried back through those (a flipped layer included), giving th, the
+  // shadow's angle from the layer's x axis, and L, its length in layer pixels.
+  // (toCompVec is not used: inside an effect it gives 1/scale, not scale.)
+  // Shape, text and other continuously rasterized layers are turned and scaled
+  // before their effects run, so their effects already work in comp pixels:
+  // carrying the direction back there would turn the shadow twice.
+  function head(layer) {
+    var walk = layer.collapseTransformation ? '' :
+      'while (true) { r += l.transform.rotation; sx *= l.transform.scale[0] / 100; sy *= l.transform.scale[1] / 100; if (!l.hasParent) break; l = l.parent; }\n';
+    return 'var r = 0, sx = 1, sy = 1, l = thisLayer;\n' + walk +
+      'if (Math.abs(sx) < 0.0001) sx = 0.0001; if (Math.abs(sy) < 0.0001) sy = 0.0001;\n' +
+      'var a = (effect("' + LONG_SHADOW_PREFIX + ' Direction")(1) - 90 - r) * Math.PI / 180;\n' +
+      'var ux = Math.cos(a) / sx, uy = Math.sin(a) / sy;\n' +
+      'var th = Math.atan2(uy, ux) * 180 / Math.PI;\n' +
+      'var L = Math.max(0, effect("' + LONG_SHADOW_PREFIX + ' Length")(1)) * Math.sqrt(ux * ux + uy * uy);\n';
+  }
+
+  return _undo("TNT: Long Shadow", function() {
+    var done = 0;
+    var skipped = [];
+    for (var i = 0; i < layers.length; i++) {
+      var layer = layers[i];
+      var issue = _longShadowLayerIssue(layer);
+      if (issue) { skipped.push(layer.name + " (" + issue + ")"); continue; }
+      try {
+        var h = head(layer);
+        // Controls first: every expression below reads them, and an expression
+        // set before what it reads exists is switched off by After Effects.
+        // Each effect is set up before the next is added, since adding one
+        // can leave earlier references to the same layer's effects invalid.
+        var e = _longShadowAdd(layer, "ADBE Angle Control", LONG_SHADOW_PREFIX + " Direction");
+        _longShadowParam(e, "ADBE Angle Control-0001", "Angle").setValue(direction);
+        e = _longShadowAdd(layer, "ADBE Slider Control", LONG_SHADOW_PREFIX + " Length");
+        _longShadowParam(e, "ADBE Slider Control-0001", "Slider").setValue(length);
+        e = _longShadowAdd(layer, "ADBE Color Control", LONG_SHADOW_PREFIX + " Color");
+        _longShadowParam(e, "ADBE Color Control-0001", "Color").setValue(color);
+        e = _longShadowAdd(layer, "ADBE Slider Control", LONG_SHADOW_PREFIX + " Opacity");
+        _longShadowParam(e, "ADBE Slider Control-0001", "Slider").setValue(opacity);
+
+        e = _longShadowAdd(layer, "ADBE GROW BOUNDS", LONG_SHADOW_PREFIX + " Room");
+        // The turned layer needs its half diagonal past its shorter side, plus the shadow.
+        _longShadowParam(e, "ADBE GROW BOUNDS-0001", "Pixels").expression = h +
+          'Math.ceil(L + (Math.sqrt(width * width + height * height) - Math.min(width, height)) / 2 + 4);';
+
+        e = _longShadowAdd(layer, "ADBE Fill", LONG_SHADOW_PREFIX + " Fill");
+        _longShadowParam(e, "ADBE Fill-0002", "Color").expression = 'effect("' + LONG_SHADOW_PREFIX + ' Color")(1);';
+
+        e = _longShadowAdd(layer, "ADBE Geometry2", LONG_SHADOW_PREFIX + " Turn");
+        _longShadowParam(e, "ADBE Geometry2-0007", "Rotation").expression = h + '-th;';
+
+        e = _longShadowAdd(layer, "ADBE Minimax", LONG_SHADOW_PREFIX + " Stretch");
+        _longShadowParam(e, "ADBE Minimax-0001", "Operation").setValue(2);   // Maximum
+        _longShadowParam(e, "ADBE Minimax-0003", "Channel").setValue(2);     // Alpha and Color (the menu starts with Color)
+        _longShadowParam(e, "ADBE Minimax-0004", "Direction").setValue(2);   // Horizontal only
+        _longShadowParam(e, "ADBE Minimax-0002", "Radius").expression = h + 'L / 2;';
+
+        e = _longShadowAdd(layer, "ADBE Geometry2", LONG_SHADOW_PREFIX + " Turn Back");
+        _longShadowParam(e, "ADBE Geometry2-0007", "Rotation").expression = h + 'th;';
+        _longShadowParam(e, "ADBE Geometry2-0002", "Position").expression = h +
+          'var t = th * Math.PI / 180;\n[value[0] + Math.cos(t) * L / 2, value[1] + Math.sin(t) * L / 2];';
+        _longShadowParam(e, "ADBE Geometry2-0008", "Opacity").expression =
+          'Math.max(0, Math.min(100, effect("' + LONG_SHADOW_PREFIX + ' Opacity")(1)));';
+
+        e = _longShadowAdd(layer, "CC Composite", LONG_SHADOW_PREFIX + " Composite");
+        // Comes in with RGB Only on, which keeps the shadow's shape and paints
+        // only colour over it: the graphic never shows. Off puts it back whole.
+        _longShadowParam(e, "CC Composite-0003", "RGB Only").setValue(0);
+        done++;
+      } catch (err) {
+        skipped.push(layer.name + " (" + err.toString() + ")");
+      }
+    }
+    var message = (done === 1) ? "Long shadow added" : ("Long shadow added to " + done + " layers");
+    if (!done) message = "No long shadow added";
+    if (skipped.length) message += ". Skipped: " + skipped.join(", ");
+    return message;
+  });
+}
+
+
 // ── fn/toggleVisibility.jsx
 function toggleVisibility() {
   var layers = getSelectedLayers(); if (!layers.length) return "No layers selected";

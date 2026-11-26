@@ -44,6 +44,7 @@ const TNT_COMMAND_ALIASES = {
   "Apply Light Sweep": "shine glint sheen reflection",
   "Apply Glow": "bloom shine",
   "Apply Grain": "noise film texture",
+  "Apply Long Shadow": "long shadowed flat shadow extrude cast drop",
   "Apply VHS": "chroma glitch retro degrade tape",
   "Align Keys to Playhead": "move keys snap",
   "Stagger Layers...": "offset cascade sequence ripple",

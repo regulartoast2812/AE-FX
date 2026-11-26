@@ -45,6 +45,7 @@ const TNT_FUNCTION_REQUIREMENTS = {
   "applyLayerStyleCmds": "layers",
   "applyLightSweep": "layers",
   "applyLinear": "layers",
+  "applyLongShadow": "layers",
   "applyOvershoot": "keyframes",
   "applySizeRig": "layers",
   "applyStrokeStyle": "layers",
@@ -105,4 +106,3 @@ const TNT_FUNCTION_REQUIREMENTS = {
   "trimPathsOut": "layers",
   "trimToKeyframes": "layers",
 };
-

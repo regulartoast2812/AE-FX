@@ -332,6 +332,7 @@ const TNT_V3_COMMANDS = [
   { name: "Apply Blur Out", category: "Effects", tntFunction: "applyBlurOut" },
   { name: "Apply Dim + Desat", category: "Effects", tntFunction: "applyDimDesat" },
   { name: "Apply Grain", category: "Effects", tntFunction: "applyGrain" },
+  { name: "Apply Long Shadow", category: "Effects", tntFunction: "applyLongShadow", does: "Apply", targets: ["Effect", "Layer"] },
   { name: "Toggle Visibility", category: "Layers", tntFunction: "toggleVisibility" },
   { name: "Show All Layers", category: "Layers", tntFunction: "showAll" },
   { name: "Toggle Lock Selected", category: "Layers", tntFunction: "toggleLockSelected" },

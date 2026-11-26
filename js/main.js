@@ -335,6 +335,7 @@ const TNT_V3_COMMANDS = [
   { name: "Apply Blur Out", category: "Effects", tntFunction: "applyBlurOut" },
   { name: "Apply Dim + Desat", category: "Effects", tntFunction: "applyDimDesat" },
   { name: "Apply Grain", category: "Effects", tntFunction: "applyGrain" },
+  { name: "Apply Long Shadow", category: "Effects", tntFunction: "applyLongShadow", does: "Apply", targets: ["Effect", "Layer"] },
   { name: "Toggle Visibility", category: "Layers", tntFunction: "toggleVisibility" },
   { name: "Show All Layers", category: "Layers", tntFunction: "showAll" },
   { name: "Toggle Lock Selected", category: "Layers", tntFunction: "toggleLockSelected" },
@@ -2072,6 +2073,7 @@ const TNT_FUNCTION_REQUIREMENTS = {
   "applyLayerStyleCmds": "layers",
   "applyLightSweep": "layers",
   "applyLinear": "layers",
+  "applyLongShadow": "layers",
   "applyOvershoot": "keyframes",
   "applySizeRig": "layers",
   "applyStrokeStyle": "layers",
@@ -2132,7 +2134,6 @@ const TNT_FUNCTION_REQUIREMENTS = {
   "trimPathsOut": "layers",
   "trimToKeyframes": "layers",
 };
-
 // Words for commands that the command's own name does not use.
 //
 // The search is literal - a term either appears in the haystack or it does not
@@ -2179,6 +2180,7 @@ const TNT_COMMAND_ALIASES = {
   "Apply Light Sweep": "shine glint sheen reflection",
   "Apply Glow": "bloom shine",
   "Apply Grain": "noise film texture",
+  "Apply Long Shadow": "long shadowed flat shadow extrude cast drop",
   "Apply VHS": "chroma glitch retro degrade tape",
   "Align Keys to Playhead": "move keys snap",
   "Stagger Layers...": "offset cascade sequence ripple",
