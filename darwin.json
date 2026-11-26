@@ -1,10 +1,10 @@
 {
   "os": "darwin",
-  "checkedAt": "2026-11-26T13:11:46.761Z",
+  "checkedAt": "2026-11-26T15:15:52.745Z",
   "app": "0.1.0",
   "tool": {
     "version": "0.1.0",
-    "commit": "51b97fe"
+    "commit": "461075e"
   },
   "parts": {
     "agent:claude": {
@@ -16,8 +16,8 @@
       "state": "Ready"
     },
     "agent:gemini": {
-      "tone": "wait",
-      "state": "Ready · talk only"
+      "tone": "off",
+      "state": "Checking…"
     },
     "agent:local": {
       "tone": "wait",
