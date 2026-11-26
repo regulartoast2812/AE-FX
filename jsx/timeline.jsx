@@ -6889,18 +6889,18 @@ function applyGrain() {
 
 // ── Long Shadow
 // A flat long shadow that runs out from the graphic in one direction, made on
-// the layer itself so it follows any later edit or animation of the layer:
-//   Grow Bounds   room for the shadow outside the layer's own box
-//   Fill          the layer in the shadow colour
-//   Transform     turn it so the shadow's direction lies along x
-//   Minimax       Maximum, horizontal only: smear it Length/2 both ways
-//   Transform     turn it back and move it Length/2 along the direction,
+// the layer itself so it follows any later edit or animation of the layer.
+// Kept to the fewest effects that can make it:
+//   Direction     angle control: 0° up, clockwise, as Drop Shadow; 135° is down-right
+//   Length        slider: comp pixels
+//   Fill          the layer in the shadow colour; its Color and Opacity are the shadow's
+//   Turn          Transform: turn it so the shadow's direction lies along x
+//   Stretch       Minimax, Maximum, horizontal only: smear it Length/2 both ways
+//   Turn Back     Transform: turn it back and move it Length/2 along the direction,
 //                 so the smear starts at the graphic and runs Length out
-//   CC Composite  the graphic itself back in front of its shadow
-// Four controls drive it by expression: Direction (0° up, clockwise, as Drop
-// Shadow; 135° is down-right), Length (comp pixels), Color, Opacity. The
-// expressions undo the layer's own rotation and scale (and its parents', via
-// toCompVec), so the shadow keeps its direction and length on screen.
+//   Composite     CC Composite: the graphic itself back in front of its shadow
+// Transform and Minimax grow the layer's render area as they need, so no
+// Grow Bounds is needed for the shadow to leave the layer's own box.
 var LONG_SHADOW_PREFIX = "Long Shadow";
 
 function _longShadowParam(effect, matchName, displayName) {
@@ -6975,18 +6975,10 @@ function applyLongShadow(options) {
         _longShadowParam(e, "ADBE Angle Control-0001", "Angle").setValue(direction);
         e = _longShadowAdd(layer, "ADBE Slider Control", LONG_SHADOW_PREFIX + " Length");
         _longShadowParam(e, "ADBE Slider Control-0001", "Slider").setValue(length);
-        e = _longShadowAdd(layer, "ADBE Color Control", LONG_SHADOW_PREFIX + " Color");
-        _longShadowParam(e, "ADBE Color Control-0001", "Color").setValue(color);
-        e = _longShadowAdd(layer, "ADBE Slider Control", LONG_SHADOW_PREFIX + " Opacity");
-        _longShadowParam(e, "ADBE Slider Control-0001", "Slider").setValue(opacity);
-
-        e = _longShadowAdd(layer, "ADBE GROW BOUNDS", LONG_SHADOW_PREFIX + " Room");
-        // The turned layer needs its half diagonal past its shorter side, plus the shadow.
-        _longShadowParam(e, "ADBE GROW BOUNDS-0001", "Pixels").expression = h +
-          'Math.ceil(L + (Math.sqrt(width * width + height * height) - Math.min(width, height)) / 2 + 4);';
 
         e = _longShadowAdd(layer, "ADBE Fill", LONG_SHADOW_PREFIX + " Fill");
-        _longShadowParam(e, "ADBE Fill-0002", "Color").expression = 'effect("' + LONG_SHADOW_PREFIX + ' Color")(1);';
+        _longShadowParam(e, "ADBE Fill-0002", "Color").setValue(color);
+        _longShadowParam(e, "ADBE Fill-0005", "Opacity").setValue(Math.max(0, Math.min(100, opacity)) / 100);
 
         e = _longShadowAdd(layer, "ADBE Geometry2", LONG_SHADOW_PREFIX + " Turn");
         _longShadowParam(e, "ADBE Geometry2-0007", "Rotation").expression = h + '-th;';
@@ -7001,8 +6993,6 @@ function applyLongShadow(options) {
         _longShadowParam(e, "ADBE Geometry2-0007", "Rotation").expression = h + 'th;';
         _longShadowParam(e, "ADBE Geometry2-0002", "Position").expression = h +
           'var t = th * Math.PI / 180;\n[value[0] + Math.cos(t) * L / 2, value[1] + Math.sin(t) * L / 2];';
-        _longShadowParam(e, "ADBE Geometry2-0008", "Opacity").expression =
-          'Math.max(0, Math.min(100, effect("' + LONG_SHADOW_PREFIX + ' Opacity")(1)));';
 
         e = _longShadowAdd(layer, "CC Composite", LONG_SHADOW_PREFIX + " Composite");
         // Comes in with RGB Only on, which keeps the shadow's shape and paints
