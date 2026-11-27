@@ -1,3 +1,10 @@
+# AE FX has moved
+
+AE FX now lives in the Creative Assist repo, at `app/src/tools/aefx`, with its whole history.
+Creative Assist (its helper Edie) installs it and keeps it up to date. This repo is archived and no longer changes.
+
+---
+
 AE FX - v41
 
 Docs:
